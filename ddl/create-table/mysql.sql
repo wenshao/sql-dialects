@@ -307,3 +307,67 @@ CREATE TABLE IF NOT EXISTS audit_log (
 -- 对引擎开发者的参考:
 --   MySQL 的演进轨迹展示了一个成熟 OLTP 引擎的功能补全路径:
 --   先解决核心存储和事务 → 再补充分析能力（窗口函数、CTE）→ 最后完善标准合规性
+
+-- ============================================================
+-- 横向对比: MySQL vs 其他方言
+-- ============================================================
+
+-- 自增策略对比:
+--   MySQL:      AUTO_INCREMENT（简单，但重启可能回退 5.7-，分布式不适用）
+--   PostgreSQL: SERIAL（语法糖）→ IDENTITY（10+，SQL 标准，推荐）
+--   Oracle:     SEQUENCE（传统）→ IDENTITY（12c+）
+--   SQL Server: IDENTITY（传统）→ SEQUENCE（2012+）
+--   SQLite:     INTEGER PRIMARY KEY（自动成为 rowid，AUTOINCREMENT 只防止复用）
+--   TiDB:       AUTO_INCREMENT（单机语义）→ AUTO_RANDOM（分布式推荐）
+
+-- DDL 事务性对比:
+--   MySQL:      DDL 隐式提交事务（不能回滚 CREATE TABLE），8.0+ 原子 DDL 保证单个 DDL 原子性
+--   PostgreSQL: DDL 是事务性的！可以 BEGIN; CREATE TABLE ...; ROLLBACK;
+--   Oracle:     DDL 隐式提交（同 MySQL）
+--   SQL Server: DDL 是事务性的（同 PostgreSQL）
+--   SQLite:     DDL 是事务性的（同 PostgreSQL）
+
+-- 在线 DDL 对比:
+--   MySQL:      5.6+ Online DDL，8.0.12+ ALGORITHM=INSTANT（部分操作不锁表）
+--   PostgreSQL: ADD COLUMN + 非 NULL 默认值在 11+ 是即时的
+--   Oracle:     ONLINE 关键字，Edition-Based Redefinition
+--   SQL Server: ONLINE = ON（Enterprise 版）
+
+-- NULL 和空字符串对比:
+--   MySQL:      '' ≠ NULL（空字符串和 NULL 是不同的值）
+--   PostgreSQL: '' ≠ NULL（同 MySQL）
+--   Oracle:     '' = NULL！（Oracle 最大的坑，迁移时必须处理）
+--   SQL Server: '' ≠ NULL（同 MySQL）
+--   SQLite:     '' ≠ NULL（同 MySQL）
+
+-- 类型严格度对比:
+--   MySQL:      宽松（会隐式转换，如 '123' + 0 = 123）
+--   PostgreSQL: 严格（需要显式 CAST，如 '123'::INTEGER）
+--   Oracle:     中等（TO_NUMBER/TO_CHAR 显式转换为主）
+--   SQL Server: 中等（CONVERT/CAST，有些隐式转换）
+--   SQLite:     极度宽松（动态类型，任何列可以存任何类型，除非 STRICT 模式）
+
+-- 字符集对比:
+--   MySQL:      utf8 ≠ UTF-8！utf8 只支持 3 字节，必须用 utf8mb4
+--   PostgreSQL: UTF-8 就是真正的 UTF-8，建库时指定
+--   Oracle:     AL32UTF8 = 真正的 UTF-8
+--   SQL Server: NVARCHAR 用 UTF-16；2019+ VARCHAR 可用 UTF-8 排序规则
+--   SQLite:     默认 UTF-8，内置 UTF-16 支持
+
+-- TEXT vs VARCHAR 对比:
+--   MySQL:      TEXT 存储在行外（overflow page），不能完整索引，VARCHAR 性能更好
+--   PostgreSQL: TEXT 和 VARCHAR 性能完全一样，官方推荐 TEXT
+--   Oracle:     VARCHAR2(n) 最大 4000 字节，CLOB 用于大文本
+--   SQL Server: VARCHAR(MAX) 替代 TEXT（TEXT 已废弃）
+
+-- CHECK 约束对比:
+--   MySQL:      5.7 及之前解析 CHECK 但不执行！8.0.16+ 才真正生效
+--   PostgreSQL: 从第一个版本就完美支持 CHECK
+--   Oracle:     完整支持 CHECK
+--   SQL Server: 完整支持 CHECK
+
+-- 分区表对比:
+--   MySQL:      分区键必须包含在主键和所有唯一索引中（最大限制）
+--   PostgreSQL: 声明式分区（10+），主键也必须包含分区键，但支持 DEFAULT 分区（11+）
+--   Oracle:     分区功能最强大，不要求分区键在主键中（Enterprise Edition）
+--   SQL Server: 需要 PARTITION FUNCTION + PARTITION SCHEME（步骤最多）
