@@ -216,10 +216,10 @@ FROM users;
 --    看到 Sort 节点在 WindowAgg 之前说明需要排序（可以用索引消除）
 
 -- ============================================================
--- 横向对比: PostgreSQL vs 其他方言
+-- 横向对比: PostgreSQL vs 其他方言的窗口函数
 -- ============================================================
 
--- 窗口函数支持版本对比:
+-- 1. 窗口函数支持版本对比:
 --   PostgreSQL: 8.4+（2009 年，较早支持）
 --   MySQL:      8.0+（2018 年！5.7 及之前不支持窗口函数，是 MySQL 长期被诟病的短板）
 --   Oracle:     8i+（2000 年左右，最早支持，功能最全）
@@ -227,7 +227,7 @@ FROM users;
 --   SQLite:     3.25+（2018 年）
 --   MariaDB:    10.2+（2017 年）
 
--- FILTER 子句对比（PostgreSQL 独有优势）:
+-- 2. FILTER 子句对比（PostgreSQL 独有优势）:
 --   PostgreSQL: COUNT(*) FILTER (WHERE condition)（9.4+，语义清晰、性能好）
 --   MySQL:      不支持 FILTER，只能用 SUM(CASE WHEN ... THEN 1 ELSE 0 END)
 --   Oracle:     不支持 FILTER，只能用 CASE WHEN
@@ -235,14 +235,14 @@ FROM users;
 --   SQLite:     3.30+ 支持 FILTER（跟随 PostgreSQL）
 --   这是 PostgreSQL 在窗口函数/聚合领域的独有优势
 
--- 帧类型对比:
+-- 3. 帧类型对比:
 --   PostgreSQL: ROWS / RANGE / GROUPS（11+，三种都支持）
 --   MySQL:      ROWS / RANGE（8.0+，不支持 GROUPS）
 --   Oracle:     ROWS / RANGE（不支持 GROUPS）
 --   SQL Server: ROWS / RANGE（2012+，不支持 GROUPS）
 --   GROUPS 是 SQL:2011 标准特性，按"相同 ORDER BY 值的组"计算帧
 
--- EXCLUDE 子句对比:
+-- 4. EXCLUDE 子句对比:
 --   PostgreSQL: EXCLUDE CURRENT ROW / GROUP / TIES / NO OTHERS（11+）
 --   MySQL:      不支持 EXCLUDE
 --   Oracle:     不支持 EXCLUDE
@@ -250,27 +250,72 @@ FROM users;
 --   SQLite:     3.28+ 支持 EXCLUDE（跟随 PostgreSQL）
 --   又一个 PostgreSQL 的独有优势
 
--- 命名窗口 (WINDOW 子句) 对比:
+-- 5. 命名窗口 (WINDOW 子句) 对比:
 --   PostgreSQL: WINDOW w AS (PARTITION BY ...)，支持窗口继承
 --   MySQL:      8.0+ 支持 WINDOW 子句
 --   Oracle:     不支持 WINDOW 子句（每个窗口函数需要写完整的 OVER）
 --   SQL Server: 不支持 WINDOW 子句
 --   SQLite:     3.28+ 支持 WINDOW 子句
 
--- RANGE BETWEEN INTERVAL 对比:
+-- 6. RANGE BETWEEN INTERVAL 对比:
 --   PostgreSQL: RANGE BETWEEN INTERVAL '7 days' PRECEDING AND CURRENT ROW（直接用 INTERVAL）
 --   MySQL:      不支持 RANGE + INTERVAL（只支持数值型 RANGE）
 --   Oracle:     支持 RANGE BETWEEN INTERVAL '7' DAY PRECEDING（语法略不同）
 --   SQL Server: 不支持 RANGE + INTERVAL（需要转换为数值或用其他方法）
 
--- NTH_VALUE / NTILE 对比:
+-- 7. NTH_VALUE / NTILE 对比:
 --   PostgreSQL: NTH_VALUE（8.4+），NTILE（8.4+）
 --   MySQL:      NTH_VALUE（8.0+），NTILE（8.0+）
 --   Oracle:     NTH_VALUE（11g+），NTILE（8i+）
 --   SQL Server: 不支持 NTH_VALUE（需要用 ROW_NUMBER + 子查询模拟），NTILE（2005+）
 
--- 性能实现对比:
+-- 8. Oracle 独有的分析函数特性:
+--   Oracle 作为窗口函数的先驱（8i+），有一些独有或最早实现的特性:
+--     - LISTAGG: 分组字符串聚合（11gR2+），其他数据库后来才加入类似功能
+--       PostgreSQL: STRING_AGG（9.0+），MySQL: GROUP_CONCAT，SQL Server: STRING_AGG（2017+）
+--     - MODEL 子句: 类似电子表格的行间计算（10g+），极其强大但复杂，其他数据库没有
+--     - RATIO_TO_REPORT: 计算占比（SUM 的语法糖），PostgreSQL 需要手写 val / SUM(val) OVER()
+--     - KEEP (DENSE_RANK FIRST/LAST): 分组最大/最小值对应的其他列，PostgreSQL 用 DISTINCT ON
+--   Oracle '' = NULL 在窗口函数中的影响:
+--     PARTITION BY col 时，如果 col 包含空字符串 ''，它们会和 NULL 行分到同一个分区
+--     迁移到 PostgreSQL: '' 和 NULL 会分到不同分区，可能导致结果不同
+--   Oracle NUMBER 类型在窗口函数中:
+--     SUM/AVG 等聚合窗口函数的结果始终是 NUMBER 类型
+--     PostgreSQL 中 SUM(INTEGER) 返回 BIGINT，SUM(BIGINT) 返回 NUMERIC
+--     迁移时注意类型差异可能导致精度或溢出行为不同
+
+-- 9. SQL Server 独有的窗口函数特性:
+--   聚集索引（Clustered Index）= 表的物理排列顺序:
+--     窗口函数的 ORDER BY 如果与聚集索引一致，可以避免排序操作
+--     这是 SQL Server 性能调优的独有考量（PostgreSQL 没有聚集索引概念）
+--   Batch Mode 处理（2012+，列存储索引相关）:
+--     对列存储索引上的窗口函数使用批处理模式，性能提升 10-100 倍
+--     2019+ Batch Mode on Rowstore: 即使是行存储索引也能使用批处理
+--     这是 SQL Server 在大数据分析场景的独有优势
+--   SQL Server 特有的窗口函数限制:
+--     - 不支持 NTH_VALUE（需要用 ROW_NUMBER + 子查询模拟）
+--     - 不支持 WINDOW 子句（每个窗口函数必须写完整的 OVER 定义）
+--     - 不支持 GROUPS 帧类型
+--     - 不支持 EXCLUDE 子句
+--     - 不支持 RANGE + INTERVAL
+--   WITH (NOLOCK) 与窗口函数的交互:
+--     在 WITH (NOLOCK) 查询中使用窗口函数可能产生不一致的结果
+--     因为 NOLOCK 允许在扫描过程中读到正在修改的数据
+--     窗口函数的排序和分区可能基于不一致的数据，导致排名跳跃或聚合值错误
+--     正确做法: 开启 RCSI（READ_COMMITTED_SNAPSHOT），不要使用 NOLOCK
+
+-- 10. SNAPSHOT 隔离与窗口函数一致性:
+--   SQL Server SNAPSHOT 隔离:
+--     开启 SNAPSHOT 后窗口函数看到的是事务开始时的一致性快照
+--     这保证了跨多行的窗口计算结果一致（不会受到并发修改影响）
+--     但需要注意 tempdb 压力（行版本存储在 tempdb 中）
+--   PostgreSQL REPEATABLE READ / SERIALIZABLE:
+--     天然 MVCC，窗口函数始终看到一致性快照，无需额外配置
+--   Oracle READ COMMITTED:
+--     天然 MVCC，语句级一致性快照，窗口函数结果始终一致
+
+-- 11. 性能实现对比:
 --   PostgreSQL: 单遍扫描 + 排序（可利用索引避免排序），12+ CTE 内联优化
 --   MySQL:      8.0 初期性能较差（内部临时表），后续版本持续优化
---   Oracle:     最成熟的窗口函数优化器，支持窗口函数消除
---   SQL Server: 2012+ 大幅改进帧计算性能，batch mode 处理列存储索引
+--   Oracle:     最成熟的窗口函数优化器，支持窗口函数消除、窗口排序合并
+--   SQL Server: 2012+ 大幅改进帧计算性能，Batch Mode 处理列存储索引
