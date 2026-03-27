@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | mysqldump/mysqlpump/MySQL Shell 导入导出 |
+| [PostgreSQL](postgres.sql) | pg_dump/pg_restore/COPY/pgloader |
+| [SQLite](sqlite.sql) | .dump/.import/.backup 命令 |
+| [Oracle](oracle.sql) | Data Pump(expdp/impdp)/SQL*Loader/GoldenGate |
+| [SQL Server](sqlserver.sql) | BACPAC/BCP/SSIS/Linked Server |
+| [MariaDB](mariadb.sql) | mariadb-dump，兼容 MySQL 工具 |
+| [Firebird](firebird.sql) | gbak 备份，isql 脚本迁移 |
+| [IBM Db2](db2.sql) | db2move/db2look/LOAD/IMPORT |
+| [SAP HANA](saphana.sql) | EXPORT/IMPORT/SDI 数据集成 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | bq load/EXPORT DATA/Transfer Service |
+| [Snowflake](snowflake.sql) | COPY INTO/Snowpipe/外部 Stage |
+| [ClickHouse](clickhouse.sql) | clickhouse-client/ATTACH/Remote 函数 |
+| [Hive](hive.sql) | EXPORT/IMPORT/DistCp 分布式拷贝 |
+| [Spark SQL](spark.sql) | DataFrame read/write，多源适配 |
+| [Flink SQL](flink.sql) | CDC Connector 实时迁移 |
+| [StarRocks](starrocks.sql) | Broker Load/Stream Load/外部表 |
+| [Doris](doris.sql) | Broker Load/Stream Load/外部表 |
+| [Trino](trino.sql) | 跨 Connector 直接 INSERT INTO SELECT |
+| [DuckDB](duckdb.sql) | 直接读取 CSV/Parquet/PG/MySQL |
+| [MaxCompute](maxcompute.sql) | Tunnel/DataWorks 数据集成 |
+| [Hologres](hologres.sql) | COPY/外部表/Data Integration |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | COPY/UNLOAD/AWS DMS |
+| [Azure Synapse](synapse.sql) | COPY INTO/ADF/PolyBase |
+| [Databricks SQL](databricks.sql) | Auto Loader/COPY INTO/外部表 |
+| [Greenplum](greenplum.sql) | gpfdist/gpload/COPY |
+| [Impala](impala.sql) | LOAD DATA/外部表/Sqoop |
+| [Vertica](vertica.sql) | COPY/vsql/Kafka 集成 |
+| [Teradata](teradata.sql) | FastLoad/MultiLoad/TPT/BTEQ |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | TiDB Lightning/Dumpling/DM 迁移工具 |
+| [OceanBase](oceanbase.sql) | OMS 迁移服务/OBLOADER/OBDUMPER |
+| [CockroachDB](cockroachdb.sql) | IMPORT/EXPORT/BACKUP/RESTORE |
+| [Spanner](spanner.sql) | Dataflow/Harbourbridge/COPY |
+| [YugabyteDB](yugabytedb.sql) | ysql_dump/yb-voyager 迁移 |
+| [PolarDB](polardb.sql) | DTS 数据迁移服务 |
+| [openGauss](opengauss.sql) | gs_dump/gs_restore/chameleon |
+| [TDSQL](tdsql.sql) | DTS 迁移/MySQL 兼容工具 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | DTS 迁移工具/dmfldr 快速装载 |
+| [KingbaseES](kingbase.sql) | sys_dump/sys_restore(PG 兼容) |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG pg_dump + timescaledb-parallel-copy |
+| [TDengine](tdengine.sql) | taosdump/taosBenchmark 迁移工具 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | Kafka Connect 导入导出 |
+| [Materialize](materialize.sql) | CREATE SOURCE 从 Kafka/PG 导入 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | SCRIPT/RUNSCRIPT 导入导出 |
+| [Derby](derby.sql) | syscs_util 系统过程导入导出 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL/MED 外部数据管理规范 |
 
 ## 横向对比
 

@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | CONCAT/SUBSTRING/REGEXP/JSON_EXTRACT 丰富 |
+| [PostgreSQL](postgres.sql) | || 拼接/正则/STRING_AGG/FORMAT，最完整 |
+| [SQLite](sqlite.sql) | || 拼接/SUBSTR/INSTR，正则需扩展 |
+| [Oracle](oracle.sql) | || 拼接/SUBSTR/REGEXP_SUBSTR/NLS 字符集 |
+| [SQL Server](sqlserver.sql) | + 拼接/CHARINDEX/STRING_SPLIT(2016+) |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 字符串函数 |
+| [Firebird](firebird.sql) | 标准字符串函数，SIMILAR TO 正则 |
+| [IBM Db2](db2.sql) | CONCAT/SUBSTR/LOCATE/REGEXP_LIKE |
+| [SAP HANA](saphana.sql) | CONCAT/SUBSTRING/LOCATE/REPLACE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT/FORMAT |
+| [Snowflake](snowflake.sql) | CONCAT/SUBSTR/REGEXP_SUBSTR/SPLIT |
+| [ClickHouse](clickhouse.sql) | 丰富字符串函数，extractAll/URL 专用函数 |
+| [Hive](hive.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT |
+| [Spark SQL](spark.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT |
+| [Flink SQL](flink.sql) | CONCAT/SUBSTRING/REGEXP_EXTRACT |
+| [StarRocks](starrocks.sql) | 兼容 MySQL 字符串函数 |
+| [Doris](doris.sql) | 兼容 MySQL 字符串函数 |
+| [Trino](trino.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT |
+| [DuckDB](duckdb.sql) | || 拼接/STRING_SPLIT/REGEXP_EXTRACT |
+| [MaxCompute](maxcompute.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT_PART |
+| [Hologres](hologres.sql) | PG 兼容字符串函数 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | || 拼接/REGEXP_SUBSTR(PG 兼容) |
+| [Azure Synapse](synapse.sql) | CONCAT/CHARINDEX/STRING_SPLIT(T-SQL) |
+| [Databricks SQL](databricks.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT |
+| [Greenplum](greenplum.sql) | PG 兼容字符串函数 |
+| [Impala](impala.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT_PART |
+| [Vertica](vertica.sql) | REGEXP_SUBSTR/SPLIT_PART/OVERLAY |
+| [Teradata](teradata.sql) | 标准字符串 + OREPLACE/OTRANSLATE |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容字符串函数 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式字符串函数 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容字符串函数 |
+| [Spanner](spanner.sql) | CONCAT/SUBSTR/REGEXP_EXTRACT/SPLIT |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容字符串函数 |
+| [PolarDB](polardb.sql) | MySQL 兼容字符串函数 |
+| [openGauss](opengauss.sql) | PG 兼容字符串函数 |
+| [TDSQL](tdsql.sql) | MySQL 兼容字符串函数 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容字符串函数 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 字符串函数 |
+| [TDengine](tdengine.sql) | CONCAT/LENGTH/LOWER/UPPER/SUBSTR 基础 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | CONCAT/SUBSTRING/SPLIT/REGEXP_EXTRACT |
+| [Materialize](materialize.sql) | PG 兼容字符串函数 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | CONCAT/SUBSTRING/POSITION/REGEXP 支持 |
+| [Derby](derby.sql) | SUBSTR/LOCATE/TRIM，功能较少 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 字符串函数规范 |
 
 ## 核心差异
 

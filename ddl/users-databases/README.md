@@ -5,85 +5,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | CREATE USER/DATABASE/SCHEMA，用户@主机粒度 |
+| [PostgreSQL](postgres.sql) | ROLE 统一用户/组，DATABASE/SCHEMA 分层 |
+| [SQLite](sqlite.sql) | 无用户系统，文件即数据库 |
+| [Oracle](oracle.sql) | USER=SCHEMA，CDB/PDB 多租户架构 |
+| [SQL Server](sqlserver.sql) | LOGIN→USER 映射，数据库→Schema 分层 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL，ROLE(10.0.5+) |
+| [Firebird](firebird.sql) | CREATE USER/DATABASE，ROLE 授权 |
+| [IBM Db2](db2.sql) | OS 用户认证，DATABASE/SCHEMA 分层 |
+| [SAP HANA](saphana.sql) | SCHEMA + 用户绑定，多租户 Tenant DB |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | IAM 权限管理，PROJECT→DATASET 结构 |
+| [Snowflake](snowflake.sql) | ACCOUNT→DATABASE→SCHEMA，ROLE 继承 |
+| [ClickHouse](clickhouse.sql) | CREATE USER(20.1+)，RBAC 权限模型 |
+| [Hive](hive.sql) | 依赖 Ranger/Sentry，DATABASE 组织 |
+| [Spark SQL](spark.sql) | 依赖 Hive Metastore 或 Unity Catalog |
+| [Flink SQL](flink.sql) | Catalog→Database 结构，无用户管理 |
+| [StarRocks](starrocks.sql) | GRANT 权限体系，DATABASE 组织 |
+| [Doris](doris.sql) | GRANT 权限体系，Database→Table |
+| [Trino](trino.sql) | Catalog→Schema→Table，外部认证 |
+| [DuckDB](duckdb.sql) | 无用户系统，进程级隔离 |
+| [MaxCompute](maxcompute.sql) | PROJECT→SCHEMA，RAM 权限 |
+| [Hologres](hologres.sql) | PG 兼容，DATABASE/SCHEMA/ROLE |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | PG 兼容用户管理，超级用户概念 |
+| [Azure Synapse](synapse.sql) | SQL 认证 + AAD 集成 |
+| [Databricks SQL](databricks.sql) | Unity Catalog 统一权限 |
+| [Greenplum](greenplum.sql) | PG 兼容用户管理 |
+| [Impala](impala.sql) | 依赖 Ranger/Sentry 授权 |
+| [Vertica](vertica.sql) | ROLE/USER + GRANT，SCHEMA 隔离 |
+| [Teradata](teradata.sql) | 用户=数据库空间，Profile 控制 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容用户权限 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式用户体系 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 ROLE/USER |
+| [Spanner](spanner.sql) | IAM 权限，Instance→Database |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 ROLE/USER |
+| [PolarDB](polardb.sql) | MySQL 兼容用户管理 |
+| [openGauss](opengauss.sql) | PG 兼容 ROLE/USER |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式权限同步 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容，USER=SCHEMA |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 用户管理 |
+| [TDengine](tdengine.sql) | SUPER/NORMAL 两级用户，Database 组织 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 依赖 Kafka ACL 认证授权 |
+| [Materialize](materialize.sql) | PG 兼容 ROLE/USER |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 简单用户密码认证 |
+| [Derby](derby.sql) | 用户认证可选，内建/LDAP |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 ROLE/GRANT 规范 |
 
 ## 核心差异
 

@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | InnoDB ACID，RC/RR/SERIALIZABLE，自动提交 |
+| [PostgreSQL](postgres.sql) | 完整 ACID，SSI 真正可串行化 |
+| [SQLite](sqlite.sql) | 文件级事务，WAL 模式并发读写 |
+| [Oracle](oracle.sql) | MVCC 无脏读，默认 READ COMMITTED |
+| [SQL Server](sqlserver.sql) | READ UNCOMMITTED~SNAPSHOT 五级隔离 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 事务，InnoDB/Aria 引擎 |
+| [Firebird](firebird.sql) | MVCC 事务，WAIT/NO WAIT 冲突处理 |
+| [IBM Db2](db2.sql) | CS/RS/RR/UR 四级隔离 |
+| [SAP HANA](saphana.sql) | MVCC + 快照隔离，SSI 支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 快照隔离，DML 有配额限制 |
+| [Snowflake](snowflake.sql) | 自动 SI 隔离，多语句事务(2021+) |
+| [ClickHouse](clickhouse.sql) | 无传统事务(INSERT 批次原子性) |
+| [Hive](hive.sql) | ACID(3.0+)，仅 ORC 事务表 |
+| [Spark SQL](spark.sql) | Delta Lake ACID 事务 |
+| [Flink SQL](flink.sql) | Exactly-Once(两阶段提交 Sink) |
+| [StarRocks](starrocks.sql) | 无传统事务(导入原子性) |
+| [Doris](doris.sql) | 导入事务(两阶段提交) |
+| [Trino](trino.sql) | 无事务，只读查询为主 |
+| [DuckDB](duckdb.sql) | 完整 ACID，MVCC，WAL |
+| [MaxCompute](maxcompute.sql) | 无事务(批处理语义) |
+| [Hologres](hologres.sql) | PG 兼容事务 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | SERIALIZABLE(默认)，MVCC |
+| [Azure Synapse](synapse.sql) | 有限事务支持 |
+| [Databricks SQL](databricks.sql) | Delta Lake ACID 事务 |
+| [Greenplum](greenplum.sql) | PG 兼容 MVCC 事务 |
+| [Impala](impala.sql) | 无事务(Kudu 表除外) |
+| [Vertica](vertica.sql) | SERIALIZABLE/RC，MVCC |
+| [Teradata](teradata.sql) | ANSI/BTET 事务模式，完整 ACID |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 乐观/悲观事务，分布式 ACID |
+| [OceanBase](oceanbase.sql) | 分布式 ACID，2PC 提交 |
+| [CockroachDB](cockroachdb.sql) | 分布式 SERIALIZABLE，无降级 |
+| [Spanner](spanner.sql) | TrueTime 全球一致，外部一致性 |
+| [YugabyteDB](yugabytedb.sql) | 分布式事务，SERIALIZABLE/SNAPSHOT |
+| [PolarDB](polardb.sql) | MySQL 兼容事务 |
+| [openGauss](opengauss.sql) | PG 兼容 MVCC 事务 |
+| [TDSQL](tdsql.sql) | 分布式事务，2PC/XA |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容事务 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 完整事务 |
+| [TDengine](tdengine.sql) | 无传统事务(时序追加) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | At-Least-Once 语义 |
+| [Materialize](materialize.sql) | Strict Serializability 一致性 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 完整 ACID 事务 |
+| [Derby](derby.sql) | 完整 ACID 事务 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:1992 隔离级别 / SQL:2003 SAVEPOINT |
 
 ## 核心差异
 

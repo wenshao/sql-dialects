@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | ROUND/CEIL/FLOOR/MOD/RAND()/TRUNCATE |
+| [PostgreSQL](postgres.sql) | 完整数学函数 + 统计函数(stddev/var) |
+| [SQLite](sqlite.sql) | 基础数学函数，3.35+ math 模块扩展 |
+| [Oracle](oracle.sql) | ROUND/TRUNC/MOD/DBMS_RANDOM |
+| [SQL Server](sqlserver.sql) | ROUND/CEILING/FLOOR/RAND/POWER |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 数学函数 |
+| [Firebird](firebird.sql) | 标准数学函数，RAND() 通过 UDF |
+| [IBM Db2](db2.sql) | ROUND/TRUNCATE/MOD/RAND，完整支持 |
+| [SAP HANA](saphana.sql) | 完整数学函数 + 统计/预测函数 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | SAFE_DIVIDE/ROUND/IEEE_DIVIDE/RAND |
+| [Snowflake](snowflake.sql) | ROUND/TRUNC/MOD/RANDOM()/HASH |
+| [ClickHouse](clickhouse.sql) | 丰富数学函数，intDiv/toDecimal 精度控制 |
+| [Hive](hive.sql) | ROUND/FLOOR/CEIL/RAND/PMOD |
+| [Spark SQL](spark.sql) | ROUND/FLOOR/CEIL/RAND/CONV |
+| [Flink SQL](flink.sql) | ROUND/FLOOR/CEIL/RAND/MOD |
+| [StarRocks](starrocks.sql) | 兼容 MySQL 数学函数 |
+| [Doris](doris.sql) | 兼容 MySQL 数学函数 |
+| [Trino](trino.sql) | ROUND/TRUNCATE/MOD/RANDOM()/CBRT |
+| [DuckDB](duckdb.sql) | 完整数学函数 + 统计扩展 |
+| [MaxCompute](maxcompute.sql) | ROUND/FLOOR/CEIL/RAND/CONV |
+| [Hologres](hologres.sql) | PG 兼容数学函数 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | ROUND/TRUNC/MOD/RANDOM()(PG 兼容) |
+| [Azure Synapse](synapse.sql) | ROUND/CEILING/FLOOR/RAND(T-SQL) |
+| [Databricks SQL](databricks.sql) | ROUND/FLOOR/CEIL/RAND/CONV |
+| [Greenplum](greenplum.sql) | PG 兼容数学函数 |
+| [Impala](impala.sql) | ROUND/FLOOR/CEIL/RAND/MOD |
+| [Vertica](vertica.sql) | 完整数学+统计函数 |
+| [Teradata](teradata.sql) | 标准数学函数 + RANDOM |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容数学函数 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式数学函数 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容数学函数 |
+| [Spanner](spanner.sql) | ROUND/TRUNC/MOD/IEEE_DIVIDE |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容数学函数 |
+| [PolarDB](polardb.sql) | MySQL 兼容数学函数 |
+| [openGauss](opengauss.sql) | PG 兼容数学函数 |
+| [TDSQL](tdsql.sql) | MySQL 兼容数学函数 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容数学函数 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 数学函数 |
+| [TDengine](tdengine.sql) | 基础数学函数(ABS/CEIL/FLOOR/ROUND) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | ABS/CEIL/FLOOR/ROUND 基础数学 |
+| [Materialize](materialize.sql) | PG 兼容数学函数 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准数学函数支持 |
+| [Derby](derby.sql) | ABS/MOD/SQRT，功能较少 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 数值函数规范 |
 
 ## 核心差异
 

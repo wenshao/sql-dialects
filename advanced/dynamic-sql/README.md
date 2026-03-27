@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | PREPARE/EXECUTE/DEALLOCATE，存储过程内动态 |
+| [PostgreSQL](postgres.sql) | EXECUTE format()，PL/pgSQL 动态 SQL |
+| [SQLite](sqlite.sql) | C API sqlite3_prepare()，无过程式 SQL |
+| [Oracle](oracle.sql) | EXECUTE IMMEDIATE/DBMS_SQL，NDS 原生动态 |
+| [SQL Server](sqlserver.sql) | sp_executesql/EXEC()，参数化支持 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL PREPARE/EXECUTE |
+| [Firebird](firebird.sql) | EXECUTE STATEMENT，过程式动态 SQL |
+| [IBM Db2](db2.sql) | PREPARE/EXECUTE/EXECUTE IMMEDIATE |
+| [SAP HANA](saphana.sql) | EXEC/EXECUTE IMMEDIATE，SQLScript 内 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | EXECUTE IMMEDIATE(脚本模式) |
+| [Snowflake](snowflake.sql) | EXECUTE IMMEDIATE(Snowflake Scripting) |
+| [ClickHouse](clickhouse.sql) | 无过程式 SQL，客户端拼接 |
+| [Hive](hive.sql) | 无动态 SQL，依赖 HiveQL 脚本 |
+| [Spark SQL](spark.sql) | 无原生动态 SQL，用 DataFrame API |
+| [Flink SQL](flink.sql) | 无动态 SQL 支持 |
+| [StarRocks](starrocks.sql) | 无动态 SQL 支持 |
+| [Doris](doris.sql) | 无动态 SQL 支持 |
+| [Trino](trino.sql) | 无动态 SQL 支持 |
+| [DuckDB](duckdb.sql) | 无过程式 SQL，客户端 API |
+| [MaxCompute](maxcompute.sql) | 无动态 SQL，用 PyODPS 脚本 |
+| [Hologres](hologres.sql) | PG 兼容 EXECUTE format() |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 无存储过程动态 SQL(用客户端) |
+| [Azure Synapse](synapse.sql) | sp_executesql(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | 无动态 SQL，用 Python/Scala |
+| [Greenplum](greenplum.sql) | PG 兼容 EXECUTE format() |
+| [Impala](impala.sql) | 无动态 SQL 支持 |
+| [Vertica](vertica.sql) | 无存储过程动态 SQL |
+| [Teradata](teradata.sql) | EXECUTE IMMEDIATE(存储过程内) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 PREPARE/EXECUTE |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式动态 SQL |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 EXECUTE format() |
+| [Spanner](spanner.sql) | 客户端参数化查询为主 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 EXECUTE format() |
+| [PolarDB](polardb.sql) | MySQL 兼容 PREPARE/EXECUTE |
+| [openGauss](opengauss.sql) | PG 兼容动态 SQL |
+| [TDSQL](tdsql.sql) | MySQL 兼容 PREPARE/EXECUTE |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | EXECUTE IMMEDIATE(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 动态 SQL |
+| [TDengine](tdengine.sql) | 无动态 SQL 支持 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无动态 SQL 支持 |
+| [Materialize](materialize.sql) | PG 兼容 EXECUTE |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | PREPARE/EXECUTE 支持 |
+| [Derby](derby.sql) | PREPARE/EXECUTE 支持(JDBC) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 PREPARE/EXECUTE 规范 |
 
 ## 核心差异
 

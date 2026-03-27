@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | JSON_TABLE 展开(8.0+)，递归 CTE 拆分 |
+| [PostgreSQL](postgres.sql) | STRING_TO_TABLE(14+)/regexp_split_to_table |
+| [SQLite](sqlite.sql) | json_each + JSON 数组 或递归 CTE |
+| [Oracle](oracle.sql) | CONNECT BY + REGEXP_SUBSTR 或 JSON_TABLE |
+| [SQL Server](sqlserver.sql) | STRING_SPLIT(2016+)/CROSS APPLY 展开 |
+| [MariaDB](mariadb.sql) | 递归 CTE 或 JSON_TABLE(10.6+) |
+| [Firebird](firebird.sql) | 递归 CTE 手动拆分 |
+| [IBM Db2](db2.sql) | XMLTABLE + 递归 CTE 方案 |
+| [SAP HANA](saphana.sql) | SERIES_GENERATE + SUBSTRING 方案 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | SPLIT() + UNNEST 一步展开 |
+| [Snowflake](snowflake.sql) | SPLIT_TO_TABLE()/LATERAL FLATTEN |
+| [ClickHouse](clickhouse.sql) | splitByChar/splitByString + arrayJoin |
+| [Hive](hive.sql) | explode(split()) + LATERAL VIEW |
+| [Spark SQL](spark.sql) | explode(split()) 展开 |
+| [Flink SQL](flink.sql) | UNNEST + STRING_TO_ARRAY 展开 |
+| [StarRocks](starrocks.sql) | explode(split()) + LATERAL |
+| [Doris](doris.sql) | explode_split() + LATERAL VIEW |
+| [Trino](trino.sql) | split() + UNNEST 展开 |
+| [DuckDB](duckdb.sql) | string_split() + UNNEST 展开 |
+| [MaxCompute](maxcompute.sql) | explode(split()) + LATERAL VIEW |
+| [Hologres](hologres.sql) | regexp_split_to_table(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | SPLIT_TO_ARRAY + 行号展开 |
+| [Azure Synapse](synapse.sql) | STRING_SPLIT(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | explode(split()) 展开 |
+| [Greenplum](greenplum.sql) | regexp_split_to_table(PG 兼容) |
+| [Impala](impala.sql) | explode(split()) + LATERAL VIEW |
+| [Vertica](vertica.sql) | SPLIT_PART + 生成行方案 |
+| [Teradata](teradata.sql) | STRTOK_SPLIT_TO_TABLE 原生函数 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 递归 CTE + SUBSTRING_INDEX |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式拆分方案 |
+| [CockroachDB](cockroachdb.sql) | regexp_split_to_table(PG 兼容) |
+| [Spanner](spanner.sql) | SPLIT() + UNNEST 展开 |
+| [YugabyteDB](yugabytedb.sql) | regexp_split_to_table(PG 兼容) |
+| [PolarDB](polardb.sql) | MySQL 兼容 JSON_TABLE 或递归 CTE |
+| [openGauss](opengauss.sql) | regexp_split_to_table(PG 兼容) |
+| [TDSQL](tdsql.sql) | MySQL 兼容递归 CTE 方案 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | CONNECT BY 或递归 CTE |
+| [KingbaseES](kingbase.sql) | PG 兼容 regexp_split_to_table |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 字符串拆分函数 |
+| [TDengine](tdengine.sql) | 不支持字符串拆行 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持字符串拆行 |
+| [Materialize](materialize.sql) | regexp_split_to_table(PG 兼容) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 无 STRING_SPLIT，递归 CTE 模拟 |
+| [Derby](derby.sql) | 无 STRING_SPLIT，Java 过程模拟 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 无标准拆分(厂商扩展) |
 
 ## 横向对比
 

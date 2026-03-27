@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 递归 CTE(8.0+) 或变量生成日期序列 |
+| [PostgreSQL](postgres.sql) | generate_series() 原生日期序列 |
+| [SQLite](sqlite.sql) | 递归 CTE 生成，3.8.3+ 支持 |
+| [Oracle](oracle.sql) | CONNECT BY LEVEL 或递归 CTE 生成 |
+| [SQL Server](sqlserver.sql) | 递归 CTE 或数字表交叉连接 |
+| [MariaDB](mariadb.sql) | seq_1_to_N 序列引擎(10.0+) |
+| [Firebird](firebird.sql) | 递归 CTE 生成日期范围 |
+| [IBM Db2](db2.sql) | 递归 CTE 生成日期序列 |
+| [SAP HANA](saphana.sql) | SERIES_GENERATE_DATE() 原生序列 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | GENERATE_DATE_ARRAY() 原生函数 |
+| [Snowflake](snowflake.sql) | GENERATOR() + ROW_NUMBER 生成 |
+| [ClickHouse](clickhouse.sql) | range() + arrayJoin() 或数字表 |
+| [Hive](hive.sql) | posexplode(split()) 模拟序列 |
+| [Spark SQL](spark.sql) | sequence() + explode() 生成 |
+| [Flink SQL](flink.sql) | 无原生序列，用 UDTF 或 Lookup |
+| [StarRocks](starrocks.sql) | 无 generate_series，递归 CTE 或表 |
+| [Doris](doris.sql) | 无 generate_series，递归 CTE 或表 |
+| [Trino](trino.sql) | sequence() + UNNEST 生成 |
+| [DuckDB](duckdb.sql) | generate_series() 原生支持 |
+| [MaxCompute](maxcompute.sql) | UDTF 或日期维表补齐 |
+| [Hologres](hologres.sql) | generate_series()(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 递归 CTE 或日期维表 |
+| [Azure Synapse](synapse.sql) | 递归 CTE 生成 |
+| [Databricks SQL](databricks.sql) | sequence() + explode() 生成 |
+| [Greenplum](greenplum.sql) | generate_series()(PG 兼容) |
+| [Impala](impala.sql) | 无原生序列，日期维表补齐 |
+| [Vertica](vertica.sql) | TIMESERIES 子句原生支持 |
+| [Teradata](teradata.sql) | sys_calendar.calendar 系统日历表 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 递归 CTE(5.1+) 或日期维表 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式递归 CTE |
+| [CockroachDB](cockroachdb.sql) | generate_series()(PG 兼容) |
+| [Spanner](spanner.sql) | GENERATE_DATE_ARRAY() 原生函数 |
+| [YugabyteDB](yugabytedb.sql) | generate_series()(PG 兼容) |
+| [PolarDB](polardb.sql) | MySQL 兼容递归 CTE |
+| [openGauss](opengauss.sql) | generate_series()(PG 兼容) |
+| [TDSQL](tdsql.sql) | MySQL 兼容递归 CTE |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 CONNECT BY 或递归 CTE |
+| [KingbaseES](kingbase.sql) | PG 兼容 generate_series() |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | time_bucket_gapfill() 原生补齐 |
+| [TDengine](tdengine.sql) | FILL() 原生时序补齐(PREV/LINEAR/NULL) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不适用(流式处理) |
+| [Materialize](materialize.sql) | generate_series()(PG 兼容) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | SYSTEM_RANGE() 生成序列 |
+| [Derby](derby.sql) | 递归 CTE(10.14+) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 递归 CTE 可模拟序列 |
 
 ## 横向对比
 

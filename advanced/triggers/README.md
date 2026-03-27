@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | BEFORE/AFTER + INSERT/UPDATE/DELETE，行级 |
+| [PostgreSQL](postgres.sql) | 行/语句级触发器，INSTEAD OF，事件触发器 |
+| [SQLite](sqlite.sql) | BEFORE/AFTER/INSTEAD OF 触发器 |
+| [Oracle](oracle.sql) | 行/语句/COMPOUND/DDL 触发器，FOLLOWS 排序 |
+| [SQL Server](sqlserver.sql) | AFTER/INSTEAD OF 触发器，DDL 触发器 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 触发器 |
+| [Firebird](firebird.sql) | BEFORE/AFTER 触发器，多触发器排序 |
+| [IBM Db2](db2.sql) | BEFORE/AFTER/INSTEAD OF 触发器 |
+| [SAP HANA](saphana.sql) | 行/语句级触发器 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 无触发器支持 |
+| [Snowflake](snowflake.sql) | 无触发器支持(Stream+Task 替代) |
+| [ClickHouse](clickhouse.sql) | 无触发器(MATERIALIZED VIEW 替代) |
+| [Hive](hive.sql) | 无触发器支持 |
+| [Spark SQL](spark.sql) | 无触发器支持 |
+| [Flink SQL](flink.sql) | 无触发器(流式处理替代) |
+| [StarRocks](starrocks.sql) | 无触发器支持 |
+| [Doris](doris.sql) | 无触发器支持 |
+| [Trino](trino.sql) | 无触发器支持 |
+| [DuckDB](duckdb.sql) | 无触发器支持 |
+| [MaxCompute](maxcompute.sql) | 无触发器支持 |
+| [Hologres](hologres.sql) | 无触发器支持 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 无触发器支持 |
+| [Azure Synapse](synapse.sql) | 无触发器支持 |
+| [Databricks SQL](databricks.sql) | 无触发器(Delta Live Tables 替代) |
+| [Greenplum](greenplum.sql) | PG 兼容触发器 |
+| [Impala](impala.sql) | 无触发器支持 |
+| [Vertica](vertica.sql) | 无触发器支持 |
+| [Teradata](teradata.sql) | 无触发器支持(ETL 工具替代) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 无触发器支持 |
+| [OceanBase](oceanbase.sql) | Oracle 模式触发器支持 |
+| [CockroachDB](cockroachdb.sql) | 无触发器支持(CDC 替代) |
+| [Spanner](spanner.sql) | 无触发器支持 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容触发器 |
+| [PolarDB](polardb.sql) | MySQL 兼容触发器 |
+| [openGauss](opengauss.sql) | PG 兼容触发器 |
+| [TDSQL](tdsql.sql) | MySQL 兼容触发器 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容触发器 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 触发器 |
+| [TDengine](tdengine.sql) | 无触发器支持 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无触发器(流处理替代) |
+| [Materialize](materialize.sql) | 无触发器(增量计算替代) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | BEFORE/AFTER 触发器(Java) |
+| [Derby](derby.sql) | AFTER 触发器(行/语句级) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 TRIGGER 规范 |
 
 ## 核心差异
 

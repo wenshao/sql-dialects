@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | Online DDL (INSTANT/INPLACE/COPY)，pt-osc/gh-ost 生态 |
+| [PostgreSQL](postgres.sql) | 11+ ADD COLUMN WITH DEFAULT 即时，DDL 可回滚 |
+| [SQLite](sqlite.sql) | 3.35 前无 DROP COLUMN，能力最弱 |
+| [Oracle](oracle.sql) | ONLINE DDL，Edition-Based Redefinition |
+| [SQL Server](sqlserver.sql) | ONLINE=ON(Enterprise)，sp_rename |
+| [MariaDB](mariadb.sql) | INSTANT ADD COLUMN(10.3+)，与 MySQL 兼容 |
+| [Firebird](firebird.sql) | 支持 ALTER TABLE，无 Online DDL |
+| [IBM Db2](db2.sql) | REORG 表重组，ADMIN_MOVE_TABLE |
+| [SAP HANA](saphana.sql) | 支持 Online ALTER，列存/行存差异 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 在线执行，无锁表 |
+| [Snowflake](snowflake.sql) | 元数据操作为主，秒级完成 |
+| [ClickHouse](clickhouse.sql) | 异步 mutation，不阻塞查询 |
+| [Hive](hive.sql) | REPLACE COLUMNS，有限 ALTER |
+| [Spark SQL](spark.sql) | ALTER TABLE 修改分区/列，Delta Lake 支持更多 |
+| [Flink SQL](flink.sql) | 仅支持 ADD/DROP 水印和列 |
+| [StarRocks](starrocks.sql) | 支持 Online Schema Change |
+| [Doris](doris.sql) | Light Schema Change(1.2+)，秒级加列 |
+| [Trino](trino.sql) | 依赖底层 Connector 实现 |
+| [DuckDB](duckdb.sql) | 支持 ADD/DROP/RENAME COLUMN |
+| [MaxCompute](maxcompute.sql) | 仅支持 ADD COLUMN，不支持 DROP |
+| [Hologres](hologres.sql) | 支持 ADD/DROP COLUMN，实时生效 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | ALTER TABLE 部分操作需重建 |
+| [Azure Synapse](synapse.sql) | 分布式表 ALTER 限制较多 |
+| [Databricks SQL](databricks.sql) | Delta Lake ALTER TABLE 丰富 |
+| [Greenplum](greenplum.sql) | 继承 PG 语法，分布键不可改 |
+| [Impala](impala.sql) | 支持 ADD/DROP/CHANGE COLUMN |
+| [Vertica](vertica.sql) | 支持 ALTER TABLE，投影需刷新 |
+| [Teradata](teradata.sql) | 支持在线 ALTER，多 AMP 协同 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容，Online DDL |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 DDL |
+| [CockroachDB](cockroachdb.sql) | 在线 Schema Change，无锁 |
+| [Spanner](spanner.sql) | 在线 Schema 变更，全球一致 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容，在线 DDL |
+| [PolarDB](polardb.sql) | MySQL 兼容，秒级 DDL |
+| [openGauss](opengauss.sql) | PG 兼容，支持在线 ALTER |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式 DDL |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容语法 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG ALTER，超表自动同步 |
+| [TDengine](tdengine.sql) | 仅支持 ADD/DROP COLUMN |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | ALTER 仅改流/表属性 |
+| [Materialize](materialize.sql) | PG 兼容，支持 ALTER |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准 ALTER TABLE 支持 |
+| [Derby](derby.sql) | 有限 ALTER，不支持 DROP COLUMN |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 ALTER TABLE 规范 |
 
 ## 核心差异
 

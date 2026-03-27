@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | JSON 类型(5.7+)，->/>> 路径操作符 |
+| [PostgreSQL](postgres.sql) | JSON/JSONB(二进制)，GIN 索引，最丰富操作 |
+| [SQLite](sqlite.sql) | json_extract()/json() 函数(3.9+)，TEXT 存储 |
+| [Oracle](oracle.sql) | JSON 类型(21c+)，IS JSON 约束，JSON_TABLE |
+| [SQL Server](sqlserver.sql) | NVARCHAR 存 JSON，OPENJSON/JSON_VALUE |
+| [MariaDB](mariadb.sql) | JSON 别名 LONGTEXT，兼容 MySQL 函数 |
+| [Firebird](firebird.sql) | 无原生 JSON 类型 |
+| [IBM Db2](db2.sql) | JSON 函数(11.1+)，BSON 存储 |
+| [SAP HANA](saphana.sql) | JSON Document Store，SQL 查询 JSON |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | JSON 类型，JSON_EXTRACT/JSON_QUERY |
+| [Snowflake](snowflake.sql) | VARIANT 存 JSON，半结构化查询强大 |
+| [ClickHouse](clickhouse.sql) | JSON 类型(实验)，JSONExtract 函数族 |
+| [Hive](hive.sql) | get_json_object()，STRING 存储 |
+| [Spark SQL](spark.sql) | from_json/to_json/get_json_object |
+| [Flink SQL](flink.sql) | JSON 类型，JSON_VALUE/JSON_QUERY |
+| [StarRocks](starrocks.sql) | JSON 类型(2.2+)，get_json_string |
+| [Doris](doris.sql) | JSON 类型(1.2+)，jsonb_extract 函数 |
+| [Trino](trino.sql) | JSON 类型，json_extract/json_format |
+| [DuckDB](duckdb.sql) | JSON 扩展，->/>> 操作符 |
+| [MaxCompute](maxcompute.sql) | STRING 存 JSON，GET_JSON_OBJECT |
+| [Hologres](hologres.sql) | JSON/JSONB(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | JSON_EXTRACT_PATH_TEXT，SUPER 类型更强 |
+| [Azure Synapse](synapse.sql) | OPENJSON/JSON_VALUE(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | from_json/to_json/: 路径语法 |
+| [Greenplum](greenplum.sql) | PG 兼容 JSON/JSONB |
+| [Impala](impala.sql) | STRING 存 JSON，GET_JSON_OBJECT |
+| [Vertica](vertica.sql) | Flex Table JSON 解析，MAPJSONEXTRACTOR |
+| [Teradata](teradata.sql) | JSON 类型(15.10+)，JSONExtract |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 JSON 操作 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 JSON |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 JSONB 操作 |
+| [Spanner](spanner.sql) | JSON 类型，JSON_VALUE/JSON_QUERY |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 JSON/JSONB |
+| [PolarDB](polardb.sql) | MySQL 兼容 JSON 操作 |
+| [openGauss](opengauss.sql) | PG 兼容 JSON/JSONB |
+| [TDSQL](tdsql.sql) | MySQL 兼容 JSON 操作 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | JSON 类型支持 |
+| [KingbaseES](kingbase.sql) | PG 兼容 JSON/JSONB |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG JSON/JSONB |
+| [TDengine](tdengine.sql) | JSON 类型(TAG 列)，子表标签 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | STRUCT/MAP 替代 JSON，嵌套访问 |
+| [Materialize](materialize.sql) | PG 兼容 JSONB |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | JSON 类型(2.0+)支持 |
+| [Derby](derby.sql) | 无 JSON 类型支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2016 JSON 函数规范 |
 
 ## 核心差异
 

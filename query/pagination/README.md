@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | LIMIT offset, count 语法 |
+| [PostgreSQL](postgres.sql) | LIMIT/OFFSET + FETCH FIRST(SQL:2008) |
+| [SQLite](sqlite.sql) | LIMIT/OFFSET 语法 |
+| [Oracle](oracle.sql) | FETCH FIRST(12c+)，ROWNUM 旧方案 |
+| [SQL Server](sqlserver.sql) | OFFSET FETCH(2012+)，TOP 旧方案 |
+| [MariaDB](mariadb.sql) | LIMIT/OFFSET 兼容 MySQL |
+| [Firebird](firebird.sql) | FIRST/SKIP + OFFSET FETCH(3.0+) |
+| [IBM Db2](db2.sql) | FETCH FIRST + OFFSET(9.7+) |
+| [SAP HANA](saphana.sql) | LIMIT/OFFSET 支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | LIMIT/OFFSET 支持 |
+| [Snowflake](snowflake.sql) | LIMIT/OFFSET + FETCH FIRST |
+| [ClickHouse](clickhouse.sql) | LIMIT n OFFSET m 语法 |
+| [Hive](hive.sql) | LIMIT 支持，无 OFFSET |
+| [Spark SQL](spark.sql) | LIMIT 支持，无 OFFSET(用窗口函数) |
+| [Flink SQL](flink.sql) | LIMIT 支持(批模式) |
+| [StarRocks](starrocks.sql) | LIMIT/OFFSET 支持 |
+| [Doris](doris.sql) | LIMIT/OFFSET 支持 |
+| [Trino](trino.sql) | LIMIT/OFFSET + FETCH FIRST |
+| [DuckDB](duckdb.sql) | LIMIT/OFFSET + FETCH FIRST |
+| [MaxCompute](maxcompute.sql) | LIMIT/OFFSET 支持 |
+| [Hologres](hologres.sql) | LIMIT/OFFSET(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | LIMIT/OFFSET(PG 兼容) |
+| [Azure Synapse](synapse.sql) | OFFSET FETCH(T-SQL 风格) |
+| [Databricks SQL](databricks.sql) | LIMIT/OFFSET 支持 |
+| [Greenplum](greenplum.sql) | PG 兼容 LIMIT/OFFSET |
+| [Impala](impala.sql) | LIMIT/OFFSET 支持 |
+| [Vertica](vertica.sql) | LIMIT/OFFSET + FETCH FIRST |
+| [Teradata](teradata.sql) | TOP/SAMPLE + QUALIFY ROW_NUMBER |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 LIMIT/OFFSET |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式分页 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 LIMIT/OFFSET |
+| [Spanner](spanner.sql) | LIMIT/OFFSET 支持 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 LIMIT/OFFSET |
+| [PolarDB](polardb.sql) | MySQL 兼容 LIMIT/OFFSET |
+| [openGauss](opengauss.sql) | PG 兼容 LIMIT/OFFSET |
+| [TDSQL](tdsql.sql) | MySQL 兼容 LIMIT/OFFSET |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | ROWNUM + OFFSET FETCH |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 分页 |
+| [TDengine](tdengine.sql) | LIMIT/OFFSET 支持 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | LIMIT 支持(Pull Query) |
+| [Materialize](materialize.sql) | PG 兼容 LIMIT/OFFSET |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | LIMIT/OFFSET + FETCH FIRST |
+| [Derby](derby.sql) | FETCH FIRST + OFFSET(10.6+) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2008 FETCH FIRST / OFFSET |
 
 ## 核心差异
 

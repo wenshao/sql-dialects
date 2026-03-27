@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | InnoDB FULLTEXT(5.6+)，MATCH AGAINST |
+| [PostgreSQL](postgres.sql) | tsvector/tsquery，GIN 索引，丰富排名 |
+| [SQLite](sqlite.sql) | FTS5 扩展模块，轻量全文搜索 |
+| [Oracle](oracle.sql) | Oracle Text(CONTAINS/CTXSYS) |
+| [SQL Server](sqlserver.sql) | CONTAINS/FREETEXT，全文目录 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL FULLTEXT，Mroonga 引擎 |
+| [Firebird](firebird.sql) | 无内建全文搜索 |
+| [IBM Db2](db2.sql) | Text Search 扩展，需配置 |
+| [SAP HANA](saphana.sql) | CONTAINS/FUZZY，内建全文搜索 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | SEARCH() 函数 + SEARCH INDEX |
+| [Snowflake](snowflake.sql) | 无原生全文搜索，用 LIKE/REGEXP |
+| [ClickHouse](clickhouse.sql) | tokenbf_v1/ngrambf 索引，近似搜索 |
+| [Hive](hive.sql) | 无内建全文搜索 |
+| [Spark SQL](spark.sql) | 无内建全文搜索，用 UDF |
+| [Flink SQL](flink.sql) | 无内建全文搜索 |
+| [StarRocks](starrocks.sql) | 无内建全文搜索，LIKE/REGEXP |
+| [Doris](doris.sql) | 倒排索引(2.0+)，MATCH_ALL/MATCH_ANY |
+| [Trino](trino.sql) | 无内建全文搜索 |
+| [DuckDB](duckdb.sql) | 无内建全文搜索，fts 扩展 |
+| [MaxCompute](maxcompute.sql) | 无内建全文搜索 |
+| [Hologres](hologres.sql) | 无内建全文搜索 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 无原生全文搜索 |
+| [Azure Synapse](synapse.sql) | 无内建全文搜索 |
+| [Databricks SQL](databricks.sql) | 无原生全文搜索 |
+| [Greenplum](greenplum.sql) | 继承 PG tsvector/tsquery |
+| [Impala](impala.sql) | 无内建全文搜索 |
+| [Vertica](vertica.sql) | Text Search 函数，v_txtindex |
+| [Teradata](teradata.sql) | 无内建全文搜索 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 FULLTEXT(5.7+) |
+| [OceanBase](oceanbase.sql) | MySQL 模式 FULLTEXT 支持 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 tsvector(22.1+) |
+| [Spanner](spanner.sql) | SEARCH INDEX + TOKENIZE 函数 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 tsvector/tsquery |
+| [PolarDB](polardb.sql) | MySQL 兼容 FULLTEXT |
+| [openGauss](opengauss.sql) | PG 兼容 tsvector/tsquery，中文分词 |
+| [TDSQL](tdsql.sql) | MySQL 兼容 FULLTEXT |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | 全文索引支持 |
+| [KingbaseES](kingbase.sql) | PG 兼容 tsvector/tsquery |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 全文搜索 |
+| [TDengine](tdengine.sql) | 不支持全文搜索 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持全文搜索 |
+| [Materialize](materialize.sql) | 不支持全文搜索 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | FULLTEXT 支持(Lucene 集成) |
+| [Derby](derby.sql) | 无全文搜索支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 无全文搜索标准 |
 
 ## 核心差异
 

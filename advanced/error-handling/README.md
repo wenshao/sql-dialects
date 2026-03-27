@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | DECLARE HANDLER(CONTINUE/EXIT)，SIGNAL/RESIGNAL |
+| [PostgreSQL](postgres.sql) | EXCEPTION WHEN 块，RAISE NOTICE/EXCEPTION |
+| [SQLite](sqlite.sql) | C API 错误码，无过程式错误处理 |
+| [Oracle](oracle.sql) | EXCEPTION WHEN 块，RAISE_APPLICATION_ERROR |
+| [SQL Server](sqlserver.sql) | TRY...CATCH 块，RAISERROR/THROW |
+| [MariaDB](mariadb.sql) | 兼容 MySQL HANDLER/SIGNAL |
+| [Firebird](firebird.sql) | WHEN...DO 块，EXCEPTION 自定义异常 |
+| [IBM Db2](db2.sql) | DECLARE HANDLER + SIGNAL/RESIGNAL |
+| [SAP HANA](saphana.sql) | DECLARE EXIT HANDLER，CE_RAISE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | BEGIN...EXCEPTION...END(脚本模式) |
+| [Snowflake](snowflake.sql) | EXCEPTION WHEN(Snowflake Scripting) |
+| [ClickHouse](clickhouse.sql) | 无过程式错误处理 |
+| [Hive](hive.sql) | 无错误处理语法 |
+| [Spark SQL](spark.sql) | 无 SQL 级错误处理，用 Scala/Python |
+| [Flink SQL](flink.sql) | 无错误处理语法 |
+| [StarRocks](starrocks.sql) | 无错误处理语法 |
+| [Doris](doris.sql) | 无错误处理语法 |
+| [Trino](trino.sql) | 无错误处理语法 |
+| [DuckDB](duckdb.sql) | 无过程式错误处理 |
+| [MaxCompute](maxcompute.sql) | 无错误处理语法，依赖调度 |
+| [Hologres](hologres.sql) | PG 兼容 EXCEPTION WHEN |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 存储过程 RAISE 支持 |
+| [Azure Synapse](synapse.sql) | TRY...CATCH(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | 无 SQL 级错误处理 |
+| [Greenplum](greenplum.sql) | PG 兼容 EXCEPTION WHEN |
+| [Impala](impala.sql) | 无错误处理语法 |
+| [Vertica](vertica.sql) | 无过程式错误处理 |
+| [Teradata](teradata.sql) | HANDLER 支持(存储过程内) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 HANDLER/SIGNAL |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式错误处理 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 EXCEPTION WHEN |
+| [Spanner](spanner.sql) | 客户端异常处理为主 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 EXCEPTION WHEN |
+| [PolarDB](polardb.sql) | MySQL 兼容错误处理 |
+| [openGauss](opengauss.sql) | PG 兼容 EXCEPTION WHEN |
+| [TDSQL](tdsql.sql) | MySQL 兼容错误处理 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 EXCEPTION WHEN |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 错误处理 |
+| [TDengine](tdengine.sql) | 无错误处理语法 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无错误处理语法 |
+| [Materialize](materialize.sql) | PG 兼容错误处理 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 无过程式错误处理 |
+| [Derby](derby.sql) | DECLARE HANDLER 支持(SQL/JRT) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 HANDLER/SIGNAL/RESIGNAL |
 
 ## 核心差异
 

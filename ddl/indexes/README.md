@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | B-Tree/Hash/全文/空间索引，InnoDB 聚簇索引 |
+| [PostgreSQL](postgres.sql) | B-Tree/GiST/GIN/BRIN/SP-GiST，表达式索引 |
+| [SQLite](sqlite.sql) | B-Tree 为主，部分索引(3.8+) |
+| [Oracle](oracle.sql) | Bitmap/Function-Based/IOT/Global Partitioned |
+| [SQL Server](sqlserver.sql) | 聚簇/非聚簇/列存储/Filtered 索引 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 索引，Hash 索引(Memory) |
+| [Firebird](firebird.sql) | ASC/DESC 索引，表达式索引 |
+| [IBM Db2](db2.sql) | MDC Block Index，XML 索引 |
+| [SAP HANA](saphana.sql) | 列存隐式索引，INVERTED/HASH/CPBTREE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 无传统索引，搜索索引(SEARCH INDEX) |
+| [Snowflake](snowflake.sql) | 无索引，自动微分区 + Clustering |
+| [ClickHouse](clickhouse.sql) | PRIMARY KEY 稀疏索引，跳数索引(minmax/bloom) |
+| [Hive](hive.sql) | 无索引(已弃用)，依赖分区+列式存储 |
+| [Spark SQL](spark.sql) | 无索引，Z-ORDER(Delta Lake) |
+| [Flink SQL](flink.sql) | 无索引概念 |
+| [StarRocks](starrocks.sql) | Bitmap/Bloom Filter/前缀索引 |
+| [Doris](doris.sql) | 前缀索引/Bloom Filter/Bitmap 索引 |
+| [Trino](trino.sql) | 无索引，下推到数据源 |
+| [DuckDB](duckdb.sql) | 自动索引(ART)，无需手动创建 |
+| [MaxCompute](maxcompute.sql) | 无索引，依赖分区裁剪 |
+| [Hologres](hologres.sql) | 聚簇索引/Bitmap/Segment Key |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 无传统索引，SORTKEY + Zone Map |
+| [Azure Synapse](synapse.sql) | 聚簇列存储索引(CCI)为默认 |
+| [Databricks SQL](databricks.sql) | 无索引，Z-ORDER/OPTIMIZE/Liquid Clustering |
+| [Greenplum](greenplum.sql) | Bitmap 索引，继承 PG B-Tree |
+| [Impala](impala.sql) | 无索引，依赖 Parquet Min/Max 过滤 |
+| [Vertica](vertica.sql) | 自动投影(Projection)替代索引 |
+| [Teradata](teradata.sql) | PI(Primary Index)，Secondary/Join Index |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容索引，TiFlash 列式副本 |
+| [OceanBase](oceanbase.sql) | 局部/全局索引，MySQL/Oracle 双模式 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容，分布式 Inverted 索引 |
+| [Spanner](spanner.sql) | 交叉索引(INTERLEAVE)，全局二级索引 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容，LSM-Tree 索引 |
+| [PolarDB](polardb.sql) | MySQL 兼容索引 |
+| [openGauss](opengauss.sql) | PG 兼容，支持 GIN/GiST |
+| [TDSQL](tdsql.sql) | MySQL 兼容，全局二级索引 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容，Bitmap/函数索引 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 索引，自动在每个 chunk 创建 |
+| [TDengine](tdengine.sql) | 时间列自动索引，TAG 索引 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无索引，Kafka 分区即分布 |
+| [Materialize](materialize.sql) | 自动索引(Arrangement)维护增量视图 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准 B-Tree/Hash 索引 |
+| [Derby](derby.sql) | 标准 B-Tree 索引 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 CREATE INDEX(非标准但通用) |
 
 ## 核心差异
 

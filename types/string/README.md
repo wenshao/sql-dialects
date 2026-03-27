@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | VARCHAR/TEXT/CHAR，CHARSET 字符集关键 |
+| [PostgreSQL](postgres.sql) | VARCHAR/TEXT/CHAR，TEXT 无长度限制 |
+| [SQLite](sqlite.sql) | TEXT 统一类型，无长度限制 |
+| [Oracle](oracle.sql) | VARCHAR2(4000)/CLOB/NVARCHAR2，字节/字符语义 |
+| [SQL Server](sqlserver.sql) | VARCHAR/NVARCHAR(MAX)/TEXT(已弃用) |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 字符串类型 |
+| [Firebird](firebird.sql) | VARCHAR/CHAR/BLOB SUB_TYPE TEXT |
+| [IBM Db2](db2.sql) | VARCHAR/CLOB/GRAPHIC(双字节) |
+| [SAP HANA](saphana.sql) | VARCHAR/NVARCHAR/CLOB/NCLOB |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | STRING(UTF-8)，无长度限制 |
+| [Snowflake](snowflake.sql) | VARCHAR(16MB)，UTF-8 统一 |
+| [ClickHouse](clickhouse.sql) | String(无限)/FixedString(N)/LowCardinality |
+| [Hive](hive.sql) | STRING/VARCHAR/CHAR |
+| [Spark SQL](spark.sql) | STRING/VARCHAR/CHAR |
+| [Flink SQL](flink.sql) | STRING/VARCHAR/CHAR |
+| [StarRocks](starrocks.sql) | VARCHAR/CHAR/STRING(3.0+) |
+| [Doris](doris.sql) | VARCHAR/CHAR/STRING |
+| [Trino](trino.sql) | VARCHAR/CHAR |
+| [DuckDB](duckdb.sql) | VARCHAR/TEXT，无长度限制 |
+| [MaxCompute](maxcompute.sql) | STRING/VARCHAR，STRING 无限长 |
+| [Hologres](hologres.sql) | TEXT/VARCHAR(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | VARCHAR(65535)/CHAR(PG 兼容) |
+| [Azure Synapse](synapse.sql) | VARCHAR/NVARCHAR(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | STRING 类型为主 |
+| [Greenplum](greenplum.sql) | PG 兼容 TEXT/VARCHAR |
+| [Impala](impala.sql) | STRING/VARCHAR/CHAR |
+| [Vertica](vertica.sql) | VARCHAR/LONG VARCHAR 列式优化 |
+| [Teradata](teradata.sql) | VARCHAR/CLOB/GRAPHIC(UNICODE) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 VARCHAR/TEXT |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式字符串类型 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 STRING/VARCHAR |
+| [Spanner](spanner.sql) | STRING(MAX)/BYTES，UTF-8 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 TEXT/VARCHAR |
+| [PolarDB](polardb.sql) | MySQL 兼容字符串类型 |
+| [openGauss](opengauss.sql) | PG 兼容 TEXT/VARCHAR |
+| [TDSQL](tdsql.sql) | MySQL 兼容字符串类型 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | VARCHAR/CLOB(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG TEXT/VARCHAR |
+| [TDengine](tdengine.sql) | NCHAR(Unicode)/BINARY/VARCHAR |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | VARCHAR/STRING 类型 |
+| [Materialize](materialize.sql) | PG 兼容 TEXT/VARCHAR |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | VARCHAR/CLOB/CHARACTER VARYING |
+| [Derby](derby.sql) | VARCHAR/CLOB/CHAR |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 CHARACTER/VARCHAR/CLOB |
 
 ## 核心差异
 

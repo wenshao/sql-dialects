@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | SUM() OVER(8.0+) 或变量累加(旧版) |
+| [PostgreSQL](postgres.sql) | SUM() OVER 完整窗口帧控制 |
+| [SQLite](sqlite.sql) | SUM() OVER(3.25+) 窗口函数 |
+| [Oracle](oracle.sql) | SUM() OVER 最早支持，分析函数 |
+| [SQL Server](sqlserver.sql) | SUM() OVER(2012+ ROWS 帧优化) |
+| [MariaDB](mariadb.sql) | SUM() OVER(10.2+)，兼容 MySQL |
+| [Firebird](firebird.sql) | SUM() OVER(3.0+) 窗口函数 |
+| [IBM Db2](db2.sql) | SUM() OVER 完整支持 |
+| [SAP HANA](saphana.sql) | SUM() OVER 内存加速 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | SUM() OVER 完整窗口帧 |
+| [Snowflake](snowflake.sql) | SUM() OVER 完整窗口帧 |
+| [ClickHouse](clickhouse.sql) | runningAccumulate()/SUM() OVER 支持 |
+| [Hive](hive.sql) | SUM() OVER(0.11+) 窗口函数 |
+| [Spark SQL](spark.sql) | SUM() OVER 完整支持 |
+| [Flink SQL](flink.sql) | SUM() OVER 流式累计(Over Window) |
+| [StarRocks](starrocks.sql) | SUM() OVER 完整支持 |
+| [Doris](doris.sql) | SUM() OVER 完整支持 |
+| [Trino](trino.sql) | SUM() OVER 完整支持 |
+| [DuckDB](duckdb.sql) | SUM() OVER 完整支持 |
+| [MaxCompute](maxcompute.sql) | SUM() OVER 完整支持 |
+| [Hologres](hologres.sql) | SUM() OVER(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | SUM() OVER 完整支持 |
+| [Azure Synapse](synapse.sql) | SUM() OVER(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | SUM() OVER 完整支持 |
+| [Greenplum](greenplum.sql) | PG 兼容 SUM() OVER |
+| [Impala](impala.sql) | SUM() OVER 完整支持 |
+| [Vertica](vertica.sql) | SUM() OVER 分析优化 |
+| [Teradata](teradata.sql) | SUM() OVER + QUALIFY 过滤 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 SUM() OVER |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式 SUM() OVER |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 SUM() OVER |
+| [Spanner](spanner.sql) | SUM() OVER 完整支持 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 SUM() OVER |
+| [PolarDB](polardb.sql) | MySQL 兼容 SUM() OVER |
+| [openGauss](opengauss.sql) | PG 兼容 SUM() OVER |
+| [TDSQL](tdsql.sql) | MySQL 兼容 SUM() OVER |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 SUM() OVER |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG SUM() OVER，时序累计 |
+| [TDengine](tdengine.sql) | CSUM() 内建累计函数 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持(流式用状态存储累计) |
+| [Materialize](materialize.sql) | SUM() OVER(PG 兼容) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | SUM() OVER 支持 |
+| [Derby](derby.sql) | 有限窗口函数，自连接模拟 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 窗口聚合 SUM() OVER 规范 |
 
 ## 横向对比
 

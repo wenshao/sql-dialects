@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | INSERT ON DUPLICATE KEY UPDATE，REPLACE INTO |
+| [PostgreSQL](postgres.sql) | INSERT ON CONFLICT(DO UPDATE/NOTHING) |
+| [SQLite](sqlite.sql) | INSERT OR REPLACE，ON CONFLICT(3.24+) |
+| [Oracle](oracle.sql) | MERGE INTO(9i+)，功能最丰富 |
+| [SQL Server](sqlserver.sql) | MERGE INTO，OUTPUT 子句 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL，INSERT ON DUPLICATE |
+| [Firebird](firebird.sql) | UPDATE OR INSERT，MERGE INTO(3.0+) |
+| [IBM Db2](db2.sql) | MERGE INTO 标准 SQL 风格 |
+| [SAP HANA](saphana.sql) | UPSERT/REPLACE/MERGE 三种语法 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | MERGE INTO，DML 配额限制 |
+| [Snowflake](snowflake.sql) | MERGE INTO 标准，多条件匹配 |
+| [ClickHouse](clickhouse.sql) | ReplacingMergeTree 引擎级去重 |
+| [Hive](hive.sql) | MERGE INTO(3.0+ ACID 表) |
+| [Spark SQL](spark.sql) | Delta Lake MERGE INTO |
+| [Flink SQL](flink.sql) | PRIMARY KEY 自动 Upsert 模式 |
+| [StarRocks](starrocks.sql) | Primary Key 模型 Upsert |
+| [Doris](doris.sql) | Unique 模型自动覆盖，MERGE(未来) |
+| [Trino](trino.sql) | MERGE INTO(401+) |
+| [DuckDB](duckdb.sql) | INSERT OR REPLACE/ON CONFLICT |
+| [MaxCompute](maxcompute.sql) | 不支持 UPSERT |
+| [Hologres](hologres.sql) | INSERT ON CONFLICT 支持 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | MERGE INTO(2023+)，DELETE+INSERT 传统方案 |
+| [Azure Synapse](synapse.sql) | 无 MERGE，用 DELETE+INSERT 模拟 |
+| [Databricks SQL](databricks.sql) | Delta Lake MERGE INTO，CDC 友好 |
+| [Greenplum](greenplum.sql) | PG 兼容 ON CONFLICT |
+| [Impala](impala.sql) | 仅 Kudu 表支持 UPSERT |
+| [Vertica](vertica.sql) | MERGE INTO 标准支持 |
+| [Teradata](teradata.sql) | MERGE INTO + UPDATE/INSERT 组合 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 ON DUPLICATE KEY UPDATE |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 MERGE/REPLACE |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 ON CONFLICT |
+| [Spanner](spanner.sql) | INSERT OR UPDATE/REPLACE |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 ON CONFLICT |
+| [PolarDB](polardb.sql) | MySQL 兼容 ON DUPLICATE |
+| [openGauss](opengauss.sql) | PG 兼容 ON CONFLICT |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式 UPSERT |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | MERGE INTO(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 ON CONFLICT |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG ON CONFLICT |
+| [TDengine](tdengine.sql) | 新记录覆盖旧记录(相同时间戳) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 相同 KEY 自动覆盖(Kafka 语义) |
+| [Materialize](materialize.sql) | 不支持(流式源驱动) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | MERGE INTO 标准支持 |
+| [Derby](derby.sql) | MERGE INTO 标准支持(10.11+) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 MERGE INTO 规范 |
 
 ## 核心差异
 

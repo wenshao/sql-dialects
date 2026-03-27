@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 多表 UPDATE，ORDER BY + LIMIT |
+| [PostgreSQL](postgres.sql) | UPDATE FROM 多表，RETURNING 返回 |
+| [SQLite](sqlite.sql) | UPDATE FROM(3.33+)，基础 UPDATE |
+| [Oracle](oracle.sql) | UPDATE SET 子查询，MERGE 更常用 |
+| [SQL Server](sqlserver.sql) | UPDATE FROM 多表，OUTPUT 子句 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL UPDATE，RETURNING(10.5+) |
+| [Firebird](firebird.sql) | UPDATE RETURNING，标准 SQL 风格 |
+| [IBM Db2](db2.sql) | 标准 UPDATE，MERGE 替代多表 |
+| [SAP HANA](saphana.sql) | 标准 UPDATE，列存实时更新 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | UPDATE WHERE 必须，DML 配额限制 |
+| [Snowflake](snowflake.sql) | UPDATE 标准，Time Travel 回溯 |
+| [ClickHouse](clickhouse.sql) | 轻量更新(23.3+)，ALTER UPDATE(异步) |
+| [Hive](hive.sql) | 仅 ACID 表可 UPDATE(3.0+) |
+| [Spark SQL](spark.sql) | Delta Lake UPDATE 支持 |
+| [Flink SQL](flink.sql) | CDC/Retract 模式更新 |
+| [StarRocks](starrocks.sql) | Primary Key 模型实时更新 |
+| [Doris](doris.sql) | Unique 模型更新，部分列更新 |
+| [Trino](trino.sql) | 依赖 Connector 支持 |
+| [DuckDB](duckdb.sql) | 标准 UPDATE 支持 |
+| [MaxCompute](maxcompute.sql) | 不支持行级 UPDATE |
+| [Hologres](hologres.sql) | 实时 UPDATE 支持 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 标准 UPDATE，推荐 DELETE+INSERT |
+| [Azure Synapse](synapse.sql) | UPDATE 支持，分布式执行 |
+| [Databricks SQL](databricks.sql) | Delta Lake UPDATE，MERGE 更常用 |
+| [Greenplum](greenplum.sql) | PG 兼容 UPDATE |
+| [Impala](impala.sql) | 仅 Kudu/Iceberg 表可 UPDATE |
+| [Vertica](vertica.sql) | 标记删除+插入，后台 PURGE |
+| [Teradata](teradata.sql) | 标准 UPDATE，支持多表 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 UPDATE |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 UPDATE |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 UPDATE |
+| [Spanner](spanner.sql) | UPDATE WHERE 必须，DML 或 Mutation |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 UPDATE |
+| [PolarDB](polardb.sql) | MySQL 兼容 UPDATE |
+| [openGauss](opengauss.sql) | PG 兼容 UPDATE |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式 UPDATE |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 UPDATE |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG UPDATE，超表透明 |
+| [TDengine](tdengine.sql) | 不支持 UPDATE(追加写入模型) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持 UPDATE |
+| [Materialize](materialize.sql) | 不支持直接 UPDATE(流式) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准 UPDATE 支持 |
+| [Derby](derby.sql) | 标准 UPDATE 支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 UPDATE 规范 |
 
 ## 核心差异
 

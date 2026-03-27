@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 手动 INSERT/UPDATE 实现 SCD，无原生支持 |
+| [PostgreSQL](postgres.sql) | TRIGGER + 历史表，temporal_tables 扩展 |
+| [SQLite](sqlite.sql) | 手动 INSERT/UPDATE 实现 SCD |
+| [Oracle](oracle.sql) | Flashback Data Archive / MERGE 实现 SCD2 |
+| [SQL Server](sqlserver.sql) | Temporal Table(2016+) 原生系统版本化 |
+| [MariaDB](mariadb.sql) | System Versioned Table(10.3+) 原生支持 |
+| [Firebird](firebird.sql) | 手动实现 SCD，无原生支持 |
+| [IBM Db2](db2.sql) | Temporal Table(时态表)原生支持 |
+| [SAP HANA](saphana.sql) | History Table / SCD 存储过程 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | MERGE INTO 实现 SCD2 |
+| [Snowflake](snowflake.sql) | MERGE + Stream/Task 自动化 SCD |
+| [ClickHouse](clickhouse.sql) | ReplacingMergeTree + VERSION 列 |
+| [Hive](hive.sql) | INSERT OVERWRITE 全量快照/MERGE SCD2 |
+| [Spark SQL](spark.sql) | Delta Lake MERGE INTO 实现 SCD2 |
+| [Flink SQL](flink.sql) | CDC + Temporal Table 实时维度 |
+| [StarRocks](starrocks.sql) | Primary Key 模型 + 版本列 |
+| [Doris](doris.sql) | Unique Key + 序列列实现版本 |
+| [Trino](trino.sql) | MERGE INTO(401+) 实现 SCD |
+| [DuckDB](duckdb.sql) | MERGE/INSERT OR REPLACE 实现 SCD |
+| [MaxCompute](maxcompute.sql) | 全量快照覆盖/增量 MERGE |
+| [Hologres](hologres.sql) | Binlog CDC + MERGE 方案 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | MERGE INTO(2023+) 或 DELETE+INSERT |
+| [Azure Synapse](synapse.sql) | Temporal Table / CTAS 方案 |
+| [Databricks SQL](databricks.sql) | Delta Lake MERGE INTO SCD2 原生 |
+| [Greenplum](greenplum.sql) | MERGE 或 DELETE+INSERT 方案 |
+| [Impala](impala.sql) | Kudu UPSERT / Iceberg MERGE |
+| [Vertica](vertica.sql) | MERGE INTO 实现 SCD |
+| [Teradata](teradata.sql) | Temporal Table 原生支持 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 MERGE 替代方案 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式 MERGE |
+| [CockroachDB](cockroachdb.sql) | 无原生 SCD，INSERT+UPDATE 方案 |
+| [Spanner](spanner.sql) | DML MERGE 实现 SCD |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 TRIGGER 方案 |
+| [PolarDB](polardb.sql) | MySQL 兼容，手动实现 |
+| [openGauss](opengauss.sql) | PG 兼容 TRIGGER 方案 |
+| [TDSQL](tdsql.sql) | MySQL 兼容，手动实现 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 MERGE |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG + 时间维度天然适配 |
+| [TDengine](tdengine.sql) | 不适用(时序追加模型) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不适用(流式处理) |
+| [Materialize](materialize.sql) | 不适用(流式增量视图) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 手动实现 SCD |
+| [Derby](derby.sql) | 手动实现 SCD |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2011 Temporal Table 规范 |
 
 ## 横向对比
 

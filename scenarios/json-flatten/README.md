@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | JSON_TABLE(8.0+)，JSON_EXTRACT/JSON_UNQUOTE |
+| [PostgreSQL](postgres.sql) | jsonb_each/jsonb_array_elements/json_to_record |
+| [SQLite](sqlite.sql) | json_each()/json_tree() 展开 |
+| [Oracle](oracle.sql) | JSON_TABLE(12c+) 原生展开 |
+| [SQL Server](sqlserver.sql) | OPENJSON/CROSS APPLY 展开 |
+| [MariaDB](mariadb.sql) | JSON_TABLE(10.6+)，JSON_EXTRACT |
+| [Firebird](firebird.sql) | 无 JSON 展开函数 |
+| [IBM Db2](db2.sql) | JSON_TABLE(11.1+) 展开 |
+| [SAP HANA](saphana.sql) | JSON_TABLE/JSON_QUERY 支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | JSON_EXTRACT_ARRAY + UNNEST 展开 |
+| [Snowflake](snowflake.sql) | LATERAL FLATTEN 展开 VARIANT/ARRAY |
+| [ClickHouse](clickhouse.sql) | JSONExtract + arrayJoin 展开 |
+| [Hive](hive.sql) | get_json_object + LATERAL VIEW explode |
+| [Spark SQL](spark.sql) | from_json + explode 或 json_tuple |
+| [Flink SQL](flink.sql) | JSON_QUERY + UNNEST 展开 |
+| [StarRocks](starrocks.sql) | json_each/get_json_string + UNNEST |
+| [Doris](doris.sql) | jsonb_extract + LATERAL VIEW explode |
+| [Trino](trino.sql) | json_extract + UNNEST 展开 |
+| [DuckDB](duckdb.sql) | json_extract + UNNEST 或 JSON 结构化 |
+| [MaxCompute](maxcompute.sql) | GET_JSON_OBJECT + LATERAL VIEW |
+| [Hologres](hologres.sql) | jsonb_array_elements(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | JSON_EXTRACT_PATH_TEXT + UNION 模拟 |
+| [Azure Synapse](synapse.sql) | OPENJSON 展开(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | from_json + explode 展开 |
+| [Greenplum](greenplum.sql) | PG 兼容 json_each/jsonb_each |
+| [Impala](impala.sql) | GET_JSON_OBJECT + 手动展开 |
+| [Vertica](vertica.sql) | MAPJSONEXTRACTOR + Flex Table |
+| [Teradata](teradata.sql) | JSON_TABLE(JSON Shredding) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | JSON_TABLE(7.0+) 展开 |
+| [OceanBase](oceanbase.sql) | MySQL 兼容 JSON_TABLE |
+| [CockroachDB](cockroachdb.sql) | jsonb_each/jsonb_array_elements(PG) |
+| [Spanner](spanner.sql) | JSON_QUERY_ARRAY + UNNEST |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 jsonb_each |
+| [PolarDB](polardb.sql) | MySQL 兼容 JSON_TABLE |
+| [openGauss](opengauss.sql) | PG 兼容 jsonb_each |
+| [TDSQL](tdsql.sql) | MySQL 兼容 JSON_EXTRACT |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | JSON 函数支持 |
+| [KingbaseES](kingbase.sql) | PG 兼容 jsonb_each |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG JSON 展开函数 |
+| [TDengine](tdengine.sql) | 不支持 JSON 展开 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | EXTRACTJSONFIELD/STRUCT 访问 |
+| [Materialize](materialize.sql) | PG 兼容 jsonb_each |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 无 JSON 展开函数 |
+| [Derby](derby.sql) | 无 JSON 支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2016 JSON_TABLE 规范 |
 
 ## 横向对比
 

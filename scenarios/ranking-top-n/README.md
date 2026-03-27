@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | ROW_NUMBER(8.0+) 或 LIMIT+变量模拟 |
+| [PostgreSQL](postgres.sql) | ROW_NUMBER/RANK + DISTINCT ON 简洁方案 |
+| [SQLite](sqlite.sql) | ROW_NUMBER(3.25+) 或 LIMIT 子查询 |
+| [Oracle](oracle.sql) | ROW_NUMBER/RANK + ROWNUM，分析函数丰富 |
+| [SQL Server](sqlserver.sql) | ROW_NUMBER/RANK + TOP WITH TIES |
+| [MariaDB](mariadb.sql) | ROW_NUMBER(10.2+) 或 LIMIT |
+| [Firebird](firebird.sql) | ROW_NUMBER(3.0+) + FIRST/SKIP |
+| [IBM Db2](db2.sql) | ROW_NUMBER + FETCH FIRST 排名 |
+| [SAP HANA](saphana.sql) | ROW_NUMBER/RANK 完整支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | ROW_NUMBER+QUALIFY 一步 Top-N |
+| [Snowflake](snowflake.sql) | ROW_NUMBER+QUALIFY 一步 Top-N |
+| [ClickHouse](clickhouse.sql) | ROW_NUMBER + LIMIT BY(独有) |
+| [Hive](hive.sql) | ROW_NUMBER/RANK 排名 |
+| [Spark SQL](spark.sql) | ROW_NUMBER/RANK 排名 |
+| [Flink SQL](flink.sql) | ROW_NUMBER TOP-N 模式(流式) |
+| [StarRocks](starrocks.sql) | ROW_NUMBER/RANK 排名 |
+| [Doris](doris.sql) | ROW_NUMBER/RANK 排名 |
+| [Trino](trino.sql) | ROW_NUMBER/RANK 排名 |
+| [DuckDB](duckdb.sql) | ROW_NUMBER+QUALIFY 一步 Top-N |
+| [MaxCompute](maxcompute.sql) | ROW_NUMBER/RANK 排名 |
+| [Hologres](hologres.sql) | ROW_NUMBER(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | ROW_NUMBER/RANK 排名 |
+| [Azure Synapse](synapse.sql) | ROW_NUMBER/RANK + TOP(T-SQL) |
+| [Databricks SQL](databricks.sql) | ROW_NUMBER+QUALIFY 排名 |
+| [Greenplum](greenplum.sql) | PG 兼容 ROW_NUMBER + DISTINCT ON |
+| [Impala](impala.sql) | ROW_NUMBER/RANK 排名 |
+| [Vertica](vertica.sql) | ROW_NUMBER/RANK + LIMIT |
+| [Teradata](teradata.sql) | QUALIFY ROW_NUMBER 原创方案 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 ROW_NUMBER |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式排名 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 ROW_NUMBER |
+| [Spanner](spanner.sql) | ROW_NUMBER/RANK 排名 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 DISTINCT ON |
+| [PolarDB](polardb.sql) | MySQL 兼容 ROW_NUMBER |
+| [openGauss](opengauss.sql) | PG 兼容 DISTINCT ON |
+| [TDSQL](tdsql.sql) | MySQL 兼容 ROW_NUMBER |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | ROWNUM/ROW_NUMBER(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG ROW_NUMBER |
+| [TDengine](tdengine.sql) | TOP()/BOTTOM() 内建函数 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | TOPK/TOPKDISTINCT 聚合 |
+| [Materialize](materialize.sql) | ROW_NUMBER(PG 兼容) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | ROW_NUMBER/RANK 支持 |
+| [Derby](derby.sql) | ROW_NUMBER + FETCH FIRST |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 ROW_NUMBER/RANK + FETCH FIRST |
 
 ## 横向对比
 

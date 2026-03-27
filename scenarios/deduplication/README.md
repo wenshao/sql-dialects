@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | ROW_NUMBER+DELETE 或 GROUP BY+临时表 |
+| [PostgreSQL](postgres.sql) | DISTINCT ON 最简洁，ctid 物理删除 |
+| [SQLite](sqlite.sql) | ROWID 去重，ROW_NUMBER(3.25+) |
+| [Oracle](oracle.sql) | ROWID 去重，ROW_NUMBER 分析函数 |
+| [SQL Server](sqlserver.sql) | ROW_NUMBER+CTE DELETE，DISTINCT 查询 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 去重方案 |
+| [Firebird](firebird.sql) | ROW_NUMBER+DELETE 方案 |
+| [IBM Db2](db2.sql) | ROW_NUMBER+DELETE，RID() 物理行 |
+| [SAP HANA](saphana.sql) | ROW_NUMBER+DELETE 去重 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | ROW_NUMBER+QUALIFY 一步去重 |
+| [Snowflake](snowflake.sql) | ROW_NUMBER+QUALIFY 一步去重 |
+| [ClickHouse](clickhouse.sql) | ReplacingMergeTree 引擎级去重 |
+| [Hive](hive.sql) | ROW_NUMBER+INSERT OVERWRITE 覆盖 |
+| [Spark SQL](spark.sql) | dropDuplicates()/ROW_NUMBER 去重 |
+| [Flink SQL](flink.sql) | ROW_NUMBER TOP-1 模式去重 |
+| [StarRocks](starrocks.sql) | Unique Key 模型自动去重 |
+| [Doris](doris.sql) | Unique Key 模型自动去重 |
+| [Trino](trino.sql) | ROW_NUMBER 去重查询 |
+| [DuckDB](duckdb.sql) | ROW_NUMBER+QUALIFY 去重 |
+| [MaxCompute](maxcompute.sql) | ROW_NUMBER+INSERT OVERWRITE |
+| [Hologres](hologres.sql) | PG 兼容 ctid/ROW_NUMBER 去重 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | ROW_NUMBER+临时表覆盖 |
+| [Azure Synapse](synapse.sql) | ROW_NUMBER+CTAS 去重 |
+| [Databricks SQL](databricks.sql) | ROW_NUMBER+QUALIFY/Delta MERGE |
+| [Greenplum](greenplum.sql) | PG 兼容 ctid 去重 |
+| [Impala](impala.sql) | ROW_NUMBER 去重查询 |
+| [Vertica](vertica.sql) | ANALYZE_STATISTICS + ROW_NUMBER |
+| [Teradata](teradata.sql) | QUALIFY ROW_NUMBER 一步去重 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 ROW_NUMBER 去重 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式去重 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 DISTINCT ON |
+| [Spanner](spanner.sql) | ROW_NUMBER 去重查询 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 DISTINCT ON |
+| [PolarDB](polardb.sql) | MySQL 兼容去重 |
+| [openGauss](opengauss.sql) | PG 兼容 DISTINCT ON/ctid |
+| [TDSQL](tdsql.sql) | MySQL 兼容去重 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | ROWID 去重(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 去重方案 |
+| [TDengine](tdengine.sql) | 相同时间戳自动覆盖(天然去重) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | LATEST_BY_OFFSET 取最新值 |
+| [Materialize](materialize.sql) | DISTINCT ON(PG 兼容) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | ROW_NUMBER 去重 |
+| [Derby](derby.sql) | ROW_NUMBER 去重 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 ROW_NUMBER/DISTINCT 规范 |
 
 ## 横向对比
 

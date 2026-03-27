@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | InnoDB 外键，CHECK(8.0.16+)，NDB 特殊限制 |
+| [PostgreSQL](postgres.sql) | 最完整约束支持，EXCLUDE/DEFERRABLE |
+| [SQLite](sqlite.sql) | 外键需手动开启 PRAGMA foreign_keys |
+| [Oracle](oracle.sql) | DEFERRABLE 约束，虚拟列 CHECK |
+| [SQL Server](sqlserver.sql) | WITH NOCHECK 延迟校验，级联操作 |
+| [MariaDB](mariadb.sql) | CHECK(10.2.1+)真正生效，与 MySQL 差异 |
+| [Firebird](firebird.sql) | 完整约束支持，含 DEFERRABLE |
+| [IBM Db2](db2.sql) | 信息性约束(NOT ENFORCED)，分区键约束 |
+| [SAP HANA](saphana.sql) | PK/UNIQUE 强制，FK/CHECK 默认不强制 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | PK/FK 仅信息性，不强制执行 |
+| [Snowflake](snowflake.sql) | NOT NULL 外均不强制，仅做优化提示 |
+| [ClickHouse](clickhouse.sql) | 无传统约束，CONSTRAINT 仅 CHECK 表达式 |
+| [Hive](hive.sql) | 不支持 PK/FK/CHECK(仅信息性) |
+| [Spark SQL](spark.sql) | NOT NULL 支持，其余不强制 |
+| [Flink SQL](flink.sql) | PK 仅声明性，用于优化 |
+| [StarRocks](starrocks.sql) | PK 模型用于去重，非传统约束 |
+| [Doris](doris.sql) | Unique 模型保证唯一，约束有限 |
+| [Trino](trino.sql) | 依赖底层连接器约束 |
+| [DuckDB](duckdb.sql) | PK/FK/CHECK/UNIQUE 完整支持 |
+| [MaxCompute](maxcompute.sql) | 不支持约束 |
+| [Hologres](hologres.sql) | PK 支持，FK 不支持 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | PK/FK 信息性，不强制执行 |
+| [Azure Synapse](synapse.sql) | NOT ENFORCED 约束，用于优化 |
+| [Databricks SQL](databricks.sql) | Delta Lake PK/FK 信息性(Unity Catalog) |
+| [Greenplum](greenplum.sql) | 分布键必须包含在 PK/UNIQUE 中 |
+| [Impala](impala.sql) | 不支持约束 |
+| [Vertica](vertica.sql) | PK/FK/UNIQUE 信息性，不强制 |
+| [Teradata](teradata.sql) | 完整约束支持，PPI 与 PK 交互 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容，外键(6.6+)，CHECK 不强制 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式约束差异 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容，分布式 UNIQUE 约束 |
+| [Spanner](spanner.sql) | PK 必须指定，INTERLEAVE 层级外键 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容约束，分布式执行 |
+| [PolarDB](polardb.sql) | MySQL 兼容，完整约束 |
+| [openGauss](opengauss.sql) | PG 兼容，支持 DEFERRABLE |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式约束限制 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容约束语法 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 约束，超表 UNIQUE 须含时间列 |
+| [TDengine](tdengine.sql) | 无传统约束，时间列为隐式 PK |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | KEY 仅用于分区，无约束 |
+| [Materialize](materialize.sql) | 无约束支持 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准约束支持，含 DEFERRABLE |
+| [Derby](derby.sql) | 完整约束支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 完整约束定义 |
 
 ## 核心差异
 

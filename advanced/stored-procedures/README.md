@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | CREATE PROCEDURE，DELIMITER 定义，游标支持 |
+| [PostgreSQL](postgres.sql) | CREATE PROCEDURE(11+)/FUNCTION，PL/pgSQL |
+| [SQLite](sqlite.sql) | 无存储过程支持 |
+| [Oracle](oracle.sql) | PL/SQL 包(PACKAGE)/过程/函数，最成熟 |
+| [SQL Server](sqlserver.sql) | T-SQL 存储过程，丰富系统 SP |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 存储过程，Oracle 模式(10.3+) |
+| [Firebird](firebird.sql) | PSQL 过程/函数，EXECUTE BLOCK |
+| [IBM Db2](db2.sql) | SQL PL 过程/函数，C/Java 外部过程 |
+| [SAP HANA](saphana.sql) | SQLScript 过程，CE 函数 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | CREATE PROCEDURE(脚本)，JavaScript UDF |
+| [Snowflake](snowflake.sql) | Snowflake Scripting/JavaScript/Python 过程 |
+| [ClickHouse](clickhouse.sql) | 无存储过程支持 |
+| [Hive](hive.sql) | 无存储过程(UDF/UDAF 替代) |
+| [Spark SQL](spark.sql) | 无存储过程(Scala/Python 替代) |
+| [Flink SQL](flink.sql) | 无存储过程支持 |
+| [StarRocks](starrocks.sql) | 无存储过程支持 |
+| [Doris](doris.sql) | 无存储过程支持 |
+| [Trino](trino.sql) | 无存储过程支持 |
+| [DuckDB](duckdb.sql) | 无存储过程支持 |
+| [MaxCompute](maxcompute.sql) | 无存储过程(PyODPS/DataWorks 替代) |
+| [Hologres](hologres.sql) | PG 兼容 PL/pgSQL 过程 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | CREATE PROCEDURE(PL/pgSQL 子集) |
+| [Azure Synapse](synapse.sql) | T-SQL 存储过程(与 SQL Server 兼容) |
+| [Databricks SQL](databricks.sql) | 无存储过程(Notebook 替代) |
+| [Greenplum](greenplum.sql) | PG 兼容 PL/pgSQL |
+| [Impala](impala.sql) | 无存储过程支持 |
+| [Vertica](vertica.sql) | 无存储过程(UDx 替代) |
+| [Teradata](teradata.sql) | SQL 存储过程 + BTEQ 脚本 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容存储过程(有限) |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式过程 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 PL/pgSQL(23.1+) |
+| [Spanner](spanner.sql) | 无存储过程支持 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 PL/pgSQL |
+| [PolarDB](polardb.sql) | MySQL 兼容存储过程 |
+| [openGauss](opengauss.sql) | PG 兼容 + Oracle PL/SQL 兼容 |
+| [TDSQL](tdsql.sql) | MySQL 兼容存储过程 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | PL/SQL 兼容(Oracle 风格) |
+| [KingbaseES](kingbase.sql) | PG 兼容 PL/pgSQL |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG PL/pgSQL |
+| [TDengine](tdengine.sql) | 无存储过程支持 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无存储过程支持 |
+| [Materialize](materialize.sql) | 无存储过程支持 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 无原生存储过程(Java Alias) |
+| [Derby](derby.sql) | Java 存储过程(SQL/JRT) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 SQL/PSM 过程规范 |
 
 ## 核心差异
 

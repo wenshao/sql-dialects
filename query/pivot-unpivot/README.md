@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 无 PIVOT，用 CASE+聚合模拟 |
+| [PostgreSQL](postgres.sql) | tablefunc 扩展 crosstab()，无原生 PIVOT |
+| [SQLite](sqlite.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Oracle](oracle.sql) | PIVOT/UNPIVOT(11g+)原生支持 |
+| [SQL Server](sqlserver.sql) | PIVOT/UNPIVOT(2005+)原生支持 |
+| [MariaDB](mariadb.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Firebird](firebird.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [IBM Db2](db2.sql) | DECODE+聚合，无原生 PIVOT |
+| [SAP HANA](saphana.sql) | 无原生 PIVOT，用 MAP_MERGE 等函数 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | PIVOT/UNPIVOT(2021+)原生支持 |
+| [Snowflake](snowflake.sql) | PIVOT/UNPIVOT 原生支持 |
+| [ClickHouse](clickhouse.sql) | 无 PIVOT，用 CASE+聚合或 Map |
+| [Hive](hive.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Spark SQL](spark.sql) | DataFrame pivot()，SQL PIVOT(3.4+) |
+| [Flink SQL](flink.sql) | 无 PIVOT 语法 |
+| [StarRocks](starrocks.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Doris](doris.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Trino](trino.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [DuckDB](duckdb.sql) | PIVOT/UNPIVOT 原生支持 |
+| [MaxCompute](maxcompute.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Hologres](hologres.sql) | 无 PIVOT，CASE+聚合模拟 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Azure Synapse](synapse.sql) | 无原生 PIVOT(T-SQL PIVOT 有限) |
+| [Databricks SQL](databricks.sql) | PIVOT 原生支持 |
+| [Greenplum](greenplum.sql) | crosstab()(PG tablefunc) |
+| [Impala](impala.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Vertica](vertica.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Teradata](teradata.sql) | 无原生 PIVOT，用 CASE+聚合 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [OceanBase](oceanbase.sql) | Oracle 模式 PIVOT 支持 |
+| [CockroachDB](cockroachdb.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Spanner](spanner.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [YugabyteDB](yugabytedb.sql) | 无 PIVOT，tablefunc 扩展 |
+| [PolarDB](polardb.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [openGauss](opengauss.sql) | tablefunc 扩展 |
+| [TDSQL](tdsql.sql) | 无 PIVOT，CASE+聚合模拟 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 PIVOT/UNPIVOT |
+| [KingbaseES](kingbase.sql) | PG 兼容 tablefunc |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG tablefunc |
+| [TDengine](tdengine.sql) | 不支持 PIVOT |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持 PIVOT |
+| [Materialize](materialize.sql) | 无 PIVOT 支持 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 无 PIVOT，CASE+聚合模拟 |
+| [Derby](derby.sql) | 无 PIVOT，CASE+聚合模拟 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 无 PIVOT 标准(厂商扩展) |
 
 ## 核心差异
 

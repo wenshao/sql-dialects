@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | DATE/DATETIME/TIMESTAMP，时区处理需注意 |
+| [PostgreSQL](postgres.sql) | DATE/TIMESTAMP/TIMESTAMPTZ/INTERVAL，时区完善 |
+| [SQLite](sqlite.sql) | TEXT/REAL/INTEGER 存储，日期函数处理 |
+| [Oracle](oracle.sql) | DATE(含时分秒)/TIMESTAMP WITH TIME ZONE |
+| [SQL Server](sqlserver.sql) | DATETIME2/DATETIMEOFFSET/DATE/TIME |
+| [MariaDB](mariadb.sql) | 兼容 MySQL，微秒精度(5.3+) |
+| [Firebird](firebird.sql) | DATE/TIME/TIMESTAMP，WITH TIME ZONE(4.0+) |
+| [IBM Db2](db2.sql) | DATE/TIME/TIMESTAMP，纳秒精度 |
+| [SAP HANA](saphana.sql) | DATE/TIME/TIMESTAMP/SECONDDATE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | DATE/DATETIME/TIMESTAMP/TIME，纳秒精度 |
+| [Snowflake](snowflake.sql) | DATE/TIMESTAMP_NTZ/LTZ/TZ 三种时区模式 |
+| [ClickHouse](clickhouse.sql) | Date/Date32/DateTime/DateTime64 精度可选 |
+| [Hive](hive.sql) | DATE/TIMESTAMP，INTERVAL 支持 |
+| [Spark SQL](spark.sql) | DATE/TIMESTAMP/TIMESTAMP_NTZ(3.4+) |
+| [Flink SQL](flink.sql) | DATE/TIME/TIMESTAMP/TIMESTAMP_LTZ |
+| [StarRocks](starrocks.sql) | DATE/DATETIME，微秒精度 |
+| [Doris](doris.sql) | DATE/DATETIME/DATEV2/DATETIMEV2 |
+| [Trino](trino.sql) | DATE/TIME/TIMESTAMP WITH TIME ZONE |
+| [DuckDB](duckdb.sql) | DATE/TIME/TIMESTAMP/TIMESTAMPTZ/INTERVAL |
+| [MaxCompute](maxcompute.sql) | DATE/DATETIME/TIMESTAMP，秒级精度 |
+| [Hologres](hologres.sql) | PG 兼容 DATE/TIMESTAMP/TIMESTAMPTZ |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | DATE/TIMESTAMP/TIMESTAMPTZ(PG 兼容) |
+| [Azure Synapse](synapse.sql) | DATETIME2/DATETIMEOFFSET(T-SQL) |
+| [Databricks SQL](databricks.sql) | DATE/TIMESTAMP/TIMESTAMP_NTZ |
+| [Greenplum](greenplum.sql) | PG 兼容日期时间类型 |
+| [Impala](impala.sql) | DATE/TIMESTAMP，无时区类型 |
+| [Vertica](vertica.sql) | DATE/TIME/TIMESTAMP/TIMESTAMPTZ/INTERVAL |
+| [Teradata](teradata.sql) | DATE(整数存储)/TIMESTAMP/INTERVAL |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容日期时间类型 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式日期类型 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容日期时间类型 |
+| [Spanner](spanner.sql) | DATE/TIMESTAMP(纳秒，UTC) |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容日期时间类型 |
+| [PolarDB](polardb.sql) | MySQL 兼容日期时间类型 |
+| [openGauss](opengauss.sql) | PG 兼容日期时间类型 |
+| [TDSQL](tdsql.sql) | MySQL 兼容日期时间类型 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 DATE/TIMESTAMP |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG TIMESTAMPTZ，时序核心类型 |
+| [TDengine](tdengine.sql) | TIMESTAMP 纳秒精度，时间为主键 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | TIMESTAMP/DATE/TIME，Kafka 时间语义 |
+| [Materialize](materialize.sql) | PG 兼容日期时间类型 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | DATE/TIME/TIMESTAMP/TIMESTAMP WITH TIME ZONE |
+| [Derby](derby.sql) | DATE/TIME/TIMESTAMP 标准类型 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 DATE/TIME/TIMESTAMP/INTERVAL |
 
 ## 核心差异
 

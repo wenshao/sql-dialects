@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | DELETE + TRUNCATE，多表 DELETE 支持 |
+| [PostgreSQL](postgres.sql) | DELETE RETURNING，USING 多表删除 |
+| [SQLite](sqlite.sql) | DELETE 基础支持，TRUNCATE 用 DELETE 模拟 |
+| [Oracle](oracle.sql) | DELETE + TRUNCATE，闪回恢复 |
+| [SQL Server](sqlserver.sql) | DELETE + TRUNCATE，OUTPUT 子句 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL DELETE，RETURNING(10.0+) |
+| [Firebird](firebird.sql) | DELETE RETURNING，标准 SQL 风格 |
+| [IBM Db2](db2.sql) | DELETE + TRUNCATE，日志控制 |
+| [SAP HANA](saphana.sql) | DELETE + TRUNCATE TABLE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | DELETE WHERE 必须，DML 配额限制 |
+| [Snowflake](snowflake.sql) | DELETE + TRUNCATE，Time Travel 恢复 |
+| [ClickHouse](clickhouse.sql) | 轻量删除(23.3+)，ALTER DELETE(异步) |
+| [Hive](hive.sql) | 仅 ACID 表可 DELETE(3.0+) |
+| [Spark SQL](spark.sql) | Delta Lake DELETE 支持，ACID |
+| [Flink SQL](flink.sql) | CDC/Retract 模式删除 |
+| [StarRocks](starrocks.sql) | Primary Key 模型支持实时删除 |
+| [Doris](doris.sql) | Unique 模型 DELETE，批量删除 |
+| [Trino](trino.sql) | 依赖 Connector 支持 |
+| [DuckDB](duckdb.sql) | 标准 DELETE 支持 |
+| [MaxCompute](maxcompute.sql) | 仅分区级 TRUNCATE |
+| [Hologres](hologres.sql) | 实时 DELETE 支持 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | DELETE + TRUNCATE，推荐 TRUNCATE |
+| [Azure Synapse](synapse.sql) | DELETE 支持，分布式执行 |
+| [Databricks SQL](databricks.sql) | Delta Lake DELETE，TIME TRAVEL 恢复 |
+| [Greenplum](greenplum.sql) | PG 兼容 DELETE |
+| [Impala](impala.sql) | 仅 Kudu/Iceberg 表可 DELETE |
+| [Vertica](vertica.sql) | 标记删除，后台 PURGE |
+| [Teradata](teradata.sql) | DELETE + TRUNCATE(FastLoad 日志) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 DELETE |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 DELETE |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 DELETE，分布式事务 |
+| [Spanner](spanner.sql) | DELETE + TRUNCATE(分区级) |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 DELETE |
+| [PolarDB](polardb.sql) | MySQL 兼容 DELETE |
+| [openGauss](opengauss.sql) | PG 兼容 DELETE RETURNING |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式 DELETE |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 DELETE |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | drop_chunks() 高效删除旧分区 |
+| [TDengine](tdengine.sql) | 按时间范围删除 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | Tombstone 消息(KEY=null) |
+| [Materialize](materialize.sql) | 不支持直接 DELETE(流式) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准 DELETE 支持 |
+| [Derby](derby.sql) | 标准 DELETE 支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 DELETE/TRUNCATE 规范 |
 
 ## 核心差异
 

@@ -5,85 +5,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | InnoDB 行锁/间隙锁/Next-Key，FOR UPDATE |
+| [PostgreSQL](postgres.sql) | MVCC + 行锁，FOR UPDATE/SHARE/NO KEY |
+| [SQLite](sqlite.sql) | 文件级锁(SHARED/RESERVED/EXCLUSIVE)，WAL 模式 |
+| [Oracle](oracle.sql) | 行锁无锁升级，FOR UPDATE WAIT/NOWAIT |
+| [SQL Server](sqlserver.sql) | 行/页/表锁升级，NOLOCK/UPDLOCK 提示 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL InnoDB 锁，SKIP LOCKED(10.6+) |
+| [Firebird](firebird.sql) | MVCC + 行锁，WITH LOCK |
+| [IBM Db2](db2.sql) | 行/页/表锁，LOCK TABLE 显式 |
+| [SAP HANA](saphana.sql) | MVCC 为主，行锁/表锁 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 无显式锁，Snapshot 隔离 |
+| [Snowflake](snowflake.sql) | 无显式锁，自动并发控制 |
+| [ClickHouse](clickhouse.sql) | 无行锁，Part 级互斥(mutation) |
+| [Hive](hive.sql) | 表/分区锁(ZooKeeper)，ACID(3.0+) |
+| [Spark SQL](spark.sql) | Delta Lake 乐观并发控制 |
+| [Flink SQL](flink.sql) | 无锁概念(流式处理) |
+| [StarRocks](starrocks.sql) | 表级锁(DDL)，无行锁 |
+| [Doris](doris.sql) | 表级锁(DDL)，无行锁 |
+| [Trino](trino.sql) | 无锁概念，只读查询为主 |
+| [DuckDB](duckdb.sql) | MVCC + WAL，进程级并发 |
+| [MaxCompute](maxcompute.sql) | 无锁概念(批处理) |
+| [Hologres](hologres.sql) | MVCC + 行锁(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 表级锁，无行锁 |
+| [Azure Synapse](synapse.sql) | 表级锁，并发有限 |
+| [Databricks SQL](databricks.sql) | Delta Lake 乐观并发 |
+| [Greenplum](greenplum.sql) | PG 兼容锁，分布式协调 |
+| [Impala](impala.sql) | 无锁概念(只读分析) |
+| [Vertica](vertica.sql) | MVCC + 投影锁，无行锁 |
+| [Teradata](teradata.sql) | 行级锁/ROWHASH 锁，ACCESS 锁模式 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 乐观/悲观事务锁，FOR UPDATE |
+| [OceanBase](oceanbase.sql) | 行锁/意向锁，MySQL 兼容 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 FOR UPDATE，分布式锁 |
+| [Spanner](spanner.sql) | 读写锁/共享锁，Paxos 复制 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容行锁 |
+| [PolarDB](polardb.sql) | MySQL 兼容 InnoDB 锁 |
+| [openGauss](opengauss.sql) | PG 兼容锁机制 |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式锁协调 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容锁机制 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 锁机制 |
+| [TDengine](tdengine.sql) | 无行锁(追加写入) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无锁概念(Kafka 分区) |
+| [Materialize](materialize.sql) | 无锁(流式增量计算) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 表级/行级锁(MVCC 模式) |
+| [Derby](derby.sql) | 行级锁，锁升级到表 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 隔离级别隐含锁语义 |
 
 ## 核心差异
 

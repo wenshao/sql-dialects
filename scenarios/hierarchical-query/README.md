@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 递归 CTE(8.0+)，此前无原生层级查询 |
+| [PostgreSQL](postgres.sql) | 递归 CTE + SEARCH/CYCLE(14+)，ltree 扩展 |
+| [SQLite](sqlite.sql) | 递归 CTE(3.8.3+)，轻量层级查询 |
+| [Oracle](oracle.sql) | CONNECT BY 经典语法 + 递归 CTE(11gR2+) |
+| [SQL Server](sqlserver.sql) | 递归 CTE + hierarchyid 类型 |
+| [MariaDB](mariadb.sql) | 递归 CTE(10.2.1+)，兼容 MySQL |
+| [Firebird](firebird.sql) | 递归 CTE(2.1+) 层级查询 |
+| [IBM Db2](db2.sql) | 递归 CTE，最早支持的方言之一 |
+| [SAP HANA](saphana.sql) | HIERARCHY 函数原生层级支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 递归 CTE 层级查询 |
+| [Snowflake](snowflake.sql) | 递归 CTE + CONNECT BY 兼容 |
+| [ClickHouse](clickhouse.sql) | 无递归 CTE，hierarchicalDictionary 有限 |
+| [Hive](hive.sql) | 无递归 CTE，需多次 JOIN 或 UDF |
+| [Spark SQL](spark.sql) | 无递归 CTE，GraphX/DataFrame 迭代 |
+| [Flink SQL](flink.sql) | 无递归 CTE 支持 |
+| [StarRocks](starrocks.sql) | 无递归 CTE 支持 |
+| [Doris](doris.sql) | 无递归 CTE 支持 |
+| [Trino](trino.sql) | 递归 CTE(362+) 支持 |
+| [DuckDB](duckdb.sql) | 递归 CTE 完整支持 |
+| [MaxCompute](maxcompute.sql) | 无递归 CTE，需多次迭代 |
+| [Hologres](hologres.sql) | 递归 CTE(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 无递归 CTE 支持 |
+| [Azure Synapse](synapse.sql) | 递归 CTE 支持 |
+| [Databricks SQL](databricks.sql) | 无递归 CTE 支持 |
+| [Greenplum](greenplum.sql) | 递归 CTE(PG 兼容) |
+| [Impala](impala.sql) | 无递归 CTE 支持 |
+| [Vertica](vertica.sql) | 递归 CTE + CONNECT BY 兼容 |
+| [Teradata](teradata.sql) | 递归 CTE，最早标准化 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | 递归 CTE(5.1+) 支持 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 模式递归查询 |
+| [CockroachDB](cockroachdb.sql) | 递归 CTE(PG 兼容) |
+| [Spanner](spanner.sql) | 递归 CTE 支持 |
+| [YugabyteDB](yugabytedb.sql) | 递归 CTE(PG 兼容) |
+| [PolarDB](polardb.sql) | MySQL 兼容递归 CTE |
+| [openGauss](opengauss.sql) | 递归 CTE + CONNECT BY 兼容 |
+| [TDSQL](tdsql.sql) | MySQL 兼容递归 CTE |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | CONNECT BY(Oracle 兼容) + 递归 CTE |
+| [KingbaseES](kingbase.sql) | PG 兼容递归 CTE |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 递归 CTE |
+| [TDengine](tdengine.sql) | 不支持层级查询 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持层级查询 |
+| [Materialize](materialize.sql) | 递归 CTE 不支持(非递归 CTE 可用) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 递归 CTE 支持 |
+| [Derby](derby.sql) | 递归 CTE 支持(10.14+) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:1999 WITH RECURSIVE 规范 |
 
 ## 横向对比
 

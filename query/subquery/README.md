@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 标量/表/EXISTS 子查询，8.0 优化器增强 |
+| [PostgreSQL](postgres.sql) | 完整子查询 + LATERAL，优化器成熟 |
+| [SQLite](sqlite.sql) | 标量/表/EXISTS 子查询，基本支持 |
+| [Oracle](oracle.sql) | 完整子查询，标量子查询缓存 |
+| [SQL Server](sqlserver.sql) | 完整子查询 + CROSS/OUTER APPLY |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 子查询 |
+| [Firebird](firebird.sql) | 标准子查询支持 |
+| [IBM Db2](db2.sql) | 完整子查询 + LATERAL 支持 |
+| [SAP HANA](saphana.sql) | 标准子查询支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 相关/非相关子查询 + ARRAY 子查询 |
+| [Snowflake](snowflake.sql) | 完整子查询支持 |
+| [ClickHouse](clickhouse.sql) | IN/JOIN 子查询，全局分布式(GLOBAL IN) |
+| [Hive](hive.sql) | IN/EXISTS(0.13+)，相关子查询有限 |
+| [Spark SQL](spark.sql) | 完整子查询(2.0+)，优化器下推 |
+| [Flink SQL](flink.sql) | IN/EXISTS 子查询，有限相关子查询 |
+| [StarRocks](starrocks.sql) | 完整子查询支持 |
+| [Doris](doris.sql) | 完整子查询支持 |
+| [Trino](trino.sql) | 完整子查询 + 相关子查询 |
+| [DuckDB](duckdb.sql) | 完整子查询 + LATERAL |
+| [MaxCompute](maxcompute.sql) | IN/EXISTS 子查询支持 |
+| [Hologres](hologres.sql) | PG 兼容子查询 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 完整子查询(PG 兼容) |
+| [Azure Synapse](synapse.sql) | 完整子查询支持 |
+| [Databricks SQL](databricks.sql) | 完整子查询支持 |
+| [Greenplum](greenplum.sql) | PG 兼容子查询 |
+| [Impala](impala.sql) | IN/EXISTS 子查询(2.0+) |
+| [Vertica](vertica.sql) | 完整子查询支持 |
+| [Teradata](teradata.sql) | 完整子查询支持 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容子查询，自动去相关 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式子查询 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容子查询 |
+| [Spanner](spanner.sql) | 完整子查询支持 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容子查询 |
+| [PolarDB](polardb.sql) | MySQL 兼容子查询 |
+| [openGauss](opengauss.sql) | PG 兼容子查询 |
+| [TDSQL](tdsql.sql) | MySQL 兼容子查询 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容子查询 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 子查询 |
+| [TDengine](tdengine.sql) | 有限子查询支持 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持子查询 |
+| [Materialize](materialize.sql) | PG 兼容子查询 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准子查询支持 |
+| [Derby](derby.sql) | 标准子查询支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:1992 子查询 / SQL:2003 LATERAL |
 
 ## 核心差异
 

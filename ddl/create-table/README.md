@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | InnoDB/MyISAM 引擎选择，AUTO_INCREMENT，CHARSET |
+| [PostgreSQL](postgres.sql) | 继承/分区表，GENERATED ALWAYS，丰富类型 |
+| [SQLite](sqlite.sql) | 无需类型严格声明，STRICT 模式(3.37+) |
+| [Oracle](oracle.sql) | 表空间管理，ORGANIZATION INDEX，分区策略 |
+| [SQL Server](sqlserver.sql) | FILEGROUP 存储，IDENTITY，压缩选项 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL，额外引擎(Aria/ColumnStore) |
+| [Firebird](firebird.sql) | COMPUTED BY 计算列，GTT 全局临时表 |
+| [IBM Db2](db2.sql) | ORGANIZE BY，MDC 多维聚簇 |
+| [SAP HANA](saphana.sql) | 列存/行存二选一，TABLE TYPE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 无索引，分区/聚簇表，嵌套 STRUCT/ARRAY |
+| [Snowflake](snowflake.sql) | VARIANT 半结构化，CLUSTER BY，Transient 表 |
+| [ClickHouse](clickhouse.sql) | ENGINE 必选(MergeTree 家族)，ORDER BY 关键 |
+| [Hive](hive.sql) | STORED AS(ORC/Parquet)，PARTITIONED BY，外部表 |
+| [Spark SQL](spark.sql) | USING 数据源，Delta/Parquet/CSV 格式 |
+| [Flink SQL](flink.sql) | WITH 连接器属性，水印定义 |
+| [StarRocks](starrocks.sql) | 明细/聚合/更新/主键四种模型 |
+| [Doris](doris.sql) | 类 StarRocks 模型，DUPLICATE/UNIQUE/AGGREGATE |
+| [Trino](trino.sql) | CREATE TABLE AS 为主，依赖 Connector |
+| [DuckDB](duckdb.sql) | 自动类型推断，可直接从文件建表 |
+| [MaxCompute](maxcompute.sql) | 分区表为主，LIFECYCLE 生命周期 |
+| [Hologres](hologres.sql) | 行存/列存/行列混存，Distribution Key |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | DISTKEY/SORTKEY 分布排序策略 |
+| [Azure Synapse](synapse.sql) | DISTRIBUTION(HASH/ROUND_ROBIN/REPLICATE) |
+| [Databricks SQL](databricks.sql) | Delta Lake USING DELTA，LOCATION 外部表 |
+| [Greenplum](greenplum.sql) | DISTRIBUTED BY 分布键，面向分析 |
+| [Impala](impala.sql) | STORED AS Parquet，Kudu 表支持 |
+| [Vertica](vertica.sql) | 投影(Projection)自动设计，列式存储 |
+| [Teradata](teradata.sql) | PI(Primary Index)分布，SET/MULTISET 表 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容建表，支持 AUTO_RANDOM |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式建表 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容，REGIONAL BY ROW 地理分布 |
+| [Spanner](spanner.sql) | INTERLEAVE 表层级，无自增 ID |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容，SPLIT AT 预拆分 |
+| [PolarDB](polardb.sql) | MySQL 兼容，存储计算分离 |
+| [openGauss](opengauss.sql) | PG 兼容，列存/行存引擎 |
+| [TDSQL](tdsql.sql) | MySQL 兼容，shardkey 分片键 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容，表空间管理 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | create_hypertable() 转超表，自动分区 |
+| [TDengine](tdengine.sql) | 超级表(STable) + 子表 + 标签(TAG) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | CREATE STREAM/TABLE，Kafka Topic 绑定 |
+| [Materialize](materialize.sql) | CREATE SOURCE/VIEW，增量维护 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准 SQL 建表，内存/文件模式 |
+| [Derby](derby.sql) | 标准 SQL 建表，嵌入式部署 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 CREATE TABLE 规范 |
 
 ## 核心差异
 

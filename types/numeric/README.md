@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | TINYINT~BIGINT/DECIMAL/FLOAT/DOUBLE |
+| [PostgreSQL](postgres.sql) | SMALLINT~BIGINT/NUMERIC/REAL/DOUBLE/MONEY |
+| [SQLite](sqlite.sql) | INTEGER/REAL 动态类型，无固定精度 |
+| [Oracle](oracle.sql) | NUMBER(p,s) 统一类型，BINARY_FLOAT/DOUBLE |
+| [SQL Server](sqlserver.sql) | INT/DECIMAL/MONEY/FLOAT/REAL/NUMERIC |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 数值类型 |
+| [Firebird](firebird.sql) | SMALLINT~BIGINT/NUMERIC/FLOAT/DOUBLE |
+| [IBM Db2](db2.sql) | SMALLINT~BIGINT/DECIMAL/REAL/DOUBLE/DECFLOAT |
+| [SAP HANA](saphana.sql) | TINYINT~BIGINT/DECIMAL/REAL/DOUBLE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | INT64/NUMERIC/BIGNUMERIC/FLOAT64 |
+| [Snowflake](snowflake.sql) | NUMBER(38,n)/FLOAT，固定+浮点双模式 |
+| [ClickHouse](clickhouse.sql) | Int8~Int256/Decimal/Float32/64 精细控制 |
+| [Hive](hive.sql) | TINYINT~BIGINT/DECIMAL/FLOAT/DOUBLE |
+| [Spark SQL](spark.sql) | BYTE~LONG/DECIMAL/FLOAT/DOUBLE |
+| [Flink SQL](flink.sql) | TINYINT~BIGINT/DECIMAL/FLOAT/DOUBLE |
+| [StarRocks](starrocks.sql) | TINYINT~LARGEINT(128bit)/DECIMAL |
+| [Doris](doris.sql) | TINYINT~LARGEINT/DECIMAL/FLOAT/DOUBLE |
+| [Trino](trino.sql) | TINYINT~BIGINT/DECIMAL/REAL/DOUBLE |
+| [DuckDB](duckdb.sql) | TINYINT~HUGEINT(128bit)/DECIMAL |
+| [MaxCompute](maxcompute.sql) | TINYINT~BIGINT/DECIMAL/FLOAT/DOUBLE |
+| [Hologres](hologres.sql) | INT/BIGINT/NUMERIC/FLOAT/DOUBLE(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | SMALLINT~BIGINT/DECIMAL/REAL/DOUBLE(PG 兼容) |
+| [Azure Synapse](synapse.sql) | INT/DECIMAL/MONEY/FLOAT(T-SQL 兼容) |
+| [Databricks SQL](databricks.sql) | BYTE~LONG/DECIMAL/FLOAT/DOUBLE |
+| [Greenplum](greenplum.sql) | PG 兼容数值类型 |
+| [Impala](impala.sql) | TINYINT~BIGINT/DECIMAL/FLOAT/DOUBLE |
+| [Vertica](vertica.sql) | INT/NUMERIC/FLOAT/DOUBLE 列式优化 |
+| [Teradata](teradata.sql) | BYTEINT~BIGINT/DECIMAL/FLOAT/NUMBER |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容数值类型 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式数值类型 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容数值类型 |
+| [Spanner](spanner.sql) | INT64/FLOAT32/FLOAT64/NUMERIC |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容数值类型 |
+| [PolarDB](polardb.sql) | MySQL 兼容数值类型 |
+| [openGauss](opengauss.sql) | PG 兼容数值类型 |
+| [TDSQL](tdsql.sql) | MySQL 兼容数值类型 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | NUMBER/INT/DECIMAL(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 数值类型 |
+| [TDengine](tdengine.sql) | TINYINT~BIGINT/FLOAT/DOUBLE，无 DECIMAL |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | INT/BIGINT/DOUBLE/DECIMAL |
+| [Materialize](materialize.sql) | PG 兼容数值类型 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准数值类型完整支持 |
+| [Derby](derby.sql) | SMALLINT~BIGINT/DECIMAL/REAL/DOUBLE |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 SMALLINT~BIGINT/NUMERIC/DECIMAL |
 
 ## 核心差异
 

@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | DATE_ADD/DATEDIFF/DATE_FORMAT，丰富日期函数 |
+| [PostgreSQL](postgres.sql) | INTERVAL 运算/date_trunc/to_char/AGE() |
+| [SQLite](sqlite.sql) | strftime()/date()/julianday()，函数式 API |
+| [Oracle](oracle.sql) | SYSDATE/ADD_MONTHS/TRUNC/TO_DATE，独有语法 |
+| [SQL Server](sqlserver.sql) | DATEADD/DATEDIFF/FORMAT/DATEFROMPARTS |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 日期函数 |
+| [Firebird](firebird.sql) | DATEADD/DATEDIFF，标准 SQL 风格 |
+| [IBM Db2](db2.sql) | DATE/TIMESTAMP 运算 + 标量函数 |
+| [SAP HANA](saphana.sql) | ADD_DAYS/DAYSBETWEEN/TO_DATE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | DATE_ADD/DATE_DIFF/FORMAT_DATE/EXTRACT |
+| [Snowflake](snowflake.sql) | DATEADD/DATEDIFF/DATE_TRUNC/TO_DATE |
+| [ClickHouse](clickhouse.sql) | toDate/toDateTime/date_diff/formatDateTime |
+| [Hive](hive.sql) | date_add/datediff/from_unixtime/unix_timestamp |
+| [Spark SQL](spark.sql) | date_add/datediff/date_format/to_date |
+| [Flink SQL](flink.sql) | DATE_FORMAT/TIMESTAMPDIFF/TO_TIMESTAMP |
+| [StarRocks](starrocks.sql) | date_add/date_diff/date_format |
+| [Doris](doris.sql) | date_add/datediff/date_format |
+| [Trino](trino.sql) | date_add/date_diff/format_datetime |
+| [DuckDB](duckdb.sql) | date_add/date_diff/strftime/date_trunc |
+| [MaxCompute](maxcompute.sql) | DATEADD/DATEDIFF/TO_DATE/FROM_UNIXTIME |
+| [Hologres](hologres.sql) | PG 兼容日期函数 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | DATEADD/DATEDIFF/TO_DATE(PG 兼容) |
+| [Azure Synapse](synapse.sql) | DATEADD/DATEDIFF/FORMAT(T-SQL) |
+| [Databricks SQL](databricks.sql) | date_add/datediff/date_format |
+| [Greenplum](greenplum.sql) | PG 兼容日期函数 |
+| [Impala](impala.sql) | date_add/datediff/from_unixtime |
+| [Vertica](vertica.sql) | TIMESTAMPDIFF/DATE_TRUNC/TO_DATE |
+| [Teradata](teradata.sql) | INTERVAL 运算，日期独有整数表示 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容日期函数 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式日期函数 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容日期函数 |
+| [Spanner](spanner.sql) | DATE_ADD/DATE_DIFF/FORMAT_DATE |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容日期函数 |
+| [PolarDB](polardb.sql) | MySQL 兼容日期函数 |
+| [openGauss](opengauss.sql) | PG 兼容日期函数 |
+| [TDSQL](tdsql.sql) | MySQL 兼容日期函数 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容日期函数 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG + time_bucket() 时序专用 |
+| [TDengine](tdengine.sql) | NOW()/TIMETRUNCATE()/TIMEDIFF() 等 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | UNIX_TIMESTAMP/FORMAT_TIMESTAMP |
+| [Materialize](materialize.sql) | PG 兼容日期函数 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | DATEADD/DATEDIFF/FORMATDATETIME |
+| [Derby](derby.sql) | DATE/TIMESTAMP 函数，功能有限 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 EXTRACT/CURRENT_DATE/INTERVAL |
 
 ## 核心差异
 

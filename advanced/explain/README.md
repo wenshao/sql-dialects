@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | EXPLAIN/EXPLAIN ANALYZE(8.0+)，JSON 格式 |
+| [PostgreSQL](postgres.sql) | EXPLAIN ANALYZE + BUFFERS/COSTS/TIMING 详细 |
+| [SQLite](sqlite.sql) | EXPLAIN QUERY PLAN，简洁输出 |
+| [Oracle](oracle.sql) | EXPLAIN PLAN/DBMS_XPLAN/V$SQL_PLAN |
+| [SQL Server](sqlserver.sql) | SET SHOWPLAN_XML/实际执行计划/Statistics IO |
+| [MariaDB](mariadb.sql) | EXPLAIN ANALYZE(10.1+)，兼容 MySQL |
+| [Firebird](firebird.sql) | SET PLANONLY/EXPLAIN，简洁计划 |
+| [IBM Db2](db2.sql) | EXPLAIN + db2exfmt 格式化工具 |
+| [SAP HANA](saphana.sql) | EXPLAIN PLAN/PLAN VISUALIZATION |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | EXPLAIN(预估)/ INFORMATION_SCHEMA.JOBS |
+| [Snowflake](snowflake.sql) | EXPLAIN + Query Profile(Web UI 可视化) |
+| [ClickHouse](clickhouse.sql) | EXPLAIN PIPELINE/AST/SYNTAX/PLAN |
+| [Hive](hive.sql) | EXPLAIN/EXPLAIN EXTENDED/EXPLAIN DEPENDENCY |
+| [Spark SQL](spark.sql) | EXPLAIN EXTENDED/CODEGEN/COST/FORMATTED |
+| [Flink SQL](flink.sql) | EXPLAIN PLAN FOR，执行图预览 |
+| [StarRocks](starrocks.sql) | EXPLAIN/EXPLAIN ANALYZE/PROFILE |
+| [Doris](doris.sql) | EXPLAIN/EXPLAIN ANALYZE |
+| [Trino](trino.sql) | EXPLAIN/EXPLAIN ANALYZE + 分布式 Stage |
+| [DuckDB](duckdb.sql) | EXPLAIN ANALYZE，内存分析 |
+| [MaxCompute](maxcompute.sql) | EXPLAIN + Cost Estimator |
+| [Hologres](hologres.sql) | EXPLAIN ANALYZE(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | EXPLAIN + SVL_QUERY_SUMMARY 系统表 |
+| [Azure Synapse](synapse.sql) | EXPLAIN(T-SQL 执行计划) |
+| [Databricks SQL](databricks.sql) | EXPLAIN EXTENDED/COST |
+| [Greenplum](greenplum.sql) | PG 兼容 EXPLAIN + 分布式 Slice |
+| [Impala](impala.sql) | EXPLAIN/PROFILE 查询剖析 |
+| [Vertica](vertica.sql) | EXPLAIN + EXPLAIN VERBOSE |
+| [Teradata](teradata.sql) | EXPLAIN 文本计划(Step 描述) |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | EXPLAIN ANALYZE，TiFlash 执行路径 |
+| [OceanBase](oceanbase.sql) | EXPLAIN + 计划缓存 GV$PLAN_CACHE |
+| [CockroachDB](cockroachdb.sql) | EXPLAIN ANALYZE(DISTSQL)分布式计划 |
+| [Spanner](spanner.sql) | EXPLAIN/Query Execution Plan |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 EXPLAIN ANALYZE |
+| [PolarDB](polardb.sql) | MySQL 兼容 EXPLAIN |
+| [openGauss](opengauss.sql) | PG 兼容 EXPLAIN ANALYZE |
+| [TDSQL](tdsql.sql) | MySQL 兼容 EXPLAIN |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | EXPLAIN 支持 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG EXPLAIN + chunk 过滤可见 |
+| [TDengine](tdengine.sql) | EXPLAIN 支持(3.0+) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | EXPLAIN 查询拓扑 |
+| [Materialize](materialize.sql) | EXPLAIN PLAN/TIMESTAMP/DECORRELATED |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | EXPLAIN ANALYZE 支持 |
+| [Derby](derby.sql) | RUNTIMESTATISTICS 执行统计 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 无标准 EXPLAIN(厂商扩展) |
 
 ## 核心差异
 

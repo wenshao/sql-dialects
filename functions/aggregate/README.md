@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | GROUP_CONCAT，JSON_ARRAYAGG(5.7+)，基础聚合 |
+| [PostgreSQL](postgres.sql) | ARRAY_AGG/STRING_AGG/FILTER/WITHIN GROUP，最丰富 |
+| [SQLite](sqlite.sql) | GROUP_CONCAT，3.44+ JSON 聚合 |
+| [Oracle](oracle.sql) | LISTAGG(11gR2+)，PERCENTILE_CONT/DISC |
+| [SQL Server](sqlserver.sql) | STRING_AGG(2017+)，GROUPING SETS 完整 |
+| [MariaDB](mariadb.sql) | GROUP_CONCAT，兼容 MySQL 聚合 |
+| [Firebird](firebird.sql) | LIST() 聚合，标准聚合函数 |
+| [IBM Db2](db2.sql) | LISTAGG，GROUPING SETS/CUBE/ROLLUP |
+| [SAP HANA](saphana.sql) | STRING_AGG，聚合下推到列存 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | ARRAY_AGG/STRING_AGG/APPROX_ 近似族 |
+| [Snowflake](snowflake.sql) | LISTAGG/ARRAY_AGG/APPROX_ 近似族 |
+| [ClickHouse](clickhouse.sql) | groupArray/-If/-State 组合器，近似聚合丰富 |
+| [Hive](hive.sql) | COLLECT_LIST/COLLECT_SET，UDAF 可扩展 |
+| [Spark SQL](spark.sql) | COLLECT_LIST/COLLECT_SET，内建+UDF |
+| [Flink SQL](flink.sql) | LISTAGG，增量聚合优化 |
+| [StarRocks](starrocks.sql) | GROUP_CONCAT/PERCENTILE，Bitmap 聚合 |
+| [Doris](doris.sql) | GROUP_CONCAT/BITMAP/HLL 聚合 |
+| [Trino](trino.sql) | ARRAY_AGG/APPROX_ 近似族 |
+| [DuckDB](duckdb.sql) | LIST_AGG/STRING_AGG，统计聚合丰富 |
+| [MaxCompute](maxcompute.sql) | WM_CONCAT/COLLECT_LIST，UDAF 扩展 |
+| [Hologres](hologres.sql) | PG 兼容聚合函数 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | LISTAGG/APPROXIMATE COUNT(PG 兼容) |
+| [Azure Synapse](synapse.sql) | STRING_AGG(T-SQL)，分布式聚合 |
+| [Databricks SQL](databricks.sql) | COLLECT_LIST/COLLECT_SET + 近似聚合 |
+| [Greenplum](greenplum.sql) | PG 兼容聚合，并行优化 |
+| [Impala](impala.sql) | GROUP_CONCAT/APPX_MEDIAN 近似聚合 |
+| [Vertica](vertica.sql) | LISTAGG，投影预聚合 |
+| [Teradata](teradata.sql) | 标准聚合 + TD_ANALYZE 统计 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 GROUP_CONCAT |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式聚合 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 ARRAY_AGG/STRING_AGG |
+| [Spanner](spanner.sql) | ARRAY_AGG/STRING_AGG，标准聚合 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容聚合函数 |
+| [PolarDB](polardb.sql) | MySQL 兼容聚合函数 |
+| [openGauss](opengauss.sql) | PG 兼容聚合函数 |
+| [TDSQL](tdsql.sql) | MySQL 兼容聚合函数 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | LISTAGG(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 聚合 + time_bucket 配合 |
+| [TDengine](tdengine.sql) | 内建 APERTURE/SPREAD/TWA 等时序聚合 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | COLLECT_LIST/TOPK，流式增量聚合 |
+| [Materialize](materialize.sql) | PG 兼容聚合，增量维护 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | LISTAGG/ARRAY_AGG 支持 |
+| [Derby](derby.sql) | 基础聚合函数(COUNT/SUM/AVG/MIN/MAX) |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 聚合 / SQL:2003 FILTER |
 
 ## 核心差异
 

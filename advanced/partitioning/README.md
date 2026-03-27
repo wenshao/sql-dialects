@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | RANGE/LIST/HASH/KEY 分区，8.0 改进 |
+| [PostgreSQL](postgres.sql) | 声明式分区(10+)，RANGE/LIST/HASH |
+| [SQLite](sqlite.sql) | 无分区支持 |
+| [Oracle](oracle.sql) | 最丰富分区(RANGE/LIST/HASH/INTERVAL/REFERENCE) |
+| [SQL Server](sqlserver.sql) | 分区函数+分区方案，Enterprise 特性 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 分区 |
+| [Firebird](firebird.sql) | 无分区支持 |
+| [IBM Db2](db2.sql) | RANGE/HASH 分区 + MDC 多维聚簇 |
+| [SAP HANA](saphana.sql) | RANGE/HASH/ROUND_ROBIN 分区 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | INTEGER/TIMESTAMP 分区 + 聚簇 |
+| [Snowflake](snowflake.sql) | 自动微分区(无需手动)，Clustering Key |
+| [ClickHouse](clickhouse.sql) | PARTITION BY 必选，TTL 自动清理 |
+| [Hive](hive.sql) | PARTITIONED BY 核心特性，静态/动态分区 |
+| [Spark SQL](spark.sql) | PARTITIONED BY，动态分区写入 |
+| [Flink SQL](flink.sql) | PARTITIONED BY，Hive 集成分区 |
+| [StarRocks](starrocks.sql) | RANGE/LIST 分区 + 分桶 |
+| [Doris](doris.sql) | RANGE/LIST 分区 + HASH 分桶 |
+| [Trino](trino.sql) | 依赖底层 Connector 分区 |
+| [DuckDB](duckdb.sql) | Hive 风格分区(COPY TO) |
+| [MaxCompute](maxcompute.sql) | PARTITIONED BY 核心特性，两级分区 |
+| [Hologres](hologres.sql) | LIST/RANGE 分区(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | DISTKEY+SORTKEY(非传统分区) |
+| [Azure Synapse](synapse.sql) | 分布式表(HASH/ROUND_ROBIN/REPLICATE) |
+| [Databricks SQL](databricks.sql) | PARTITIONED BY，Delta Lake Z-ORDER |
+| [Greenplum](greenplum.sql) | RANGE/LIST 分区 + 分布键 |
+| [Impala](impala.sql) | PARTITIONED BY，Hive 兼容 |
+| [Vertica](vertica.sql) | PARTITION BY RANGE，层级分区 |
+| [Teradata](teradata.sql) | PPI(Primary Partition Index)，多级分区 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | RANGE/HASH/LIST 分区(MySQL 兼容) |
+| [OceanBase](oceanbase.sql) | RANGE/HASH/LIST/KEY 分区 |
+| [CockroachDB](cockroachdb.sql) | PARTITION BY(RANGE/LIST)，地理分区 |
+| [Spanner](spanner.sql) | INTERLEAVE 层级 + SPLIT AT |
+| [YugabyteDB](yugabytedb.sql) | RANGE/HASH 自动分片 |
+| [PolarDB](polardb.sql) | MySQL 兼容分区 |
+| [openGauss](opengauss.sql) | RANGE/LIST/HASH/INTERVAL 分区 |
+| [TDSQL](tdsql.sql) | RANGE/LIST + shardkey 分片 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | RANGE/LIST/HASH 分区(Oracle 兼容) |
+| [KingbaseES](kingbase.sql) | PG 兼容分区 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 自动时间分区(chunk)，核心特性 |
+| [TDengine](tdengine.sql) | 按时间自动分片(vnode) |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | Kafka 分区(KEY 分区) |
+| [Materialize](materialize.sql) | 无显式分区，自动分片 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 无分区支持 |
+| [Derby](derby.sql) | 无分区支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 无分区标准(厂商扩展) |
 
 ## 核心差异
 

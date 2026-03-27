@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | INNER/LEFT/RIGHT/CROSS JOIN，8.0 无 FULL JOIN |
+| [PostgreSQL](postgres.sql) | 全 JOIN 类型 + LATERAL JOIN，完整支持 |
+| [SQLite](sqlite.sql) | INNER/LEFT/CROSS JOIN，无 RIGHT/FULL |
+| [Oracle](oracle.sql) | 全 JOIN 类型，(+) 旧语法，LATERAL(12c+) |
+| [SQL Server](sqlserver.sql) | 全 JOIN 类型，CROSS/OUTER APPLY |
+| [MariaDB](mariadb.sql) | 兼容 MySQL JOIN，10.3+ 部分增强 |
+| [Firebird](firebird.sql) | 全 JOIN 类型，标准 SQL 风格 |
+| [IBM Db2](db2.sql) | 全 JOIN 类型 + LATERAL 支持 |
+| [SAP HANA](saphana.sql) | 全 JOIN 类型，列存优化 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | 全 JOIN 类型 + UNNEST 数组展开 JOIN |
+| [Snowflake](snowflake.sql) | 全 JOIN 类型 + LATERAL FLATTEN |
+| [ClickHouse](clickhouse.sql) | 全 JOIN 类型，分布式 JOIN 需注意内存 |
+| [Hive](hive.sql) | 支持 FULL JOIN，MapReduce 实现 |
+| [Spark SQL](spark.sql) | 全 JOIN 类型，Broadcast/Sort-Merge/Shuffle |
+| [Flink SQL](flink.sql) | 流式 JOIN(Regular/Temporal/Interval/Lookup) |
+| [StarRocks](starrocks.sql) | 全 JOIN 类型，Broadcast/Shuffle 策略 |
+| [Doris](doris.sql) | 全 JOIN 类型，Broadcast/Shuffle 策略 |
+| [Trino](trino.sql) | 全 JOIN 类型 + UNNEST 支持 |
+| [DuckDB](duckdb.sql) | 全 JOIN 类型 + LATERAL/ASOF JOIN |
+| [MaxCompute](maxcompute.sql) | 全 JOIN 类型，MapJoin 提示 |
+| [Hologres](hologres.sql) | PG 兼容 JOIN |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | 全 JOIN 类型，分布键优化 |
+| [Azure Synapse](synapse.sql) | 全 JOIN 类型，分布式执行 |
+| [Databricks SQL](databricks.sql) | 全 JOIN 类型，自适应执行 |
+| [Greenplum](greenplum.sql) | PG 兼容 JOIN，分布键 co-locate |
+| [Impala](impala.sql) | 全 JOIN 类型，Broadcast/Shuffle |
+| [Vertica](vertica.sql) | 全 JOIN 类型，投影优化 |
+| [Teradata](teradata.sql) | 全 JOIN 类型，Hash/Merge/Product Join |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 JOIN，Index/Hash Join |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 JOIN |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 JOIN，分布式执行 |
+| [Spanner](spanner.sql) | 全 JOIN 类型，分布式 JOIN |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 JOIN |
+| [PolarDB](polardb.sql) | MySQL 兼容 JOIN，并行执行 |
+| [openGauss](opengauss.sql) | PG 兼容 JOIN |
+| [TDSQL](tdsql.sql) | MySQL 兼容，跨分片 JOIN |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 JOIN |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG JOIN，超表透明 |
+| [TDengine](tdengine.sql) | 有限 JOIN，仅子表间 JOIN |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 流-流/流-表 JOIN，时间窗口约束 |
+| [Materialize](materialize.sql) | PG 兼容 JOIN，增量维护 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 全 JOIN 类型支持 |
+| [Derby](derby.sql) | 全 JOIN 类型支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:1992 JOIN / SQL:2003 LATERAL |
 
 ## 核心差异
 

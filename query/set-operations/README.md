@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | UNION/UNION ALL，8.0+ INTERSECT/EXCEPT |
+| [PostgreSQL](postgres.sql) | UNION/INTERSECT/EXCEPT + ALL，完整支持 |
+| [SQLite](sqlite.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Oracle](oracle.sql) | UNION/INTERSECT/MINUS(非 EXCEPT) |
+| [SQL Server](sqlserver.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [MariaDB](mariadb.sql) | 10.3+ INTERSECT/EXCEPT |
+| [Firebird](firebird.sql) | UNION 支持，无 INTERSECT/EXCEPT |
+| [IBM Db2](db2.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [SAP HANA](saphana.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Snowflake](snowflake.sql) | UNION/INTERSECT/EXCEPT/MINUS |
+| [ClickHouse](clickhouse.sql) | UNION ALL 为主，无 INTERSECT/EXCEPT |
+| [Hive](hive.sql) | UNION ALL(1.2+)，INTERSECT/EXCEPT(2.1+) |
+| [Spark SQL](spark.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Flink SQL](flink.sql) | UNION ALL/INTERSECT/EXCEPT 支持 |
+| [StarRocks](starrocks.sql) | UNION/INTERSECT/EXCEPT 支持 |
+| [Doris](doris.sql) | UNION/INTERSECT/EXCEPT 支持 |
+| [Trino](trino.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [DuckDB](duckdb.sql) | UNION/INTERSECT/EXCEPT + BY NAME |
+| [MaxCompute](maxcompute.sql) | UNION ALL 支持，INTERSECT/EXCEPT 支持 |
+| [Hologres](hologres.sql) | UNION/INTERSECT/EXCEPT(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Azure Synapse](synapse.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Databricks SQL](databricks.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Greenplum](greenplum.sql) | PG 兼容集合操作 |
+| [Impala](impala.sql) | UNION ALL 支持，无 INTERSECT/EXCEPT |
+| [Vertica](vertica.sql) | UNION/INTERSECT/EXCEPT 完整支持 |
+| [Teradata](teradata.sql) | UNION/INTERSECT/EXCEPT/MINUS |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容，INTERSECT/EXCEPT(6.4+) |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式集合操作 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容集合操作 |
+| [Spanner](spanner.sql) | UNION/INTERSECT/EXCEPT 支持 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容集合操作 |
+| [PolarDB](polardb.sql) | MySQL 兼容集合操作 |
+| [openGauss](opengauss.sql) | PG 兼容集合操作 |
+| [TDSQL](tdsql.sql) | MySQL 兼容集合操作 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 MINUS |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 集合操作 |
+| [TDengine](tdengine.sql) | 不支持集合操作 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 不支持集合操作 |
+| [Materialize](materialize.sql) | PG 兼容 UNION/EXCEPT |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | UNION/INTERSECT/EXCEPT 支持 |
+| [Derby](derby.sql) | UNION/INTERSECT/EXCEPT 支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:1992 UNION/INTERSECT/EXCEPT 规范 |
 
 ## 核心差异
 

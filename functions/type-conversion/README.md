@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | CAST/CONVERT()，隐式转换宽松 |
+| [PostgreSQL](postgres.sql) | CAST/::运算符，严格类型系统 |
+| [SQLite](sqlite.sql) | 动态类型，CAST 支持但隐式转换灵活 |
+| [Oracle](oracle.sql) | TO_NUMBER/TO_CHAR/TO_DATE，显式转换体系 |
+| [SQL Server](sqlserver.sql) | CAST/CONVERT/TRY_CAST/TRY_CONVERT |
+| [MariaDB](mariadb.sql) | 兼容 MySQL CAST/CONVERT |
+| [Firebird](firebird.sql) | CAST 标准支持 |
+| [IBM Db2](db2.sql) | CAST/DECIMAL/CHAR/INTEGER 类型函数 |
+| [SAP HANA](saphana.sql) | CAST/TO_INT/TO_VARCHAR/TO_DATE |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | CAST/SAFE_CAST(失败返回 NULL) |
+| [Snowflake](snowflake.sql) | CAST/TRY_CAST/::运算符 |
+| [ClickHouse](clickhouse.sql) | toInt32/toString 类型函数族，严格 |
+| [Hive](hive.sql) | CAST，隐式转换规则宽松 |
+| [Spark SQL](spark.sql) | CAST，TRY_CAST(3.4+) |
+| [Flink SQL](flink.sql) | CAST/TRY_CAST 支持 |
+| [StarRocks](starrocks.sql) | CAST 支持 |
+| [Doris](doris.sql) | CAST 支持 |
+| [Trino](trino.sql) | CAST/TRY_CAST/TRY() 安全转换 |
+| [DuckDB](duckdb.sql) | CAST/TRY_CAST/::运算符 |
+| [MaxCompute](maxcompute.sql) | CAST 支持 |
+| [Hologres](hologres.sql) | CAST/::(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | CAST/::(PG 兼容)，隐式转换 |
+| [Azure Synapse](synapse.sql) | CAST/CONVERT/TRY_CAST(T-SQL) |
+| [Databricks SQL](databricks.sql) | CAST/TRY_CAST 支持 |
+| [Greenplum](greenplum.sql) | PG 兼容 CAST/:: |
+| [Impala](impala.sql) | CAST 支持 |
+| [Vertica](vertica.sql) | CAST/::/TO_NUMBER/TO_CHAR |
+| [Teradata](teradata.sql) | CAST/FORMAT 组合转换 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 CAST/CONVERT |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式转换 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 CAST/:: |
+| [Spanner](spanner.sql) | CAST/SAFE_CAST |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 CAST/:: |
+| [PolarDB](polardb.sql) | MySQL 兼容 CAST |
+| [openGauss](opengauss.sql) | PG 兼容 CAST/:: |
+| [TDSQL](tdsql.sql) | MySQL 兼容 CAST |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 TO_NUMBER/TO_CHAR |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG CAST/:: |
+| [TDengine](tdengine.sql) | CAST 支持基础类型 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | CAST 支持基础类型 |
+| [Materialize](materialize.sql) | PG 兼容 CAST/:: |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | CAST/CONVERT 标准支持 |
+| [Derby](derby.sql) | CAST 标准支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 CAST 规范 |
 
 ## 核心差异
 

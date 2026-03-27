@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | AUTO_INCREMENT 为主，8.0 无独立 SEQUENCE |
+| [PostgreSQL](postgres.sql) | SEQUENCE + SERIAL/GENERATED，完整支持 |
+| [SQLite](sqlite.sql) | AUTOINCREMENT(ROWID 机制)，无独立序列 |
+| [Oracle](oracle.sql) | SEQUENCE 对象，12c+ IDENTITY 列 |
+| [SQL Server](sqlserver.sql) | IDENTITY 列 + SEQUENCE(2012+) |
+| [MariaDB](mariadb.sql) | AUTO_INCREMENT + SEQUENCE(10.3+) |
+| [Firebird](firebird.sql) | GENERATOR/SEQUENCE 对象 |
+| [IBM Db2](db2.sql) | SEQUENCE + IDENTITY 列 |
+| [SAP HANA](saphana.sql) | SEQUENCE 支持，多种循环策略 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | GENERATE_UUID()，无自增序列 |
+| [Snowflake](snowflake.sql) | SEQUENCE + AUTOINCREMENT，不保证连续 |
+| [ClickHouse](clickhouse.sql) | 无自增，用 UUID/generateUUIDv4() |
+| [Hive](hive.sql) | 无序列，用 ROW_NUMBER() 模拟 |
+| [Spark SQL](spark.sql) | monotonically_increasing_id()，不连续 |
+| [Flink SQL](flink.sql) | 无序列支持 |
+| [StarRocks](starrocks.sql) | AUTO_INCREMENT(3.0+)，不保证连续 |
+| [Doris](doris.sql) | AUTO_INCREMENT(2.1+)，仅 Unique 模型 |
+| [Trino](trino.sql) | 无序列，UUID 替代 |
+| [DuckDB](duckdb.sql) | CREATE SEQUENCE 完整支持 |
+| [MaxCompute](maxcompute.sql) | 无序列支持 |
+| [Hologres](hologres.sql) | SERIAL 类型(PG 兼容) |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | IDENTITY 列 + DEFAULT(PG SEQUENCE 不完整) |
+| [Azure Synapse](synapse.sql) | IDENTITY 列，分布式不保证连续 |
+| [Databricks SQL](databricks.sql) | GENERATED ALWAYS AS IDENTITY(Delta) |
+| [Greenplum](greenplum.sql) | SERIAL(PG 兼容)，分布式不连续 |
+| [Impala](impala.sql) | 无序列支持 |
+| [Vertica](vertica.sql) | SEQUENCE + AUTO_INCREMENT，节点级缓存 |
+| [Teradata](teradata.sql) | GENERATED ALWAYS/BY DEFAULT |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | AUTO_INCREMENT/AUTO_RANDOM 分布式唯一 |
+| [OceanBase](oceanbase.sql) | MySQL 模式 AUTO_INCREMENT/Oracle 模式 SEQUENCE |
+| [CockroachDB](cockroachdb.sql) | SERIAL(unique_rowid)，UUID 推荐 |
+| [Spanner](spanner.sql) | 无自增，UUID/BIT_REVERSE 推荐 |
+| [YugabyteDB](yugabytedb.sql) | PG SEQUENCE 兼容，分布式缓存 |
+| [PolarDB](polardb.sql) | MySQL 兼容 AUTO_INCREMENT |
+| [openGauss](opengauss.sql) | PG 兼容 SEQUENCE |
+| [TDSQL](tdsql.sql) | MySQL 兼容 AUTO_INCREMENT，全局唯一 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | SEQUENCE + IDENTITY 列 |
+| [KingbaseES](kingbase.sql) | PG 兼容 SEQUENCE |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG SEQUENCE |
+| [TDengine](tdengine.sql) | 无序列，时间戳为主键 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | 无序列支持 |
+| [Materialize](materialize.sql) | 无序列支持 |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | SEQUENCE + IDENTITY 完整支持 |
+| [Derby](derby.sql) | IDENTITY 列 + SEQUENCE |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 SEQUENCE GENERATOR 规范 |
 
 ## 核心差异
 

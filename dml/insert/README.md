@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | 多行 VALUES，LOAD DATA INFILE 批量导入 |
+| [PostgreSQL](postgres.sql) | INSERT RETURNING，COPY 高速批量导入 |
+| [SQLite](sqlite.sql) | 多行 VALUES，事务内批量性能佳 |
+| [Oracle](oracle.sql) | INSERT ALL 多表，12c+ 多行 VALUES |
+| [SQL Server](sqlserver.sql) | INSERT OUTPUT，BULK INSERT 批量 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL，RETURNING(10.5+) |
+| [Firebird](firebird.sql) | INSERT RETURNING，标准 SQL 风格 |
+| [IBM Db2](db2.sql) | INSERT + SELECT FROM FINAL TABLE |
+| [SAP HANA](saphana.sql) | 批量 INSERT，IMPORT FROM 快速导入 |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | Streaming INSERT + Load Job 双模式 |
+| [Snowflake](snowflake.sql) | COPY INTO 高速加载，VARIANT 半结构化 |
+| [ClickHouse](clickhouse.sql) | 大批量写入优化，INSERT SELECT 高效 |
+| [Hive](hive.sql) | INSERT OVERWRITE 覆盖，LOAD DATA 加载 |
+| [Spark SQL](spark.sql) | INSERT INTO/OVERWRITE，DataFrame API 更常用 |
+| [Flink SQL](flink.sql) | INSERT INTO 流式写入，CDC 支持 |
+| [StarRocks](starrocks.sql) | Stream Load/Broker Load/INSERT 多通道 |
+| [Doris](doris.sql) | Stream Load/Broker Load 批量导入 |
+| [Trino](trino.sql) | INSERT INTO SELECT 为主 |
+| [DuckDB](duckdb.sql) | COPY/INSERT 高效，直接从文件插入 |
+| [MaxCompute](maxcompute.sql) | Tunnel 批量上传，INSERT OVERWRITE |
+| [Hologres](hologres.sql) | 实时写入 + 批量 COPY 导入 |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | COPY 从 S3 加载，推荐批量 |
+| [Azure Synapse](synapse.sql) | COPY INTO 从 Blob 加载 |
+| [Databricks SQL](databricks.sql) | INSERT INTO/OVERWRITE，Auto Loader |
+| [Greenplum](greenplum.sql) | gpload/COPY 批量导入 |
+| [Impala](impala.sql) | INSERT INTO/OVERWRITE SELECT |
+| [Vertica](vertica.sql) | COPY 批量加载，Flex Table 半结构化 |
+| [Teradata](teradata.sql) | FastLoad/MultiLoad/TPump 工具体系 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容，Lightning 批量导入 |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式 INSERT |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 INSERT，IMPORT 批量 |
+| [Spanner](spanner.sql) | Mutation API 更高效，INSERT DML |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 INSERT |
+| [PolarDB](polardb.sql) | MySQL 兼容，并行 INSERT |
+| [openGauss](opengauss.sql) | PG 兼容，COPY 批量导入 |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式批量导入 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容 INSERT ALL |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG INSERT/COPY，时序优化批量 |
+| [TDengine](tdengine.sql) | INSERT 多子表写入，Schemaless 协议 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | INSERT INTO 向流写入 |
+| [Materialize](materialize.sql) | 不支持直接 INSERT(源驱动) |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 标准 INSERT + CSVREAD 导入 |
+| [Derby](derby.sql) | 标准 INSERT 支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 INSERT 规范 |
 
 ## 核心差异
 

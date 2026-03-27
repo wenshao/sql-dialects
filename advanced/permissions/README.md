@@ -7,85 +7,85 @@
 ## 方言列表
 
 ### 传统关系型数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| MySQL | [mysql.sql](mysql.sql) |
-| PostgreSQL | [postgres.sql](postgres.sql) |
-| SQLite | [sqlite.sql](sqlite.sql) |
-| Oracle | [oracle.sql](oracle.sql) |
-| SQL Server | [sqlserver.sql](sqlserver.sql) |
-| MariaDB | [mariadb.sql](mariadb.sql) |
-| Firebird | [firebird.sql](firebird.sql) |
-| IBM Db2 | [db2.sql](db2.sql) |
-| SAP HANA | [saphana.sql](saphana.sql) |
+| [MySQL](mysql.sql) | GRANT/REVOKE，全局/库/表/列粒度 |
+| [PostgreSQL](postgres.sql) | GRANT/REVOKE，ROLE 继承，行级安全(RLS) |
+| [SQLite](sqlite.sql) | 无权限系统(文件级访问控制) |
+| [Oracle](oracle.sql) | 系统/对象权限，ROLE，VPD/DBMS_RLS |
+| [SQL Server](sqlserver.sql) | GRANT/DENY/REVOKE 三态，SCHEMA 隔离 |
+| [MariaDB](mariadb.sql) | 兼容 MySQL 权限，ROLE(10.0.5+) |
+| [Firebird](firebird.sql) | GRANT/REVOKE + ROLE，DDL 权限 |
+| [IBM Db2](db2.sql) | GRANT/REVOKE，LBAC 标签安全 |
+| [SAP HANA](saphana.sql) | GRANT/REVOKE + 分析权限(Analytic Privilege) |
 
 ### 大数据 / 分析型引擎
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| BigQuery | [bigquery.sql](bigquery.sql) |
-| Snowflake | [snowflake.sql](snowflake.sql) |
-| ClickHouse | [clickhouse.sql](clickhouse.sql) |
-| Hive | [hive.sql](hive.sql) |
-| Spark SQL | [spark.sql](spark.sql) |
-| Flink SQL | [flink.sql](flink.sql) |
-| StarRocks | [starrocks.sql](starrocks.sql) |
-| Doris | [doris.sql](doris.sql) |
-| Trino | [trino.sql](trino.sql) |
-| DuckDB | [duckdb.sql](duckdb.sql) |
-| MaxCompute | [maxcompute.sql](maxcompute.sql) |
-| Hologres | [hologres.sql](hologres.sql) |
+| [BigQuery](bigquery.sql) | IAM ROLE 绑定，Dataset/Table/View 粒度 |
+| [Snowflake](snowflake.sql) | RBAC + DAC，ROLE 层级继承，列级安全 |
+| [ClickHouse](clickhouse.sql) | GRANT/REVOKE(20.1+)，RBAC 权限模型 |
+| [Hive](hive.sql) | Ranger/Sentry 外部授权 |
+| [Spark SQL](spark.sql) | Unity Catalog 权限或 Ranger |
+| [Flink SQL](flink.sql) | 无权限管理(依赖外部) |
+| [StarRocks](starrocks.sql) | GRANT/REVOKE，RBAC 模型 |
+| [Doris](doris.sql) | GRANT/REVOKE，RBAC 模型 |
+| [Trino](trino.sql) | 外部 Authorizer(OPA/Ranger) |
+| [DuckDB](duckdb.sql) | 无权限系统(进程级) |
+| [MaxCompute](maxcompute.sql) | RAM + ACL + Policy，三层权限 |
+| [Hologres](hologres.sql) | PG 兼容 GRANT/REVOKE |
 
 ### 云数仓
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| Redshift | [redshift.sql](redshift.sql) |
-| Azure Synapse | [synapse.sql](synapse.sql) |
-| Databricks SQL | [databricks.sql](databricks.sql) |
-| Greenplum | [greenplum.sql](greenplum.sql) |
-| Impala | [impala.sql](impala.sql) |
-| Vertica | [vertica.sql](vertica.sql) |
-| Teradata | [teradata.sql](teradata.sql) |
+| [Redshift](redshift.sql) | GRANT/REVOKE(PG 兼容) |
+| [Azure Synapse](synapse.sql) | GRANT/DENY/REVOKE + AAD(T-SQL) |
+| [Databricks SQL](databricks.sql) | Unity Catalog GRANT/REVOKE |
+| [Greenplum](greenplum.sql) | PG 兼容 GRANT/REVOKE |
+| [Impala](impala.sql) | Ranger/Sentry 外部授权 |
+| [Vertica](vertica.sql) | GRANT/REVOKE + ROLE，列级权限 |
+| [Teradata](teradata.sql) | GRANT/REVOKE，对象级精细控制 |
 
 ### 分布式 / NewSQL
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TiDB | [tidb.sql](tidb.sql) |
-| OceanBase | [oceanbase.sql](oceanbase.sql) |
-| CockroachDB | [cockroachdb.sql](cockroachdb.sql) |
-| Spanner | [spanner.sql](spanner.sql) |
-| YugabyteDB | [yugabytedb.sql](yugabytedb.sql) |
-| PolarDB | [polardb.sql](polardb.sql) |
-| openGauss | [opengauss.sql](opengauss.sql) |
-| TDSQL | [tdsql.sql](tdsql.sql) |
+| [TiDB](tidb.sql) | MySQL 兼容 GRANT/REVOKE |
+| [OceanBase](oceanbase.sql) | MySQL/Oracle 双模式权限 |
+| [CockroachDB](cockroachdb.sql) | PG 兼容 GRANT/REVOKE |
+| [Spanner](spanner.sql) | IAM 权限，细粒度访问控制 |
+| [YugabyteDB](yugabytedb.sql) | PG 兼容 GRANT/REVOKE + RLS |
+| [PolarDB](polardb.sql) | MySQL 兼容权限 |
+| [openGauss](opengauss.sql) | PG 兼容 + 行级安全 |
+| [TDSQL](tdsql.sql) | MySQL 兼容，分布式权限同步 |
 
 ### 国产数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| DamengDB | [dameng.sql](dameng.sql) |
-| KingbaseES | [kingbase.sql](kingbase.sql) |
+| [DamengDB](dameng.sql) | Oracle 兼容权限体系 |
+| [KingbaseES](kingbase.sql) | PG 兼容 |
 
 ### 时序数据库
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| TimescaleDB | [timescaledb.sql](timescaledb.sql) |
-| TDengine | [tdengine.sql](tdengine.sql) |
+| [TimescaleDB](timescaledb.sql) | 继承 PG 权限 + RLS |
+| [TDengine](tdengine.sql) | SUPER/NORMAL 两级权限 |
 
 ### 流处理
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| ksqlDB | [ksqldb.sql](ksqldb.sql) |
-| Materialize | [materialize.sql](materialize.sql) |
+| [ksqlDB](ksqldb.sql) | Kafka ACL + RBAC(Confluent) |
+| [Materialize](materialize.sql) | PG 兼容 RBAC |
 
 ### 嵌入式 / 轻量
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| H2 | [h2.sql](h2.sql) |
-| Derby | [derby.sql](derby.sql) |
+| [H2](h2.sql) | 简单用户权限 |
+| [Derby](derby.sql) | GRANT/REVOKE 标准支持 |
 
 ### SQL 标准
-| 方言 | 链接 |
+| 方言 | 简评 |
 |---|---|
-| SQL Standard | [sql-standard.sql](sql-standard.sql) |
+| [SQL Standard](sql-standard.sql) | SQL:2003 GRANT/REVOKE/ROLE 规范 |
 
 ## 核心差异
 
