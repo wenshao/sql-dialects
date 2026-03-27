@@ -4,19 +4,63 @@
 --   [1] Hologres Documentation
 --       https://www.alibabacloud.com/help/en/hologres/
 
--- PostgreSQL 兼容数学函数
-SELECT ABS(-42); SELECT CEIL(4.3); SELECT FLOOR(4.7);
-SELECT ROUND(3.14159, 2); SELECT TRUNC(3.14159, 2);
-SELECT MOD(17, 5); SELECT 17 % 5;
-SELECT POWER(2, 10); SELECT SQRT(144);
-SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG(100);
-SELECT SIGN(-42); SELECT PI(); SELECT RANDOM();
+-- ============================================================
+-- 基本数学函数（PostgreSQL 兼容）
+-- ============================================================
+SELECT ABS(-42);                          -- 42
+SELECT CEIL(4.3);                         -- 5
+SELECT CEILING(4.3);                      -- 5
+SELECT FLOOR(4.7);                        -- 4
+SELECT ROUND(3.14159, 2);                 -- 3.14
+SELECT ROUND(3.14159);                    -- 3
+SELECT TRUNC(3.14159, 2);                 -- 3.14
+SELECT TRUNC(3.14159);                    -- 3
 
-SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
-SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1); SELECT ATAN2(1, 1);
-SELECT DEGREES(PI()); SELECT RADIANS(180);
+-- ============================================================
+-- 取模运算
+-- ============================================================
+SELECT MOD(17, 5);                        -- 2
+SELECT 17 % 5;                            -- 2
 
-SELECT GREATEST(1, 5, 3); SELECT LEAST(1, 5, 3);
+-- ============================================================
+-- 幂、根、指数、对数
+-- ============================================================
+SELECT POWER(2, 10);                      -- 1024
+SELECT SQRT(144);                         -- 12
+SELECT EXP(1);                            -- 2.718281828...
+SELECT LN(2.718281828);                   -- ≈ 1.0
+SELECT LOG(100);                          -- 2            (以 10 为底)
+
+-- ============================================================
+-- 符号、常量和随机数
+-- ============================================================
+SELECT SIGN(-42);                         -- -1
+SELECT SIGN(0);                           -- 0
+SELECT SIGN(42);                          -- 1
+SELECT PI();                              -- 3.14159265358979
+SELECT RANDOM();                          -- 0.0 到 1.0 之间
+
+-- ============================================================
+-- 三角函数（弧度）
+-- ============================================================
+SELECT SIN(0);                            -- 0
+SELECT COS(0);                            -- 1
+SELECT TAN(PI()/4);                       -- ≈ 1.0
+SELECT ASIN(1);                           -- π/2
+SELECT ACOS(1);                           -- 0
+SELECT ATAN(1);                           -- π/4
+SELECT ATAN2(1, 1);                       -- π/4
+SELECT DEGREES(PI());                     -- 180
+SELECT RADIANS(180);                      -- π
+
+-- ============================================================
+-- GREATEST / LEAST
+-- ============================================================
+SELECT GREATEST(1, 5, 3, 9, 2);          -- 9
+SELECT LEAST(1, 5, 3, 9, 2);             -- 1
 
 -- 注意：Hologres 兼容 PostgreSQL 数学函数
--- 限制：某些高级函数可能不支持
+-- 注意：LOG(x) 以 10 为底（与 PostgreSQL 一致）
+-- 注意：Hologres 面向实时分析，数学函数主要用于 OLAP 查询
+-- 限制：某些高级函数（如 CBRT）可能不支持
+-- 限制：位运算支持可能有限

@@ -22,5 +22,42 @@ SELECT UNIX_TIMESTAMP('2024-01-15', 'yyyy-MM-dd'); -- → Unix
 -- :: 运算符                                     -- Databricks SQL
 SELECT 42::STRING; SELECT '42'::INT;
 
+-- 更多数值转换
+SELECT CAST('100' AS BIGINT);                        -- 100
+SELECT CAST(3.14 AS INT);                            -- 3 (截断)
+SELECT CAST(3.14 AS DECIMAL(10,1));                  -- 3.1
+SELECT CAST(TRUE AS INT);                            -- 1
+SELECT CAST(0 AS BOOLEAN);                           -- false
+
+-- TRY_CAST 详细示例
+SELECT TRY_CAST('hello' AS INT);                     -- NULL
+SELECT TRY_CAST('2024-99-99' AS DATE);               -- NULL
+SELECT TRY_CAST('' AS INT);                          -- NULL
+SELECT TRY_CAST('3.14' AS DECIMAL(10,2));            -- 3.14
+
+-- 日期/时间格式化
+SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyy-MM-dd HH:mm:ss');
+SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), 'dd/MM/yyyy');
+SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), 'yyyy年MM月dd日');
+SELECT TO_DATE('15/01/2024', 'dd/MM/yyyy');
+SELECT TO_TIMESTAMP('2024-01-15 10:30:00', 'yyyy-MM-dd HH:mm:ss');
+SELECT FROM_UNIXTIME(1705276800, 'yyyy-MM-dd HH:mm:ss');
+SELECT UNIX_TIMESTAMP('2024-01-15', 'yyyy-MM-dd');
+
+-- 日期部分提取
+SELECT YEAR(CURRENT_DATE());                         -- 2024
+SELECT MONTH(CURRENT_DATE());                        -- 1
+SELECT DAY(CURRENT_DATE());                          -- 15
+
+-- 复合类型转换
+SELECT CAST(ARRAY(1, 2, 3) AS ARRAY<STRING>);
+-- SELECT from_json('{"a":1}', 'a INT');
+-- SELECT to_json(struct(1 AS a, 'hello' AS b));
+
+-- 精度処理
+SELECT CAST(1.0/3.0 AS DECIMAL(10,4));              -- 0.3333
+SELECT ROUND(3.14159, 2);                            -- 3.14
+
 -- 注意：Databricks 支持 CAST, TRY_CAST, :: 运算符
--- 注意：日期函数使用 Java SimpleDateFormat 模式
+-- 注意：日期函数使用 Java SimpleDateFormat 模式 (yyyy, MM, dd, HH, mm, ss)
+-- 注意：TRY_CAST 是处理脏数据的最佳实践

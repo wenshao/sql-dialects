@@ -20,6 +20,56 @@ SELECT to_timestamp('2024-01-15 10:30:00', 'YYYY-MM-DD HH24:MI:SS');
 SELECT 1 + 1.5;                                 -- DECIMAL
 SELECT 'hello' || 42::TEXT;                      -- 需显式转换
 
+-- 更多数值转换
+SELECT CAST(3.14 AS INT);                            -- 3 (截断)
+SELECT '100'::INT8;                                  -- 100
+SELECT CAST(3.14 AS DECIMAL(10,1));                  -- 3.1
+SELECT 42::FLOAT8;                                   -- 42.0
+
+-- 布尔转换
+SELECT CAST(1 AS BOOLEAN);                           -- true
+SELECT 'yes'::BOOLEAN;                               -- true
+SELECT TRUE::INT;                                    -- 1
+
+-- 日期/時間格式化
+SELECT to_char(now(), 'YYYY-MM-DD HH24:MI:SS');
+SELECT to_char(now(), 'Day, DD Month YYYY');
+SELECT to_timestamp(1705276800);                     -- Unix → TIMESTAMP
+SELECT EXTRACT(EPOCH FROM now());                    -- TIMESTAMP → Unix
+
+-- UUID 转换 (CockroachDB 推荐)
+SELECT gen_random_uuid()::TEXT;
+SELECT 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID;
+
+-- 区间转換
+SELECT INTERVAL '2 hours 30 minutes';
+SELECT '1 day'::INTERVAL;
+
+-- 数组转换
+SELECT ARRAY[1,2,3]::TEXT[];
+SELECT '{1,2,3}'::INT[];
+
+-- JSONB 转换
+SELECT '{"a":1}'::JSONB;
+SELECT CAST('["a","b"]' AS JSONB);
+SELECT '42'::JSONB;
+
+-- 精度処理
+SELECT CAST(1.0/3.0 AS DECIMAL(10,4));              -- 0.3333
+SELECT round(3.14159, 2);                            -- 3.14
+
+-- 错误処理（无 TRY_CAST）
+-- 可用 PL/pgSQL 封装安全转换
+-- CREATE FUNCTION safe_cast_int(text) RETURNS INT AS $$
+-- BEGIN RETURN $1::INT;
+-- EXCEPTION WHEN OTHERS THEN RETURN NULL;
+-- END; $$ LANGUAGE plpgsql;
+
+-- 分布式注意事项
+-- unique_rowid() 返回 INT8，可用 ::TEXT 转换
+-- 类型转换在各节点独立执行
+
 -- 注意：CockroachDB 兼容 PostgreSQL 类型转换
 -- 注意：支持 CAST 和 :: 运算符
+-- 注意：推荐 UUID 而非 SERIAL 避免热点
 -- 限制：无 TRY_CAST（转换失败抛错）

@@ -10,7 +10,15 @@
 - **191,000+ 行代码**，每个文件附官方文档参考资料
 - 经过多轮全量审计，修正 154+ 个问题
 
-## 覆盖的数据库（45 种）
+## 快速导航
+
+> **按方言浏览** → [`dialects/`](dialects/) — 选择一个数据库，查看它在所有模块中的写法
+>
+> **按功能浏览** → 点击下方目录链接，查看所有方言在该功能上的对比
+>
+> **全局索引** → [`INDEX.md`](INDEX.md) — 完整矩阵导航
+
+## 覆盖的数据库（[45 种](dialects/)）
 
 ### 传统关系型数据库
 MySQL, PostgreSQL, SQLite, Oracle, SQL Server, MariaDB, Firebird, IBM Db2, SAP HANA

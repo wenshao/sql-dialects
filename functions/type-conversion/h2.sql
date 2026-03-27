@@ -15,7 +15,57 @@ SELECT FORMATDATETIME(CURRENT_TIMESTAMP, 'yyyy-MM-dd HH:mm:ss');
 SELECT PARSEDATETIME('2024-01-15', 'yyyy-MM-dd');
 SELECT TO_CHAR(42); SELECT TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD');
 
+-- 更多数值转换
+SELECT CAST(3.14 AS INT);                            -- 3 (截断)
+SELECT CAST(3.14 AS SMALLINT);                       -- 3
+SELECT CAST(3.14 AS BIGINT);                         -- 3
+SELECT CAST(42 AS REAL);                             -- 42.0
+SELECT CAST(42 AS DOUBLE);                           -- 42.0
+SELECT CAST(42 AS DECIMAL(10,2));                    -- 42.00
+
+-- 布尔转换
+SELECT CAST(1 AS BOOLEAN);                           -- TRUE
+SELECT CAST(0 AS BOOLEAN);                           -- FALSE
+SELECT CAST(TRUE AS INT);                            -- 1
+SELECT CAST('true' AS BOOLEAN);                      -- TRUE
+
+-- 日期/时间格式化
+SELECT FORMATDATETIME(CURRENT_TIMESTAMP, 'yyyy-MM-dd HH:mm:ss');
+SELECT FORMATDATETIME(CURRENT_TIMESTAMP, 'dd/MM/yyyy');
+SELECT FORMATDATETIME(CURRENT_TIMESTAMP, 'yyyy年MM月dd日');
+SELECT PARSEDATETIME('2024-01-15', 'yyyy-MM-dd');
+SELECT PARSEDATETIME('15/01/2024 10:30', 'dd/MM/yyyy HH:mm');
+
+-- 日期/时间部分提取
+SELECT EXTRACT(YEAR FROM CURRENT_DATE);
+SELECT EXTRACT(MONTH FROM CURRENT_DATE);
+SELECT EXTRACT(DAY FROM CURRENT_DATE);
+SELECT YEAR(CURRENT_DATE);                           -- H2 简写
+SELECT MONTH(CURRENT_DATE);
+SELECT DAY_OF_WEEK(CURRENT_DATE);
+
+-- 字符串 ↔ 日期
+SELECT CAST('2024-01-15' AS DATE);
+SELECT CAST('10:30:00' AS TIME);
+SELECT CAST('2024-01-15 10:30:00' AS TIMESTAMP);
+SELECT CAST(CURRENT_DATE AS VARCHAR);
+
+-- 隐式转换
+SELECT 1 + 1.5;                                     -- DOUBLE
+SELECT CONCAT('val: ', 42);                          -- 隐式转字符串
+-- H2 隐式转换相对宽松
+
+-- 兼容模式下的转换
+-- MODE=MySQL: CAST('42' AS SIGNED), CONVERT(42, CHAR)
+-- MODE=PostgreSQL: 42::TEXT（部分支持）
+-- MODE=Oracle: TO_CHAR(SYSDATE, 'YYYY-MM-DD')
+
+-- 错误处理（无 TRY_CAST）
+-- CAST 转换失败抛出异常
+-- 建议在 Java 应用层用 try-catch 处理
+
 -- 注意：H2 支持 CAST 和 CONVERT
--- 注意：FORMATDATETIME/PARSEDATETIME 用于日期格式化
+-- 注意：FORMATDATETIME/PARSEDATETIME 使用 Java SimpleDateFormat 模式
 -- 注意：部分兼容 TO_CHAR
+-- 注意：兼容模式影响可用的转换函数
 -- 限制：无 TRY_CAST, ::

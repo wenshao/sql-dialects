@@ -4,19 +4,71 @@
 --   [1] KingbaseES SQL 参考手册
 --       https://help.kingbase.com.cn/
 
--- 兼容 PostgreSQL/Oracle 数学函数
-SELECT ABS(-42); SELECT CEIL(4.3); SELECT FLOOR(4.7);
-SELECT ROUND(3.14159, 2); SELECT TRUNC(3.14159, 2);
-SELECT MOD(17, 5); SELECT POWER(2, 10); SELECT SQRT(144);
-SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG(100);
-SELECT SIGN(-42); SELECT PI(); SELECT RANDOM();
+-- ============================================================
+-- 基本数学函数（兼容 PostgreSQL/Oracle）
+-- ============================================================
+SELECT ABS(-42);                          -- 42
+SELECT CEIL(4.3);                         -- 5
+SELECT CEILING(4.3);                      -- 5
+SELECT FLOOR(4.7);                        -- 4
+SELECT ROUND(3.14159, 2);                 -- 3.14
+SELECT ROUND(3.14159);                    -- 3
+SELECT TRUNC(3.14159, 2);                 -- 3.14
+SELECT TRUNC(3.14159);                    -- 3
 
-SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
-SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1); SELECT ATAN2(1, 1);
-SELECT DEGREES(PI()); SELECT RADIANS(180);
+-- ============================================================
+-- 取模运算
+-- ============================================================
+SELECT MOD(17, 5);                        -- 2
 
-SELECT GREATEST(1, 5, 3); SELECT LEAST(1, 5, 3);
-SELECT 5 & 3; SELECT 5 | 3; SELECT ~5;
+-- ============================================================
+-- 幂、根、指数、对数
+-- ============================================================
+SELECT POWER(2, 10);                      -- 1024
+SELECT SQRT(144);                         -- 12
+SELECT CBRT(27);                          -- 3            (立方根，PostgreSQL 模式)
+SELECT EXP(1);                            -- 2.718281828...
+SELECT LN(2.718281828);                   -- ≈ 1.0
+SELECT LOG(100);                          -- 2            (以 10 为底，PostgreSQL 模式)
+
+-- ============================================================
+-- 符号、常量和随机数
+-- ============================================================
+SELECT SIGN(-42);                         -- -1
+SELECT SIGN(0);                           -- 0
+SELECT SIGN(42);                          -- 1
+SELECT PI();                              -- 3.14159265358979
+SELECT RANDOM();                          -- 0.0 到 1.0 之间
+
+-- ============================================================
+-- 三角函数（弧度）
+-- ============================================================
+SELECT SIN(0);                            -- 0
+SELECT COS(0);                            -- 1
+SELECT TAN(PI()/4);                       -- ≈ 1.0
+SELECT ASIN(1);                           -- π/2
+SELECT ACOS(1);                           -- 0
+SELECT ATAN(1);                           -- π/4
+SELECT ATAN2(1, 1);                       -- π/4
+SELECT DEGREES(PI());                     -- 180
+SELECT RADIANS(180);                      -- π
+
+-- ============================================================
+-- GREATEST / LEAST
+-- ============================================================
+SELECT GREATEST(1, 5, 3, 9, 2);          -- 9
+SELECT LEAST(1, 5, 3, 9, 2);             -- 1
+
+-- ============================================================
+-- 位运算（PostgreSQL 模式）
+-- ============================================================
+SELECT 5 & 3;                             -- 1            (AND)
+SELECT 5 | 3;                             -- 7            (OR)
+SELECT ~5;                                -- -6           (NOT)
+SELECT 1 << 4;                            -- 16           (左移)
+SELECT 16 >> 2;                           -- 4            (右移)
 
 -- 注意：KingbaseES 兼容 PostgreSQL 和 Oracle 数学函数
--- 注意：具体支持取决于兼容模式
+-- 注意：具体支持取决于兼容模式（PG 模式 / Oracle 模式）
+-- 注意：Oracle 模式下 LOG 行为可能不同
+-- 注意：Oracle 模式额外支持 REMAINDER 等函数
