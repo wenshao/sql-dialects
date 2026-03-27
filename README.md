@@ -10,13 +10,23 @@
 - **191,000+ 行代码**，每个文件附官方文档参考资料
 - 经过多轮全量审计，修正 154+ 个问题
 
+## 面向 SQL 引擎开发者
+
+本项目面向 SQL 引擎开发者（如 MaxCompute、StarRocks、Doris 的语法设计和开发人员），分析各引擎的语法设计决策、实现 trade-off、兼容性选择。
+
+> **新手开始** → [`docs/how-to-use.md`](docs/how-to-use.md) — 引擎开发者阅读指南
+>
+> **做 MySQL 兼容？** → [`docs/mysql-compat-guide.md`](docs/mysql-compat-guide.md) — MySQL 兼容引擎开发指南
+>
+> **设计新特性？** → [`docs/feature-design-checklist.md`](docs/feature-design-checklist.md) — SQL 特性设计清单
+
 ## 快速导航
 
 > **按方言浏览** → [`dialects/`](dialects/) — 选择一个数据库，查看它在所有模块中的写法
 >
 > **按功能浏览** → 点击下方目录链接，查看所有方言在该功能上的对比
 >
-> **全局索引** → [`INDEX.md`](INDEX.md) — 完整矩阵导航
+> **全局索引** → [`INDEX.md`](INDEX.md) — 设计主题导航 + 决策速查表
 
 ## 覆盖的数据库（[45 种](dialects/)）
 
