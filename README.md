@@ -18,6 +18,10 @@
 >
 > **做 MySQL 兼容？** → [`docs/mysql-compat-guide.md`](docs/mysql-compat-guide.md) — MySQL 兼容引擎开发指南
 >
+> **做 PostgreSQL 兼容？** → [`docs/postgresql-compat-guide.md`](docs/postgresql-compat-guide.md) — PostgreSQL 兼容引擎开发指南
+>
+> **做 Oracle 兼容？** → [`docs/oracle-compat-guide.md`](docs/oracle-compat-guide.md) — Oracle 兼容引擎开发指南
+>
 > **设计新特性？** → [`docs/feature-design-checklist.md`](docs/feature-design-checklist.md) — SQL 特性设计清单
 
 ## 快速导航
