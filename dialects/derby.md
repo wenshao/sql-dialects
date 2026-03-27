@@ -4,6 +4,49 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4021 行
 
+## 概述与定位
+
+Apache Derby 是一个纯 Java 实现的开源关系型数据库，是 Apache 软件基金会的顶级项目。Derby 的设计目标是提供零管理、零配置的嵌入式数据库体验——只需将一个 JAR 文件加入 Java 应用的 classpath 即可使用。它同时支持嵌入式模式和网络服务器模式。Derby 的另一个身份是 Java DB——曾随 JDK 6-8 捆绑发布，使其成为 Java 开发者最容易获取的数据库。
+
+## 历史与演进
+
+- **1996 年**：Cloudscape 公司开发 JBMS 数据库（Derby 的前身）。
+- **1999 年**：Informix 收购 Cloudscape。
+- **2001 年**：IBM 收购 Informix，将 Cloudscape 纳入 IBM 产品线。
+- **2004 年**：IBM 将 Cloudscape 代码捐赠给 Apache 基金会，命名为 Derby。
+- **2006 年**：Sun 将 Derby 以"Java DB"身份捆绑在 JDK 6 中。
+- **2011 年**：10.8 版本引入 BOOLEAN 类型和增强的 SQL 标准支持。
+- **2019 年**：10.15 引入 SEQUENCE 和 OFFSET/FETCH 分页。
+- **2022-2025 年**：10.16/10.17 持续维护，保持与新 JDK 版本的兼容性。
+
+## 核心设计思路
+
+Derby 的核心设计哲学是**简单和标准**。它严格遵循 SQL 标准和 JDBC 规范，不追求扩展性而追求正确性。存储引擎基于传统的 B-Tree 索引和堆文件（Heap File）组织，使用 WAL（Write-Ahead Logging）保证事务持久性。并发控制支持行级锁和表级锁。Derby 可通过**Java 存储过程**扩展——用户可以用 Java 方法实现存储过程和函数，通过 `CALL` 语句调用。
+
+## 独特特色
+
+- **MERGE 语句**（10.11+）：支持标准 SQL MERGE（UPSERT），`MERGE INTO target USING source ON condition WHEN MATCHED/NOT MATCHED`。
+- **Java 存储过程**：`CREATE PROCEDURE procName ... LANGUAGE JAVA PARAMETER STYLE JAVA EXTERNAL NAME 'pkg.Class.method'` 用 Java 类实现存储过程。
+- **SYSCS_UTIL 系统工具**：`CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY(...)` 等系统过程管理数据库属性。
+- **零配置嵌入**：`jdbc:derby:mydb;create=true` 自动创建并连接数据库，无需安装或配置。
+- **内置网络服务器**：可选启动 Derby Network Server 提供远程 JDBC 访问。
+- **GENERATED ALWAYS AS IDENTITY**：标准 SQL 自增列语法。
+- **XML 数据类型**：内置 XML 类型和 XMLPARSE/XMLSERIALIZE/XMLEXISTS 函数。
+
+## 已知不足
+
+- SQL 功能集相比现代数据库较为保守——窗口函数支持有限，不支持 CTE 的递归形式。
+- 不支持 JSON 数据类型和相关函数。
+- 性能不适合高并发或大数据量的生产场景。
+- 社区活跃度低，版本更新缓慢，新特性引入非常保守。
+- 不支持 FULL OUTER JOIN（仅在较新版本中部分支持）。
+- 不支持 CREATE TABLE AS SELECT（CTAS）。
+- 从 JDK 9 开始不再随 JDK 捆绑，获取便利性下降。
+
+## 对引擎开发者的参考价值
+
+Derby 的代码库是学习传统 RDBMS 实现的良好教材——完整的 SQL 解析器（基于 JavaCC）、基于成本的查询优化器、B-Tree 存储引擎、WAL 日志管理和锁管理器都在一个纯 Java 代码库中清晰实现。Java 存储过程的集成方式展示了如何将宿主语言方法嵌入 SQL 引擎。SYSCS_UTIL 系统过程的设计为数据库管理接口提供了一种内省式的参考模式。Derby 对 SQL 标准的严格遵循也使其成为 SQL 标准合规性测试的良好参考。
+
 ## 全部模块
 
 ### DDL — 数据定义
