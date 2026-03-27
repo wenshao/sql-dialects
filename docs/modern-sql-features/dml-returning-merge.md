@@ -89,50 +89,23 @@ RETURNING *;
 ### PostgreSQL RETURNING（最全面）
 
 ```sql
--- INSERT ... RETURNING
-INSERT INTO users (name, email)
-VALUES ('Alice', 'alice@example.com')
+-- INSERT ... RETURNING（包括默认值、序列值）
+INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com')
 RETURNING id, name, email, created_at;
--- 返回插入后的值（包括默认值、触发器修改后的值）
-
--- 批量 INSERT ... RETURNING
-INSERT INTO users (name, email) VALUES
-    ('Alice', 'alice@example.com'),
-    ('Bob', 'bob@example.com'),
-    ('Carol', 'carol@example.com')
-RETURNING id, name;
--- 返回 3 行
-
--- INSERT ... SELECT ... RETURNING
-INSERT INTO archive (user_id, action, ts)
-SELECT user_id, 'migration', NOW() FROM old_users
-RETURNING id;
 
 -- UPDATE ... RETURNING
-UPDATE products
-SET price = price * 1.1
-WHERE category = 'food'
+UPDATE products SET price = price * 1.1 WHERE category = 'food'
 RETURNING id, name, price AS new_price;
 
 -- DELETE ... RETURNING
-DELETE FROM expired_sessions
-WHERE expires_at < NOW()
+DELETE FROM expired_sessions WHERE expires_at < NOW()
 RETURNING session_id, user_id;
 
--- RETURNING 中可以使用表达式
-INSERT INTO orders (product_id, quantity, unit_price)
-VALUES (42, 10, 9.99)
-RETURNING id, quantity * unit_price AS total_amount;
-
--- 与 CTE 结合: DML 结果作为后续查询的输入
+-- 表达式和 CTE 结合: DML 结果作为后续查询的输入
 WITH deleted AS (
-    DELETE FROM orders
-    WHERE status = 'cancelled'
-    RETURNING *
+    DELETE FROM orders WHERE status = 'cancelled' RETURNING *
 )
-INSERT INTO order_archive
-SELECT *, NOW() AS archived_at
-FROM deleted;
+INSERT INTO order_archive SELECT *, NOW() AS archived_at FROM deleted;
 
 -- UPSERT + RETURNING
 INSERT INTO config (key, value) VALUES ('timeout', '30')
@@ -191,92 +164,37 @@ WHERE category = 'food';
 SELECT * FROM @affected WHERE new_price > 100;
 ```
 
-### Oracle RETURNING（PL/SQL 专属）
+### Oracle RETURNING（仅 PL/SQL）
 
 ```sql
--- Oracle 的 RETURNING 只能在 PL/SQL 中使用，不能在纯 SQL 中使用
-
--- PL/SQL 中的 RETURNING INTO
-DECLARE
-    v_id NUMBER;
-    v_created DATE;
+-- Oracle 的 RETURNING 只能在 PL/SQL 中使用，纯 SQL 不支持
+DECLARE v_id NUMBER;
 BEGIN
-    INSERT INTO users (name, email)
-    VALUES ('Alice', 'alice@example.com')
-    RETURNING id, created_at INTO v_id, v_created;
-
-    DBMS_OUTPUT.PUT_LINE('New ID: ' || v_id);
+    INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com')
+    RETURNING id INTO v_id;
 END;
-
--- 批量操作: RETURNING BULK COLLECT INTO
-DECLARE
-    TYPE id_list IS TABLE OF NUMBER;
-    v_ids id_list;
-BEGIN
-    UPDATE products SET price = price * 0.9
-    WHERE category = 'electronics'
-    RETURNING id BULK COLLECT INTO v_ids;
-
-    FOR i IN 1..v_ids.COUNT LOOP
-        DBMS_OUTPUT.PUT_LINE('Updated: ' || v_ids(i));
-    END LOOP;
-END;
-
--- 纯 SQL 中不支持:
--- UPDATE products SET price = price * 0.9 RETURNING id;  -- 错误!
+-- 批量操作: RETURNING id BULK COLLECT INTO v_ids
 ```
 
-### SQLite RETURNING (3.35.0+)
+### SQLite RETURNING (3.35.0+) / MariaDB (10.5+)
 
 ```sql
--- SQLite 3.35.0 (2021-03-12) 添加了 RETURNING 支持
-INSERT INTO users (name, email)
-VALUES ('Alice', 'alice@example.com')
+-- SQLite: INSERT/UPDATE/DELETE 都支持 RETURNING
+INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com')
 RETURNING id, name, email;
 
-UPDATE products SET price = price * 0.9
-WHERE category = 'electronics'
-RETURNING id, name, price;
-
-DELETE FROM old_logs WHERE ts < '2024-01-01'
-RETURNING *;
-
--- 注意: SQLite 的 RETURNING 返回值是最终值（触发器修改后的值）
-```
-
-### MariaDB RETURNING (10.5+)
-
-```sql
--- MariaDB 10.5+ 支持 DELETE ... RETURNING
-DELETE FROM expired_sessions
-WHERE expires_at < NOW()
-RETURNING session_id, user_id;
-
--- MariaDB 10.5+ 支持 INSERT ... RETURNING
-INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com')
-RETURNING id, name;
-
--- 注意: MariaDB 不支持 UPDATE ... RETURNING (截至 11.x)
+-- MariaDB: INSERT 和 DELETE 支持 RETURNING，UPDATE 不支持
+DELETE FROM old_logs WHERE ts < '2024-01-01' RETURNING *;
 ```
 
 ### MySQL（不支持 RETURNING）
 
 ```sql
--- MySQL 只能用 LAST_INSERT_ID() 获取自增 ID
+-- 只能用 LAST_INSERT_ID() 获取自增 ID（无法获取其他列）
 INSERT INTO users (name, email) VALUES ('Alice', 'alice@example.com');
 SELECT LAST_INSERT_ID();
--- 只返回最后一个自增 ID，无法获取其他列
 
--- 批量插入时 LAST_INSERT_ID() 只返回第一个 ID
-INSERT INTO users (name, email) VALUES
-    ('Alice', 'alice@example.com'),
-    ('Bob', 'bob@example.com');
-SELECT LAST_INSERT_ID();  -- 只返回 Alice 的 ID
-
--- 要获取其他信息只能额外查询
-UPDATE products SET price = price * 0.9 WHERE category = 'electronics';
-SELECT ROW_COUNT();  -- 只能知道影响行数
-SELECT * FROM products WHERE category = 'electronics';  -- 额外查询
+-- 批量插入时只返回第一个 ID; UPDATE 只能获取 ROW_COUNT()
 ```
 
 ## 设计分析
@@ -348,53 +266,15 @@ DML 执行流程（有 RETURNING）:
     return result_set
 ```
 
-### 3. 旧值访问的实现
+### 3. 旧值访问与触发器交互
 
-如果要支持 SQL Server 风格的新旧值同时访问：
+支持 SQL Server 风格新旧值同时访问: 更新前复制行数据（`deleted.*`），更新后取新行（`inserted.*`），或利用 MVCC 旧版本。
 
-```
-UPDATE 执行器:
-    for each matching row:
-        old_values = copy(current_row)        -- 保存旧值
-        apply_update(current_row, set_exprs)  -- 原地更新
-        new_values = current_row              -- 新值
+触发器交互需要注意: PostgreSQL 的 RETURNING 返回 BEFORE 触发器修改后的值（AFTER 触发器尚未执行）; SQL Server 的 OUTPUT 返回触发器执行前的值。时机差异需明确文档化。
 
-        -- RETURNING/OUTPUT 表达式中:
-        -- "deleted.col" 引用 old_values
-        -- "inserted.col" 引用 new_values
-```
+### 4. RETURNING 结果作为表表达式
 
-需要在更新前复制行数据（额外内存开销），或者使用 MVCC 中的旧版本。
-
-### 4. 与触发器的交互
-
-RETURNING 返回的值应该是触发器执行后的最终值：
-
-```
-INSERT 流程:
-    1. BEFORE INSERT 触发器（可能修改行）
-    2. 实际插入
-    3. AFTER INSERT 触发器（可能修改行）
-    4. RETURNING 获取最终行  ← 此时的值
-
-PostgreSQL: RETURNING 返回 BEFORE 触发器修改后的值（AFTER 触发器此时尚未执行）
-SQL Server: OUTPUT 返回触发器执行前的值
-```
-
-不同引擎的处理时机不同，需要明确文档化。
-
-### 5. RETURNING 结果作为表表达式
-
-PostgreSQL 允许 DML RETURNING 在 CTE 中使用，这需要执行器支持"DML 子计划返回行集"：
-
-```sql
-WITH ins AS (
-    INSERT INTO t (a) VALUES (1) RETURNING *
-)
-SELECT * FROM ins;
-```
-
-执行计划中，CTE 的子计划是一个 DML 节点而非 SELECT 节点，其输出类型是 RETURNING 指定的列。
+PostgreSQL 允许 DML RETURNING 在 CTE 中使用（`WITH ins AS (INSERT ... RETURNING *) SELECT * FROM ins`），执行计划中 CTE 子计划是 DML 节点而非 SELECT 节点。
 
 ## 参考资料
 

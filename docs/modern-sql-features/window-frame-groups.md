@@ -142,79 +142,35 @@ FROM scores;
 -- Grace  95  92.5   (组: {90,95})
 ```
 
-### 三种模式对比
+### 三种模式对比（数据: score = 80, 80, 85, 85, 85, 90, 95）
 
-```sql
--- 用同一个窗口，三种模式的不同结果
--- 数据: score = 80, 80, 85, 85, 85, 90, 95
+| score=85 的帧 | ROWS (前后各1行) | RANGE (值+/-5) | GROUPS (前后各1组) |
+|---------------|-----------------|----------------|-------------------|
+| 第1个85 | {80, 85, 85} | {80,80,85,85,85,90} | {80,80,85,85,85,90} |
+| 第2个85 | {85, 85, 85} | 同上 | 同上 |
+| 第3个85 | {85, 85, 90} | 同上 | 同上 |
 
--- ROWS: 当前行物理位置前后各 1 行
-SELECT score,
-    ARRAY_AGG(score) OVER (ORDER BY score ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS frame
-FROM scores;
--- 80: {80, 80}
--- 80: {80, 80, 85}
--- 85: {80, 85, 85}       <-- 三个 85 看到不同帧
--- 85: {85, 85, 85}
--- 85: {85, 85, 90}
--- 90: {85, 90, 95}
--- 95: {90, 95}
-
--- RANGE: 当前值 +/- 5 的范围
-SELECT score,
-    ARRAY_AGG(score) OVER (ORDER BY score RANGE BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS frame
-FROM scores;
--- 80: {80, 80, 85, 85, 85}
--- 85: {80, 80, 85, 85, 85, 90}
--- 90: {85, 85, 85, 90, 95}
--- 95: {90, 95}
-
--- GROUPS: 前后各 1 组
-SELECT score,
-    ARRAY_AGG(score) OVER (ORDER BY score GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS frame
-FROM scores;
--- 80: {80, 80, 85, 85, 85}        <-- 同值行看到相同帧
--- 85: {80, 80, 85, 85, 85, 90}    <-- 三个 85 帧完全一致
--- 90: {85, 85, 85, 90, 95}
--- 95: {90, 95}
-```
+关键区别: ROWS 下三个 85 看到不同帧; GROUPS 下三个 85 帧完全一致。
 
 ## EXCLUDE 子句
 
 SQL:2011 同时引入了 EXCLUDE 子句，可与 GROUPS 配合使用（也可用于 ROWS/RANGE）。
 
-```sql
--- EXCLUDE NO OTHERS: 默认，不排除任何行
-SUM(val) OVER (ORDER BY x GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING
-               EXCLUDE NO OTHERS)
-
--- EXCLUDE CURRENT ROW: 从帧中排除当前行（但保留同组其他行）
--- 用途: 计算"除自己外的组内均值"
-AVG(score) OVER (ORDER BY dept GROUPS BETWEEN 0 PRECEDING AND 0 FOLLOWING
-                 EXCLUDE CURRENT ROW)
-
--- EXCLUDE GROUP: 排除当前行的整个对等组
--- 用途: 只看相邻组，不包含自己所在的组
-SUM(val) OVER (ORDER BY x GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING
-               EXCLUDE GROUP)
-
--- EXCLUDE TIES: 排除与当前行对等的其他行（保留当前行自身）
-AVG(score) OVER (ORDER BY dept GROUPS BETWEEN 1 PRECEDING AND 1 FOLLOWING
-                 EXCLUDE TIES)
-```
-
-### EXCLUDE 的实际场景
+| EXCLUDE 选项 | 语义 | 典型用途 |
+|-------------|------|---------|
+| `NO OTHERS` | 不排除（默认） | - |
+| `CURRENT ROW` | 排除当前行，保留同组其他行 | 除自己外的组内均值 |
+| `GROUP` | 排除当前行的整个对等组 | 只看相邻组 |
+| `TIES` | 排除对等行，保留当前行自身 | 当前行 vs 同值其他行 |
 
 ```sql
--- 场景: 计算每个学生与同分段其他学生的分差
+-- 计算每个学生与同分段其他学生的分差
 SELECT student, score,
     score - AVG(score) OVER (
-        ORDER BY score
-        GROUPS BETWEEN 0 PRECEDING AND 0 FOLLOWING
+        ORDER BY score GROUPS BETWEEN 0 PRECEDING AND 0 FOLLOWING
         EXCLUDE CURRENT ROW
     ) AS diff_from_peers
 FROM scores;
--- 当只有一个同分学生时，EXCLUDE CURRENT ROW 后帧为空，结果为 NULL
 ```
 
 ## 不支持 GROUPS 的引擎如何替代

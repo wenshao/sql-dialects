@@ -145,63 +145,31 @@ SELECT * FROM t WHERE col IS NOT DISTINCT FROM 42;  -- MariaDB only
 ### SQLite（IS / IS NOT）
 
 ```sql
--- SQLite 使用 IS / IS NOT 关键字（与标准的 IS NULL 用法扩展）
+-- SQLite 扩展了 IS 的语义: col IS 42 等同于 IS NOT DISTINCT FROM
 SELECT * FROM t WHERE col IS 42;      -- NULL-safe equals
 SELECT * FROM t WHERE col IS NOT 42;  -- NULL-safe not equals
-
--- 注意: 这不是标准 SQL! 标准的 IS 只用于 IS NULL / IS NOT NULL
--- SQLite 扩展了 IS 的语义使其可用于任意值
-
--- JOIN 条件
-SELECT a.*, b.*
-FROM table_a a
-JOIN table_b b ON a.key IS b.key;
+-- 注意: 非标准 SQL，标准 IS 只用于 IS NULL / IS NOT NULL
 ```
 
-### SQL Server（无直接支持）
+### SQL Server / Oracle（无直接支持）
 
 ```sql
--- SQL Server 没有 IS NOT DISTINCT FROM，需要手写
--- 方案 1: 复合条件（最可靠）
-SELECT a.*, b.*
-FROM table_a a
-JOIN table_b b ON (a.key = b.key OR (a.key IS NULL AND b.key IS NULL));
-
--- 方案 2: ISNULL / COALESCE 变通（有陷阱）
--- 需要选择一个不会出现在实际数据中的哨兵值
-WHERE ISNULL(a.key, -999) = ISNULL(b.key, -999);
--- 危险: 如果 -999 是合法数据值，逻辑就错了!
-
--- 方案 3: INTERSECT 技巧（正确但晦涩）
-WHERE EXISTS (SELECT a.key INTERSECT SELECT b.key);
--- 利用了集合操作中 NULL = NULL 的特性
-```
-
-### Oracle（DECODE 变通）
-
-```sql
--- Oracle 没有 IS NOT DISTINCT FROM
--- 方案 1: DECODE（Oracle 特有，NULL-safe 比较）
-WHERE DECODE(a.key, b.key, 1, 0) = 1;
--- DECODE 中 NULL = NULL 返回 TRUE
-
--- 方案 2: NVL（与 ISNULL 同样有哨兵值问题）
-WHERE NVL(a.key, -999) = NVL(b.key, -999);
-
--- 方案 3: 手写完整条件
+-- SQL Server 方案 1: 复合条件（最可靠）
 WHERE (a.key = b.key OR (a.key IS NULL AND b.key IS NULL));
+-- SQL Server 方案 2: INTERSECT 技巧（正确但晦涩）
+WHERE EXISTS (SELECT a.key INTERSECT SELECT b.key);
+-- 方案 3: ISNULL/NVL 哨兵值（有陷阱: 哨兵值可能是合法数据!）
+WHERE ISNULL(a.key, -999) = ISNULL(b.key, -999);
 
--- Oracle 的 DECODE 方案在实践中最常用，因为简洁且没有哨兵值问题
+-- Oracle 特有: DECODE（NULL-safe，无哨兵值问题）
+WHERE DECODE(a.key, b.key, 1, 0) = 1;
 ```
 
 ### Snowflake
 
 ```sql
--- 标准语法
 SELECT * FROM t WHERE col IS NOT DISTINCT FROM 42;
-
--- 或使用内置函数
-SELECT * FROM t WHERE EQUAL_NULL(col, 42);
+SELECT * FROM t WHERE EQUAL_NULL(col, 42);    -- 内置函数形式
 ```
 
 ## 典型用例

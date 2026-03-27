@@ -141,33 +141,20 @@ SELECT * FROM staging;
 -- 不会出现"写了一半"的中间状态
 ```
 
-### MaxCompute
+### MaxCompute / Flink SQL
 
 ```sql
--- 覆盖指定分区
+-- MaxCompute: 与 Hive 语法一致
 INSERT OVERWRITE TABLE sales PARTITION (dt='2024-01-15')
 SELECT product_id, amount FROM staging;
 
--- 动态分区覆盖
-INSERT OVERWRITE TABLE sales PARTITION (dt)
-SELECT product_id, amount, dt FROM staging;
-
--- 覆盖多级分区
+-- 多级分区混合（静态 + 动态）
 INSERT OVERWRITE TABLE sales PARTITION (year='2024', month='01', day)
 SELECT product_id, amount, day FROM staging;
--- year 和 month 是静态值，day 是动态的
-```
 
-### Flink SQL
-
-```sql
--- Flink SQL 批模式下支持 INSERT OVERWRITE
+-- Flink SQL: 批模式下支持，语法类似
 INSERT OVERWRITE sales PARTITION (dt='2024-01-15')
 SELECT product_id, amount FROM staging;
-
--- 动态分区
-INSERT OVERWRITE sales
-SELECT product_id, amount, dt FROM staging;
 ```
 
 ## STATIC vs DYNAMIC 分区覆盖
@@ -208,36 +195,12 @@ DYNAMIC 覆盖后: [dt=01, dt=02, dt=03, dt=04, dt=05]
 
 ## 不支持 INSERT OVERWRITE 的引擎如何替代
 
-### BigQuery
-
 ```sql
--- 方案 1: MERGE 模拟覆盖
-MERGE INTO target t
-USING source s ON t.dt = s.dt AND t.id = s.id
-WHEN MATCHED THEN UPDATE SET t.amount = s.amount
-WHEN NOT MATCHED THEN INSERT (id, amount, dt) VALUES (s.id, s.amount, s.dt);
-
--- 方案 2: DML 删除 + 插入（非原子）
-DELETE FROM target WHERE dt = '2024-01-15';
-INSERT INTO target SELECT * FROM source WHERE dt = '2024-01-15';
-
--- 方案 3: bq CLI 的 WRITE_TRUNCATE 模式
--- bq query --destination_table=target --replace ...
-```
-
-### PostgreSQL / MySQL
-
-```sql
--- 传统 RDBMS 中的"覆盖"通常用事务保证原子性
+-- BigQuery: 用 MERGE 或 bq CLI 的 WRITE_TRUNCATE 模式
+-- PostgreSQL / MySQL: 用事务保证原子性
 BEGIN;
 DELETE FROM target WHERE dt = '2024-01-15';
 INSERT INTO target SELECT * FROM source WHERE dt = '2024-01-15';
-COMMIT;
-
--- 或用 TRUNCATE + INSERT（全表覆盖）
-BEGIN;
-TRUNCATE TABLE target;
-INSERT INTO target SELECT * FROM source;
 COMMIT;
 ```
 
@@ -297,22 +260,7 @@ partition_spec:
 
 这是最优方案: 既有文件级效率，又有事务保证。
 
-### 3. 动态分区发现
-
-DYNAMIC 模式需要在写入完成后才知道涉及哪些分区：
-
-```
-1. 执行 SELECT，收集所有结果行
-2. 按分区列的值分组，发现涉及的分区集合
-3. 只覆盖这些分区，保留其他分区不动
-```
-
-实现要点：
-- 需要在 writer 端维护"已见分区"集合
-- 每个分区写入独立的文件/目录
-- 写入完成后，原子性地替换涉及的分区
-
-### 4. REPLACE INTO 不是 INSERT OVERWRITE
+### 3. REPLACE INTO 不是 INSERT OVERWRITE
 
 MySQL 的 `REPLACE INTO` 和 INSERT OVERWRITE 语义完全不同：
 

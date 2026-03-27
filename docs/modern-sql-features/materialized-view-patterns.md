@@ -205,25 +205,9 @@ GROUP BY dept_id;
 
 -- 关键区别:
 -- - 只处理新 INSERT 的数据，不扫描历史数据
--- - 不处理 UPDATE/DELETE (ClickHouse 本身也很少用)
--- - 创建 MV 时不回填历史数据!
+-- - 不处理 UPDATE/DELETE
+-- - 创建 MV 时不回填历史数据（需手动 INSERT INTO mv_target SELECT ...）
 -- - MV 本身是一个独立的表，有自己的引擎和存储
-
--- 带目标表的写法（更灵活）
-CREATE TABLE mv_target (
-    dept_id UInt32,
-    total_amount Decimal(18,2),
-    order_count UInt64
-) ENGINE = SummingMergeTree()
-ORDER BY dept_id;
-
-CREATE MATERIALIZED VIEW mv_sales TO mv_target
-AS SELECT dept_id, sum(amount) AS total_amount, count() AS order_count
-FROM sales GROUP BY dept_id;
-
--- 回填历史数据（需要手动）
-INSERT INTO mv_target
-SELECT dept_id, sum(amount), count() FROM sales GROUP BY dept_id;
 ```
 
 ### Materialize（流式增量维护）
@@ -254,45 +238,7 @@ GROUP BY region;
 
 ### MySQL（手动模拟）
 
-```sql
--- MySQL 不支持物化视图，需要手动实现
-
--- 方案 1: 辅助表 + 定时任务
-CREATE TABLE mv_sales_summary (
-    dept_id INT PRIMARY KEY,
-    total_amount DECIMAL(18,2),
-    order_count INT,
-    last_refreshed TIMESTAMP
-);
-
--- 刷新存储过程
-DELIMITER //
-CREATE PROCEDURE refresh_mv_sales()
-BEGIN
-    TRUNCATE TABLE mv_sales_summary;
-    INSERT INTO mv_sales_summary
-    SELECT dept_id, SUM(amount), COUNT(*), NOW()
-    FROM sales
-    GROUP BY dept_id;
-END //
-DELIMITER ;
-
--- 定时调用 (MySQL Event Scheduler)
-CREATE EVENT refresh_mv_every_hour
-ON SCHEDULE EVERY 1 HOUR
-DO CALL refresh_mv_sales();
-
--- 方案 2: 触发器维护（实时但有性能开销）
-CREATE TRIGGER trg_sales_insert AFTER INSERT ON sales
-FOR EACH ROW
-BEGIN
-    INSERT INTO mv_sales_summary (dept_id, total_amount, order_count)
-    VALUES (NEW.dept_id, NEW.amount, 1)
-    ON DUPLICATE KEY UPDATE
-        total_amount = total_amount + NEW.amount,
-        order_count = order_count + 1;
-END;
-```
+MySQL 不支持物化视图。常用方案：辅助表 + Event Scheduler 定时 TRUNCATE + INSERT，或触发器实时维护辅助表（性能开销大）。
 
 ## 设计分析: 刷新策略对比
 
@@ -328,64 +274,17 @@ GROUP BY dept_id;
 
 ## 对引擎开发者的实现建议
 
-### 1. 全量刷新的实现
+### 1. 全量刷新
 
-最简单的方案，适合 MVP 版本：
+最简单方案: 创建临时表 → INSERT AS SELECT → 原子性 RENAME 交换 → DROP 旧表。CONCURRENTLY 变体需要 diff: 执行查询得新结果集 → 与现有数据 diff (需 UNIQUE INDEX) → 应用增量变更。
 
-```
-REFRESH MATERIALIZED VIEW mv:
-    1. 创建临时表 tmp
-    2. INSERT INTO tmp AS SELECT ... (MV 的定义查询)
-    3. 原子性交换: RENAME mv → mv_old, tmp → mv
-    4. DROP mv_old
-```
+### 2. 增量刷新
 
-CONCURRENTLY 变体需要增量 diff：
+增量刷新需要捕获基表变更: (A) 变更日志——基表维护 INSERT/UPDATE/DELETE 日志; (B) 时间戳过滤——处理 `updated_at > 上次刷新时间` 的行; (C) WAL 位点——重放 WAL 中后续变更。
 
-```
-REFRESH MATERIALIZED VIEW CONCURRENTLY mv:
-    1. 执行 MV 的定义查询，得到新结果集
-    2. 与现有 MV 数据做 diff (需要 UNIQUE INDEX)
-    3. 应用 INSERT/UPDATE/DELETE 到 MV
-    4. 整个过程不阻塞读取（读取旧数据直到完成）
-```
+### 3. 查询改写
 
-### 2. 增量刷新的实现
-
-增量刷新需要捕获基表变更（change capture）：
-
-```
-方案 A: 变更日志 (Oracle Materialized View Log)
-    基表维护 INSERT/UPDATE/DELETE 日志
-    刷新时只处理日志中的变更
-
-方案 B: 时间戳过滤
-    MV 记录上次刷新时间 T
-    刷新时: 处理 WHERE updated_at > T 的行
-
-方案 C: LSN/WAL 位点
-    MV 记录上次处理的 WAL 位点
-    刷新时: 重放 WAL 中后续的变更
-```
-
-### 3. 查询改写的实现
-
-查询改写在优化器中作为一个规则：
-
-```
-输入: 用户查询 Q
-对每个物化视图 MV:
-    1. 检查 MV 是否能回答 Q (subsumption test)
-    2. 如果能，构造改写后的查询 Q'
-    3. 估算 Q' 的成本，与原始 Q 比较
-    4. 选择成本更低的方案
-```
-
-subsumption test 的核心判断：
-- MV 的 FROM 表是否包含 Q 需要的表
-- MV 的 WHERE 条件是否弱于 Q 的条件
-- MV 的 GROUP BY 粒度是否不粗于 Q 的粒度
-- MV 的 SELECT 列是否包含 Q 需要的列
+查询改写在优化器中作为规则: 对每个 MV 做 subsumption test，判断 MV 是否能回答用户查询 Q（FROM 表覆盖、WHERE 条件不强于、GROUP BY 粒度不粗于、SELECT 列覆盖），然后比较代价选择最优方案。
 
 ## 参考资料
 

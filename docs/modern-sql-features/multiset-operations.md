@@ -150,27 +150,14 @@ SELECT item FROM warehouse_b;
 
 这是 ClickHouse 的一个独特设计选择，与其 UNION 的默认行为一致（ClickHouse 中 UNION 也默认 DISTINCT，但提供 UNION ALL）。需要特别注意迁移兼容性。
 
-### SQL Server（不支持 ALL 变体）
+### SQL Server / BigQuery / Snowflake（不支持 ALL 变体）
+
+这些引擎只支持 INTERSECT/EXCEPT（隐式 DISTINCT），不支持 ALL。
+
+## 替代方案: ROW_NUMBER + JOIN
 
 ```sql
--- SQL Server 只支持无 ALL 的版本
-SELECT item FROM warehouse_a
-INTERSECT
-SELECT item FROM warehouse_b;
-
-SELECT item FROM warehouse_a
-EXCEPT
-SELECT item FROM warehouse_b;
-
--- 无法写: INTERSECT ALL 或 EXCEPT ALL
-```
-
-## 替代方案: 不支持 ALL 时的模拟
-
-### 方案 1: ROW_NUMBER + JOIN
-
-```sql
--- 模拟 INTERSECT ALL
+-- 模拟 INTERSECT ALL: 为每个值编号后 JOIN
 WITH a_numbered AS (
     SELECT item, ROW_NUMBER() OVER (PARTITION BY item ORDER BY item) AS rn
     FROM warehouse_a
@@ -179,42 +166,12 @@ b_numbered AS (
     SELECT item, ROW_NUMBER() OVER (PARTITION BY item ORDER BY item) AS rn
     FROM warehouse_b
 )
-SELECT a.item
-FROM a_numbered a
+SELECT a.item FROM a_numbered a
 JOIN b_numbered b ON a.item = b.item AND a.rn = b.rn;
 
--- 模拟 EXCEPT ALL
-WITH a_numbered AS (
-    SELECT item, ROW_NUMBER() OVER (PARTITION BY item ORDER BY item) AS rn
-    FROM warehouse_a
-),
-b_numbered AS (
-    SELECT item, ROW_NUMBER() OVER (PARTITION BY item ORDER BY item) AS rn
-    FROM warehouse_b
-)
-SELECT a.item
-FROM a_numbered a
-LEFT JOIN b_numbered b ON a.item = b.item AND a.rn = b.rn
-WHERE b.item IS NULL;
+-- 模拟 EXCEPT ALL: 改为 LEFT JOIN + WHERE IS NULL
+-- ...LEFT JOIN b_numbered b ON ... WHERE b.item IS NULL
 ```
-
-### 方案 2: 聚合计数
-
-```sql
--- 模拟 INTERSECT ALL（更直观但需要 lateral 或交叉连接展开）
-WITH counts AS (
-    SELECT item, LEAST(a_cnt, b_cnt) AS result_cnt
-    FROM (
-        SELECT item, COUNT(*) AS a_cnt FROM warehouse_a GROUP BY item
-    ) a
-    JOIN (
-        SELECT item, COUNT(*) AS b_cnt FROM warehouse_b GROUP BY item
-    ) b USING (item)
-)
--- 需要再展开 result_cnt 次...（实际操作很繁琐）
-```
-
-ROW_NUMBER 方案更实用，但性能不如原生 INTERSECT ALL（需要额外的排序和 JOIN）。
 
 ## 实际应用场景
 

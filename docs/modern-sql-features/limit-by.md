@@ -131,45 +131,24 @@ FROM ranked
 WHERE rn <= 3;
 ```
 
-### LATERAL JOIN / CROSS APPLY（更高效的方案）
+### LATERAL JOIN / CROSS APPLY（有索引时最高效）
 
 ```sql
--- PostgreSQL: LATERAL
-SELECT d.dept_id, d.dept_name, e.emp_name, e.salary
+-- PostgreSQL: LATERAL（有合适索引时避免全表扫描）
+SELECT d.dept_id, e.emp_name, e.salary
 FROM departments d
 JOIN LATERAL (
-    SELECT emp_name, salary
-    FROM employees
-    WHERE dept_id = d.dept_id
-    ORDER BY salary DESC
-    LIMIT 3
+    SELECT emp_name, salary FROM employees
+    WHERE dept_id = d.dept_id ORDER BY salary DESC LIMIT 3
 ) e ON true;
 
--- SQL Server: CROSS APPLY
-SELECT d.dept_id, d.dept_name, e.emp_name, e.salary
+-- SQL Server: CROSS APPLY（语义等同）
+SELECT d.dept_id, e.emp_name, e.salary
 FROM departments d
 CROSS APPLY (
-    SELECT TOP 3 emp_name, salary
-    FROM employees
-    WHERE dept_id = d.dept_id
-    ORDER BY salary DESC
+    SELECT TOP 3 emp_name, salary FROM employees
+    WHERE dept_id = d.dept_id ORDER BY salary DESC
 ) e;
-```
-
-LATERAL/CROSS APPLY 在有合适索引时可以避免全表扫描，性能优于 ROW_NUMBER 方案。
-
-### 相关子查询（通用但性能差）
-
-```sql
--- 最通用的写法，但性能最差
-SELECT e.dept_id, e.emp_name, e.salary
-FROM employees e
-WHERE (
-    SELECT COUNT(*)
-    FROM employees e2
-    WHERE e2.dept_id = e.dept_id
-      AND (e2.salary > e.salary OR (e2.salary = e.salary AND e2.id < e.id))
-) < 3;
 ```
 
 ## 设计分析: 专用语法 vs 通用方案

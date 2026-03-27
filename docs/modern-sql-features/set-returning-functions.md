@@ -76,167 +76,47 @@ FROM orders;
 ### DuckDB: generate_series / range
 
 ```sql
--- generate_series: 包含结束值（闭区间）
-SELECT * FROM generate_series(1, 5);
--- 1, 2, 3, 4, 5
-
--- range: 不包含结束值（半开区间，类似 Python range）
-SELECT * FROM range(1, 5);
--- 1, 2, 3, 4
-
--- 日期序列
+-- generate_series: 闭区间; range: 半开区间（类似 Python）
+SELECT * FROM generate_series(1, 5);         -- 1,2,3,4,5
+SELECT * FROM range(1, 5);                   -- 1,2,3,4
 SELECT * FROM generate_series(DATE '2024-01-01', DATE '2024-01-07', INTERVAL 1 DAY);
-
--- 时间戳序列
-SELECT * FROM generate_series(
-    TIMESTAMP '2024-01-01',
-    TIMESTAMP '2024-01-31',
-    INTERVAL 1 DAY
-);
 ```
 
 ### BigQuery: GENERATE_xxx_ARRAY + UNNEST
 
-BigQuery 的序列生成分两步：生成数组 + 展开数组。
-
 ```sql
--- 日期序列
-SELECT date
-FROM UNNEST(GENERATE_DATE_ARRAY('2024-01-01', '2024-01-07')) AS date;
-
--- 时间戳序列（每小时）
-SELECT ts
-FROM UNNEST(GENERATE_TIMESTAMP_ARRAY(
-    '2024-01-01', '2024-01-02', INTERVAL 1 HOUR
-)) AS ts;
-
--- 整数序列（无直接函数，用 GENERATE_ARRAY）
-SELECT n
-FROM UNNEST(GENERATE_ARRAY(1, 100)) AS n;
-
--- 带步长
-SELECT n
-FROM UNNEST(GENERATE_ARRAY(0, 100, 10)) AS n;
+-- 序列生成分两步: 生成数组 + UNNEST 展开
+SELECT date FROM UNNEST(GENERATE_DATE_ARRAY('2024-01-01', '2024-01-07')) AS date;
+SELECT n FROM UNNEST(GENERATE_ARRAY(1, 100)) AS n;
 ```
 
 ### Oracle: CONNECT BY LEVEL
 
-Oracle 没有 SRF，但可以用层次查询的副作用生成序列：
-
 ```sql
--- 整数序列
-SELECT LEVEL AS n
-FROM DUAL
-CONNECT BY LEVEL <= 100;
-
--- 日期序列
-SELECT DATE '2024-01-01' + LEVEL - 1 AS report_date
-FROM DUAL
-CONNECT BY LEVEL <= 365;
-
--- 也可以用递归 CTE (Oracle 11g R2+)
-WITH nums (n) AS (
-    SELECT 1 FROM DUAL
-    UNION ALL
-    SELECT n + 1 FROM nums WHERE n < 100
-)
-SELECT n FROM nums;
+-- 用层次查询的副作用生成序列（无直接 SRF）
+SELECT LEVEL AS n FROM DUAL CONNECT BY LEVEL <= 100;
+SELECT DATE '2024-01-01' + LEVEL - 1 AS d FROM DUAL CONNECT BY LEVEL <= 365;
 ```
 
-### MySQL（无 SRF）
+### MySQL / SQL Server（递归 CTE）
 
 ```sql
--- MySQL 没有序列生成函数
--- 方案 1: 递归 CTE (MySQL 8.0+)
+-- 无 SRF，用递归 CTE 代替
 WITH RECURSIVE seq (n) AS (
-    SELECT 1
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 100
-)
-SELECT n FROM seq;
-
--- 日期序列
-WITH RECURSIVE dates (d) AS (
-    SELECT DATE '2024-01-01'
-    UNION ALL
-    SELECT d + INTERVAL 1 DAY FROM dates WHERE d < '2024-12-31'
-)
-SELECT d FROM dates;
-
--- 方案 2: 辅助数字表（大型序列更高效）
-CREATE TABLE numbers (n INT PRIMARY KEY);
-INSERT INTO numbers
-WITH RECURSIVE seq (n) AS (
-    SELECT 0 UNION ALL SELECT n + 1 FROM seq WHERE n < 9999
-)
-SELECT n FROM seq;
-
--- 使用数字表生成日期序列
-SELECT DATE_ADD('2024-01-01', INTERVAL n DAY) AS report_date
-FROM numbers
-WHERE n <= DATEDIFF('2024-12-31', '2024-01-01');
+    SELECT 1 UNION ALL SELECT n + 1 FROM seq WHERE n < 100
+) SELECT n FROM seq;
+-- SQL Server 需加 OPTION (MAXRECURSION 0) 取消 100 层限制
 ```
 
-### SQL Server（递归 CTE）
+### ClickHouse: numbers / Snowflake: GENERATOR
 
 ```sql
--- SQL Server 也没有直接的序列生成 SRF
--- 方案 1: 递归 CTE
-WITH seq AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM seq WHERE n < 100
-)
-SELECT n FROM seq
-OPTION (MAXRECURSION 0);  -- 默认限制 100 层
+-- ClickHouse: numbers() 表函数
+SELECT number FROM numbers(10);                            -- 0..9
+SELECT toDate('2024-01-01') + number AS d FROM numbers(365);
 
--- 方案 2: VALUES + CROSS JOIN 生成大序列
-WITH E1 AS (SELECT n FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(n)),
-     E2 AS (SELECT a.n FROM E1 a CROSS JOIN E1 b),    -- 100 行
-     E4 AS (SELECT a.n FROM E2 a CROSS JOIN E2 b)     -- 10000 行
-SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS n
-FROM E4;
-
--- 日期序列
-WITH seq AS (
-    SELECT CAST('2024-01-01' AS DATE) AS d
-    UNION ALL
-    SELECT DATEADD(DAY, 1, d) FROM seq WHERE d < '2024-12-31'
-)
-SELECT d FROM seq
-OPTION (MAXRECURSION 0);
-```
-
-### ClickHouse: numbers / arrayJoin
-
-```sql
--- numbers() 表函数: 生成 0 到 N-1 的序列
-SELECT number FROM numbers(10);
--- 0, 1, 2, 3, ..., 9
-
--- numbers(start, count): 带起始值
-SELECT number FROM numbers(5, 10);
--- 5, 6, 7, ..., 14
-
--- 配合日期计算
-SELECT toDate('2024-01-01') + number AS report_date
-FROM numbers(365);
-```
-
-### Snowflake: GENERATOR + SEQ
-
-```sql
--- GENERATOR: 生成指定数量的行
-SELECT SEQ4() AS n
-FROM TABLE(GENERATOR(ROWCOUNT => 100));
-
--- 日期序列
-SELECT DATEADD(DAY, SEQ4(), '2024-01-01'::DATE) AS report_date
-FROM TABLE(GENERATOR(ROWCOUNT => 365));
-
--- ROW_NUMBER 方式
-SELECT ROW_NUMBER() OVER (ORDER BY SEQ4()) - 1 AS n
-FROM TABLE(GENERATOR(ROWCOUNT => 100));
+-- Snowflake: GENERATOR + SEQ4
+SELECT SEQ4() AS n FROM TABLE(GENERATOR(ROWCOUNT => 100));
 ```
 
 ## 数组/JSON 展开
@@ -332,65 +212,24 @@ ProjectWithSRF
 
 **推荐**: 优先支持 FROM 子句中的 SRF（标准方式）。SELECT 中的 SRF 语义复杂（多个 SRF 在 SELECT 中如何交互？PostgreSQL 在不同版本中改变过行为）。
 
-### 2. SRF 的接口设计
+### 2. 与 LATERAL 的交互
 
-```
-interface SetReturningFunction {
-    // 初始化，传入参数
-    void init(Value[] args);
-
-    // 返回下一行，或 null 表示结束
-    Row next();
-
-    // 重置（用于 LATERAL 场景，外部行变化时重新开始）
-    void reset(Value[] newArgs);
-
-    // 返回输出列的类型信息
-    ColumnType[] outputTypes();
-}
-```
-
-### 3. 与 LATERAL 的交互
-
-SRF 最常见的使用模式是与外部表做 LATERAL JOIN：
+SRF 最常见的使用模式是与外部表做 LATERAL JOIN。逗号连接的 SRF 如果引用了前面表的列，应自动推断为 LATERAL 语义：
 
 ```sql
 SELECT t.id, s.n
 FROM my_table t, generate_series(1, t.count) AS s(n);
--- 等效于
-FROM my_table t CROSS JOIN LATERAL generate_series(1, t.count) AS s(n);
+-- 等效于: FROM my_table t CROSS JOIN LATERAL generate_series(1, t.count) AS s(n)
 ```
 
-实现时，逗号连接的 SRF 如果引用了前面表的列，应自动推断为 LATERAL 语义。
+### 3. 空结果与高效实现
 
-### 4. 空结果的处理
+SRF 返回零行时：CROSS JOIN 语义下外部行被过滤掉；LEFT JOIN LATERAL 下外部行保留、SRF 列为 NULL。
 
-SRF 可能返回零行。处理方式：
-
-| 场景 | CROSS JOIN / INNER JOIN | LEFT JOIN LATERAL |
-|------|------------------------|-------------------|
-| SRF 返回 0 行 | 外部行被过滤掉 | 外部行保留，SRF 列为 NULL |
-
-```sql
--- generate_series(1, 0) 返回空
-SELECT t.id, s.n
-FROM my_table t, generate_series(1, t.count) AS s(n);
--- 当 t.count = 0 时，该行不出现在结果中
-
--- LEFT JOIN 保留空结果
-SELECT t.id, s.n
-FROM my_table t
-LEFT JOIN LATERAL generate_series(1, t.count) AS s(n) ON true;
--- 当 t.count = 0 时，id 出现但 n 为 NULL
-```
-
-### 5. 常用 SRF 的高效实现
-
-**generate_series**: 不需要实际生成数组再展开。使用迭代器模式，每次 `next()` 返回当前值并加步长。内存占用 O(1)。
-
-**unnest**: 对于内存中的数组，直接遍历数组元素。对于大数组，考虑流式输出避免一次性展开。
-
-**JSON 数组展开**: 使用流式 JSON 解析器（SAX style），避免先解析整个 JSON 再展开。
+高效实现要点：
+- **generate_series**: 迭代器模式，每次 `next()` 返回当前值并加步长，内存 O(1)
+- **unnest**: 直接遍历数组元素，大数组考虑流式输出
+- **JSON 数组展开**: 使用流式 JSON 解析器（SAX style），避免先解析整个 JSON
 
 ## 实际场景
 

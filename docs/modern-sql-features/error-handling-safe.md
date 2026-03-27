@@ -116,21 +116,11 @@ SELECT COALESCE(TRY_CAST(user_input AS INT), 0) AS safe_value;
 ### Snowflake: TRY_ 前缀
 
 ```sql
--- TRY_TO_NUMBER / TRY_TO_DECIMAL
-SELECT TRY_TO_NUMBER('123.45');         -- 123
-SELECT TRY_TO_DECIMAL('abc', 10, 2);    -- NULL
-
--- TRY_TO_DATE / TRY_TO_TIMESTAMP
+-- 专用函数: TRY_TO_NUMBER, TRY_TO_DATE, TRY_TO_TIMESTAMP, TRY_TO_BOOLEAN
 SELECT TRY_TO_DATE('2024-02-30');              -- NULL
-SELECT TRY_TO_TIMESTAMP('not-a-date');         -- NULL
 SELECT TRY_TO_DATE('20240115', 'YYYYMMDD');    -- 2024-01-15
-
--- TRY_TO_BOOLEAN
-SELECT TRY_TO_BOOLEAN('true');   -- TRUE
-SELECT TRY_TO_BOOLEAN('maybe');  -- NULL
-
--- TRY_CAST (通用)
-SELECT TRY_CAST('hello' AS INTEGER);  -- NULL
+-- 通用: TRY_CAST
+SELECT TRY_CAST('hello' AS INTEGER);           -- NULL
 ```
 
 ### ClickHouse: OrNull / OrZero 后缀
@@ -162,28 +152,13 @@ SELECT toInt32OrDefault('abc', 42);  -- 42
 
 ### Oracle: VALIDATE_CONVERSION
 
-Oracle 没有 TRY_CAST，而是提供了一个验证函数：
-
 ```sql
--- VALIDATE_CONVERSION: 返回 1(可转换) 或 0(不可转换)
-SELECT VALIDATE_CONVERSION('123' AS NUMBER);    -- 1
-SELECT VALIDATE_CONVERSION('abc' AS NUMBER);    -- 0
-
--- 结合 CASE WHEN 使用
-SELECT
-    CASE WHEN VALIDATE_CONVERSION(price_str AS NUMBER) = 1
-         THEN CAST(price_str AS NUMBER)
-         ELSE NULL
-    END AS safe_price
+-- 验证函数: 返回 1(可转换) 或 0(不可转换)，需结合 CASE WHEN 使用
+SELECT CASE WHEN VALIDATE_CONVERSION(price_str AS NUMBER) = 1
+            THEN CAST(price_str AS NUMBER) ELSE NULL
+       END AS safe_price
 FROM products;
-
--- 也支持日期格式验证
-SELECT VALIDATE_CONVERSION('2024-02-30' AS DATE, 'YYYY-MM-DD');  -- 0
-SELECT VALIDATE_CONVERSION('2024-02-28' AS DATE, 'YYYY-MM-DD');  -- 1
-
--- Oracle 的设计哲学: 分离验证和转换
--- 优点: 验证结果可以用于多种决策（不只是返回 NULL）
--- 缺点: 两步操作，且实际上 CAST 执行了两次（验证一次，转换一次）
+-- 设计哲学: 分离验证和转换。优点: 验证结果可用于多种决策; 缺点: 两步操作
 ```
 
 ### Trino: TRY_CAST + TRY()
@@ -250,85 +225,21 @@ FROM products;
   → 遇到错误返回 NULL，继续执行
 ```
 
-实现方式：
+三种实现方式:
 
-**方式 A: 异常捕获**
+| 方式 | 描述 | 优缺点 |
+|------|------|--------|
+| A: 异常捕获 | `try { CAST } catch { return NULL }` | 简单但异常开销大 |
+| B: 先验证再转换 | `if canConvert then CAST else NULL` | 无异常但验证逻辑易不同步 |
+| C: 标志位传递 | `CAST(expr, safe=true)` 内部检查标志 | **推荐**: 灵活且避免代码重复 |
 
-```
-TRY_CAST(expr AS type):
-    try:
-        return CAST(expr AS type)
-    catch ConversionError:
-        return NULL
-```
+### 2. TRY() 通用包装
 
-简单直接，但异常处理有性能开销（尤其当大量行转换失败时）。
+BigQuery 的 `SAFE.` 和 Trino 的 `TRY()` 需要在执行框架层面支持"错误吞噬"模式: 保存错误处理上下文 → 设置安全模式 → 求值 → 恢复上下文。注意 `TRY` 不应吞噬语法错误和类型不匹配等编译期错误。
 
-**方式 B: 先验证再转换**
+### 3. 性能考量
 
-```
-TRY_CAST(expr AS type):
-    if canConvert(expr, type):
-        return CAST(expr AS type)
-    else:
-        return NULL
-```
-
-避免异常开销，但需要为每种类型实现验证逻辑（且验证和转换的逻辑可能不同步）。
-
-**方式 C: 标志位传递**
-
-```
-CAST(expr AS type, safe=true):
-    // 在转换函数内部检查 safe 标志
-    // 遇到错误时根据标志决定抛异常还是返回 NULL
-```
-
-最灵活，避免代码重复，但需要修改所有转换函数的签名。
-
-**推荐方式 C**，在函数执行器中增加 `error_mode` 参数。
-
-### 2. TRY() 通用包装的实现
-
-BigQuery 的 `SAFE.` 和 Trino 的 `TRY()` 是通用机制，需要在执行框架层面支持：
-
-```
-TRY(expression):
-    保存当前错误处理上下文
-    设置错误处理模式 = SAFE
-    result = evaluate(expression)
-    恢复错误处理上下文
-    return result   // 或 NULL（如果 evaluate 内部遇到错误）
-```
-
-实现要点：
-- 需要在表达式求值器中支持"错误吞噬"模式
-- `TRY` 内部的子表达式（包括嵌套函数调用）都应使用安全模式
-- 注意: `TRY` 不应吞噬所有错误——类型不匹配、语法错误等应正常报错
-
-### 3. NULL 传播与安全函数的交互
-
-安全函数的 NULL 传播规则需要明确定义：
-
-```sql
--- 输入是 NULL 时，安全函数的行为:
-SAFE_CAST(NULL AS INT)  →  NULL   (与 CAST(NULL AS INT) 一致)
-TRY_CAST(NULL AS INT)   →  NULL
-
--- 安全除法:
-SAFE_DIVIDE(NULL, 5)    →  NULL   (NULL 传播)
-SAFE_DIVIDE(10, NULL)   →  NULL   (NULL 传播)
-SAFE_DIVIDE(10, 0)      →  NULL   (安全语义)
-SAFE_DIVIDE(NULL, 0)    →  NULL   (NULL 传播优先)
-```
-
-### 4. 性能考量
-
-在大量脏数据场景中，安全函数可能频繁触发错误路径。优化建议：
-
-- 使用方式 C（标志位）避免异常创建和捕获的开销
-- 对字符串到数字的转换，使用高效的字符扫描（不要先正则匹配再转换）
-- 考虑批量处理: 收集错误行的索引，批量设置 NULL
+大量脏数据时安全函数频繁触发错误路径。使用标志位（方式 C）避免异常创建开销；字符串转数字用高效字符扫描而非先正则匹配。
 
 ## 参考资料
 
