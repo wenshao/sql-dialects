@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **物化视图**：PostgreSQL/Oracle/SQL Server 支持完整的物化视图，MySQL 不原生支持（需要手动维护），BigQuery/Snowflake 支持自动刷新的物化视图
+2. **可更新视图**：MySQL/PostgreSQL/Oracle 支持对简单视图执行 INSERT/UPDATE/DELETE，但条件严格（不能有 JOIN、GROUP BY 等）
+3. **WITH CHECK OPTION**：防止通过视图插入不满足视图 WHERE 条件的数据，多数 RDBMS 支持但语义有细微差异
+4. **递归视图**：SQL 标准定义了 `CREATE RECURSIVE VIEW`，但大多数方言用视图 + 递归 CTE 实现
+5. **物化视图刷新**：Oracle 支持增量刷新（FAST REFRESH），PostgreSQL 只支持全量刷新（REFRESH MATERIALIZED VIEW），BigQuery 自动增量刷新
+
+## 选型建议
+
+普通视图适合封装复杂查询、实现权限隔离。物化视图适合加速慢查询，但需要考虑数据新鲜度和刷新成本。在 MySQL 中可以用定时任务 + 物理表模拟物化视图。在分析型引擎中物化视图常用于预聚合加速。
+
+## 版本演进
+
+- PostgreSQL 9.3+：引入物化视图，9.4+ 支持 CONCURRENTLY 刷新不阻塞查询
+- MySQL 8.0：视图功能与 5.7 基本一致，仍无原生物化视图
+- ClickHouse：物化视图是触发式的，INSERT 时自动增量更新到目标表

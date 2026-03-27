@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **权限粒度**：PostgreSQL 支持列级权限，MySQL 支持列级权限，Oracle 用 VPD（Virtual Private Database）实现行级安全，SQL Server 有行级安全策略（2016+）
+2. **角色系统**：PostgreSQL 角色即用户（ROLE 统一模型），MySQL 8.0+ 才有 ROLE，Oracle 一直区分 USER 和 ROLE，SQL Server 有固定服务器/数据库角色
+3. **默认权限**：PostgreSQL 可设置 DEFAULT PRIVILEGES 自动授权新对象，MySQL 无此功能需要逐个授权
+4. **云数据库权限**：BigQuery 使用 IAM 而非 SQL GRANT，Snowflake 有独特的角色继承树，Databricks 集成 Unity Catalog
+
+## 选型建议
+
+遵循最小权限原则：应用程序账户只给 SELECT/INSERT/UPDATE/DELETE 权限，DDL 权限留给 DBA 账户。使用角色（ROLE）管理权限组而非逐用户授权。云数据库的权限体系通常与传统 SQL GRANT 差异大，需要单独学习。
+
+## 版本演进
+
+- MySQL 8.0：引入 ROLE 机制，权限管理能力显著提升
+- PostgreSQL 15+：对 PUBLIC schema 的默认权限收紧（安全增强）
+- SQL Server 2016+：引入行级安全（Row-Level Security）策略

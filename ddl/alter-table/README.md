@@ -86,3 +86,22 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **ADD COLUMN**：所有方言都支持，但 PostgreSQL 11+ 对带 DEFAULT 的 ADD COLUMN 是即时操作，MySQL 5.6 之前可能锁全表
+2. **MODIFY/ALTER COLUMN**：MySQL 用 `MODIFY COLUMN`，PostgreSQL 用 `ALTER COLUMN ... TYPE`，SQL Server 用 `ALTER COLUMN`，语法完全不同
+3. **DROP COLUMN**：SQLite 3.35.0 之前不支持，ClickHouse 支持但是异步操作，BigQuery 用 `DROP COLUMN` 但有限制
+4. **RENAME COLUMN**：MySQL 8.0+/PostgreSQL/Oracle 支持 `RENAME COLUMN`，MySQL 5.7 需要用 `CHANGE COLUMN`（必须重写完整列定义）
+5. **在线 DDL**：MySQL 8.0 的 `ALGORITHM=INSTANT` 可即时完成部分 ALTER 操作，PostgreSQL 大多数 ADD COLUMN 天然即时
+
+## 选型建议
+
+生产环境做 ALTER TABLE 前务必在测试环境验证是否会锁表。MySQL 大表改列推荐使用 pt-online-schema-change 或 gh-ost 工具。PostgreSQL 的大多数 ALTER 操作更友好，但 ALTER COLUMN TYPE 仍可能需要重写表。
+
+## 版本演进
+
+- MySQL 8.0.12+：ALGORITHM=INSTANT 支持更多即时 ALTER 操作
+- PostgreSQL 11+：ADD COLUMN WITH DEFAULT 不再需要重写全表
+- SQLite 3.35.0：首次支持 DROP COLUMN
+- SQLite 3.25.0：首次支持 RENAME COLUMN

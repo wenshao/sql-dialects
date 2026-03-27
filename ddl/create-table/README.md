@@ -86,3 +86,22 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **自增主键**：MySQL 用 `AUTO_INCREMENT`，PostgreSQL 用 `SERIAL`/`GENERATED AS IDENTITY`（推荐后者），Oracle 12c+ 才支持 IDENTITY，之前必须用 SEQUENCE + TRIGGER
+2. **IF NOT EXISTS**：MySQL/PostgreSQL/SQLite 支持，Oracle/SQL Server 不直接支持，需要用过程式代码或条件判断
+3. **存储引擎指定**：ClickHouse 必须指定引擎（MergeTree 等），Hive 必须指定行列格式和存储位置，传统 RDBMS 通常有默认引擎
+4. **排序键/分区键**：ClickHouse 的 ORDER BY 是表级的（排序键），BigQuery 可指定 clustering，Hive 用 PARTITIONED BY，这些概念在传统 RDBMS 中不存在
+5. **临时表语法**：`CREATE TEMPORARY TABLE` vs `CREATE GLOBAL TEMPORARY TABLE` vs `#table_name`（SQL Server）
+
+## 选型建议
+
+传统业务系统选 MySQL/PostgreSQL 的标准 CREATE TABLE 语法即可。需要分析场景时，重点掌握 ClickHouse 的引擎选择和 Hive/Spark 的分区分桶策略。云数仓（BigQuery/Snowflake）的建表语法最简洁，大部分存储细节由平台自动管理。
+
+## 版本演进
+
+- PostgreSQL 10+：引入 `GENERATED AS IDENTITY`（替代 SERIAL），这是 SQL 标准语法
+- MySQL 8.0：支持 `CHECK` 约束（之前只解析不执行）、支持降序索引
+- Oracle 12c：引入 IDENTITY 列，不再强制依赖 SEQUENCE
+- SQL Server 2016+：支持 `DROP IF EXISTS` 语法简化 DDL 脚本

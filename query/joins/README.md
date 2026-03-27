@@ -86,3 +86,22 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **FULL OUTER JOIN**：MySQL/MariaDB 不支持，需要用 LEFT JOIN UNION RIGHT JOIN 模拟
+2. **LATERAL JOIN**：PostgreSQL 9.3+ 和 MySQL 8.0.14+ 支持，Oracle 12c+ 用 CROSS APPLY/OUTER APPLY，SQL Server 用 CROSS/OUTER APPLY
+3. **NATURAL JOIN**：所有方言语法相同但生产环境不推荐使用（列名变化会悄悄改变语义）
+4. **旧式 JOIN 语法**：Oracle 的 `(+)` 语法和 WHERE 中的隐式 JOIN 仍在旧代码中常见，新代码应使用显式 JOIN ... ON
+5. **分布式 JOIN 性能**：大数据引擎中 JOIN 可能触发数据 shuffle，Hive/Spark 的 Map-side JOIN（broadcast）和 Sort-Merge JOIN 对性能影响巨大
+
+## 选型建议
+
+优先使用 INNER JOIN 和 LEFT JOIN，覆盖 90% 以上的业务场景。CROSS JOIN 用于生成笛卡尔积（如日期序列 x 维度）。大数据场景下 JOIN 小表时使用 broadcast hint 避免 shuffle。LATERAL JOIN 适合"每行对应 Top-N"的需求。
+
+## 版本演进
+
+- MySQL 8.0.14+：支持 LATERAL 派生表
+- PostgreSQL 9.3+：引入 LATERAL JOIN
+- Hive 0.13+：支持隐式 JOIN 语法的 CROSS JOIN
+- ClickHouse：引入多种 JOIN 算法（hash/partial_merge/parallel_hash）可通过设置调优

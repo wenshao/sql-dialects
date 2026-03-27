@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **过程式语言**：MySQL 用 SQL/PSM（BEGIN...END），PostgreSQL 用 PL/pgSQL（DECLARE...BEGIN...END），Oracle 用 PL/SQL，SQL Server 用 T-SQL，四种语法几乎完全不同
+2. **CREATE PROCEDURE vs FUNCTION**：PostgreSQL 11 之前只有 FUNCTION（用 RETURNS VOID 模拟 PROCEDURE），11+ 才支持真正的 PROCEDURE 和事务控制
+3. **返回结果集**：MySQL 过程可直接执行 SELECT 返回结果集，PostgreSQL 需要 RETURNS TABLE 或 REFCURSOR，Oracle 用 SYS_REFCURSOR
+4. **分析型引擎支持**：BigQuery 支持 Scripting（过程式 SQL），Snowflake 支持 JavaScript/Python 存储过程，ClickHouse/Hive 不支持存储过程
+
+## 选型建议
+
+现代架构趋势是将业务逻辑从存储过程移到应用层，存储过程主要用于：DBA 的维护脚本、数据迁移/ETL、性能关键的批处理。新项目不建议重度依赖存储过程（可移植性差、版本控制困难、调试不便）。
+
+## 版本演进
+
+- PostgreSQL 11+：引入 CREATE PROCEDURE（支持事务控制 COMMIT/ROLLBACK）
+- BigQuery 2019+：引入 Scripting 和存储过程支持
+- Snowflake：支持 JavaScript/SQL/Python/Scala 编写存储过程，多语言支持是独特优势

@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **ROUND 舍入规则**：PostgreSQL/Oracle 使用四舍五入，SQL Server 使用四舍五入，MySQL 使用四舍五入，但某些方言的 ROUND 对 .5 的处理可能采用银行家舍入（round half to even）
+2. **取模运算符**：MySQL/PostgreSQL 支持 `%` 运算符和 MOD() 函数，Oracle 只有 MOD() 函数（不支持 `%`），SQL Server 支持 `%`
+3. **整数除法**：MySQL 的 `5/2=2.5`，PostgreSQL 的 `5/2=2`（整数除法），Oracle 的 `5/2=2.5`，这个差异在迁移时极易出错
+4. **随机数**：MySQL 用 RAND()，PostgreSQL 用 RANDOM()，Oracle 用 DBMS_RANDOM.VALUE，SQL Server 用 RAND() 或 NEWID()
+5. **数学常量**：MySQL 有 PI()，PostgreSQL 有 PI()，Oracle 需要 `ACOS(-1)` 计算 PI，SQL Server 有 PI()
+
+## 选型建议
+
+数学函数是跨方言差异较小的领域（ABS/CEIL/FLOOR/POWER/SQRT 几乎通用），但整数除法行为差异是重大陷阱。涉及精确数值计算时始终使用 DECIMAL 类型避免浮点误差。随机排序（ORDER BY RAND()/RANDOM()）在大表上性能极差。
+
+## 版本演进
+
+- 数学函数在各方言中变化极少，属于最稳定的语法领域
+- PostgreSQL 16+：增强统计函数支持
+- ClickHouse：拥有极其丰富的数学函数库（含近似计算和统计函数）

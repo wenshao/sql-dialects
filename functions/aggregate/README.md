@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **字符串聚合**：MySQL 用 GROUP_CONCAT()，PostgreSQL 用 STRING_AGG()（9.0+），Oracle 用 LISTAGG()，SQL Server 用 STRING_AGG()（2017+），分隔符参数位置和默认行为各不相同
+2. **COUNT(DISTINCT) 多列**：MySQL 支持 `COUNT(DISTINCT a, b)`，PostgreSQL/Oracle/SQL Server 不支持（需要子查询或 CONCAT 模拟）
+3. **NULL 处理**：所有标准聚合函数（SUM/AVG/MIN/MAX）跳过 NULL 值，`COUNT(*)` 计所有行但 `COUNT(column)` 跳过 NULL
+4. **FILTER 子句**：PostgreSQL 9.4+ 支持 `SUM(x) FILTER (WHERE condition)`，其他方言需要用 `SUM(CASE WHEN condition THEN x END)` 模拟
+5. **近似聚合**：BigQuery/ClickHouse/Snowflake 提供 APPROX_COUNT_DISTINCT 等近似聚合函数，大数据量下性能远优于精确计算
+
+## 选型建议
+
+COUNT(DISTINCT) 在大基数列上性能差，大数据场景考虑使用 HyperLogLog 等近似算法。GROUP_CONCAT/STRING_AGG 的结果长度可能受限（MySQL 默认 1024 字节限制，需调整 group_concat_max_len）。FILTER 子句是 PostgreSQL 的杀手级特性，比 CASE WHEN 更简洁。
+
+## 版本演进
+
+- PostgreSQL 9.4+：引入聚合函数的 FILTER 子句
+- SQL Server 2017+：引入 STRING_AGG()（替代 FOR XML PATH 拼接字符串的复杂写法）
+- MySQL 8.0：GROUP_CONCAT 仍是主要的字符串聚合方式，无 STRING_AGG

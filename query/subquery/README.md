@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **关联子查询性能**：MySQL 5.7 对 IN 子查询的优化较弱（可能逐行执行），8.0 改进显著；PostgreSQL 自动将 IN 子查询优化为 semi-join
+2. **标量子查询位置**：所有方言支持 SELECT/WHERE 中的标量子查询，但 FROM 子句中的子查询（派生表）的列别名要求不同
+3. **EXISTS vs IN**：语义上等价，但 EXISTS 在关联子查询中通常更高效（可以短路返回），IN 对 NULL 值有特殊行为（NOT IN 遇到 NULL 会返回空）
+4. **LATERAL 子查询**：PostgreSQL/MySQL 8.0+ 支持 LATERAL 关键字使子查询可以引用外层 FROM 子句的列
+
+## 选型建议
+
+能用 JOIN 的场景优先用 JOIN 而非子查询（更易读且通常更高效）。需要"存在性检查"时用 EXISTS 而非 IN（避免 NOT IN 的 NULL 陷阱）。复杂子查询建议改写为 CTE（WITH 语法），可读性和可维护性更好。
+
+## 版本演进
+
+- MySQL 8.0：对 IN 子查询的 semi-join 优化显著改进，性能比 5.7 大幅提升
+- PostgreSQL：子查询优化器一直很强，自动选择 semi-join/anti-join/materialize 等策略
+- ClickHouse：IN 子查询会自动物化为临时集合，但 JOIN 子查询的分布式执行需要注意数据分布

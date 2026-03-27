@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **生命周期**：MySQL 的临时表会话结束自动删除，PostgreSQL 支持 ON COMMIT DROP/DELETE ROWS/PRESERVE ROWS，Oracle 的全局临时表结构持久但数据按事务/会话
+2. **命名约定**：SQL Server 用 `#table`（局部）和 `##table`（全局），其他方言用 `CREATE TEMPORARY TABLE`
+3. **可见性**：MySQL/PostgreSQL 的临时表只对当前会话可见，Oracle 的全局临时表定义对所有会话可见但数据隔离
+4. **CTE 替代**：简单场景可用 CTE（WITH 子句）替代临时表，但 CTE 的生命周期限于单条查询，临时表可跨多条语句
+
+## 选型建议
+
+临时表适合复杂 ETL 管道中的中间结果存储、存储过程中的多步骤处理。简单场景优先用 CTE。大数据引擎中临时表通常存储在计算节点本地磁盘，注意数据量不要超出节点容量。
+
+## 版本演进
+
+- PostgreSQL 15+：改进临时表的性能和系统目录清理
+- MySQL 8.0：临时表使用 TempTable 存储引擎替代 MEMORY 引擎，性能和大数据量支持改进
+- BigQuery：支持临时表但有 24 小时过期限制

@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **多表关联更新**：MySQL 用 `UPDATE t1 JOIN t2 ON ... SET t1.col = t2.col`，PostgreSQL 用 `UPDATE t1 SET col = t2.col FROM t2 WHERE ...`，Oracle 用 `UPDATE (SELECT ...) SET ...` 或 MERGE
+2. **UPDATE ... RETURNING**：PostgreSQL 支持返回更新后的行，MySQL/Oracle 不支持
+3. **ORDER BY + LIMIT 更新**：MySQL 支持 `UPDATE t SET ... ORDER BY ... LIMIT n`，PostgreSQL/Oracle 不支持这种语法
+4. **分析型引擎限制**：ClickHouse 的 ALTER TABLE UPDATE 是异步 mutation，Hive 需要 ACID 表才支持 UPDATE，BigQuery 有 DML 配额限制
+
+## 选型建议
+
+生产环境的 UPDATE 务必先用相同 WHERE 条件的 SELECT 验证影响行数。大批量 UPDATE 建议分批执行避免长事务。在分析型引擎中，考虑用 INSERT OVERWRITE 替代 UPDATE（重写整个分区）。
+
+## 版本演进
+
+- Hive 0.14+：支持 ACID 事务表的 UPDATE 操作
+- ClickHouse 20.8+：支持轻量级 UPDATE（ALTER TABLE UPDATE），但仍是异步操作
+- DuckDB：支持 UPDATE FROM 语法，与 PostgreSQL 类似

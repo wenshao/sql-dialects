@@ -86,3 +86,22 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **语法分裂**：MySQL 用 `ON DUPLICATE KEY UPDATE`，PostgreSQL 用 `ON CONFLICT ... DO UPDATE`，SQL 标准用 `MERGE ... WHEN MATCHED/NOT MATCHED`
+2. **MERGE 支持**：Oracle/SQL Server/Db2 完整支持 MERGE，PostgreSQL 15+ 支持 MERGE，MySQL 至今不支持 MERGE
+3. **冲突目标**：PostgreSQL 的 ON CONFLICT 必须指定冲突列或约束名，MySQL 自动基于 UNIQUE/PRIMARY KEY 判断
+4. **REPLACE INTO**：MySQL/SQLite 的 REPLACE INTO 实际是 DELETE + INSERT，会重置自增 ID 和触发 DELETE 触发器，应谨慎使用
+5. **分析型引擎**：ClickHouse 用 ReplacingMergeTree 引擎实现最终去重，BigQuery/Snowflake 用 MERGE 语法
+
+## 选型建议
+
+优先使用 SQL 标准 MERGE 语法（如果方言支持），可移植性最好。MySQL 场景使用 ON DUPLICATE KEY UPDATE（比 REPLACE INTO 更安全）。高并发场景注意 UPSERT 的死锁风险，MySQL 的 ON DUPLICATE KEY UPDATE 在并发下可能死锁。
+
+## 版本演进
+
+- PostgreSQL 9.5+：引入 ON CONFLICT（INSERT ... ON CONFLICT DO UPDATE/NOTHING）
+- PostgreSQL 15+：引入 SQL 标准 MERGE 语法
+- SQLite 3.24.0+：引入 ON CONFLICT（UPSERT）语法
+- MySQL 8.0：ON DUPLICATE KEY UPDATE 支持 VALUES() 的别名替代（推荐用 AS 新行别名）

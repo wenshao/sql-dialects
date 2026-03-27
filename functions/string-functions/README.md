@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **字符串拼接**：MySQL 用 CONCAT()，PostgreSQL/Oracle 用 `||` 运算符（也支持 CONCAT()），SQL Server 用 `+` 运算符或 CONCAT()。注意：Oracle 的 `||` 对 NULL 透明（NULL || 'a' = 'a'），PostgreSQL 的 `||` 遇 NULL 返回 NULL
+2. **SUBSTRING 语法**：标准语法 `SUBSTRING(s FROM pos FOR len)`，MySQL 也支持 `SUBSTRING(s, pos, len)`，Oracle 用 SUBSTR()
+3. **长度函数**：MySQL/PostgreSQL 用 LENGTH()（字符数）/CHAR_LENGTH()，Oracle 用 LENGTH()（字符数），SQL Server 用 LEN()（去尾部空格）/DATALENGTH()（字节数）
+4. **正则表达式**：PostgreSQL 支持 `~` 运算符和 REGEXP_REPLACE/MATCH，MySQL 8.0+ 支持 REGEXP_REPLACE()，Oracle 用 REGEXP_LIKE/REGEXP_REPLACE
+5. **TRIM 语法**：标准 `TRIM(LEADING/TRAILING/BOTH 'x' FROM s)` 被大多数方言支持，MySQL/PostgreSQL 也有简化的 LTRIM/RTRIM
+
+## 选型建议
+
+字符串拼接优先用 CONCAT() 函数（跨方言最安全，且 MySQL 的 CONCAT 对 NULL 参数返回 NULL 但 SQL Server 的 CONCAT 将 NULL 视为空字符串）。正则表达式功能强大但性能差，大数据量场景慎用。LENGTH() 的字节 vs 字符语义在多字节编码下差异显著。
+
+## 版本演进
+
+- MySQL 8.0+：引入 REGEXP_REPLACE()、REGEXP_SUBSTR() 等正则函数（5.7 只有 REGEXP/RLIKE 匹配）
+- PostgreSQL：正则支持一直很完善，包括命名捕获组等高级特性
+- SQL Server 2017+：引入 STRING_AGG()、CONCAT_WS()、TRIM() 等现代字符串函数

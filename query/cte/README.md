@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **递归 CTE 终止**：各方言的最大递归深度不同：PostgreSQL 默认无限（需自行控制），MySQL 默认 1000（cte_max_recursion_depth），SQL Server 默认 100（OPTION MAXRECURSION）
+2. **CTE 物化行为**：PostgreSQL 12+ 可以用 MATERIALIZED/NOT MATERIALIZED 控制 CTE 是否物化，MySQL 的优化器自动决定，Oracle 的 CTE 通常会物化
+3. **DML 中的 CTE**：PostgreSQL 支持 WITH ... INSERT/UPDATE/DELETE（可写 CTE），MySQL 8.0 只支持 WITH ... SELECT，SQL Server 支持部分场景
+4. **多个 CTE**：所有支持 CTE 的方言都支持用逗号分隔多个 CTE，后面的 CTE 可以引用前面定义的 CTE
+
+## 选型建议
+
+CTE 的最大价值是提高 SQL 可读性：将复杂查询分解为命名的逻辑步骤。递归 CTE 用于层级查询和序列生成。注意 CTE 不一定比子查询更快——在某些方言中 CTE 会强制物化导致无法利用外层查询的过滤条件下推。
+
+## 版本演进
+
+- MySQL 8.0：首次支持 CTE（包括递归 CTE），之前完全不支持
+- SQLite 3.8.3+：支持普通 CTE，3.34.0+ 支持递归 CTE 的 MATERIALIZED hint
+- PostgreSQL 12+：CTE 默认从"总是物化"改为"按需物化"，这是重大性能改进
+- ClickHouse：支持非递归 CTE（WITH 子句），但递归 CTE 支持有限

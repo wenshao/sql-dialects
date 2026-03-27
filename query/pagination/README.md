@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **LIMIT/OFFSET**：MySQL/PostgreSQL/SQLite/MariaDB 使用，最直观但 OFFSET 大时性能差
+2. **FETCH FIRST**：SQL 标准语法 `FETCH FIRST n ROWS ONLY`，Oracle 12c+/SQL Server 2012+/Db2/PostgreSQL 都支持
+3. **ROWNUM**：Oracle 12c 之前的经典分页方式（三层嵌套 SELECT），代码冗长但无替代方案
+4. **TOP**：SQL Server 特有的 `SELECT TOP n`，不支持 OFFSET（需要配合 OFFSET FETCH 或 ROW_NUMBER）
+5. **Teradata 独特语法**：`SELECT TOP n` 或 `QUALIFY ROW_NUMBER() OVER (...) BETWEEN m AND n`
+
+## 选型建议
+
+前几页用 LIMIT/OFFSET 即可，深分页（OFFSET > 10000）必须用键集分页（WHERE id > last_id ORDER BY id LIMIT n）。API 分页推荐用游标分页（cursor-based），比 OFFSET 更稳定且性能一致。报表场景的分页通常在应用层处理。
+
+## 版本演进
+
+- Oracle 12c+：引入 `OFFSET n ROWS FETCH FIRST m ROWS ONLY`，告别 ROWNUM 三层嵌套
+- SQL Server 2012+：引入 `OFFSET ... FETCH NEXT ...` 语法
+- MySQL 8.0：引入窗口函数，可用 ROW_NUMBER() 实现更灵活的分页逻辑

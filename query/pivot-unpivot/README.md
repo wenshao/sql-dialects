@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **原生 PIVOT/UNPIVOT**：Oracle 11g+/SQL Server 2005+ 原生支持，BigQuery/Snowflake/Databricks 也支持，MySQL/PostgreSQL 不支持（需要用条件聚合模拟）
+2. **条件聚合模拟**：`SUM(CASE WHEN category = 'A' THEN value END) AS A` 是通用的 PIVOT 替代方案，所有方言都支持
+3. **动态列**：原生 PIVOT 需要硬编码列名（编译时确定），动态列需要用动态 SQL（存储过程中拼接 SQL 字符串）
+4. **UNPIVOT 替代**：可以用 UNION ALL 或 CROSS JOIN + LATERAL/VALUES 模拟 UNPIVOT
+
+## 选型建议
+
+列值已知且固定时，条件聚合（CASE WHEN + GROUP BY）是最通用的跨方言 PIVOT 方案。列值动态变化时，建议在应用层（Python/Java）做行列转换。原生 PIVOT 语法更简洁但可移植性差。
+
+## 版本演进
+
+- Oracle 11g+：引入原生 PIVOT/UNPIVOT 关键字
+- SQL Server 2005+：支持 PIVOT/UNPIVOT
+- BigQuery/Snowflake：近年引入 PIVOT/UNPIVOT 语法支持
+- PostgreSQL：通过 tablefunc 扩展的 crosstab() 函数提供有限的 PIVOT 能力

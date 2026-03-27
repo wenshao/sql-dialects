@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **精度默认值**：MySQL DATETIME 默认秒级（可指定到微秒 DATETIME(6)），PostgreSQL TIMESTAMP 默认微秒级，Oracle TIMESTAMP 默认微秒级但 DATE 包含时间到秒
+2. **时区处理**：PostgreSQL 的 `TIMESTAMP WITH TIME ZONE` 存储 UTC 并自动转换，MySQL 的 TIMESTAMP 自动转 UTC 但 DATETIME 不处理时区，Oracle 有 `TIMESTAMP WITH TIME ZONE` 和 `TIMESTAMP WITH LOCAL TIME ZONE`
+3. **日期范围**：MySQL DATETIME 范围 1000-01-01 到 9999-12-31，MySQL TIMESTAMP 范围 1970-01-01 到 2038-01-19（2038 问题），PostgreSQL 范围 4713 BC 到 294276 AD
+4. **INTERVAL 类型**：PostgreSQL/Oracle 有原生 INTERVAL 类型（`INTERVAL '1 day'`），MySQL 的 INTERVAL 只能在日期函数中使用不能独立存储
+5. **获取当前时间**：MySQL 用 NOW()/CURRENT_TIMESTAMP，PostgreSQL 用 NOW()/CURRENT_TIMESTAMP（事务内时间固定），Oracle 用 SYSDATE/SYSTIMESTAMP
+
+## 选型建议
+
+新项目一律使用带时区的时间戳类型存储时间。MySQL 建议用 DATETIME(3)（毫秒级）或 DATETIME(6)（微秒级）而非 TIMESTAMP（避免 2038 问题和范围限制）。PostgreSQL 推荐 TIMESTAMPTZ。日期计算逻辑在迁移时务必全面测试。
+
+## 版本演进
+
+- MySQL 5.6+：DATETIME/TIMESTAMP 支持指定小数秒精度（最多 6 位微秒）
+- MySQL 8.0.28+：TIMESTAMP 的 2038 年上限问题在内部有缓解方案（但建议迁移到 DATETIME）
+- PostgreSQL 12+：增强 JSON 路径中的日期时间处理能力

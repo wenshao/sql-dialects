@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **自增机制**：MySQL 用 AUTO_INCREMENT（表级属性），PostgreSQL 推荐 GENERATED AS IDENTITY（SQL 标准），Oracle 传统上用独立 SEQUENCE 对象
+2. **SEQUENCE 对象**：PostgreSQL/Oracle/SQL Server/Db2 支持独立的 SEQUENCE 对象，MySQL 不支持独立 SEQUENCE（MariaDB 10.3+ 支持）
+3. **ID 不连续性**：所有自增方案在回滚、批量插入、服务器重启后都可能产生间隙，这是正常行为而非 bug
+4. **分布式 ID**：分布式数据库（TiDB/CockroachDB/Spanner）的自增 ID 通常是非单调递增的，可能跳跃或乱序，以避免成为写入热点
+5. **UUID 替代**：现代实践中越来越多使用 UUID/ULID 替代自增 ID，PostgreSQL 的 gen_random_uuid()、MySQL 8.0 的 UUID() 等
+
+## 选型建议
+
+简单应用使用 AUTO_INCREMENT/IDENTITY 即可。需要跨表共享序列时使用 SEQUENCE 对象。分布式系统推荐 UUID 或雪花算法（Snowflake ID），避免自增 ID 成为分布式写入瓶颈。
+
+## 版本演进
+
+- PostgreSQL 10+：推荐 `GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY` 替代 SERIAL
+- Oracle 12c+：引入 IDENTITY 列，简化了之前 SEQUENCE + TRIGGER 的模式
+- MariaDB 10.3+：引入 CREATE SEQUENCE 语法（MySQL 至今不支持）

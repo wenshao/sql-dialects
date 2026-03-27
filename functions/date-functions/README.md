@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **日期加减**：MySQL 用 DATE_ADD()/DATE_SUB()/INTERVAL 关键字，PostgreSQL 用 `+ INTERVAL '1 day'` 运算符，Oracle 用 ADD_MONTHS()/date ± number，SQL Server 用 DATEADD()
+2. **日期差值**：MySQL 用 DATEDIFF()（只返回天数），PostgreSQL 直接相减（date1 - date2 返回整数天），Oracle 直接相减返回小数天，SQL Server DATEDIFF() 可指定单位
+3. **日期截断**：MySQL 没有原生 DATE_TRUNC（用 DATE_FORMAT 模拟），PostgreSQL/Snowflake/BigQuery 用 DATE_TRUNC()，Oracle 用 TRUNC()
+4. **格式化字符串**：MySQL 用 `%Y-%m-%d`，Oracle 用 `YYYY-MM-DD`，PostgreSQL 的 TO_CHAR 用 `YYYY-MM-DD`，SQL Server 用格式代码数字
+5. **一周的第一天**：MySQL 取决于 @@default_week_format，PostgreSQL 一周从周一开始（ISO 标准），Oracle 取决于 NLS_TERRITORY
+
+## 选型建议
+
+日期函数是跨方言迁移时工作量最大的领域之一。建议在应用层封装日期操作逻辑，或使用 ORM 的日期函数抽象。关键日期操作（月末、工作日计算）建议写单元测试验证跨方言行为一致性。
+
+## 版本演进
+
+- MySQL 8.0：引入更多窗口函数与日期结合的能力，但仍无 DATE_TRUNC
+- PostgreSQL 14+：增强 EXTRACT 和 date_bin() 函数（按任意间隔截断时间）
+- BigQuery：日期函数设计最一致（DATE_ADD/DATE_SUB/DATE_DIFF/DATE_TRUNC 命名统一）

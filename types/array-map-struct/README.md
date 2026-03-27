@@ -84,3 +84,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **ARRAY 支持**：PostgreSQL 原生支持 ARRAY 类型（任意元素类型），BigQuery/ClickHouse/Hive/Spark 都支持 ARRAY，MySQL/SQL Server/Oracle 不原生支持
+2. **MAP 类型**：Hive/Spark/ClickHouse/Flink 支持 MAP 类型（键值对），PostgreSQL 用 hstore 扩展或 JSONB 模拟，传统 RDBMS 大多不支持
+3. **STRUCT/ROW 类型**：BigQuery 的 STRUCT、PostgreSQL 的 ROW/复合类型、Hive 的 STRUCT，适合嵌套数据但查询语法各不相同
+4. **展开操作**：PostgreSQL 用 unnest()，BigQuery 用 UNNEST()，Hive/Spark 用 explode()/LATERAL VIEW，ClickHouse 用 arrayJoin()
+
+## 选型建议
+
+复合类型在分析型引擎中很常见（处理嵌套 JSON/Parquet 数据），但在 OLTP 数据库中应谨慎使用（违反第一范式）。PostgreSQL 的 ARRAY 适合存储标签列表等简单场景。需要复杂嵌套数据结构时优先考虑 BigQuery/Spark 等原生支持 STRUCT 的引擎。
+
+## 版本演进
+
+- PostgreSQL：ARRAY 类型从早期版本就支持，是传统 RDBMS 中支持最完善的
+- Hive 0.7+：引入复合类型（ARRAY、MAP、STRUCT）
+- BigQuery：原生支持 ARRAY 和 STRUCT，是云数仓中嵌套数据能力最强的
+- ClickHouse：ARRAY 和 MAP 支持完善，近年引入 Tuple/Named Tuple 类型

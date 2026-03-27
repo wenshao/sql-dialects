@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **执行方式**：MySQL 用 PREPARE + EXECUTE + DEALLOCATE，PostgreSQL 用 EXECUTE（PL/pgSQL 中）或 PREPARE，Oracle 用 EXECUTE IMMEDIATE，SQL Server 用 sp_executesql 或 EXEC()
+2. **参数绑定**：PostgreSQL/Oracle/SQL Server 支持参数化动态 SQL（防注入），MySQL 的 PREPARE 支持 `?` 占位符
+3. **安全风险**：动态 SQL 是 SQL 注入的主要入口，必须使用参数绑定而非字符串拼接
+4. **分析型引擎**：大多数分析型引擎不支持存储过程内的动态 SQL，BigQuery 的 EXECUTE IMMEDIATE 是例外
+
+## 选型建议
+
+动态 SQL 应作为最后手段使用：表名/列名动态时无法避免，但 WHERE 条件值应始终用参数绑定。生产环境的动态 SQL 必须做白名单校验（只允许预定义的表名/列名）。优先考虑用 ORM 或应用层生成 SQL 替代数据库内的动态 SQL。
+
+## 版本演进
+
+- BigQuery：引入 EXECUTE IMMEDIATE 支持脚本中的动态 SQL
+- Snowflake：存储过程中支持 JavaScript 拼接和执行 SQL
+- PostgreSQL：PL/pgSQL 的 EXECUTE 一直是动态 SQL 的标准方式，支持 USING 参数绑定

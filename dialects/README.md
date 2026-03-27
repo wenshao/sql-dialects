@@ -91,3 +91,23 @@
 | 方言 | 说明 | 文件数 |
 |---|---|---|
 | [SQL 标准](sql-standard.md) | SQL-86 ~ SQL:2023 标准演进 | 51 |
+
+## 如何选择数据库
+
+**OLTP 场景**（高并发读写、事务要求高）：MySQL/PostgreSQL 是首选开源方案，Oracle/SQL Server 是传统企业选择。
+需要水平扩展时考虑 TiDB（兼容 MySQL）或 CockroachDB（兼容 PostgreSQL）。
+
+**OLAP 场景**（大数据分析、报表查询）：ClickHouse 适合实时分析，Snowflake/BigQuery 适合云原生数仓，
+Hive/Spark SQL 适合已有 Hadoop 生态的环境，DuckDB 适合单机嵌入式分析。
+
+**混合负载（HTAP）**：TiDB、OceanBase、PolarDB 在 HTAP 方向上投入较大，
+但真实 HTAP 的成熟度仍在演进中，大多数生产环境仍然是 OLTP + OLAP 分离架构。
+
+## 兼容性族谱
+
+迁移成本从低到高排序：
+- **MySQL 兼容族**：MySQL → MariaDB/TiDB/OceanBase(MySQL模式)/PolarDB/TDSQL 迁移成本最低
+- **PostgreSQL 兼容族**：PostgreSQL → CockroachDB/YugabyteDB/Greenplum/Redshift/TimescaleDB 迁移相对容易
+- **Oracle 兼容族**：Oracle → 达梦/人大金仓/OceanBase(Oracle模式) 有专门的兼容层
+- **Hive/Spark 族**：Hive ↔ Spark SQL ↔ Databricks ↔ Flink SQL 语法相近但细节差异不少
+- **跨族迁移**（如 MySQL → PostgreSQL 或 Oracle → MySQL）需要全面审查 SQL 语法、数据类型、函数调用

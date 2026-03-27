@@ -84,3 +84,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **FOR UPDATE**：PostgreSQL/Oracle/MySQL 支持 `SELECT ... FOR UPDATE`，SQL Server 用 `WITH (UPDLOCK, ROWLOCK)` 锁提示
+2. **SKIP LOCKED/NOWAIT**：PostgreSQL 9.5+/Oracle/MySQL 8.0+ 支持 SKIP LOCKED（跳过已锁定行）和 NOWAIT（立即失败不等待），非常适合任务队列场景
+3. **锁粒度**：MySQL InnoDB 有行锁和间隙锁（Gap Lock），PostgreSQL 有行锁和咨询锁（Advisory Lock），Oracle 没有锁升级问题，SQL Server 有锁升级（行→页→表）
+4. **死锁检测**：所有 RDBMS 都有死锁检测器会自动回滚一个事务，但检测速度和策略不同
+5. **分析型引擎**：大多数分析型引擎没有行级锁概念，BigQuery 靠快照隔离，ClickHouse 靠 mutation 队列
+
+## 选型建议
+
+尽量避免显式锁（FOR UPDATE），优先用乐观锁（版本号/CAS）或数据库的 MVCC 机制。需要显式锁时始终以固定顺序获取锁以避免死锁。SKIP LOCKED 是实现数据库任务队列的最佳方案。Advisory Lock（PostgreSQL）适合分布式锁的轻量级实现。
+
+## 版本演进
+
+- MySQL 8.0+：支持 SKIP LOCKED 和 NOWAIT（之前只能等待锁超时）
+- PostgreSQL 9.5+：引入 SKIP LOCKED，使得用 SELECT FOR UPDATE 实现任务队列成为实际可用方案
+- MySQL 8.0：改进死锁检测和诊断信息（SHOW ENGINE INNODB STATUS 的死锁日志更详细）

@@ -84,3 +84,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **命名空间层次**：PostgreSQL 有 database → schema → table 三层结构，MySQL 的 database 等同于 schema，Oracle 用 user 约等于 schema，SQL Server 有 server → database → schema → table 四层
+2. **跨库查询**：PostgreSQL 不支持跨 database 查询（需要 dblink/FDW），MySQL 可以直接 `SELECT * FROM other_db.table`，SQL Server/Oracle 都支持跨库查询
+3. **用户认证**：PostgreSQL 通过 pg_hba.conf 配置认证方式，MySQL 在 user 表中管理，Oracle 有内部认证和 OS 认证，云数据库通常集成 IAM
+4. **角色系统**：PostgreSQL 的 ROLE 统一了用户和角色概念，MySQL 8.0+ 才支持 ROLE，Oracle 一直区分 USER 和 ROLE
+
+## 选型建议
+
+设计数据库架构时，PostgreSQL 的 schema 机制适合多租户隔离，MySQL 的多 database 方案更简单直接。云数据库（BigQuery/Snowflake）通常有自己的项目/账户/仓库层次结构，与传统 RDBMS 差异较大。
+
+## 版本演进
+
+- MySQL 8.0：引入角色（ROLE）机制，之前只能直接给用户授权
+- PostgreSQL 16+：支持 `GRANT ... ON ALL TABLES IN SCHEMA` 的改进
+- BigQuery：使用 IAM 角色代替传统 SQL 权限，与 Google Cloud 深度集成

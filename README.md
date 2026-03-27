@@ -21,31 +21,31 @@
 ## 覆盖的数据库（[45 种](dialects/)）
 
 ### 传统关系型数据库
-MySQL, PostgreSQL, SQLite, Oracle, SQL Server, MariaDB, Firebird, IBM Db2, SAP HANA
+[MySQL](dialects/mysql.md), [PostgreSQL](dialects/postgres.md), [SQLite](dialects/sqlite.md), [Oracle](dialects/oracle.md), [SQL Server](dialects/sqlserver.md), [MariaDB](dialects/mariadb.md), [Firebird](dialects/firebird.md), [IBM Db2](dialects/db2.md), [SAP HANA](dialects/saphana.md)
 
 ### 大数据 / 分析型引擎
-BigQuery, Snowflake, MaxCompute, Hive, ClickHouse, StarRocks, Trino, Hologres, Apache Doris, DuckDB, Spark SQL, Flink SQL
+[BigQuery](dialects/bigquery.md), [Snowflake](dialects/snowflake.md), [MaxCompute](dialects/maxcompute.md), [Hive](dialects/hive.md), [ClickHouse](dialects/clickhouse.md), [StarRocks](dialects/starrocks.md), [Trino](dialects/trino.md), [Hologres](dialects/hologres.md), [Apache Doris](dialects/doris.md), [DuckDB](dialects/duckdb.md), [Spark SQL](dialects/spark.md), [Flink SQL](dialects/flink.md)
 
 ### 云数仓
-Amazon Redshift, Azure Synapse, Databricks SQL, Greenplum, Apache Impala, Vertica, Teradata
+[Amazon Redshift](dialects/redshift.md), [Azure Synapse](dialects/synapse.md), [Databricks SQL](dialects/databricks.md), [Greenplum](dialects/greenplum.md), [Apache Impala](dialects/impala.md), [Vertica](dialects/vertica.md), [Teradata](dialects/teradata.md)
 
 ### 分布式 / NewSQL
-TiDB, OceanBase, CockroachDB, Google Cloud Spanner, YugabyteDB, PolarDB, openGauss, TDSQL
+[TiDB](dialects/tidb.md), [OceanBase](dialects/oceanbase.md), [CockroachDB](dialects/cockroachdb.md), [Google Cloud Spanner](dialects/spanner.md), [YugabyteDB](dialects/yugabytedb.md), [PolarDB](dialects/polardb.md), [openGauss](dialects/opengauss.md), [TDSQL](dialects/tdsql.md)
 
 ### 国产数据库
-达梦 (DamengDB), 人大金仓 (KingbaseES)
+[达梦 (DamengDB)](dialects/dameng.md), [人大金仓 (KingbaseES)](dialects/kingbase.md)
 
 ### 流处理
-Flink SQL, ksqlDB, Materialize
+[Flink SQL](dialects/flink.md), [ksqlDB](dialects/ksqldb.md), [Materialize](dialects/materialize.md)
 
 ### 时序数据库
-TimescaleDB, TDengine
+[TimescaleDB](dialects/timescaledb.md), [TDengine](dialects/tdengine.md)
 
 ### 嵌入式 / 轻量
-H2, Apache Derby
+[H2](dialects/h2.md), [Apache Derby](dialects/derby.md)
 
 ### SQL 标准
-SQL-86 / SQL-89 / SQL-92 / SQL:1999 / SQL:2003 / SQL:2008 / SQL:2011 / SQL:2016 / SQL:2023
+[SQL-86 ~ SQL:2023](dialects/sql-standard.md)
 
 ## 目录结构
 
@@ -153,3 +153,25 @@ SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;
 - [`INDEX.md`](INDEX.md) — 全局导航索引（模块矩阵 + 方言速查）
 - [`REFERENCES.md`](REFERENCES.md) — 所有方言的官方文档链接索引
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — 贡献指南
+
+## 学习路径建议
+
+**入门阶段**：先学 `query/joins/` + `dml/insert/` + `ddl/create-table/`，掌握最基础的增删改查。
+然后学 `functions/` 下的字符串函数和日期函数，这两类在日常开发中使用频率最高。
+
+**进阶阶段**：重点攻克 `query/window-functions/` 和 `query/cte/`，它们是现代 SQL 的核心能力分水岭。
+配合 `scenarios/` 下的实战场景练习，尤其是 TopN、去重、累计求和三个高频场景。
+
+**高级阶段**：学习 `advanced/transactions/` + `advanced/explain/` + `advanced/partitioning/`，
+这三者直接关系到生产环境的数据一致性和查询性能。
+
+## 跨方言核心差异
+
+45 种方言可以归纳为几个"兼容族"：**MySQL 族**（MySQL、MariaDB、TiDB、OceanBase、PolarDB、TDSQL、StarRocks、Doris）、
+**PostgreSQL 族**（PostgreSQL、CockroachDB、YugabyteDB、Greenplum、Redshift、TimescaleDB、Materialize）、
+**Oracle 族**（Oracle、达梦、人大金仓、OceanBase Oracle 模式）、**Hive/Spark 族**（Hive、Spark SQL、Databricks、Flink SQL、MaxCompute）。
+掌握一个族的代表方言后，同族内的迁移成本较低，跨族迁移才是真正的挑战。
+
+最大的坑通常在三个地方：**NULL 处理**（Oracle 中空字符串等于 NULL，其他方言不是）、
+**隐式类型转换**（MySQL 极为宽松，PostgreSQL 极为严格）、
+**事务行为**（分析型引擎大多不支持完整 ACID 事务）。

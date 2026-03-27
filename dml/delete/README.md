@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **多表关联删除**：MySQL 用 `DELETE t1 FROM t1 JOIN t2 ON ...`，PostgreSQL 用 `DELETE FROM t1 USING t2 WHERE ...`，SQL Server 用 `DELETE t1 FROM t1 JOIN t2 ON ...`
+2. **TRUNCATE vs DELETE**：TRUNCATE 不可回滚（MySQL/Oracle）或可回滚（PostgreSQL），TRUNCATE 不触发触发器，速度远快于 DELETE
+3. **DELETE ... RETURNING**：PostgreSQL 支持返回被删除的行，MySQL/Oracle 不支持
+4. **DELETE ... ORDER BY LIMIT**：MySQL 支持限制删除行数，适合分批删除大量数据
+5. **软删除的替代**：分析型引擎中 DELETE 代价昂贵，ClickHouse 用 TTL 自动清理过期数据更高效
+
+## 选型建议
+
+清空全表用 TRUNCATE（不需要日志和触发器时）。大批量删除建议分批执行或使用分区 DROP。生产环境建议先 SELECT COUNT(*) 确认影响范围。在分析型引擎中避免频繁 DELETE，优先考虑分区过期策略。
+
+## 版本演进
+
+- ClickHouse：DELETE 从异步 mutation 演进到 20.8+ 的轻量级删除（ALTER TABLE DELETE）
+- Hive 0.14+：ACID 事务表支持 DELETE
+- MySQL 8.0：DELETE 的 WITH CTE 语法支持（更清晰的子查询写法）

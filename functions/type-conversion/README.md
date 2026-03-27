@@ -86,3 +86,22 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **CAST 语法**：`CAST(expr AS type)` 是 SQL 标准，所有方言都支持，但目标类型名称不同（如 MySQL 的 SIGNED vs PostgreSQL 的 INTEGER）
+2. **PostgreSQL :: 运算符**：PostgreSQL 特有的 `expr::type` 简写（如 `'123'::int`），简洁但不可移植
+3. **CONVERT 函数**：MySQL 的 CONVERT(expr, type) 和 SQL Server 的 CONVERT(type, expr, style) 参数顺序不同
+4. **隐式转换**：MySQL 隐式转换极为宽松（`'abc' = 0` 为 true），PostgreSQL 极为严格（类型不匹配直接报错），Oracle 居中
+5. **TRY_CAST**：SQL Server/Snowflake/Databricks 支持 TRY_CAST（转换失败返回 NULL 而非报错），PostgreSQL/MySQL 需要用 CASE WHEN + 正则模拟
+
+## 选型建议
+
+始终使用显式 CAST 而非依赖隐式转换，这是最重要的跨方言最佳实践。MySQL 的隐式转换是安全隐患（WHERE varchar_col = 0 会匹配所有非数字字符串）。PostgreSQL 的严格类型检查虽然初期不便但长期更安全。
+
+## 版本演进
+
+- SQL Server 2012+：引入 TRY_CAST/TRY_CONVERT（安全转换）
+- Snowflake/Databricks：也支持 TRY_CAST 语法
+- PostgreSQL：无 TRY_CAST，但可以通过自定义函数实现类似功能
+- MySQL 8.0：CAST 支持的目标类型更丰富（如 CAST(... AS FLOAT)）

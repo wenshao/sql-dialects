@@ -13,3 +13,25 @@
 | [sequences](sequences/) | 序列与自增策略 | [对比](sequences/_comparison.md) |
 | [users-databases](users-databases/) | 数据库/Schema/用户管理 | -- |
 | [views](views/) | 视图（普通视图、物化视图） | [对比](views/_comparison.md) |
+
+## 学习建议
+
+建议按 create-table → constraints → indexes → alter-table → views → sequences → users-databases 的顺序学习。
+建表是基础，约束和索引直接影响数据完整性和查询性能，改表是日常运维必备。
+视图和序列属于进阶内容，users-databases 偏运维管理方向。
+
+## 关键差异概述
+
+DDL 在各方言中差异最大的领域是：自增策略（AUTO_INCREMENT vs SERIAL vs IDENTITY vs SEQUENCE）、
+在线 DDL 能力（MySQL 8.0 ALGORITHM=INSTANT vs PostgreSQL 11+ 即时 ADD COLUMN WITH DEFAULT）、
+以及约束执行方式（BigQuery/Snowflake 的约束是信息性的不强制执行）。
+
+分析型引擎（ClickHouse、Hive、StarRocks）的建表语法与传统 RDBMS 差异极大，
+需要指定存储引擎、排序键、分区策略、分桶策略等，这些概念在传统数据库中不存在或含义不同。
+
+## 常见陷阱
+
+- MySQL 的 `ALTER TABLE` 可能锁全表（5.6 之前），PostgreSQL 的 `ADD COLUMN` 带默认值在 11+ 才是即时的
+- 分布式数据库的约束通常不强制执行（TiDB 6.6 之前不支持外键）
+- 各方言的 `DROP COLUMN` 行为差异大：SQLite 3.35.0 之前完全不支持
+- ClickHouse/Hive 没有传统意义上的 `ALTER COLUMN` 修改列类型

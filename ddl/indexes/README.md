@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **默认索引类型**：大多数 RDBMS 默认 B-Tree，PostgreSQL 还支持 GiST/GIN/BRIN/Hash，ClickHouse 用跳数索引（minmax/set/bloom_filter）
+2. **部分索引**：PostgreSQL/SQLite 支持 `CREATE INDEX ... WHERE`，MySQL 不支持，需要用生成列 + 索引模拟
+3. **函数索引/表达式索引**：PostgreSQL 原生支持，MySQL 8.0+ 通过虚拟生成列支持，Oracle 直接支持
+4. **全文索引**：MySQL 用 `FULLTEXT INDEX`，PostgreSQL 用 GIN 索引 + tsvector，Oracle 用 Oracle Text，各方言实现完全不同
+5. **分析型引擎的索引哲学**：BigQuery/Snowflake 没有用户创建的索引（靠自动优化），ClickHouse 靠排序键和跳数索引，理念与 OLTP 完全不同
+
+## 选型建议
+
+OLTP 场景下索引是性能优化的第一手段，但不要过度建索引（写入性能和存储开销）。OLAP 场景下索引的重要性大幅降低，列式存储和分区裁剪才是关键。复合索引的列顺序至关重要，应把选择性最高的列放在前面。
+
+## 版本演进
+
+- PostgreSQL 11+：CREATE INDEX CONCURRENTLY 支持覆盖索引（INCLUDE）
+- MySQL 8.0：支持降序索引、不可见索引（INVISIBLE INDEX）、函数索引
+- PostgreSQL 13+：B-Tree 索引去重（deduplication）减少索引体积

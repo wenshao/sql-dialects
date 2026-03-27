@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **多行 VALUES**：MySQL/PostgreSQL/SQLite 支持 `INSERT INTO t VALUES (1,'a'),(2,'b')`，Oracle 12c 之前必须用 `INSERT ALL` 或 `UNION ALL` 子查询
+2. **INSERT ... RETURNING**：PostgreSQL/Oracle/MariaDB 10.5+ 支持返回插入后的数据（含自增 ID），MySQL 不支持需要用 LAST_INSERT_ID()
+3. **INSERT OVERWRITE**：Hive/Spark/MaxCompute 支持 INSERT OVERWRITE（覆盖写入分区），传统 RDBMS 没有此语法
+4. **批量插入性能**：MySQL 的多值 INSERT 和 LOAD DATA INFILE 性能差异可达 10-50 倍，PostgreSQL 的 COPY 命令是最快的批量导入方式
+5. **默认值处理**：`INSERT INTO t DEFAULT VALUES` 在 PostgreSQL/SQL Server 中有效，MySQL 用 `INSERT INTO t () VALUES ()`
+
+## 选型建议
+
+少量数据插入用标准 INSERT VALUES。大批量数据导入应使用专用工具：MySQL 的 LOAD DATA INFILE、PostgreSQL 的 COPY、BigQuery 的 Load Job、Snowflake 的 COPY INTO。ORM 生成的逐行 INSERT 在大批量场景下性能极差。
+
+## 版本演进
+
+- Oracle 12c+：支持多行 VALUES 语法，告别 INSERT ALL 的繁琐写法
+- MariaDB 10.5+：INSERT ... RETURNING 支持
+- MySQL 8.0：VALUES 语句可以作为独立的行构造器使用

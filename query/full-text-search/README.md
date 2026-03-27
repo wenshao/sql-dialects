@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **实现方式**：MySQL 用 FULLTEXT INDEX + MATCH AGAINST，PostgreSQL 用 tsvector/tsquery + GIN 索引，Oracle 用 Oracle Text（CONTAINS），SQL Server 用 Full-Text Catalog
+2. **中文支持**：MySQL 5.7+ 内置 ngram 分词器，PostgreSQL 需要安装 zhparser/pg_jieba 扩展，Oracle Text 内置多语言分词
+3. **相关性排序**：各方言返回相关性分数的方式不同——MySQL 的 MATCH 返回相关性，PostgreSQL 用 ts_rank()，Oracle 用 SCORE()
+4. **分析型引擎**：大多数分析型引擎没有原生全文索引，依赖 LIKE '%keyword%' 或正则表达式（ClickHouse 有 tokenbf_v1 索引支持简单全文查找）
+
+## 选型建议
+
+轻量级全文搜索可以用数据库内置功能。对搜索质量要求高的场景（电商搜索、内容平台）应使用 Elasticsearch/Solr 等专业搜索引擎。PostgreSQL 的全文搜索功能最丰富，支持词典、同义词、权重等高级特性。
+
+## 版本演进
+
+- MySQL 5.6+：InnoDB 引擎支持 FULLTEXT INDEX（之前仅 MyISAM 支持）
+- MySQL 5.7+：内置 ngram 和 MeCab 分词器支持 CJK 语言
+- PostgreSQL 12+：引入 websearch_to_tsquery() 支持类似 Google 的搜索语法

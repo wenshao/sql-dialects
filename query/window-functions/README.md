@@ -86,3 +86,22 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **支持时间线**：Oracle 8i 最早支持（2000 年），PostgreSQL 8.4（2009 年），SQL Server 2012，MySQL 8.0（2018 年），SQLite 3.25.0（2018 年）
+2. **RANGE vs ROWS**：ROWS 按物理行计算窗口帧，RANGE 按逻辑值计算；大多数方言默认 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW，这可能导致意外结果
+3. **QUALIFY 子句**：BigQuery/Snowflake/Databricks 支持 QUALIFY 直接过滤窗口函数结果，其他方言需要用子查询或 CTE 包装
+4. **窗口函数嵌套**：不能在窗口函数内嵌套窗口函数（SQL 标准限制），需要用子查询分层计算
+5. **GROUPS 窗口帧**：SQL:2011 标准的 GROUPS 帧类型只有少数方言支持（PostgreSQL 11+、SQLite 3.28.0+），MySQL 8.0 不支持
+
+## 选型建议
+
+ROW_NUMBER/RANK/DENSE_RANK 是最常用的三个窗口函数，务必理解它们处理并列值的差异。LAG/LEAD 适合计算环比/同比。SUM/AVG OVER 适合累计和移动平均。始终显式指定窗口帧（ROWS BETWEEN ...）避免默认帧的意外行为。
+
+## 版本演进
+
+- MySQL 8.0：首次支持窗口函数（之前需要用变量模拟 ROW_NUMBER）
+- PostgreSQL 11+：支持 GROUPS 帧类型和窗口函数中的 EXCLUDE 子句
+- SQLite 3.25.0+：引入窗口函数支持
+- Hive 0.11+：引入窗口函数支持，是大数据引擎中较早支持的

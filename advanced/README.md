@@ -16,3 +16,25 @@
 | [temp-tables](temp-tables/) | 临时表 | [对比](temp-tables/_comparison.md) |
 | [transactions](transactions/) | 事务 | [对比](transactions/_comparison.md) |
 | [triggers](triggers/) | 触发器 | [对比](triggers/_comparison.md) |
+
+## 学习建议
+
+建议按 transactions → explain → temp-tables → partitioning → permissions → locking → stored-procedures → triggers → error-handling → dynamic-sql 的顺序学习。
+事务和执行计划是生产环境必备技能，临时表和分区影响查询架构设计，
+存储过程和触发器在现代架构中使用频率降低但在遗留系统中仍很重要。
+
+## 关键差异概述
+
+高级特性是方言差异最极端的领域。存储过程的语法在每个方言中几乎完全不同：
+MySQL 的 BEGIN...END、PostgreSQL 的 PL/pgSQL、Oracle 的 PL/SQL、SQL Server 的 T-SQL 各成体系。
+分析型引擎（BigQuery、ClickHouse、Hive）大多不支持或极度弱化存储过程和触发器。
+
+事务隔离级别的实际行为差异巨大：MySQL InnoDB 默认 REPEATABLE READ 且通过间隙锁避免幻读，
+PostgreSQL 默认 READ COMMITTED 使用 MVCC，Oracle 只支持 READ COMMITTED 和 SERIALIZABLE。
+
+## 常见陷阱
+
+- 存储过程代码几乎无法跨方言复用，迁移时通常需要完全重写
+- 分析型引擎的"事务"概念与 OLTP 数据库完全不同，不要假设 ACID 保证
+- EXPLAIN 输出格式差异巨大，优化经验不能直接跨方言套用
+- 触发器的执行时机（BEFORE/AFTER/INSTEAD OF）各方言支持程度不同

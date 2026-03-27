@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **输出格式**：MySQL 的 EXPLAIN 默认表格格式（8.0+ 支持 TREE/JSON），PostgreSQL 默认文本树形（支持 JSON/YAML/XML），Oracle 用 DBMS_XPLAN，SQL Server 用图形化执行计划
+2. **EXPLAIN ANALYZE**：PostgreSQL 和 MySQL 8.0+ 支持 EXPLAIN ANALYZE（实际执行并返回真实耗时），Oracle 需要 SQL Trace + TKPROF
+3. **成本模型**：各方言的成本单位和估算算法完全不同，PostgreSQL 的 cost 是相对值，MySQL 的 cost 是估算的 IO + CPU 操作数
+4. **关键指标**：MySQL 重点看 type（ALL/index/range/ref/eq_ref）和 rows，PostgreSQL 重点看 Seq Scan vs Index Scan 和 actual time
+
+## 选型建议
+
+EXPLAIN 是 SQL 性能优化的第一工具，每个 DBA 都应精通所用方言的执行计划解读。EXPLAIN ANALYZE 会实际执行查询，对生产环境的 DML 语句（UPDATE/DELETE）要谨慎使用。PostgreSQL 的 EXPLAIN (ANALYZE, BUFFERS) 提供最详细的性能信息。
+
+## 版本演进
+
+- MySQL 8.0.18+：引入 EXPLAIN ANALYZE（之前只有 EXPLAIN 估算值）
+- MySQL 8.0：引入 TREE 格式输出和 JSON 格式详细信息
+- PostgreSQL 13+：EXPLAIN 增加 WAL 和 incremental sort 信息
+- ClickHouse：clickhouse-client 的 `SET send_logs_level = 'trace'` 可以查看详细的查询管道

@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **CASE 表达式**：SQL 标准语法，所有方言都支持。分为简单 CASE（CASE x WHEN 1 THEN ...）和搜索 CASE（CASE WHEN x > 1 THEN ...）
+2. **IF 函数**：MySQL/MariaDB 有 IF(condition, true_val, false_val)，其他方言用 CASE WHEN 替代。SQL Server 有 IIF()（2012+）
+3. **COALESCE vs NVL/ISNULL**：COALESCE 是 SQL 标准（支持多参数），NVL 是 Oracle 特有（只支持两参数），ISNULL 是 SQL Server 特有
+4. **NULLIF**：所有方言都支持，`NULLIF(a, b)` 当 a=b 时返回 NULL，常用于避免除零错误 `x / NULLIF(y, 0)`
+5. **DECODE**：Oracle 特有函数（类似简单 CASE），迁移时必须改写为 CASE WHEN
+
+## 选型建议
+
+跨方言代码始终使用 CASE WHEN 和 COALESCE（SQL 标准），避免使用 IF()、NVL()、ISNULL()、DECODE() 等方言特有函数。NULLIF 配合除法避免除零错误是通用技巧。COALESCE 可以串联多个备选值（如 COALESCE(a, b, c, 0)）。
+
+## 版本演进
+
+- SQL Server 2012+：引入 IIF() 函数（从 Access 移植），但建议使用 CASE WHEN
+- 条件函数在各方言中变化较小，属于最稳定的语法领域
+- ClickHouse：独有的 multiIf() 函数提供多条件判断，比嵌套 if() 更清晰

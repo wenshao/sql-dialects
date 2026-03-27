@@ -86,3 +86,20 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **VARCHAR 上限**：MySQL 最大 65535 字节（行总长限制），PostgreSQL VARCHAR 最大 1GB，Oracle VARCHAR2 最大 4000 字节（EXTENDED 模式 32767），SQL Server VARCHAR(MAX) 最大 2GB
+2. **空字符串 vs NULL**：Oracle 中 `''` 等于 NULL，这是最著名的跨方言陷阱之一，其他所有方言中 `''` 和 NULL 是不同的
+3. **字符集/编码**：MySQL 的 utf8 实际只支持 3 字节 UTF-8（不含 emoji），需要 utf8mb4 才完整支持；PostgreSQL 数据库级设置编码，Oracle 用 NCHAR/NVARCHAR2 处理 Unicode
+4. **TEXT 类型**：MySQL/PostgreSQL/SQLite 有 TEXT 类型（不限长度），Oracle 用 CLOB，SQL Server 用 VARCHAR(MAX)
+
+## 选型建议
+
+现代应用一律使用 UTF-8 编码（MySQL 必须是 utf8mb4）。VARCHAR 长度应设合理值而非总用最大值（影响内存分配和排序缓冲区）。Oracle 迁移时务必处理空字符串 = NULL 的差异。大数据引擎通常只有 STRING 类型，不区分 CHAR/VARCHAR。
+
+## 版本演进
+
+- MySQL 5.5+：默认字符集从 latin1 改为 utf8（但推荐显式使用 utf8mb4）
+- MySQL 8.0：默认字符集改为 utf8mb4，默认排序规则改为 utf8mb4_0900_ai_ci
+- Oracle 12c+：VARCHAR2 最大长度可扩展到 32767 字节（MAX_STRING_SIZE=EXTENDED）

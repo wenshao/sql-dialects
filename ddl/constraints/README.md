@@ -86,3 +86,21 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 核心差异
+
+1. **CHECK 约束**：MySQL 8.0.16+ 才真正执行 CHECK 约束（之前只解析不执行），PostgreSQL/Oracle/SQL Server 一直支持
+2. **外键支持**：分析型引擎（BigQuery/Snowflake/ClickHouse/Hive）的外键是信息性的不强制执行，TiDB 6.6 之前不支持外键
+3. **DEFERRABLE 约束**：PostgreSQL/Oracle 支持延迟约束检查（事务提交时检查），MySQL/SQL Server 不支持
+4. **UNIQUE 约束与 NULL**：SQL 标准允许 UNIQUE 列有多个 NULL，PostgreSQL/Oracle 遵循标准，SQL Server 默认只允许一个 NULL
+5. **约束命名**：PostgreSQL/Oracle 严格管理约束名，MySQL 约束名可选但推荐命名以便后续管理
+
+## 选型建议
+
+OLTP 数据库应充分利用约束保证数据完整性，外键约束对数据一致性非常有价值但会影响写入性能。OLAP/大数据场景通常在应用层或 ETL 管道中保证数据质量，数据库层的约束往往是信息性的。
+
+## 版本演进
+
+- MySQL 8.0.16：CHECK 约束从"仅解析"变为真正强制执行
+- TiDB 6.6：首次支持外键约束
+- PostgreSQL 15+：支持 NULLS NOT DISTINCT 使 UNIQUE 约束完全排除 NULL 重复
