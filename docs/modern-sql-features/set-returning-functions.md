@@ -244,22 +244,8 @@ FROM TABLE(GENERATOR(ROWCOUNT => 100));
 ### PostgreSQL: unnest / jsonb_array_elements
 
 ```sql
--- unnest: 展开数组
-SELECT unnest(ARRAY[1, 2, 3]);
--- 1, 2, 3
-
--- 在 FROM 中使用
-SELECT u.elem
-FROM unnest(ARRAY['a', 'b', 'c']) AS u(elem);
-
--- 展开表中的数组列
-SELECT id, unnest(tags) AS tag
-FROM articles;
-
--- 多个 unnest 并行展开
-SELECT unnest(ARRAY[1,2,3]) AS id,
-       unnest(ARRAY['a','b','c']) AS code;
--- (1,'a'), (2,'b'), (3,'c')
+-- unnest: 展开数组（最常用）
+SELECT id, unnest(tags) AS tag FROM articles;
 
 -- jsonb 数组展开
 SELECT jsonb_array_elements('[1, 2, 3]'::jsonb);
@@ -267,73 +253,43 @@ SELECT jsonb_array_elements('[1, 2, 3]'::jsonb);
 -- jsonb 对象展开为键值对
 SELECT * FROM jsonb_each('{"a": 1, "b": 2}'::jsonb);
 
--- regexp 分割展开
+-- 字符串分割展开
 SELECT regexp_split_to_table('one,two,three', ',');
--- one, two, three
-
--- string_to_table (PostgreSQL 14+)
-SELECT string_to_table('one,two,three', ',');
+SELECT string_to_table('one,two,three', ',');  -- PostgreSQL 14+
 ```
 
 ### BigQuery: UNNEST
 
 ```sql
--- UNNEST 展开数组
-SELECT elem
-FROM UNNEST([1, 2, 3]) AS elem;
+-- 展开数组（逗号 JOIN 隐含 LATERAL 语义）
+SELECT id, tag FROM articles, UNNEST(tags) AS tag;
 
--- 展开表中的数组列
-SELECT id, tag
-FROM articles, UNNEST(tags) AS tag;
-
--- 展开 STRUCT 数组
-SELECT id, item.name, item.quantity
-FROM orders, UNNEST(items) AS item;
-
--- 带下标
-SELECT id, tag, offset
-FROM articles, UNNEST(tags) AS tag WITH OFFSET;
+-- 展开 STRUCT 数组（带下标）
+SELECT id, item.name, offset
+FROM orders, UNNEST(items) AS item WITH OFFSET;
 ```
 
 ### Spark SQL: explode / posexplode
 
 ```sql
--- explode: 展开数组
-SELECT id, exploded_tag
-FROM articles
-LATERAL VIEW explode(tags) t AS exploded_tag;
+-- LATERAL VIEW + explode
+SELECT id, tag FROM articles LATERAL VIEW explode(tags) t AS tag;
 
 -- posexplode: 展开并带位置
-SELECT id, pos, exploded_tag
-FROM articles
-LATERAL VIEW posexplode(tags) t AS pos, exploded_tag;
+SELECT id, pos, tag FROM articles LATERAL VIEW posexplode(tags) t AS pos, tag;
 
--- explode_outer: NULL 或空数组时保留原行（OUTER 语义）
-SELECT id, tag
-FROM articles
-LATERAL VIEW OUTER explode(tags) t AS tag;
-
--- Spark 3.0+ 简化语法
-SELECT id, explode(tags) AS tag FROM articles;
+-- explode_outer: NULL 或空数组时保留原行
+SELECT id, tag FROM articles LATERAL VIEW OUTER explode(tags) t AS tag;
 ```
 
 ### ClickHouse: arrayJoin
 
 ```sql
--- arrayJoin: ClickHouse 独有的数组展开函数
--- 可以在 SELECT 子句中使用（不需要 FROM）
+-- arrayJoin: 可以在 SELECT 子句中使用（不需要 FROM）
 SELECT arrayJoin([1, 2, 3]) AS n;
--- 1, 2, 3
 
 -- 展开表中的数组列
-SELECT id, arrayJoin(tags) AS tag
-FROM articles;
-
--- 带下标
-SELECT id,
-    arrayJoin(arrayEnumerate(tags)) AS idx,
-    tags[arrayJoin(arrayEnumerate(tags))] AS tag
-FROM articles;
+SELECT id, arrayJoin(tags) AS tag FROM articles;
 ```
 
 ## 对引擎开发者的实现建议
