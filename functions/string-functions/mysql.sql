@@ -170,25 +170,21 @@ SELECT 'hello123' REGEXP '^[a-z]+[0-9]+$';             -- 1 (true)
 SELECT REGEXP_LIKE('hello123', '^[a-z]+[0-9]+$');      -- 1 (8.0+ 函数形式)
 
 -- 横向对比:
---   MySQL 8.0:  REGEXP_REPLACE / REGEXP_SUBSTR (ICU)
---   PostgreSQL: regexp_replace / regexp_matches (POSIX)，支持返回数组
---               ~ 操作符: WHERE col ~ '^[a-z]+'
---   Oracle:     REGEXP_REPLACE / REGEXP_SUBSTR / REGEXP_COUNT (POSIX 扩展)
---   SQL Server: 无内置正则！需要 CLR 函数或 LIKE 通配符模拟
---   ClickHouse: match() / extract() / replaceRegexpAll() (RE2 引擎)
+--   MySQL 8.0:  REGEXP_REPLACE/REGEXP_SUBSTR (ICU 引擎)
+--   PostgreSQL: regexp_replace/regexp_matches (POSIX)，~ 操作符
+--   Oracle:     REGEXP_REPLACE/REGEXP_SUBSTR/REGEXP_COUNT
+--   SQL Server: 无内置正则! 需要 CLR 函数或 LIKE 模拟
+--   ClickHouse: match()/extract()/replaceRegexpAll() (RE2 引擎)
 
 -- ============================================================
--- 8. FORMAT 和字符编码函数
+-- 8. FORMAT 和编码函数
 -- ============================================================
-SELECT FORMAT(1234567.89, 2);         -- '1,234,567.89' (带千分位)
-SELECT FORMAT(1234567.89, 2, 'de_DE'); -- '1.234.567,89' (德语格式)
-
--- 字符编码
+SELECT FORMAT(1234567.89, 2);         -- '1,234,567.89' (千分位)
+SELECT FORMAT(1234567.89, 2, 'de_DE'); -- '1.234.567,89' (德语)
 SELECT HEX('abc');                     -- '616263'
 SELECT UNHEX('616263');                -- 'abc'
 SELECT ASCII('A');                     -- 65
 SELECT CHAR(65);                       -- 'A'
-SELECT ORD('你');                      -- 14990752 (多字节字符的编码值)
 
 -- ============================================================
 -- 9. 版本演进与最佳实践

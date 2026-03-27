@@ -186,11 +186,8 @@ GRANT ROLE_ADMIN ON *.* TO 'dba'@'localhost';              -- 管理角色
 -- ============================================================
 -- 7. 版本演进与最佳实践
 -- ============================================================
--- MySQL 5.7:    caching_sha2_password 可选
--- MySQL 8.0:    角色、动态权限、caching_sha2_password 成为默认认证插件
--- MySQL 8.0.16: 部分撤销 (Partial Revokes)
--- MySQL 8.0.19: 登录失败锁定
--- MySQL 8.0.27: 多因素认证 (MFA)
+-- MySQL 8.0: 角色, 动态权限, caching_sha2_password 默认
+-- MySQL 8.0.16: 部分撤销 | 8.0.19: 登录锁定 | 8.0.27: MFA
 --
 -- 实践建议:
 --   1. 永远不要用 'root'@'%'（不限制 root 的来源 IP）
