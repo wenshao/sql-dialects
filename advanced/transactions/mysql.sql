@@ -196,29 +196,11 @@ SELECT * FROM accounts WHERE id = 1 FOR UPDATE SKIP LOCKED; -- 跳过已锁行
 --   4. 默认隔离级别: RC 是工业界共识，MySQL 的 RR 默认是历史遗留
 
 -- ============================================================
--- 7. DDL 与事务的关系
+-- 7. DDL 与事务 + 版本演进与最佳实践
 -- ============================================================
--- MySQL: DDL 隐式提交当前事务（不能在事务中回滚 DDL）
--- 例:
---   START TRANSACTION;
---   INSERT INTO t VALUES (1);
---   CREATE TABLE t2 (...);   -- 隐式 COMMIT! INSERT 被提交
---   ROLLBACK;                -- 无效，事务已被 DDL 提交
---
--- 横向对比:
---   PostgreSQL: DDL 是事务性的，可以 BEGIN; CREATE TABLE ...; ROLLBACK;
---   SQL Server: DDL 是事务性的
---   Oracle:     DDL 隐式提交（同 MySQL）
---   SQLite:     DDL 是事务性的
---
--- 对引擎开发者的启示:
---   事务性 DDL 是现代数据库的重要能力。
---   MySQL/Oracle 的 DDL 隐式提交使得 schema migration 工具无法在单事务中
---   原子地应用多个 DDL 变更 → 失败时需要手动回滚 → 运维风险
-
--- ============================================================
--- 8. 版本演进与最佳实践
--- ============================================================
+-- DDL 隐式提交当前事务（不能在事务中回滚 DDL）
+-- PostgreSQL/SQL Server/SQLite: DDL 是事务性的（可 ROLLBACK）
+-- MySQL/Oracle: DDL 隐式提交 → schema migration 无法在单事务中原子变更
 -- MySQL 5.5:   InnoDB 成为默认引擎
 -- MySQL 5.6.5: 只读事务 START TRANSACTION READ ONLY
 -- MySQL 8.0:   FOR SHARE 替代 LOCK IN SHARE MODE

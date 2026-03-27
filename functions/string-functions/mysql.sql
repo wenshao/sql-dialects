@@ -151,20 +151,12 @@ SELECT RPAD('hi', 5, '.');            -- 'hi...' (右填充)
 
 SELECT TRIM('  hello  ');              -- 'hello'
 SELECT TRIM(LEADING '0' FROM '00042'); -- '42' (去前导零)
-SELECT TRIM(BOTH 'x' FROM 'xxhixx');  -- 'hi'
 SELECT LTRIM('  hello');               -- 'hello'
 SELECT RTRIM('hello  ');               -- 'hello'
-
 SELECT REVERSE('hello');               -- 'olleh'
 SELECT REPEAT('ab', 3);                -- 'ababab'
-SELECT SPACE(5);                       -- '     ' (5 个空格)
-
--- 大小写
-SELECT UPPER('hello');                 -- 'HELLO'
+SELECT UPPER('hello');                 -- 'HELLO' (受 COLLATION 影响)
 SELECT LOWER('HELLO');                 -- 'hello'
--- 注意: UPPER/LOWER 受 COLLATION 影响
--- utf8mb4_bin 下: UPPER('ss') = 'SS'
--- utf8mb4_0900_ai_ci 下: UPPER 遵循 Unicode 大小写映射规则
 
 -- ============================================================
 -- 7. 正则表达式 (8.0+: ICU 正则引擎)

@@ -127,11 +127,6 @@ ALTER USER 'alice'@'localhost' PASSWORD REUSE INTERVAL 365 DAY;
 ALTER USER 'alice'@'localhost' FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 1;
 -- 3 次失败后锁定 1 天
 
--- 4.4 多因素认证 (8.0.27+)
--- MySQL 8.0.27 开始支持最多 3 因素认证:
-ALTER USER 'alice'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'pass1'
-    AND IDENTIFIED WITH authentication_ldap_simple;
-
 -- ============================================================
 -- 5. 动态权限 (8.0+): 取代超级权限的碎片化
 -- ============================================================
