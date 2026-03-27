@@ -17,4 +17,55 @@
 -- 四、自增: 无（使用ROW_NUMBER或应用层生成）
 -- 五、日期: GETDATE(); CURRENT_TIMESTAMP; DATEADD(d,1,'day');
 --   DATEDIFF(a,b,'dd'); TO_CHAR(ts,'yyyy-mm-dd hh:mi:ss')
+--   FROM_UNIXTIME(epoch); UNIX_TIMESTAMP(ts);
+--   YEAR(d); MONTH(d); DAY(d); HOUR(ts)
 -- 六、字符串: LENGTH, TOUPPER, TOLOWER, TRIM, SUBSTR, REGEXP_REPLACE, INSTR, CONCAT
+
+-- ============================================================
+-- 七、数据类型映射（从 MySQL/Hive/Oracle 到 MaxCompute）
+-- ============================================================
+-- MySQL → MaxCompute:
+--   INT → INT, BIGINT → BIGINT, FLOAT → FLOAT,
+--   DOUBLE → DOUBLE, DECIMAL(p,s) → DECIMAL(p,s),
+--   VARCHAR → STRING, TEXT → STRING,
+--   DATETIME → DATETIME (2.0), DATE → DATE (2.0),
+--   BOOLEAN → BOOLEAN, BLOB → BINARY,
+--   AUTO_INCREMENT → 不支持, JSON → STRING
+-- Hive → MaxCompute: 高度兼容
+--   STRING → STRING, INT → INT, ARRAY → ARRAY,
+--   MAP → MAP, STRUCT → STRUCT
+-- Oracle → MaxCompute:
+--   NUMBER → DECIMAL, VARCHAR2 → STRING,
+--   CLOB → STRING, DATE → DATETIME,
+--   SYSDATE → GETDATE()
+
+-- 八、函数等价映射
+-- MySQL → MaxCompute:
+--   IFNULL → NVL/COALESCE, NOW() → GETDATE(),
+--   DATE_FORMAT → TO_CHAR, STR_TO_DATE → TO_DATE,
+--   CONCAT(a,b) → CONCAT(a,b), GROUP_CONCAT → WM_CONCAT,
+--   LIMIT → LIMIT (MaxCompute 2.0)
+-- Hive → MaxCompute: 大部分兼容
+--   get_json_object → GET_JSON_OBJECT,
+--   unix_timestamp → UNIX_TIMESTAMP
+
+-- 九、常见陷阱补充
+--   阿里云大数据计算平台，非实时数据库
+--   无 UPDATE/DELETE（2.0 有限支持酸性事务）
+--   分区设计很重要（按天/小时分区常见）
+--   计费按扫描数据量（控制分区过滤很重要）
+--   不支持索引/主键（全表扫描）
+--   项目(project) → schema → table 结构
+--   Tunnel 工具上传/下载数据
+
+-- 十、NULL 处理
+-- NVL(a, b); COALESCE(a, b, c);
+-- NULLIF(a, b);
+-- NVL2(a, b, c);                                     -- a非NULL返回b，否则c
+
+-- 十一、分页语法 (MaxCompute 2.0)
+-- SELECT * FROM t ORDER BY id LIMIT 10 OFFSET 20;
+-- 旧版: 不支持 OFFSET
+
+-- 十二、日期格式码 (Java SimpleDateFormat)
+-- yyyy=年, MM=月, dd=日, HH=24时, mm=分, ss=秒

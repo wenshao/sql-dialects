@@ -16,4 +16,54 @@
 --   兼容模式不是100%兼容, 大型生产环境建议迁移到其他数据库
 -- 四、自增: AUTO_INCREMENT 或 GENERATED ALWAYS AS IDENTITY
 -- 五、日期: CURRENT_TIMESTAMP(); CURRENT_DATE(); DATEADD('DAY',1,d)
+--   DATEDIFF('DAY',a,b); FORMATDATETIME(ts,'yyyy-MM-dd HH:mm:ss')
+--   PARSEDATETIME(s,'yyyy-MM-dd'); EXTRACT(YEAR FROM d)
 -- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, LOCATE, ||, CONCAT
+
+-- ============================================================
+-- 七、数据类型映射（从 MySQL/PostgreSQL/Oracle 到 H2）
+-- ============================================================
+-- MySQL → H2:
+--   INT → INT, BIGINT → BIGINT, FLOAT → REAL,
+--   DOUBLE → DOUBLE, VARCHAR(n) → VARCHAR(n),
+--   TEXT → CLOB, DATETIME → TIMESTAMP, DATE → DATE,
+--   DECIMAL(p,s) → DECIMAL(p,s), BOOLEAN → BOOLEAN,
+--   BLOB → BLOB, JSON → JSON (H2 2.x),
+--   AUTO_INCREMENT → AUTO_INCREMENT/IDENTITY
+-- PostgreSQL → H2:
+--   INTEGER → INT, TEXT → CLOB, SERIAL → AUTO_INCREMENT,
+--   BOOLEAN → BOOLEAN, JSONB → JSON (H2 2.x),
+--   BYTEA → BLOB, ARRAY → ARRAY (H2 2.x)
+-- Oracle → H2:
+--   NUMBER → DECIMAL, VARCHAR2 → VARCHAR,
+--   CLOB → CLOB, DATE → TIMESTAMP,
+--   SYSDATE → CURRENT_TIMESTAMP, SEQUENCE → SEQUENCE
+
+-- 八、函数等价映射
+-- MySQL → H2:
+--   IFNULL → IFNULL/COALESCE, NOW() → CURRENT_TIMESTAMP(),
+--   DATE_FORMAT → FORMATDATETIME, STR_TO_DATE → PARSEDATETIME,
+--   CONCAT(a,b) → CONCAT(a,b)/a||b,
+--   GROUP_CONCAT → GROUP_CONCAT (H2 支持),
+--   LIMIT → LIMIT/OFFSET FETCH
+
+-- 九、常见陷阱补充
+--   嵌入式数据库，适合测试/原型/桌面应用
+--   内存模式 (mem:) vs 文件模式 (file:)
+--   兼容模式不是 100% 兼容（功能子集）
+--   大型生产环境不建议使用
+--   H2 2.x 相比 1.x 有较大变化
+--   MVCC 默认启用
+--   TCP 服务器模式可远程连接
+
+-- 十、NULL 处理
+-- IFNULL(a, b); COALESCE(a, b, c);
+-- NULLIF(a, b); NVL(a, b) (Oracle 模式);
+
+-- 十一、分页语法
+-- SELECT * FROM t ORDER BY id LIMIT 10 OFFSET 20;
+-- SELECT * FROM t ORDER BY id OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
+
+-- 十二、日期格式码 (Java SimpleDateFormat)
+-- yyyy=年, MM=月, dd=日, HH=24时, mm=分, ss=秒
+-- 注意: 与 MySQL (%Y/%m/%d) 和 PostgreSQL (YYYY/MM/DD) 格式不同

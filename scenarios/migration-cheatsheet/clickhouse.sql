@@ -26,3 +26,46 @@
 --           SELECT formatDateTime(now(), '%Y-%m-%d %H:%M:%S');
 -- 四、字符串: length, upper, lower, trim, substring(s,start,len),
 --            replaceAll, position(s,sub), concat, arrayStringConcat(groupArray(name),', ')
+
+-- ============================================================
+-- 五、数据类型映射（从 MySQL/PostgreSQL 到 ClickHouse）
+-- ============================================================
+-- MySQL → ClickHouse:
+--   INT → Int32, BIGINT → Int64, FLOAT → Float32,
+--   DOUBLE → Float64, DECIMAL(p,s) → Decimal(p,s),
+--   VARCHAR → String, TEXT → String,
+--   DATETIME → DateTime, DATE → Date/Date32,
+--   BOOLEAN → UInt8 (0/1), BLOB → String,
+--   JSON → String 或 JSON (实验性),
+--   AUTO_INCREMENT → 不支持, TINYINT → Int8,
+--   NULL → Nullable(T) (需显式声明)
+-- PostgreSQL → ClickHouse:
+--   INTEGER → Int32, TEXT → String, SERIAL → 不支持,
+--   BOOLEAN → UInt8, JSONB → String, UUID → UUID,
+--   ARRAY → Array(T), BYTEA → String
+
+-- 六、函数等价映射
+-- MySQL → ClickHouse:
+--   IFNULL → ifNull, NOW() → now(),
+--   DATE_FORMAT → formatDateTime, CONCAT → concat,
+--   GROUP_CONCAT → groupArray + arrayStringConcat,
+--   LIMIT → LIMIT, DATE_ADD → date_add,
+--   DATEDIFF → dateDiff
+
+-- 七、常见陷阱补充
+--   无 UPDATE/DELETE (用 ALTER TABLE UPDATE/DELETE 异步执行)
+--   默认列不可 NULL (需 Nullable(T) 包装)
+--   必须指定表引擎 (MergeTree 最常用)
+--   无事务 (原子 INSERT 除外)
+--   无 JOIN 索引 (大表 JOIN 需预聚合)
+--   字符串排序需指定 collation
+--   ORDER BY 定义 MergeTree 的主键排序
+--   分区键 (PARTITION BY) 影响数据管理
+
+-- 八、NULL 处理
+-- ifNull(a, b); coalesce(a, b, c);
+-- nullIf(a, b); isNull(a); isNotNull(a);
+-- 注意: 默认列不可 NULL，Nullable 有性能开销
+
+-- 九、分页语法
+-- SELECT * FROM t ORDER BY id LIMIT 10 OFFSET 20;
