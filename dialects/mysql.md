@@ -91,86 +91,86 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### DDL — 数据定义
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| 建表 | [mysql.sql](../ddl/create-table/mysql.sql) | ENGINE 可插拔架构，AUTO_INCREMENT 自增，utf8≠UTF-8 教训 |
-| 改表 | [mysql.sql](../ddl/alter-table/mysql.sql) | Online DDL (INSTANT/INPLACE/COPY)，pt-osc/gh-ost 生态 |
-| 索引 | [mysql.sql](../ddl/indexes/mysql.sql) | InnoDB 聚集索引+回表，8.0 函数索引/不可见索引 |
-| 约束 | [mysql.sql](../ddl/constraints/mysql.sql) | CHECK 约束 8.0.16 才执行（之前静默忽略），外键影响性能 |
-| 视图 | [mysql.sql](../ddl/views/mysql.sql) | MERGE/TEMPTABLE 算法，无物化视图 |
-| 序列与自增 | [mysql.sql](../ddl/sequences/mysql.sql) | AUTO_INCREMENT lock_mode 三种模式，无 SEQUENCE 对象 |
-| 数据库/Schema/用户 | [mysql.sql](../ddl/users-databases/mysql.sql) | user@host 独特权限模型 |
+| 模块 | 简评 |
+|---|---|
+| [建表](../ddl/create-table/mysql.sql) | ENGINE 可插拔架构，AUTO_INCREMENT 自增，utf8≠UTF-8 教训 |
+| [改表](../ddl/alter-table/mysql.sql) | Online DDL (INSTANT/INPLACE/COPY)，pt-osc/gh-ost 生态 |
+| [索引](../ddl/indexes/mysql.sql) | InnoDB 聚集索引+回表，8.0 函数索引/不可见索引 |
+| [约束](../ddl/constraints/mysql.sql) | CHECK 约束 8.0.16 才执行（之前静默忽略），外键影响性能 |
+| [视图](../ddl/views/mysql.sql) | MERGE/TEMPTABLE 算法，无物化视图 |
+| [序列与自增](../ddl/sequences/mysql.sql) | AUTO_INCREMENT lock_mode 三种模式，无 SEQUENCE 对象 |
+| [数据库/Schema/用户](../ddl/users-databases/mysql.sql) | user@host 独特权限模型 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| 动态 SQL | [mysql.sql](../advanced/dynamic-sql/mysql.sql) | PREPARE/EXECUTE，存储过程内可用 |
-| 错误处理 | [mysql.sql](../advanced/error-handling/mysql.sql) | DECLARE HANDLER (CONTINUE/EXIT)，弱于 PL/SQL 异常 |
-| 执行计划 | [mysql.sql](../advanced/explain/mysql.sql) | EXPLAIN ANALYZE (8.0.18+)，JSON/TREE 格式 |
-| 锁机制 | [mysql.sql](../advanced/locking/mysql.sql) | InnoDB 行锁+间隙锁+Next-Key Lock，RR 默认有间隙锁 |
-| 分区 | [mysql.sql](../advanced/partitioning/mysql.sql) | 分区键必须在主键中（最大限制），RANGE/LIST/HASH |
-| 权限 | [mysql.sql](../advanced/permissions/mysql.sql) | user@host 模型，8.0 角色，Partial Revokes |
-| 存储过程 | [mysql.sql](../advanced/stored-procedures/mysql.sql) | DELIMITER 尴尬，无 Package/匿名块/BULK COLLECT |
-| 临时表 | [mysql.sql](../advanced/temp-tables/mysql.sql) | CREATE TEMPORARY TABLE，MEMORY/InnoDB 引擎 |
-| 事务 | [mysql.sql](../advanced/transactions/mysql.sql) | InnoDB MVCC (Read View)，默认 RR（历史原因），DDL 隐式提交 |
-| 触发器 | [mysql.sql](../advanced/triggers/mysql.sql) | 只有行级 FOR EACH ROW，无 INSTEAD OF/DDL 触发器 |
+| 模块 | 简评 |
+|---|---|
+| [动态 SQL](../advanced/dynamic-sql/mysql.sql) | PREPARE/EXECUTE，存储过程内可用 |
+| [错误处理](../advanced/error-handling/mysql.sql) | DECLARE HANDLER (CONTINUE/EXIT)，弱于 PL/SQL 异常 |
+| [执行计划](../advanced/explain/mysql.sql) | EXPLAIN ANALYZE (8.0.18+)，JSON/TREE 格式 |
+| [锁机制](../advanced/locking/mysql.sql) | InnoDB 行锁+间隙锁+Next-Key Lock，RR 默认有间隙锁 |
+| [分区](../advanced/partitioning/mysql.sql) | 分区键必须在主键中（最大限制），RANGE/LIST/HASH |
+| [权限](../advanced/permissions/mysql.sql) | user@host 模型，8.0 角色，Partial Revokes |
+| [存储过程](../advanced/stored-procedures/mysql.sql) | DELIMITER 尴尬，无 Package/匿名块/BULK COLLECT |
+| [临时表](../advanced/temp-tables/mysql.sql) | CREATE TEMPORARY TABLE，MEMORY/InnoDB 引擎 |
+| [事务](../advanced/transactions/mysql.sql) | InnoDB MVCC (Read View)，默认 RR（历史原因），DDL 隐式提交 |
+| [触发器](../advanced/triggers/mysql.sql) | 只有行级 FOR EACH ROW，无 INSTEAD OF/DDL 触发器 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| 删除 | [mysql.sql](../dml/delete/mysql.sql) | DELETE+LIMIT（独有），TRUNCATE 不可回滚 |
-| 插入 | [mysql.sql](../dml/insert/mysql.sql) | INSERT...SET 独有语法，LOAD DATA 批量，multi-row VALUES |
-| 更新 | [mysql.sql](../dml/update/mysql.sql) | 多表 UPDATE JOIN 语法，SET 左到右求值 |
-| Upsert | [mysql.sql](../dml/upsert/mysql.sql) | ON DUPLICATE KEY UPDATE 推荐，REPLACE INTO 有隐患 |
+| 模块 | 简评 |
+|---|---|
+| [删除](../dml/delete/mysql.sql) | DELETE+LIMIT（独有），TRUNCATE 不可回滚 |
+| [插入](../dml/insert/mysql.sql) | INSERT...SET 独有语法，LOAD DATA 批量，multi-row VALUES |
+| [更新](../dml/update/mysql.sql) | 多表 UPDATE JOIN 语法，SET 左到右求值 |
+| [Upsert](../dml/upsert/mysql.sql) | ON DUPLICATE KEY UPDATE 推荐，REPLACE INTO 有隐患 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| 聚合函数 | [mysql.sql](../functions/aggregate/mysql.sql) | GROUP_CONCAT 默认1024截断，无 GROUPING SETS/FILTER |
-| 条件函数 | [mysql.sql](../functions/conditional/mysql.sql) | IF() 函数，\|\| 是逻辑 OR 不是拼接 |
-| 日期函数 | [mysql.sql](../functions/date-functions/mysql.sql) | DATE_FORMAT %格式，NOW()=语句时间 |
-| 数学函数 | [mysql.sql](../functions/math-functions/mysql.sql) | 完整，UNSIGNED 废弃中 |
-| 字符串函数 | [mysql.sql](../functions/string-functions/mysql.sql) | CONCAT NULL 传播，\|\| 不是拼接（最大方言差异之一） |
-| 类型转换 | [mysql.sql](../functions/type-conversion/mysql.sql) | 隐式转换极宽松，可能导致索引失效 |
+| 模块 | 简评 |
+|---|---|
+| [聚合函数](../functions/aggregate/mysql.sql) | GROUP_CONCAT 默认1024截断，无 GROUPING SETS/FILTER |
+| [条件函数](../functions/conditional/mysql.sql) | IF() 函数，\|\| 是逻辑 OR 不是拼接 |
+| [日期函数](../functions/date-functions/mysql.sql) | DATE_FORMAT %格式，NOW()=语句时间 |
+| [数学函数](../functions/math-functions/mysql.sql) | 完整，UNSIGNED 废弃中 |
+| [字符串函数](../functions/string-functions/mysql.sql) | CONCAT NULL 传播，\|\| 不是拼接（最大方言差异之一） |
+| [类型转换](../functions/type-conversion/mysql.sql) | 隐式转换极宽松，可能导致索引失效 |
 
 ### Query — 查询
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| CTE | [mysql.sql](../query/cte/mysql.sql) | 8.0+，早期总是物化，递归只支持 UNION ALL |
-| 全文搜索 | [mysql.sql](../query/full-text-search/mysql.sql) | InnoDB FULLTEXT (5.6+)，ngram 中文分词 |
-| 连接查询 | [mysql.sql](../query/joins/mysql.sql) | 无 FULL OUTER JOIN，Hash Join (8.0.18+) |
-| 分页 | [mysql.sql](../query/pagination/mysql.sql) | LIMIT/OFFSET，深分页 O(offset) 问题 |
-| 行列转换 | [mysql.sql](../query/pivot-unpivot/mysql.sql) | 无原生 PIVOT，用 CASE+GROUP BY |
-| 集合操作 | [mysql.sql](../query/set-operations/mysql.sql) | INTERSECT/EXCEPT 8.0.31 才加入 |
-| 子查询 | [mysql.sql](../query/subquery/mysql.sql) | 5.x 性能噩梦已修复，8.0 semijoin 优化 |
-| 窗口函数 | [mysql.sql](../query/window-functions/mysql.sql) | 8.0+ 才支持（晚了15年），无 QUALIFY |
+| 模块 | 简评 |
+|---|---|
+| [CTE](../query/cte/mysql.sql) | 8.0+，早期总是物化，递归只支持 UNION ALL |
+| [全文搜索](../query/full-text-search/mysql.sql) | InnoDB FULLTEXT (5.6+)，ngram 中文分词 |
+| [连接查询](../query/joins/mysql.sql) | 无 FULL OUTER JOIN，Hash Join (8.0.18+) |
+| [分页](../query/pagination/mysql.sql) | LIMIT/OFFSET，深分页 O(offset) 问题 |
+| [行列转换](../query/pivot-unpivot/mysql.sql) | 无原生 PIVOT，用 CASE+GROUP BY |
+| [集合操作](../query/set-operations/mysql.sql) | INTERSECT/EXCEPT 8.0.31 才加入 |
+| [子查询](../query/subquery/mysql.sql) | 5.x 性能噩梦已修复，8.0 semijoin 优化 |
+| [窗口函数](../query/window-functions/mysql.sql) | 8.0+ 才支持（晚了15年），无 QUALIFY |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| 日期填充 | [mysql.sql](../scenarios/date-series-fill/mysql.sql) | 无 generate_series，需递归 CTE 或辅助表生成日期序列 |
-| 去重 | [mysql.sql](../scenarios/deduplication/mysql.sql) | DELETE+JOIN 自关联或用临时表，8.0 可用窗口函数 ROW_NUMBER |
-| 区间检测 | [mysql.sql](../scenarios/gap-detection/mysql.sql) | 8.0 用 LAG/LEAD 窗口函数检测，5.x 需变量模拟 |
-| 层级查询 | [mysql.sql](../scenarios/hierarchical-query/mysql.sql) | 8.0 递归 CTE 替代了早期的存储过程循环方案 |
-| JSON 展开 | [mysql.sql](../scenarios/json-flatten/mysql.sql) | JSON_TABLE (8.0.4+) 将 JSON 数组展开为行，功能完整 |
-| 迁移速查 | [mysql.sql](../scenarios/migration-cheatsheet/mysql.sql) | 方言差异大，重点关注隐式转换、utf8mb4、GROUP BY 语义 |
-| TopN 查询 | [mysql.sql](../scenarios/ranking-top-n/mysql.sql) | 8.0 用 ROW_NUMBER 分组排名，5.x 用变量模拟 |
-| 累计求和 | [mysql.sql](../scenarios/running-total/mysql.sql) | 8.0 SUM() OVER 原生支持，5.x 靠用户变量 hack |
-| 缓慢变化维 | [mysql.sql](../scenarios/slowly-changing-dim/mysql.sql) | 无 MERGE 语句，用 INSERT...ON DUPLICATE KEY UPDATE 实现 SCD |
-| 字符串拆分 | [mysql.sql](../scenarios/string-split-to-rows/mysql.sql) | 无原生拆分函数，用递归 CTE+SUBSTRING_INDEX 实现 |
-| 窗口分析 | [mysql.sql](../scenarios/window-analytics/mysql.sql) | 8.0 全窗口函数可用，frame 子句支持完整 |
+| 模块 | 简评 |
+|---|---|
+| [日期填充](../scenarios/date-series-fill/mysql.sql) | 无 generate_series，需递归 CTE 或辅助表 |
+| [去重](../scenarios/deduplication/mysql.sql) | DELETE+JOIN 或 ROW_NUMBER(8.0+) |
+| [区间检测](../scenarios/gap-detection/mysql.sql) | LAG/LEAD(8.0+)，5.x 需变量模拟 |
+| [层级查询](../scenarios/hierarchical-query/mysql.sql) | 递归 CTE(8.0+)，无 CONNECT BY |
+| [JSON 展开](../scenarios/json-flatten/mysql.sql) | JSON_TABLE(8.0.4+) 功能完整 |
+| [迁移速查](../scenarios/migration-cheatsheet/mysql.sql) | 重点关注隐式转换、utf8mb4、GROUP BY 语义 |
+| [TopN](../scenarios/ranking-top-n/mysql.sql) | ROW_NUMBER(8.0+)，5.x 用变量模拟 |
+| [累计求和](../scenarios/running-total/mysql.sql) | SUM() OVER(8.0+)，5.x 靠用户变量 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/mysql.sql) | 无 MERGE，用 ON DUPLICATE KEY UPDATE |
+| [字符串拆分](../scenarios/string-split-to-rows/mysql.sql) | 无原生拆分，递归 CTE+SUBSTRING_INDEX |
+| [窗口分析](../scenarios/window-analytics/mysql.sql) | 8.0 全窗口函数，frame 子句完整 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 | 简评 |
-|---|---|---|
-| 复合类型 | [mysql.sql](../types/array-map-struct/mysql.sql) | 无 ARRAY/MAP/STRUCT，用 JSON 替代 |
-| 日期时间 | [mysql.sql](../types/datetime/mysql.sql) | DATETIME vs TIMESTAMP（2038问题），微秒精度 |
-| JSON | [mysql.sql](../types/json/mysql.sql) | 二进制存储，多值索引(8.0.17+)，partial update |
-| 数值类型 | [mysql.sql](../types/numeric/mysql.sql) | UNSIGNED 废弃趋势，DECIMAL BCD 精确 |
-| 字符串类型 | [mysql.sql](../types/string/mysql.sql) | utf8≠UTF-8（历史最大坑），TEXT 有诸多限制 |
+| 模块 | 简评 |
+|---|---|
+| [复合类型](../types/array-map-struct/mysql.sql) | 无 ARRAY/MAP/STRUCT，用 JSON 替代 |
+| [日期时间](../types/datetime/mysql.sql) | DATETIME vs TIMESTAMP（2038问题），微秒精度 |
+| [JSON](../types/json/mysql.sql) | 二进制存储，多值索引(8.0.17+)，partial update |
+| [数值类型](../types/numeric/mysql.sql) | UNSIGNED 废弃趋势，DECIMAL BCD 精确 |
+| [字符串类型](../types/string/mysql.sql) | utf8≠UTF-8（历史最大坑），TEXT 有诸多限制 |
