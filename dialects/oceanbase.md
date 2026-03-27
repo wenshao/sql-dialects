@@ -2,7 +2,7 @@
 
 **分类**: 分布式数据库（兼容 MySQL/Oracle）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4820 行
+**总行数**: 4951 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [oceanbase.sql](../ddl/create-table/oceanbase.sql) |
+| 改表 | [oceanbase.sql](../ddl/alter-table/oceanbase.sql) |
+| 索引 | [oceanbase.sql](../ddl/indexes/oceanbase.sql) |
+| 约束 | [oceanbase.sql](../ddl/constraints/oceanbase.sql) |
+| 视图 | [oceanbase.sql](../ddl/views/oceanbase.sql) |
+| 序列与自增 | [oceanbase.sql](../ddl/sequences/oceanbase.sql) |
+| 数据库/Schema/用户 | [oceanbase.sql](../ddl/users-databases/oceanbase.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [oceanbase.sql](../advanced/temp-tables/oceanbase.sql) |
 | 事务 | [oceanbase.sql](../advanced/transactions/oceanbase.sql) |
 | 触发器 | [oceanbase.sql](../advanced/triggers/oceanbase.sql) |
-| 改表 | [oceanbase.sql](../ddl/alter-table/oceanbase.sql) |
-| 约束 | [oceanbase.sql](../ddl/constraints/oceanbase.sql) |
-| 建表 | [oceanbase.sql](../ddl/create-table/oceanbase.sql) |
-| 索引 | [oceanbase.sql](../ddl/indexes/oceanbase.sql) |
-| 序列与自增 | [oceanbase.sql](../ddl/sequences/oceanbase.sql) |
-| 数据库/Schema/用户 | [oceanbase.sql](../ddl/users-databases/oceanbase.sql) |
-| 视图 | [oceanbase.sql](../ddl/views/oceanbase.sql) |
 
 ### DML — 数据操作
 

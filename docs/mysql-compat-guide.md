@@ -67,6 +67,10 @@
 - 真正的 UTF-8 需要用 `utf8mb4`
 - 兼容引擎可以让 utf8 = utf8mb4，但要注意索引长度计算的差异
 
+> **MySQL 5.7 EOL 提醒**: MySQL 5.7 已于 2023 年 10 月停止官方支持（EOL）。新项目应使用 MySQL 8.0+ 或兼容引擎。存量迁移用户请注意安全补丁已不可获得。
+
+> **MySQL 8.4 / 9.x 变更**: MySQL 8.4（2024 LTS）废弃了部分特性（如 `mysql_native_password` 默认禁用、一些旧系统变量）。MySQL 9.0 完全移除了 `utf8mb3` 别名——`utf8` 字符集不再可用，必须显式使用 `utf8mb4`。兼容引擎应跟进这些变更以保持行为一致。
+
 ### 4. || 是逻辑 OR
 
 详见 [functions/string-functions/mysql.sql](../functions/string-functions/mysql.sql)

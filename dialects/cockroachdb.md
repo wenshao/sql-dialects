@@ -2,7 +2,7 @@
 
 **分类**: 分布式数据库（兼容 PostgreSQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4571 行
+**总行数**: 4696 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [cockroachdb.sql](../ddl/create-table/cockroachdb.sql) |
+| 改表 | [cockroachdb.sql](../ddl/alter-table/cockroachdb.sql) |
+| 索引 | [cockroachdb.sql](../ddl/indexes/cockroachdb.sql) |
+| 约束 | [cockroachdb.sql](../ddl/constraints/cockroachdb.sql) |
+| 视图 | [cockroachdb.sql](../ddl/views/cockroachdb.sql) |
+| 序列与自增 | [cockroachdb.sql](../ddl/sequences/cockroachdb.sql) |
+| 数据库/Schema/用户 | [cockroachdb.sql](../ddl/users-databases/cockroachdb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [cockroachdb.sql](../advanced/temp-tables/cockroachdb.sql) |
 | 事务 | [cockroachdb.sql](../advanced/transactions/cockroachdb.sql) |
 | 触发器 | [cockroachdb.sql](../advanced/triggers/cockroachdb.sql) |
-| 改表 | [cockroachdb.sql](../ddl/alter-table/cockroachdb.sql) |
-| 约束 | [cockroachdb.sql](../ddl/constraints/cockroachdb.sql) |
-| 建表 | [cockroachdb.sql](../ddl/create-table/cockroachdb.sql) |
-| 索引 | [cockroachdb.sql](../ddl/indexes/cockroachdb.sql) |
-| 序列与自增 | [cockroachdb.sql](../ddl/sequences/cockroachdb.sql) |
-| 数据库/Schema/用户 | [cockroachdb.sql](../ddl/users-databases/cockroachdb.sql) |
-| 视图 | [cockroachdb.sql](../ddl/views/cockroachdb.sql) |
 
 ### DML — 数据操作
 

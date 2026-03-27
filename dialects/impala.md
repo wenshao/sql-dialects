@@ -2,7 +2,7 @@
 
 **分类**: Hadoop SQL 引擎（Cloudera）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3813 行
+**总行数**: 4626 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [impala.sql](../ddl/create-table/impala.sql) |
+| 改表 | [impala.sql](../ddl/alter-table/impala.sql) |
+| 索引 | [impala.sql](../ddl/indexes/impala.sql) |
+| 约束 | [impala.sql](../ddl/constraints/impala.sql) |
+| 视图 | [impala.sql](../ddl/views/impala.sql) |
+| 序列与自增 | [impala.sql](../ddl/sequences/impala.sql) |
+| 数据库/Schema/用户 | [impala.sql](../ddl/users-databases/impala.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [impala.sql](../advanced/temp-tables/impala.sql) |
 | 事务 | [impala.sql](../advanced/transactions/impala.sql) |
 | 触发器 | [impala.sql](../advanced/triggers/impala.sql) |
-| 改表 | [impala.sql](../ddl/alter-table/impala.sql) |
-| 约束 | [impala.sql](../ddl/constraints/impala.sql) |
-| 建表 | [impala.sql](../ddl/create-table/impala.sql) |
-| 索引 | [impala.sql](../ddl/indexes/impala.sql) |
-| 序列与自增 | [impala.sql](../ddl/sequences/impala.sql) |
-| 数据库/Schema/用户 | [impala.sql](../ddl/users-databases/impala.sql) |
-| 视图 | [impala.sql](../ddl/views/impala.sql) |
 
 ### DML — 数据操作
 

@@ -2,7 +2,7 @@
 
 **分类**: 大数据计算引擎
 **文件数**: 51 个 SQL 文件
-**总行数**: 4569 行
+**总行数**: 4707 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [spark.sql](../ddl/create-table/spark.sql) |
+| 改表 | [spark.sql](../ddl/alter-table/spark.sql) |
+| 索引 | [spark.sql](../ddl/indexes/spark.sql) |
+| 约束 | [spark.sql](../ddl/constraints/spark.sql) |
+| 视图 | [spark.sql](../ddl/views/spark.sql) |
+| 序列与自增 | [spark.sql](../ddl/sequences/spark.sql) |
+| 数据库/Schema/用户 | [spark.sql](../ddl/users-databases/spark.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [spark.sql](../advanced/temp-tables/spark.sql) |
 | 事务 | [spark.sql](../advanced/transactions/spark.sql) |
 | 触发器 | [spark.sql](../advanced/triggers/spark.sql) |
-| 改表 | [spark.sql](../ddl/alter-table/spark.sql) |
-| 约束 | [spark.sql](../ddl/constraints/spark.sql) |
-| 建表 | [spark.sql](../ddl/create-table/spark.sql) |
-| 索引 | [spark.sql](../ddl/indexes/spark.sql) |
-| 序列与自增 | [spark.sql](../ddl/sequences/spark.sql) |
-| 数据库/Schema/用户 | [spark.sql](../ddl/users-databases/spark.sql) |
-| 视图 | [spark.sql](../ddl/views/spark.sql) |
 
 ### DML — 数据操作
 

@@ -2,7 +2,7 @@
 
 **分类**: 传统关系型数据库（IBM）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4355 行
+**总行数**: 4539 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [db2.sql](../ddl/create-table/db2.sql) |
+| 改表 | [db2.sql](../ddl/alter-table/db2.sql) |
+| 索引 | [db2.sql](../ddl/indexes/db2.sql) |
+| 约束 | [db2.sql](../ddl/constraints/db2.sql) |
+| 视图 | [db2.sql](../ddl/views/db2.sql) |
+| 序列与自增 | [db2.sql](../ddl/sequences/db2.sql) |
+| 数据库/Schema/用户 | [db2.sql](../ddl/users-databases/db2.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [db2.sql](../advanced/temp-tables/db2.sql) |
 | 事务 | [db2.sql](../advanced/transactions/db2.sql) |
 | 触发器 | [db2.sql](../advanced/triggers/db2.sql) |
-| 改表 | [db2.sql](../ddl/alter-table/db2.sql) |
-| 约束 | [db2.sql](../ddl/constraints/db2.sql) |
-| 建表 | [db2.sql](../ddl/create-table/db2.sql) |
-| 索引 | [db2.sql](../ddl/indexes/db2.sql) |
-| 序列与自增 | [db2.sql](../ddl/sequences/db2.sql) |
-| 数据库/Schema/用户 | [db2.sql](../ddl/users-databases/db2.sql) |
-| 视图 | [db2.sql](../ddl/views/db2.sql) |
 
 ### DML — 数据操作
 

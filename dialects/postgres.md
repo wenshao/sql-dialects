@@ -2,7 +2,7 @@
 
 **分类**: 传统关系型数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 5571 行
+**总行数**: 9047 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [postgres.sql](../ddl/create-table/postgres.sql) |
+| 改表 | [postgres.sql](../ddl/alter-table/postgres.sql) |
+| 索引 | [postgres.sql](../ddl/indexes/postgres.sql) |
+| 约束 | [postgres.sql](../ddl/constraints/postgres.sql) |
+| 视图 | [postgres.sql](../ddl/views/postgres.sql) |
+| 序列与自增 | [postgres.sql](../ddl/sequences/postgres.sql) |
+| 数据库/Schema/用户 | [postgres.sql](../ddl/users-databases/postgres.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [postgres.sql](../advanced/temp-tables/postgres.sql) |
 | 事务 | [postgres.sql](../advanced/transactions/postgres.sql) |
 | 触发器 | [postgres.sql](../advanced/triggers/postgres.sql) |
-| 改表 | [postgres.sql](../ddl/alter-table/postgres.sql) |
-| 约束 | [postgres.sql](../ddl/constraints/postgres.sql) |
-| 建表 | [postgres.sql](../ddl/create-table/postgres.sql) |
-| 索引 | [postgres.sql](../ddl/indexes/postgres.sql) |
-| 序列与自增 | [postgres.sql](../ddl/sequences/postgres.sql) |
-| 数据库/Schema/用户 | [postgres.sql](../ddl/users-databases/postgres.sql) |
-| 视图 | [postgres.sql](../ddl/views/postgres.sql) |
 
 ### DML — 数据操作
 

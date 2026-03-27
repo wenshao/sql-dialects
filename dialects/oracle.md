@@ -2,7 +2,7 @@
 
 **分类**: 传统关系型数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 5246 行
+**总行数**: 8199 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [oracle.sql](../ddl/create-table/oracle.sql) |
+| 改表 | [oracle.sql](../ddl/alter-table/oracle.sql) |
+| 索引 | [oracle.sql](../ddl/indexes/oracle.sql) |
+| 约束 | [oracle.sql](../ddl/constraints/oracle.sql) |
+| 视图 | [oracle.sql](../ddl/views/oracle.sql) |
+| 序列与自增 | [oracle.sql](../ddl/sequences/oracle.sql) |
+| 数据库/Schema/用户 | [oracle.sql](../ddl/users-databases/oracle.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [oracle.sql](../advanced/temp-tables/oracle.sql) |
 | 事务 | [oracle.sql](../advanced/transactions/oracle.sql) |
 | 触发器 | [oracle.sql](../advanced/triggers/oracle.sql) |
-| 改表 | [oracle.sql](../ddl/alter-table/oracle.sql) |
-| 约束 | [oracle.sql](../ddl/constraints/oracle.sql) |
-| 建表 | [oracle.sql](../ddl/create-table/oracle.sql) |
-| 索引 | [oracle.sql](../ddl/indexes/oracle.sql) |
-| 序列与自增 | [oracle.sql](../ddl/sequences/oracle.sql) |
-| 数据库/Schema/用户 | [oracle.sql](../ddl/users-databases/oracle.sql) |
-| 视图 | [oracle.sql](../ddl/views/oracle.sql) |
 
 ### DML — 数据操作
 

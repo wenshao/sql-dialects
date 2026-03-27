@@ -19,10 +19,18 @@
 
 | 特性 | BigQuery | Snowflake | MaxCompute | Hive | ClickHouse | StarRocks | Trino | Hologres | Doris | DuckDB | Spark | Flink |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| JSON 类型 | ✅ JSON | ✅ VARIANT | ❌ STRING | ❌ STRING | ✅ JSON | ✅ JSON | ✅ JSON | ✅ JSON/JSONB | ✅ JSON | ✅ JSON | ❌ STRING | ❌ STRING |
+| JSON 类型 | ✅ JSON | ✅ VARIANT | ✅ JSON | ❌ STRING | ⚠️ 25.3+ | ✅ JSON | ✅ JSON | ✅ JSON/JSONB | ✅ JSON | ✅ JSON | ❌ STRING | ❌ STRING |
 | 路径提取 | ✅ JSON_VALUE | ✅ : 语法 | ✅ GET_JSON_OBJECT | ✅ GET_JSON_OBJECT | ✅ JSONExtract | ✅ ->/->> | ✅ json_extract | ✅ ->/->> | ✅ JSON_EXTRACT | ✅ ->/->> | ✅ get_json_object | ✅ JSON_VALUE |
 | 半结构化 | ✅ STRUCT | ✅ VARIANT/OBJECT | ✅ | ✅ MAP/STRUCT | ✅ Tuple/Map | ❌ | ✅ ROW/MAP | ❌ | ❌ | ✅ STRUCT/MAP | ✅ MAP/STRUCT | ✅ ROW/MAP |
 | JSON 索引 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ GIN | ❌ | ❌ | ❌ | ❌ |
+
+### 云数据仓库
+
+| 特性 | Redshift | Synapse | Databricks | Greenplum | Impala | Vertica | Teradata |
+|---|---|---|---|---|---|---|---|
+| JSON 类型 | ✅ SUPER | ❌ NVARCHAR | ❌ STRING | ✅ JSON/JSONB | ❌ STRING | ❌ LONG VARCHAR | ❌ JSON |
+| 路径提取 | ✅ json_extract_path_text | ✅ JSON_VALUE | ✅ get_json_object | ✅ ->/->>/#> | ✅ get_json_object | ✅ JSON_EXTRACT | ✅ JSONExtract |
+| JSON 索引 | ❌ | ❌ | ❌ | ✅ GIN on JSONB | ❌ | ❌ | ❌ |
 
 ### 分布式 / NewSQL
 
@@ -30,6 +38,13 @@
 |---|---|---|---|---|---|---|---|---|---|---|
 | JSON 类型 | ✅ | ✅ | ✅ JSONB | ✅ JSON | ✅ JSONB | ✅ | ✅ | ✅ | ✅ | ✅ JSON/JSONB |
 | 路径提取 | ✅ ->/->> | ✅ ->/->> | ✅ ->/->> | ✅ JSON_VALUE | ✅ ->/->> | ✅ ->/->> | ✅ ->/->> | ✅ ->/->> | ✅ | ✅ ->/->> |
+
+### 特殊用途
+
+| 特性 | TimescaleDB | TDengine | ksqlDB | Materialize | H2 | Derby |
+|---|---|---|---|---|---|---|
+| JSON 类型 | ✅ JSONB | ❌ STRING | ❌ STRING | ❌ STRING | ✅ JSON | ❌ VARCHAR |
+| 路径提取 | ✅ ->/->> | ❌ | ❌ | ❌ | ✅ JSON_VALUE | ❌ |
 
 ## 关键差异
 

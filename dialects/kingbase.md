@@ -2,7 +2,7 @@
 
 **分类**: 国产数据库（兼容 PostgreSQL/Oracle）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3542 行
+**总行数**: 5407 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [kingbase.sql](../ddl/create-table/kingbase.sql) |
+| 改表 | [kingbase.sql](../ddl/alter-table/kingbase.sql) |
+| 索引 | [kingbase.sql](../ddl/indexes/kingbase.sql) |
+| 约束 | [kingbase.sql](../ddl/constraints/kingbase.sql) |
+| 视图 | [kingbase.sql](../ddl/views/kingbase.sql) |
+| 序列与自增 | [kingbase.sql](../ddl/sequences/kingbase.sql) |
+| 数据库/Schema/用户 | [kingbase.sql](../ddl/users-databases/kingbase.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [kingbase.sql](../advanced/temp-tables/kingbase.sql) |
 | 事务 | [kingbase.sql](../advanced/transactions/kingbase.sql) |
 | 触发器 | [kingbase.sql](../advanced/triggers/kingbase.sql) |
-| 改表 | [kingbase.sql](../ddl/alter-table/kingbase.sql) |
-| 约束 | [kingbase.sql](../ddl/constraints/kingbase.sql) |
-| 建表 | [kingbase.sql](../ddl/create-table/kingbase.sql) |
-| 索引 | [kingbase.sql](../ddl/indexes/kingbase.sql) |
-| 序列与自增 | [kingbase.sql](../ddl/sequences/kingbase.sql) |
-| 数据库/Schema/用户 | [kingbase.sql](../ddl/users-databases/kingbase.sql) |
-| 视图 | [kingbase.sql](../ddl/views/kingbase.sql) |
 
 ### DML — 数据操作
 

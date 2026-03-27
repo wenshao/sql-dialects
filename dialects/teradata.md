@@ -2,7 +2,7 @@
 
 **分类**: 老牌 MPP 数仓
 **文件数**: 51 个 SQL 文件
-**总行数**: 4089 行
+**总行数**: 4474 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [teradata.sql](../ddl/create-table/teradata.sql) |
+| 改表 | [teradata.sql](../ddl/alter-table/teradata.sql) |
+| 索引 | [teradata.sql](../ddl/indexes/teradata.sql) |
+| 约束 | [teradata.sql](../ddl/constraints/teradata.sql) |
+| 视图 | [teradata.sql](../ddl/views/teradata.sql) |
+| 序列与自增 | [teradata.sql](../ddl/sequences/teradata.sql) |
+| 数据库/Schema/用户 | [teradata.sql](../ddl/users-databases/teradata.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [teradata.sql](../advanced/temp-tables/teradata.sql) |
 | 事务 | [teradata.sql](../advanced/transactions/teradata.sql) |
 | 触发器 | [teradata.sql](../advanced/triggers/teradata.sql) |
-| 改表 | [teradata.sql](../ddl/alter-table/teradata.sql) |
-| 约束 | [teradata.sql](../ddl/constraints/teradata.sql) |
-| 建表 | [teradata.sql](../ddl/create-table/teradata.sql) |
-| 索引 | [teradata.sql](../ddl/indexes/teradata.sql) |
-| 序列与自增 | [teradata.sql](../ddl/sequences/teradata.sql) |
-| 数据库/Schema/用户 | [teradata.sql](../ddl/users-databases/teradata.sql) |
-| 视图 | [teradata.sql](../ddl/views/teradata.sql) |
 
 ### DML — 数据操作
 

@@ -294,6 +294,15 @@ INSERT INTO users (active) VALUES (TRUE);
 -- 但 PG 也接受 0/1 的隐式转换到布尔
 ```
 
+> **重要**: PostgreSQL 在 WHERE 条件中允许 `WHERE active = 1`（通过隐式转换），但在 INSERT VALUES 上下文中**不会**隐式将整数 0/1 转换为 BOOLEAN。即 `INSERT INTO t (active) VALUES (1)` 会报类型错误，必须使用 `VALUES (TRUE)` 或 `VALUES (1::BOOLEAN)`。这是迁移中最常见的 BOOLEAN 相关陷阱。
+
+## PostgreSQL 版本特性提示
+
+| 版本 | 特性 | 迁移相关说明 |
+|------|------|-------------|
+| PostgreSQL 15 | 标准 MERGE 语句 | `MERGE INTO ... USING ... ON ... WHEN MATCHED THEN UPDATE WHEN NOT MATCHED THEN INSERT`，替代了之前的 UPSERT 变通方案（INSERT ... ON CONFLICT 仍推荐用于简单场景） |
+| PostgreSQL 17 | `JSON_TABLE()` | 将 JSON 数组展开为关系表行，类似 MySQL 的 `JSON_TABLE`。此前 PG 用户需要 `jsonb_to_recordset` + LATERAL 等变通方式 |
+
 ## 迁移工具推荐
 
 | 工具 | 用途 |

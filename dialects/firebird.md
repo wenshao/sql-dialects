@@ -2,7 +2,7 @@
 
 **分类**: 传统关系型数据库（InterBase 开源分支）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4104 行
+**总行数**: 4276 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [firebird.sql](../ddl/create-table/firebird.sql) |
+| 改表 | [firebird.sql](../ddl/alter-table/firebird.sql) |
+| 索引 | [firebird.sql](../ddl/indexes/firebird.sql) |
+| 约束 | [firebird.sql](../ddl/constraints/firebird.sql) |
+| 视图 | [firebird.sql](../ddl/views/firebird.sql) |
+| 序列与自增 | [firebird.sql](../ddl/sequences/firebird.sql) |
+| 数据库/Schema/用户 | [firebird.sql](../ddl/users-databases/firebird.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [firebird.sql](../advanced/temp-tables/firebird.sql) |
 | 事务 | [firebird.sql](../advanced/transactions/firebird.sql) |
 | 触发器 | [firebird.sql](../advanced/triggers/firebird.sql) |
-| 改表 | [firebird.sql](../ddl/alter-table/firebird.sql) |
-| 约束 | [firebird.sql](../ddl/constraints/firebird.sql) |
-| 建表 | [firebird.sql](../ddl/create-table/firebird.sql) |
-| 索引 | [firebird.sql](../ddl/indexes/firebird.sql) |
-| 序列与自增 | [firebird.sql](../ddl/sequences/firebird.sql) |
-| 数据库/Schema/用户 | [firebird.sql](../ddl/users-databases/firebird.sql) |
-| 视图 | [firebird.sql](../ddl/views/firebird.sql) |
 
 ### DML — 数据操作
 

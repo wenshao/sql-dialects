@@ -2,7 +2,7 @@
 
 **分类**: Lakehouse 平台（基于 Spark）
 **文件数**: 51 个 SQL 文件
-**总行数**: 5044 行
+**总行数**: 5095 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [databricks.sql](../ddl/create-table/databricks.sql) |
+| 改表 | [databricks.sql](../ddl/alter-table/databricks.sql) |
+| 索引 | [databricks.sql](../ddl/indexes/databricks.sql) |
+| 约束 | [databricks.sql](../ddl/constraints/databricks.sql) |
+| 视图 | [databricks.sql](../ddl/views/databricks.sql) |
+| 序列与自增 | [databricks.sql](../ddl/sequences/databricks.sql) |
+| 数据库/Schema/用户 | [databricks.sql](../ddl/users-databases/databricks.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [databricks.sql](../advanced/temp-tables/databricks.sql) |
 | 事务 | [databricks.sql](../advanced/transactions/databricks.sql) |
 | 触发器 | [databricks.sql](../advanced/triggers/databricks.sql) |
-| 改表 | [databricks.sql](../ddl/alter-table/databricks.sql) |
-| 约束 | [databricks.sql](../ddl/constraints/databricks.sql) |
-| 建表 | [databricks.sql](../ddl/create-table/databricks.sql) |
-| 索引 | [databricks.sql](../ddl/indexes/databricks.sql) |
-| 序列与自增 | [databricks.sql](../ddl/sequences/databricks.sql) |
-| 数据库/Schema/用户 | [databricks.sql](../ddl/users-databases/databricks.sql) |
-| 视图 | [databricks.sql](../ddl/views/databricks.sql) |
 
 ### DML — 数据操作
 

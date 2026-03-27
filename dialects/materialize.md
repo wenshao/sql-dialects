@@ -2,7 +2,7 @@
 
 **分类**: 流式物化视图（兼容 PostgreSQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3665 行
+**总行数**: 4756 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [materialize.sql](../ddl/create-table/materialize.sql) |
+| 改表 | [materialize.sql](../ddl/alter-table/materialize.sql) |
+| 索引 | [materialize.sql](../ddl/indexes/materialize.sql) |
+| 约束 | [materialize.sql](../ddl/constraints/materialize.sql) |
+| 视图 | [materialize.sql](../ddl/views/materialize.sql) |
+| 序列与自增 | [materialize.sql](../ddl/sequences/materialize.sql) |
+| 数据库/Schema/用户 | [materialize.sql](../ddl/users-databases/materialize.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [materialize.sql](../advanced/temp-tables/materialize.sql) |
 | 事务 | [materialize.sql](../advanced/transactions/materialize.sql) |
 | 触发器 | [materialize.sql](../advanced/triggers/materialize.sql) |
-| 改表 | [materialize.sql](../ddl/alter-table/materialize.sql) |
-| 约束 | [materialize.sql](../ddl/constraints/materialize.sql) |
-| 建表 | [materialize.sql](../ddl/create-table/materialize.sql) |
-| 索引 | [materialize.sql](../ddl/indexes/materialize.sql) |
-| 序列与自增 | [materialize.sql](../ddl/sequences/materialize.sql) |
-| 数据库/Schema/用户 | [materialize.sql](../ddl/users-databases/materialize.sql) |
-| 视图 | [materialize.sql](../ddl/views/materialize.sql) |
 
 ### DML — 数据操作
 

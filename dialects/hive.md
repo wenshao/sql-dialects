@@ -2,7 +2,7 @@
 
 **分类**: Hadoop 数仓（Apache）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4511 行
+**总行数**: 4629 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [hive.sql](../ddl/create-table/hive.sql) |
+| 改表 | [hive.sql](../ddl/alter-table/hive.sql) |
+| 索引 | [hive.sql](../ddl/indexes/hive.sql) |
+| 约束 | [hive.sql](../ddl/constraints/hive.sql) |
+| 视图 | [hive.sql](../ddl/views/hive.sql) |
+| 序列与自增 | [hive.sql](../ddl/sequences/hive.sql) |
+| 数据库/Schema/用户 | [hive.sql](../ddl/users-databases/hive.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [hive.sql](../advanced/temp-tables/hive.sql) |
 | 事务 | [hive.sql](../advanced/transactions/hive.sql) |
 | 触发器 | [hive.sql](../advanced/triggers/hive.sql) |
-| 改表 | [hive.sql](../ddl/alter-table/hive.sql) |
-| 约束 | [hive.sql](../ddl/constraints/hive.sql) |
-| 建表 | [hive.sql](../ddl/create-table/hive.sql) |
-| 索引 | [hive.sql](../ddl/indexes/hive.sql) |
-| 序列与自增 | [hive.sql](../ddl/sequences/hive.sql) |
-| 数据库/Schema/用户 | [hive.sql](../ddl/users-databases/hive.sql) |
-| 视图 | [hive.sql](../ddl/views/hive.sql) |
 
 ### DML — 数据操作
 

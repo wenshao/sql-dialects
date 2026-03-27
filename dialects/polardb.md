@@ -2,7 +2,7 @@
 
 **分类**: 云原生数据库（阿里云，兼容 MySQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3393 行
+**总行数**: 3925 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [polardb.sql](../ddl/create-table/polardb.sql) |
+| 改表 | [polardb.sql](../ddl/alter-table/polardb.sql) |
+| 索引 | [polardb.sql](../ddl/indexes/polardb.sql) |
+| 约束 | [polardb.sql](../ddl/constraints/polardb.sql) |
+| 视图 | [polardb.sql](../ddl/views/polardb.sql) |
+| 序列与自增 | [polardb.sql](../ddl/sequences/polardb.sql) |
+| 数据库/Schema/用户 | [polardb.sql](../ddl/users-databases/polardb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [polardb.sql](../advanced/temp-tables/polardb.sql) |
 | 事务 | [polardb.sql](../advanced/transactions/polardb.sql) |
 | 触发器 | [polardb.sql](../advanced/triggers/polardb.sql) |
-| 改表 | [polardb.sql](../ddl/alter-table/polardb.sql) |
-| 约束 | [polardb.sql](../ddl/constraints/polardb.sql) |
-| 建表 | [polardb.sql](../ddl/create-table/polardb.sql) |
-| 索引 | [polardb.sql](../ddl/indexes/polardb.sql) |
-| 序列与自增 | [polardb.sql](../ddl/sequences/polardb.sql) |
-| 数据库/Schema/用户 | [polardb.sql](../ddl/users-databases/polardb.sql) |
-| 视图 | [polardb.sql](../ddl/views/polardb.sql) |
 
 ### DML — 数据操作
 

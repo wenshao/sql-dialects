@@ -2,7 +2,7 @@
 
 **分类**: 流批一体计算引擎
 **文件数**: 51 个 SQL 文件
-**总行数**: 4707 行
+**总行数**: 5042 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [flink.sql](../ddl/create-table/flink.sql) |
+| 改表 | [flink.sql](../ddl/alter-table/flink.sql) |
+| 索引 | [flink.sql](../ddl/indexes/flink.sql) |
+| 约束 | [flink.sql](../ddl/constraints/flink.sql) |
+| 视图 | [flink.sql](../ddl/views/flink.sql) |
+| 序列与自增 | [flink.sql](../ddl/sequences/flink.sql) |
+| 数据库/Schema/用户 | [flink.sql](../ddl/users-databases/flink.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [flink.sql](../advanced/temp-tables/flink.sql) |
 | 事务 | [flink.sql](../advanced/transactions/flink.sql) |
 | 触发器 | [flink.sql](../advanced/triggers/flink.sql) |
-| 改表 | [flink.sql](../ddl/alter-table/flink.sql) |
-| 约束 | [flink.sql](../ddl/constraints/flink.sql) |
-| 建表 | [flink.sql](../ddl/create-table/flink.sql) |
-| 索引 | [flink.sql](../ddl/indexes/flink.sql) |
-| 序列与自增 | [flink.sql](../ddl/sequences/flink.sql) |
-| 数据库/Schema/用户 | [flink.sql](../ddl/users-databases/flink.sql) |
-| 视图 | [flink.sql](../ddl/views/flink.sql) |
 
 ### DML — 数据操作
 

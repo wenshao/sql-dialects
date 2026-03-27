@@ -2,7 +2,7 @@
 
 **分类**: 时序数据库（PostgreSQL 扩展）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4106 行
+**总行数**: 4382 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [timescaledb.sql](../ddl/create-table/timescaledb.sql) |
+| 改表 | [timescaledb.sql](../ddl/alter-table/timescaledb.sql) |
+| 索引 | [timescaledb.sql](../ddl/indexes/timescaledb.sql) |
+| 约束 | [timescaledb.sql](../ddl/constraints/timescaledb.sql) |
+| 视图 | [timescaledb.sql](../ddl/views/timescaledb.sql) |
+| 序列与自增 | [timescaledb.sql](../ddl/sequences/timescaledb.sql) |
+| 数据库/Schema/用户 | [timescaledb.sql](../ddl/users-databases/timescaledb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [timescaledb.sql](../advanced/temp-tables/timescaledb.sql) |
 | 事务 | [timescaledb.sql](../advanced/transactions/timescaledb.sql) |
 | 触发器 | [timescaledb.sql](../advanced/triggers/timescaledb.sql) |
-| 改表 | [timescaledb.sql](../ddl/alter-table/timescaledb.sql) |
-| 约束 | [timescaledb.sql](../ddl/constraints/timescaledb.sql) |
-| 建表 | [timescaledb.sql](../ddl/create-table/timescaledb.sql) |
-| 索引 | [timescaledb.sql](../ddl/indexes/timescaledb.sql) |
-| 序列与自增 | [timescaledb.sql](../ddl/sequences/timescaledb.sql) |
-| 数据库/Schema/用户 | [timescaledb.sql](../ddl/users-databases/timescaledb.sql) |
-| 视图 | [timescaledb.sql](../ddl/views/timescaledb.sql) |
 
 ### DML — 数据操作
 

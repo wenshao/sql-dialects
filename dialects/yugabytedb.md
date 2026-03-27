@@ -2,7 +2,7 @@
 
 **分类**: 分布式数据库（兼容 PostgreSQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4483 行
+**总行数**: 4726 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [yugabytedb.sql](../ddl/create-table/yugabytedb.sql) |
+| 改表 | [yugabytedb.sql](../ddl/alter-table/yugabytedb.sql) |
+| 索引 | [yugabytedb.sql](../ddl/indexes/yugabytedb.sql) |
+| 约束 | [yugabytedb.sql](../ddl/constraints/yugabytedb.sql) |
+| 视图 | [yugabytedb.sql](../ddl/views/yugabytedb.sql) |
+| 序列与自增 | [yugabytedb.sql](../ddl/sequences/yugabytedb.sql) |
+| 数据库/Schema/用户 | [yugabytedb.sql](../ddl/users-databases/yugabytedb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [yugabytedb.sql](../advanced/temp-tables/yugabytedb.sql) |
 | 事务 | [yugabytedb.sql](../advanced/transactions/yugabytedb.sql) |
 | 触发器 | [yugabytedb.sql](../advanced/triggers/yugabytedb.sql) |
-| 改表 | [yugabytedb.sql](../ddl/alter-table/yugabytedb.sql) |
-| 约束 | [yugabytedb.sql](../ddl/constraints/yugabytedb.sql) |
-| 建表 | [yugabytedb.sql](../ddl/create-table/yugabytedb.sql) |
-| 索引 | [yugabytedb.sql](../ddl/indexes/yugabytedb.sql) |
-| 序列与自增 | [yugabytedb.sql](../ddl/sequences/yugabytedb.sql) |
-| 数据库/Schema/用户 | [yugabytedb.sql](../ddl/users-databases/yugabytedb.sql) |
-| 视图 | [yugabytedb.sql](../ddl/views/yugabytedb.sql) |
 
 ### DML — 数据操作
 

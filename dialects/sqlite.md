@@ -2,7 +2,7 @@
 
 **分类**: 嵌入式数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 3893 行
+**总行数**: 6216 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [sqlite.sql](../ddl/create-table/sqlite.sql) |
+| 改表 | [sqlite.sql](../ddl/alter-table/sqlite.sql) |
+| 索引 | [sqlite.sql](../ddl/indexes/sqlite.sql) |
+| 约束 | [sqlite.sql](../ddl/constraints/sqlite.sql) |
+| 视图 | [sqlite.sql](../ddl/views/sqlite.sql) |
+| 序列与自增 | [sqlite.sql](../ddl/sequences/sqlite.sql) |
+| 数据库/Schema/用户 | [sqlite.sql](../ddl/users-databases/sqlite.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [sqlite.sql](../advanced/temp-tables/sqlite.sql) |
 | 事务 | [sqlite.sql](../advanced/transactions/sqlite.sql) |
 | 触发器 | [sqlite.sql](../advanced/triggers/sqlite.sql) |
-| 改表 | [sqlite.sql](../ddl/alter-table/sqlite.sql) |
-| 约束 | [sqlite.sql](../ddl/constraints/sqlite.sql) |
-| 建表 | [sqlite.sql](../ddl/create-table/sqlite.sql) |
-| 索引 | [sqlite.sql](../ddl/indexes/sqlite.sql) |
-| 序列与自增 | [sqlite.sql](../ddl/sequences/sqlite.sql) |
-| 数据库/Schema/用户 | [sqlite.sql](../ddl/users-databases/sqlite.sql) |
-| 视图 | [sqlite.sql](../ddl/views/sqlite.sql) |
 
 ### DML — 数据操作
 

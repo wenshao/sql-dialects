@@ -2,7 +2,7 @@
 
 **分类**: Azure 云数仓（基于 T-SQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4674 行
+**总行数**: 5000 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [synapse.sql](../ddl/create-table/synapse.sql) |
+| 改表 | [synapse.sql](../ddl/alter-table/synapse.sql) |
+| 索引 | [synapse.sql](../ddl/indexes/synapse.sql) |
+| 约束 | [synapse.sql](../ddl/constraints/synapse.sql) |
+| 视图 | [synapse.sql](../ddl/views/synapse.sql) |
+| 序列与自增 | [synapse.sql](../ddl/sequences/synapse.sql) |
+| 数据库/Schema/用户 | [synapse.sql](../ddl/users-databases/synapse.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [synapse.sql](../advanced/temp-tables/synapse.sql) |
 | 事务 | [synapse.sql](../advanced/transactions/synapse.sql) |
 | 触发器 | [synapse.sql](../advanced/triggers/synapse.sql) |
-| 改表 | [synapse.sql](../ddl/alter-table/synapse.sql) |
-| 约束 | [synapse.sql](../ddl/constraints/synapse.sql) |
-| 建表 | [synapse.sql](../ddl/create-table/synapse.sql) |
-| 索引 | [synapse.sql](../ddl/indexes/synapse.sql) |
-| 序列与自增 | [synapse.sql](../ddl/sequences/synapse.sql) |
-| 数据库/Schema/用户 | [synapse.sql](../ddl/users-databases/synapse.sql) |
-| 视图 | [synapse.sql](../ddl/views/synapse.sql) |
 
 ### DML — 数据操作
 

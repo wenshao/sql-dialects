@@ -99,6 +99,7 @@ CREATE DATABASE dev_db CLONE prod_db;
 - 三种 TIMESTAMP 类型是 Snowflake 独特设计
 - PostgreSQL 只有两种（TIMESTAMP vs TIMESTAMPTZ）
 - MySQL 只有两种（DATETIME vs TIMESTAMP）
+- **TIMESTAMP_TYPE_MAPPING**: Snowflake 会话参数，控制 `TIMESTAMP` 关键字默认映射到哪种类型（NTZ/LTZ/TZ）。默认为 NTZ。迁移时需确认源系统语义与目标映射一致。
 - **对引擎开发者**: 两种（带时区/不带时区）通常足够，三种增加认知负担
 
 ### 约束（信息性，不执行）
@@ -133,7 +134,7 @@ CREATE TABLE orders (
 | `NUMBER` | `NUMERIC` | `DECIMAL` | `NUMERIC` | `DECIMAL` |
 | `TRY_TO_NUMBER(x)` | 自定义函数 | 无 | `SAFE_CAST(x AS NUMERIC)` | `CAST(x AS DECIMAL)` |
 | `ILIKE` | `ILIKE` | `LIKE`(默认CI) | 无 | 无 |
-| `IFF(cond, a, b)` | `CASE WHEN` | `IF(cond, a, b)` | `IF(cond, a, b)` | `IF(cond, a, b)` |
+| `IFF(cond, a, b)` | `CASE WHEN` | `IF(cond, a, b)` | `CASE WHEN cond THEN a ELSE b END` | `IF(cond, a, b)` |
 | `LISTAGG(col, ',')` | `STRING_AGG(col, ',')` | `GROUP_CONCAT(col)` | `STRING_AGG(col, ',')` | `CONCAT_WS(',', COLLECT_LIST(col))` |
 | `PARSE_JSON(str)` | `str::JSONB` | `CAST(str AS JSON)` | `JSON str` | `FROM_JSON(str, schema)` |
 
@@ -149,3 +150,5 @@ CREATE TABLE orders (
 | 分区 | 自动微分区（Micro-Partition），用 CLUSTER BY 优化 |
 | MERGE | 完整支持 SQL 标准 MERGE |
 | 窗口函数 | 完整支持，包括 QUALIFY |
+
+> **Dynamic Tables（2024 GA）**: Snowflake 于 2024 年正式发布 Dynamic Tables，支持声明式数据管道（`CREATE DYNAMIC TABLE ... AS SELECT ...`，自动增量刷新）。替代了传统的 Task + Stream 组合模式，迁移 ETL 管道时推荐优先使用。

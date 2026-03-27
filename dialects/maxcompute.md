@@ -2,7 +2,7 @@
 
 **分类**: 阿里云大数据平台
 **文件数**: 51 个 SQL 文件
-**总行数**: 3729 行
+**总行数**: 4134 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [maxcompute.sql](../ddl/create-table/maxcompute.sql) |
+| 改表 | [maxcompute.sql](../ddl/alter-table/maxcompute.sql) |
+| 索引 | [maxcompute.sql](../ddl/indexes/maxcompute.sql) |
+| 约束 | [maxcompute.sql](../ddl/constraints/maxcompute.sql) |
+| 视图 | [maxcompute.sql](../ddl/views/maxcompute.sql) |
+| 序列与自增 | [maxcompute.sql](../ddl/sequences/maxcompute.sql) |
+| 数据库/Schema/用户 | [maxcompute.sql](../ddl/users-databases/maxcompute.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [maxcompute.sql](../advanced/temp-tables/maxcompute.sql) |
 | 事务 | [maxcompute.sql](../advanced/transactions/maxcompute.sql) |
 | 触发器 | [maxcompute.sql](../advanced/triggers/maxcompute.sql) |
-| 改表 | [maxcompute.sql](../ddl/alter-table/maxcompute.sql) |
-| 约束 | [maxcompute.sql](../ddl/constraints/maxcompute.sql) |
-| 建表 | [maxcompute.sql](../ddl/create-table/maxcompute.sql) |
-| 索引 | [maxcompute.sql](../ddl/indexes/maxcompute.sql) |
-| 序列与自增 | [maxcompute.sql](../ddl/sequences/maxcompute.sql) |
-| 数据库/Schema/用户 | [maxcompute.sql](../ddl/users-databases/maxcompute.sql) |
-| 视图 | [maxcompute.sql](../ddl/views/maxcompute.sql) |
 
 ### DML — 数据操作
 

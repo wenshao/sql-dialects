@@ -29,7 +29,7 @@
 
 | 特性 | Redshift | Synapse | Databricks | Greenplum | Impala | Vertica | Teradata |
 |---|---|---|---|---|---|---|---|
-| MERGE | ✅ 2023+ | ❌ | ✅ | ❌ | ⚠️ Kudu only | ✅ | ✅ |
+| MERGE | ✅ 2023+ | ⚠️ 专用池 | ✅ | ❌ | ⚠️ Kudu only | ✅ | ✅ |
 | ON CONFLICT | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
 | UPSERT 关键字 | ❌ | ❌ | ❌ | ❌ | ✅ Kudu | ❌ | ❌ |
 | Staging 模式 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -50,7 +50,7 @@
 | 特性 | TimescaleDB | TDengine | ksqlDB | Materialize | H2 | Derby |
 |---|---|---|---|---|---|---|
 | MERGE | ✅ 15+ | ❌ | ❌ | ❌ | ✅ | ✅ 10.11+ |
-| ON CONFLICT | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| ON CONFLICT | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 隐式 UPSERT | ❌ | ✅ 时间戳覆盖 | ✅ PK 覆盖 | ❌ | ✅ MERGE KEY | ❌ |
 
 ## 关键差异
@@ -63,4 +63,4 @@
 - **ClickHouse** 通过 ReplacingMergeTree 引擎实现最终一致的去重
 - **Doris/StarRocks** 通过数据模型（Unique Key / Primary Key）实现隐式 UPSERT
 - **TDengine** 相同时间戳插入自动覆盖
-- **Synapse** 2022+ 支持 MERGE；旧版用 DELETE + INSERT 或 Staging 模式
+- **Synapse** 专用池支持 MERGE（serverless 不支持）；旧版用 DELETE + INSERT 或 Staging 模式
