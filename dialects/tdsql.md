@@ -49,86 +49,86 @@ TDSQL 展示了基于 MySQL 生态构建分布式数据库的工程路径：SQL 
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [tdsql.sql](../ddl/create-table/tdsql.sql) |
-| 改表 | [tdsql.sql](../ddl/alter-table/tdsql.sql) |
-| 索引 | [tdsql.sql](../ddl/indexes/tdsql.sql) |
-| 约束 | [tdsql.sql](../ddl/constraints/tdsql.sql) |
-| 视图 | [tdsql.sql](../ddl/views/tdsql.sql) |
-| 序列与自增 | [tdsql.sql](../ddl/sequences/tdsql.sql) |
-| 数据库/Schema/用户 | [tdsql.sql](../ddl/users-databases/tdsql.sql) |
+| [建表](../ddl/create-table/tdsql.sql) | MySQL 兼容(腾讯)，分布式分片透明，ShardKey 指定分片键 |
+| [改表](../ddl/alter-table/tdsql.sql) | Online DDL(MySQL 兼容)，分布式 DDL 原子 |
+| [索引](../ddl/indexes/tdsql.sql) | InnoDB 索引(MySQL 兼容)，全局二级索引 |
+| [约束](../ddl/constraints/tdsql.sql) | PK/FK/CHECK(MySQL 兼容)，分布式约束有限制 |
+| [视图](../ddl/views/tdsql.sql) | MySQL 兼容视图 |
+| [序列与自增](../ddl/sequences/tdsql.sql) | AUTO_INCREMENT(MySQL 兼容)，全局唯一自增 |
+| [数据库/Schema/用户](../ddl/users-databases/tdsql.sql) | MySQL 兼容权限，分片实例管理 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [tdsql.sql](../advanced/dynamic-sql/tdsql.sql) |
-| 错误处理 | [tdsql.sql](../advanced/error-handling/tdsql.sql) |
-| 执行计划 | [tdsql.sql](../advanced/explain/tdsql.sql) |
-| 锁机制 | [tdsql.sql](../advanced/locking/tdsql.sql) |
-| 分区 | [tdsql.sql](../advanced/partitioning/tdsql.sql) |
-| 权限 | [tdsql.sql](../advanced/permissions/tdsql.sql) |
-| 存储过程 | [tdsql.sql](../advanced/stored-procedures/tdsql.sql) |
-| 临时表 | [tdsql.sql](../advanced/temp-tables/tdsql.sql) |
-| 事务 | [tdsql.sql](../advanced/transactions/tdsql.sql) |
-| 触发器 | [tdsql.sql](../advanced/triggers/tdsql.sql) |
+| [动态 SQL](../advanced/dynamic-sql/tdsql.sql) | PREPARE/EXECUTE(MySQL 兼容) |
+| [错误处理](../advanced/error-handling/tdsql.sql) | DECLARE HANDLER(MySQL 兼容) |
+| [执行计划](../advanced/explain/tdsql.sql) | EXPLAIN(MySQL 兼容)，分布式执行计划 |
+| [锁机制](../advanced/locking/tdsql.sql) | InnoDB 行锁(MySQL 兼容)，分布式锁管理 |
+| [分区](../advanced/partitioning/tdsql.sql) | ShardKey 分片(分布式)+PARTITION(MySQL 兼容) 双层 |
+| [权限](../advanced/permissions/tdsql.sql) | MySQL 兼容权限模型 |
+| [存储过程](../advanced/stored-procedures/tdsql.sql) | MySQL 兼容存储过程(分片限制) |
+| [临时表](../advanced/temp-tables/tdsql.sql) | TEMPORARY TABLE(MySQL 兼容) |
+| [事务](../advanced/transactions/tdsql.sql) | 分布式事务(XA/TCC)，强一致性，MySQL 兼容 |
+| [触发器](../advanced/triggers/tdsql.sql) | MySQL 兼容触发器(分片限制) |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [tdsql.sql](../dml/delete/tdsql.sql) |
-| 插入 | [tdsql.sql](../dml/insert/tdsql.sql) |
-| 更新 | [tdsql.sql](../dml/update/tdsql.sql) |
-| Upsert | [tdsql.sql](../dml/upsert/tdsql.sql) |
+| [删除](../dml/delete/tdsql.sql) | DELETE(MySQL 兼容)，分布式路由 |
+| [插入](../dml/insert/tdsql.sql) | INSERT(MySQL 兼容)，ShardKey 路由写入 |
+| [更新](../dml/update/tdsql.sql) | UPDATE(MySQL 兼容)，跨分片更新透明 |
+| [Upsert](../dml/upsert/tdsql.sql) | ON DUPLICATE KEY UPDATE(MySQL 兼容) |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [tdsql.sql](../functions/aggregate/tdsql.sql) |
-| 条件函数 | [tdsql.sql](../functions/conditional/tdsql.sql) |
-| 日期函数 | [tdsql.sql](../functions/date-functions/tdsql.sql) |
-| 数学函数 | [tdsql.sql](../functions/math-functions/tdsql.sql) |
-| 字符串函数 | [tdsql.sql](../functions/string-functions/tdsql.sql) |
-| 类型转换 | [tdsql.sql](../functions/type-conversion/tdsql.sql) |
+| [聚合函数](../functions/aggregate/tdsql.sql) | MySQL 兼容聚合，分布式聚合下推 |
+| [条件函数](../functions/conditional/tdsql.sql) | IF/CASE(MySQL 兼容) |
+| [日期函数](../functions/date-functions/tdsql.sql) | MySQL 兼容日期函数 |
+| [数学函数](../functions/math-functions/tdsql.sql) | MySQL 兼容数学函数 |
+| [字符串函数](../functions/string-functions/tdsql.sql) | MySQL 兼容字符串函数 |
+| [类型转换](../functions/type-conversion/tdsql.sql) | CAST/CONVERT(MySQL 兼容) |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [tdsql.sql](../query/cte/tdsql.sql) |
-| 全文搜索 | [tdsql.sql](../query/full-text-search/tdsql.sql) |
-| 连接查询 | [tdsql.sql](../query/joins/tdsql.sql) |
-| 分页 | [tdsql.sql](../query/pagination/tdsql.sql) |
-| 行列转换 | [tdsql.sql](../query/pivot-unpivot/tdsql.sql) |
-| 集合操作 | [tdsql.sql](../query/set-operations/tdsql.sql) |
-| 子查询 | [tdsql.sql](../query/subquery/tdsql.sql) |
-| 窗口函数 | [tdsql.sql](../query/window-functions/tdsql.sql) |
+| [CTE](../query/cte/tdsql.sql) | 递归 CTE(MySQL 8.0 兼容) |
+| [全文搜索](../query/full-text-search/tdsql.sql) | InnoDB FULLTEXT(MySQL 兼容) |
+| [连接查询](../query/joins/tdsql.sql) | MySQL 兼容 JOIN，跨分片 JOIN 自动路由 |
+| [分页](../query/pagination/tdsql.sql) | LIMIT/OFFSET(MySQL 兼容) |
+| [行列转换](../query/pivot-unpivot/tdsql.sql) | 无原生 PIVOT(同 MySQL) |
+| [集合操作](../query/set-operations/tdsql.sql) | UNION(MySQL 兼容)，分布式 UNION |
+| [子查询](../query/subquery/tdsql.sql) | MySQL 兼容子查询，分布式下推优化 |
+| [窗口函数](../query/window-functions/tdsql.sql) | MySQL 8.0 兼容窗口函数 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [tdsql.sql](../scenarios/date-series-fill/tdsql.sql) |
-| 去重 | [tdsql.sql](../scenarios/deduplication/tdsql.sql) |
-| 区间检测 | [tdsql.sql](../scenarios/gap-detection/tdsql.sql) |
-| 层级查询 | [tdsql.sql](../scenarios/hierarchical-query/tdsql.sql) |
-| JSON 展开 | [tdsql.sql](../scenarios/json-flatten/tdsql.sql) |
-| 迁移速查 | [tdsql.sql](../scenarios/migration-cheatsheet/tdsql.sql) |
-| TopN 查询 | [tdsql.sql](../scenarios/ranking-top-n/tdsql.sql) |
-| 累计求和 | [tdsql.sql](../scenarios/running-total/tdsql.sql) |
-| 缓慢变化维 | [tdsql.sql](../scenarios/slowly-changing-dim/tdsql.sql) |
-| 字符串拆分 | [tdsql.sql](../scenarios/string-split-to-rows/tdsql.sql) |
-| 窗口分析 | [tdsql.sql](../scenarios/window-analytics/tdsql.sql) |
+| [日期填充](../scenarios/date-series-fill/tdsql.sql) | 递归 CTE(MySQL 兼容) |
+| [去重](../scenarios/deduplication/tdsql.sql) | ROW_NUMBER+CTE(MySQL 兼容) |
+| [区间检测](../scenarios/gap-detection/tdsql.sql) | 窗口函数(MySQL 兼容) |
+| [层级查询](../scenarios/hierarchical-query/tdsql.sql) | 递归 CTE(MySQL 兼容) |
+| [JSON 展开](../scenarios/json-flatten/tdsql.sql) | JSON_TABLE(MySQL 兼容) |
+| [迁移速查](../scenarios/migration-cheatsheet/tdsql.sql) | MySQL 兼容，ShardKey 分片设计是核心差异 |
+| [TopN 查询](../scenarios/ranking-top-n/tdsql.sql) | ROW_NUMBER+LIMIT(MySQL 兼容) |
+| [累计求和](../scenarios/running-total/tdsql.sql) | SUM() OVER(MySQL 兼容) |
+| [缓慢变化维](../scenarios/slowly-changing-dim/tdsql.sql) | ON DUPLICATE KEY UPDATE(MySQL 兼容) |
+| [字符串拆分](../scenarios/string-split-to-rows/tdsql.sql) | JSON_TABLE 或递归 CTE(MySQL 兼容) |
+| [窗口分析](../scenarios/window-analytics/tdsql.sql) | MySQL 8.0 兼容窗口函数 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [tdsql.sql](../types/array-map-struct/tdsql.sql) |
-| 日期时间 | [tdsql.sql](../types/datetime/tdsql.sql) |
-| JSON | [tdsql.sql](../types/json/tdsql.sql) |
-| 数值类型 | [tdsql.sql](../types/numeric/tdsql.sql) |
-| 字符串类型 | [tdsql.sql](../types/string/tdsql.sql) |
+| [复合类型](../types/array-map-struct/tdsql.sql) | 无 ARRAY/STRUCT，JSON 替代(MySQL 兼容) |
+| [日期时间](../types/datetime/tdsql.sql) | DATETIME/TIMESTAMP(MySQL 兼容) |
+| [JSON](../types/json/tdsql.sql) | JSON(MySQL 兼容)，JSON_TABLE |
+| [数值类型](../types/numeric/tdsql.sql) | MySQL 兼容数值类型 |
+| [字符串类型](../types/string/tdsql.sql) | utf8mb4 推荐(MySQL 兼容) |

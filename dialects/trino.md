@@ -58,86 +58,86 @@ Trino（原 PrestoSQL）是一款开源的分布式 SQL 查询引擎，最初由
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [trino.sql](../ddl/create-table/trino.sql) |
-| 改表 | [trino.sql](../ddl/alter-table/trino.sql) |
-| 索引 | [trino.sql](../ddl/indexes/trino.sql) |
-| 约束 | [trino.sql](../ddl/constraints/trino.sql) |
-| 视图 | [trino.sql](../ddl/views/trino.sql) |
-| 序列与自增 | [trino.sql](../ddl/sequences/trino.sql) |
-| 数据库/Schema/用户 | [trino.sql](../ddl/users-databases/trino.sql) |
+| [建表](../ddl/create-table/trino.sql) | 联邦查询引擎，Connector 对接多数据源，CTAS 常用 |
+| [改表](../ddl/alter-table/trino.sql) | ALTER 能力取决于 Connector(Hive/Iceberg/Delta 各不同) |
+| [索引](../ddl/indexes/trino.sql) | 无自有索引，依赖底层 Connector 数据源的索引 |
+| [约束](../ddl/constraints/trino.sql) | 无约束执行，元数据仅供优化器参考 |
+| [视图](../ddl/views/trino.sql) | 视图定义存储在 Connector 中，跨 Catalog 查询 |
+| [序列与自增](../ddl/sequences/trino.sql) | 无 SEQUENCE/自增，由底层数据源或 UUID 生成 |
+| [数据库/Schema/用户](../ddl/users-databases/trino.sql) | Catalog.Schema.Table 三级命名空间，多数据源联邦 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [trino.sql](../advanced/dynamic-sql/trino.sql) |
-| 错误处理 | [trino.sql](../advanced/error-handling/trino.sql) |
-| 执行计划 | [trino.sql](../advanced/explain/trino.sql) |
-| 锁机制 | [trino.sql](../advanced/locking/trino.sql) |
-| 分区 | [trino.sql](../advanced/partitioning/trino.sql) |
-| 权限 | [trino.sql](../advanced/permissions/trino.sql) |
-| 存储过程 | [trino.sql](../advanced/stored-procedures/trino.sql) |
-| 临时表 | [trino.sql](../advanced/temp-tables/trino.sql) |
-| 事务 | [trino.sql](../advanced/transactions/trino.sql) |
-| 触发器 | [trino.sql](../advanced/triggers/trino.sql) |
+| [动态 SQL](../advanced/dynamic-sql/trino.sql) | 无动态 SQL/存储过程，纯查询引擎定位 |
+| [错误处理](../advanced/error-handling/trino.sql) | 无过程式错误处理，查询级错误返回 |
+| [执行计划](../advanced/explain/trino.sql) | EXPLAIN ANALYZE 带分布式 Stage/Fragment 信息 |
+| [锁机制](../advanced/locking/trino.sql) | 无锁（查询引擎定位），并发由底层数据源管理 |
+| [分区](../advanced/partitioning/trino.sql) | Connector 分区透传(Hive PARTITIONED BY 等) |
+| [权限](../advanced/permissions/trino.sql) | 内置 RBAC+Ranger 集成，Catalog/Schema/Table 级 |
+| [存储过程](../advanced/stored-procedures/trino.sql) | 无存储过程，纯 SQL 查询引擎 |
+| [临时表](../advanced/temp-tables/trino.sql) | 无临时表，用 CTAS+DROP 模拟 |
+| [事务](../advanced/transactions/trino.sql) | Connector 级事务(部分)，非完整 ACID |
+| [触发器](../advanced/triggers/trino.sql) | 无触发器支持 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [trino.sql](../dml/delete/trino.sql) |
-| 插入 | [trino.sql](../dml/insert/trino.sql) |
-| 更新 | [trino.sql](../dml/update/trino.sql) |
-| Upsert | [trino.sql](../dml/upsert/trino.sql) |
+| [删除](../dml/delete/trino.sql) | DELETE 能力取决于 Connector(Hive/Iceberg/Delta) |
+| [插入](../dml/insert/trino.sql) | INSERT INTO/CTAS，跨 Connector 数据迁移利器 |
+| [更新](../dml/update/trino.sql) | UPDATE 能力取决于 Connector(部分支持) |
+| [Upsert](../dml/upsert/trino.sql) | MERGE(Iceberg/Delta Connector)，非通用 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [trino.sql](../functions/aggregate/trino.sql) |
-| 条件函数 | [trino.sql](../functions/conditional/trino.sql) |
-| 日期函数 | [trino.sql](../functions/date-functions/trino.sql) |
-| 数学函数 | [trino.sql](../functions/math-functions/trino.sql) |
-| 字符串函数 | [trino.sql](../functions/string-functions/trino.sql) |
-| 类型转换 | [trino.sql](../functions/type-conversion/trino.sql) |
+| [聚合函数](../functions/aggregate/trino.sql) | GROUPING SETS/CUBE/ROLLUP，approx_distinct HyperLogLog |
+| [条件函数](../functions/conditional/trino.sql) | IF/CASE/COALESCE/NULLIF/TRY 标准 |
+| [日期函数](../functions/date-functions/trino.sql) | date_trunc/date_add/date_diff，INTERVAL 类型 |
+| [数学函数](../functions/math-functions/trino.sql) | 完整数学函数，infinity/nan 处理 |
+| [字符串函数](../functions/string-functions/trino.sql) | || 拼接，regexp_extract/replace，split 返回 ARRAY |
+| [类型转换](../functions/type-conversion/trino.sql) | CAST+TRY_CAST 安全转换，类型系统严格 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [trino.sql](../query/cte/trino.sql) |
-| 全文搜索 | [trino.sql](../query/full-text-search/trino.sql) |
-| 连接查询 | [trino.sql](../query/joins/trino.sql) |
-| 分页 | [trino.sql](../query/pagination/trino.sql) |
-| 行列转换 | [trino.sql](../query/pivot-unpivot/trino.sql) |
-| 集合操作 | [trino.sql](../query/set-operations/trino.sql) |
-| 子查询 | [trino.sql](../query/subquery/trino.sql) |
-| 窗口函数 | [trino.sql](../query/window-functions/trino.sql) |
+| [CTE](../query/cte/trino.sql) | WITH 标准+递归 CTE 支持 |
+| [全文搜索](../query/full-text-search/trino.sql) | 无内置全文搜索，依赖 Connector(Elasticsearch 等) |
+| [连接查询](../query/joins/trino.sql) | Broadcast/Partitioned JOIN，跨 Connector JOIN |
+| [分页](../query/pagination/trino.sql) | LIMIT/OFFSET 标准，FETCH FIRST 亦支持 |
+| [行列转换](../query/pivot-unpivot/trino.sql) | 无原生 PIVOT，CASE+GROUP BY 模拟 |
+| [集合操作](../query/set-operations/trino.sql) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/trino.sql) | 关联子查询+IN/EXISTS，优化器自动去关联 |
+| [窗口函数](../query/window-functions/trino.sql) | 完整窗口函数支持，分布式排序 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [trino.sql](../scenarios/date-series-fill/trino.sql) |
-| 去重 | [trino.sql](../scenarios/deduplication/trino.sql) |
-| 区间检测 | [trino.sql](../scenarios/gap-detection/trino.sql) |
-| 层级查询 | [trino.sql](../scenarios/hierarchical-query/trino.sql) |
-| JSON 展开 | [trino.sql](../scenarios/json-flatten/trino.sql) |
-| 迁移速查 | [trino.sql](../scenarios/migration-cheatsheet/trino.sql) |
-| TopN 查询 | [trino.sql](../scenarios/ranking-top-n/trino.sql) |
-| 累计求和 | [trino.sql](../scenarios/running-total/trino.sql) |
-| 缓慢变化维 | [trino.sql](../scenarios/slowly-changing-dim/trino.sql) |
-| 字符串拆分 | [trino.sql](../scenarios/string-split-to-rows/trino.sql) |
-| 窗口分析 | [trino.sql](../scenarios/window-analytics/trino.sql) |
+| [日期填充](../scenarios/date-series-fill/trino.sql) | SEQUENCE()+UNNEST 生成日期序列 |
+| [去重](../scenarios/deduplication/trino.sql) | ROW_NUMBER+CTE 去重 |
+| [区间检测](../scenarios/gap-detection/trino.sql) | 窗口函数检测间隙 |
+| [层级查询](../scenarios/hierarchical-query/trino.sql) | 递归 CTE 支持 |
+| [JSON 展开](../scenarios/json-flatten/trino.sql) | json_extract/json_parse，UNNEST+CAST 展开 JSON 数组 |
+| [迁移速查](../scenarios/migration-cheatsheet/trino.sql) | 联邦查询引擎，SQL 方言接近 ANSI，Connector 能力决定 DML |
+| [TopN 查询](../scenarios/ranking-top-n/trino.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 TopN |
+| [累计求和](../scenarios/running-total/trino.sql) | SUM() OVER 标准，分布式并行 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/trino.sql) | MERGE(Iceberg/Delta)，非通用 |
+| [字符串拆分](../scenarios/string-split-to-rows/trino.sql) | split()+UNNEST 展开(函数式风格) |
+| [窗口分析](../scenarios/window-analytics/trino.sql) | 完整窗口函数，分布式计算 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [trino.sql](../types/array-map-struct/trino.sql) |
-| 日期时间 | [trino.sql](../types/datetime/trino.sql) |
-| JSON | [trino.sql](../types/json/trino.sql) |
-| 数值类型 | [trino.sql](../types/numeric/trino.sql) |
-| 字符串类型 | [trino.sql](../types/string/trino.sql) |
+| [复合类型](../types/array-map-struct/trino.sql) | ARRAY/MAP/ROW 原生类型，UNNEST 展开 |
+| [日期时间](../types/datetime/trino.sql) | DATE/TIME/TIMESTAMP WITH TZ，INTERVAL 类型 |
+| [JSON](../types/json/trino.sql) | JSON 类型，json_extract 路径查询，无 JSON 索引 |
+| [数值类型](../types/numeric/trino.sql) | TINYINT-BIGINT/REAL/DOUBLE/DECIMAL(38位)，严格类型 |
+| [字符串类型](../types/string/trino.sql) | VARCHAR/CHAR，UTF-8 默认，无 TEXT 别名 |

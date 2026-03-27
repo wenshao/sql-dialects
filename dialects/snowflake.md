@@ -63,86 +63,86 @@ Snowflake SQL 语法主体兼容 ANSI SQL，同时借鉴了 Oracle（如 QUALIFY
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [snowflake.sql](../ddl/create-table/snowflake.sql) |
-| 改表 | [snowflake.sql](../ddl/alter-table/snowflake.sql) |
-| 索引 | [snowflake.sql](../ddl/indexes/snowflake.sql) |
-| 约束 | [snowflake.sql](../ddl/constraints/snowflake.sql) |
-| 视图 | [snowflake.sql](../ddl/views/snowflake.sql) |
-| 序列与自增 | [snowflake.sql](../ddl/sequences/snowflake.sql) |
-| 数据库/Schema/用户 | [snowflake.sql](../ddl/users-databases/snowflake.sql) |
+| [建表](../ddl/create-table/snowflake.sql) | 计算存储分离，VARIANT 半结构化列，CLUSTER BY 自动微分区 |
+| [改表](../ddl/alter-table/snowflake.sql) | ALTER 在线执行，元数据操作瞬时，无锁 |
+| [索引](../ddl/indexes/snowflake.sql) | 无用户创建索引，自动微分区+Search Optimization Service |
+| [约束](../ddl/constraints/snowflake.sql) | PK/FK/UNIQUE 声明但不强制执行（同 BigQuery），仅元数据 |
+| [视图](../ddl/views/snowflake.sql) | 物化视图自动维护，Secure View 隐藏定义 |
+| [序列与自增](../ddl/sequences/snowflake.sql) | AUTOINCREMENT/IDENTITY+SEQUENCE 对象 |
+| [数据库/Schema/用户](../ddl/users-databases/snowflake.sql) | Database.Schema.Object 三级命名空间，RBAC 完善 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [snowflake.sql](../advanced/dynamic-sql/snowflake.sql) |
-| 错误处理 | [snowflake.sql](../advanced/error-handling/snowflake.sql) |
-| 执行计划 | [snowflake.sql](../advanced/explain/snowflake.sql) |
-| 锁机制 | [snowflake.sql](../advanced/locking/snowflake.sql) |
-| 分区 | [snowflake.sql](../advanced/partitioning/snowflake.sql) |
-| 权限 | [snowflake.sql](../advanced/permissions/snowflake.sql) |
-| 存储过程 | [snowflake.sql](../advanced/stored-procedures/snowflake.sql) |
-| 临时表 | [snowflake.sql](../advanced/temp-tables/snowflake.sql) |
-| 事务 | [snowflake.sql](../advanced/transactions/snowflake.sql) |
-| 触发器 | [snowflake.sql](../advanced/triggers/snowflake.sql) |
+| [动态 SQL](../advanced/dynamic-sql/snowflake.sql) | Snowflake Scripting(SQL/JavaScript)，EXECUTE IMMEDIATE |
+| [错误处理](../advanced/error-handling/snowflake.sql) | EXCEPTION 块(Snowflake Scripting)，SQLCODE/SQLERRM |
+| [执行计划](../advanced/explain/snowflake.sql) | EXPLAIN 文本+Query Profile 图形化，Warehouse 资源分析 |
+| [锁机制](../advanced/locking/snowflake.sql) | 自动并发控制，无用户可见锁，乐观并发 |
+| [分区](../advanced/partitioning/snowflake.sql) | 自动微分区(Micro-Partition)，无需手动管理，CLUSTER BY 优化 |
+| [权限](../advanced/permissions/snowflake.sql) | RBAC+DAC 双模型，FUTURE GRANTS 自动授权新对象 |
+| [存储过程](../advanced/stored-procedures/snowflake.sql) | JavaScript/SQL/Python/Scala/Java 多语言存储过程 |
+| [临时表](../advanced/temp-tables/snowflake.sql) | TEMPORARY+TRANSIENT 表，Time Travel 保留期不同 |
+| [事务](../advanced/transactions/snowflake.sql) | ACID 事务，自动提交默认开启，AUTOCOMMIT 可关闭 |
+| [触发器](../advanced/triggers/snowflake.sql) | 无触发器，用 Streams+Tasks 实现变更捕获 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [snowflake.sql](../dml/delete/snowflake.sql) |
-| 插入 | [snowflake.sql](../dml/insert/snowflake.sql) |
-| 更新 | [snowflake.sql](../dml/update/snowflake.sql) |
-| Upsert | [snowflake.sql](../dml/upsert/snowflake.sql) |
+| [删除](../dml/delete/snowflake.sql) | DELETE 标准，Time Travel 可恢复(1-90天)，UNDROP TABLE |
+| [插入](../dml/insert/snowflake.sql) | INSERT+COPY INTO 批量加载(S3/Azure/GCS)，Snowpipe 流式 |
+| [更新](../dml/update/snowflake.sql) | UPDATE 标准，多表 UPDATE 支持 |
+| [Upsert](../dml/upsert/snowflake.sql) | MERGE 标准完整实现，INSERT+ON CONFLICT 不支持 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [snowflake.sql](../functions/aggregate/snowflake.sql) |
-| 条件函数 | [snowflake.sql](../functions/conditional/snowflake.sql) |
-| 日期函数 | [snowflake.sql](../functions/date-functions/snowflake.sql) |
-| 数学函数 | [snowflake.sql](../functions/math-functions/snowflake.sql) |
-| 字符串函数 | [snowflake.sql](../functions/string-functions/snowflake.sql) |
-| 类型转换 | [snowflake.sql](../functions/type-conversion/snowflake.sql) |
+| [聚合函数](../functions/aggregate/snowflake.sql) | LISTAGG/ARRAY_AGG，GROUPING SETS/CUBE/ROLLUP 完整 |
+| [条件函数](../functions/conditional/snowflake.sql) | IFF/IIF 简洁条件，CASE/DECODE/NVL/NVL2 Oracle 风格兼容 |
+| [日期函数](../functions/date-functions/snowflake.sql) | DATE_TRUNC/DATEADD/DATEDIFF 标准，LAST_DAY，TO_DATE 灵活 |
+| [数学函数](../functions/math-functions/snowflake.sql) | GREATEST/LEAST 内置，完整数学函数 |
+| [字符串函数](../functions/string-functions/snowflake.sql) | SPLIT_PART/STRTOK，REGEXP_REPLACE/SUBSTR 正则完整 |
+| [类型转换](../functions/type-conversion/snowflake.sql) | TRY_CAST 安全转换，:: 运算符(PG 风格)，隐式转换适度 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [snowflake.sql](../query/cte/snowflake.sql) |
-| 全文搜索 | [snowflake.sql](../query/full-text-search/snowflake.sql) |
-| 连接查询 | [snowflake.sql](../query/joins/snowflake.sql) |
-| 分页 | [snowflake.sql](../query/pagination/snowflake.sql) |
-| 行列转换 | [snowflake.sql](../query/pivot-unpivot/snowflake.sql) |
-| 集合操作 | [snowflake.sql](../query/set-operations/snowflake.sql) |
-| 子查询 | [snowflake.sql](../query/subquery/snowflake.sql) |
-| 窗口函数 | [snowflake.sql](../query/window-functions/snowflake.sql) |
+| [CTE](../query/cte/snowflake.sql) | WITH 标准+递归 CTE，RESULT_SCAN 缓存上一查询结果 |
+| [全文搜索](../query/full-text-search/snowflake.sql) | 无传统全文索引，LIKE/REGEXP/CONTAINS+Search Optimization |
+| [连接查询](../query/joins/snowflake.sql) | JOIN 完整，LATERAL FLATTEN 展开半结构化数据 |
+| [分页](../query/pagination/snowflake.sql) | LIMIT/OFFSET 标准，FETCH FIRST 亦支持 |
+| [行列转换](../query/pivot-unpivot/snowflake.sql) | PIVOT/UNPIVOT 原生支持 |
+| [集合操作](../query/set-operations/snowflake.sql) | UNION/INTERSECT/EXCEPT+ALL 完整 |
+| [子查询](../query/subquery/snowflake.sql) | 关联子查询优化好，标量子查询支持 |
+| [窗口函数](../query/window-functions/snowflake.sql) | 完整窗口函数，QUALIFY 过滤独有（同 BigQuery） |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [snowflake.sql](../scenarios/date-series-fill/snowflake.sql) |
-| 去重 | [snowflake.sql](../scenarios/deduplication/snowflake.sql) |
-| 区间检测 | [snowflake.sql](../scenarios/gap-detection/snowflake.sql) |
-| 层级查询 | [snowflake.sql](../scenarios/hierarchical-query/snowflake.sql) |
-| JSON 展开 | [snowflake.sql](../scenarios/json-flatten/snowflake.sql) |
-| 迁移速查 | [snowflake.sql](../scenarios/migration-cheatsheet/snowflake.sql) |
-| TopN 查询 | [snowflake.sql](../scenarios/ranking-top-n/snowflake.sql) |
-| 累计求和 | [snowflake.sql](../scenarios/running-total/snowflake.sql) |
-| 缓慢变化维 | [snowflake.sql](../scenarios/slowly-changing-dim/snowflake.sql) |
-| 字符串拆分 | [snowflake.sql](../scenarios/string-split-to-rows/snowflake.sql) |
-| 窗口分析 | [snowflake.sql](../scenarios/window-analytics/snowflake.sql) |
+| [日期填充](../scenarios/date-series-fill/snowflake.sql) | GENERATOR+ROW_NUMBER 或 TABLE(GENERATOR(ROWCOUNT=>N)) |
+| [去重](../scenarios/deduplication/snowflake.sql) | QUALIFY ROW_NUMBER() 最简去重，无需子查询 |
+| [区间检测](../scenarios/gap-detection/snowflake.sql) | GENERATOR+窗口函数检测间隙 |
+| [层级查询](../scenarios/hierarchical-query/snowflake.sql) | 递归 CTE 支持，CONNECT BY 兼容(部分) |
+| [JSON 展开](../scenarios/json-flatten/snowflake.sql) | LATERAL FLATTEN 展开(独有语法)，VARIANT 原生半结构化 |
+| [迁移速查](../scenarios/migration-cheatsheet/snowflake.sql) | VARIANT 类型+自动微分区+无索引是核心差异 |
+| [TopN 查询](../scenarios/ranking-top-n/snowflake.sql) | QUALIFY ROW_NUMBER() 最简 TopN，无需嵌套 |
+| [累计求和](../scenarios/running-total/snowflake.sql) | SUM() OVER 标准，Warehouse 弹性扩展计算 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/snowflake.sql) | MERGE+Streams 变更捕获，Time Travel 辅助 |
+| [字符串拆分](../scenarios/string-split-to-rows/snowflake.sql) | SPLIT_TO_TABLE/LATERAL FLATTEN(SPLIT()) 简洁 |
+| [窗口分析](../scenarios/window-analytics/snowflake.sql) | 完整窗口函数+QUALIFY，WINDOW 命名子句 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [snowflake.sql](../types/array-map-struct/snowflake.sql) |
-| 日期时间 | [snowflake.sql](../types/datetime/snowflake.sql) |
-| JSON | [snowflake.sql](../types/json/snowflake.sql) |
-| 数值类型 | [snowflake.sql](../types/numeric/snowflake.sql) |
-| 字符串类型 | [snowflake.sql](../types/string/snowflake.sql) |
+| [复合类型](../types/array-map-struct/snowflake.sql) | VARIANT/ARRAY/OBJECT 半结构化原生支持，无需预定义 Schema |
+| [日期时间](../types/datetime/snowflake.sql) | DATE/TIME/TIMESTAMP_NTZ/LTZ/TZ 三种时间戳类型 |
+| [JSON](../types/json/snowflake.sql) | VARIANT 类型原生存储，: 路径访问，FLATTEN 展开，无需解析 |
+| [数值类型](../types/numeric/snowflake.sql) | NUMBER(38,N) 默认，FLOAT/DOUBLE，整数别名完善 |
+| [字符串类型](../types/string/snowflake.sql) | VARCHAR 默认 16MB，UTF-8 默认，COLLATE 支持 |

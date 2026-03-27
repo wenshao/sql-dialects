@@ -49,86 +49,86 @@ OceanBase 是少数将 Paxos 共识协议工程化落地到金融核心场景的
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [oceanbase.sql](../ddl/create-table/oceanbase.sql) |
-| 改表 | [oceanbase.sql](../ddl/alter-table/oceanbase.sql) |
-| 索引 | [oceanbase.sql](../ddl/indexes/oceanbase.sql) |
-| 约束 | [oceanbase.sql](../ddl/constraints/oceanbase.sql) |
-| 视图 | [oceanbase.sql](../ddl/views/oceanbase.sql) |
-| 序列与自增 | [oceanbase.sql](../ddl/sequences/oceanbase.sql) |
-| 数据库/Schema/用户 | [oceanbase.sql](../ddl/users-databases/oceanbase.sql) |
+| [建表](../ddl/create-table/oceanbase.sql) | MySQL+Oracle 双兼容模式(租户级)，分布式自动分片 |
+| [改表](../ddl/alter-table/oceanbase.sql) | Online DDL(无锁)，分布式原子 Schema 变更 |
+| [索引](../ddl/indexes/oceanbase.sql) | 全局/局部索引，LSM-Tree 存储，聚集索引(4.x+) |
+| [约束](../ddl/constraints/oceanbase.sql) | PK/FK/CHECK/UNIQUE(MySQL/Oracle 兼容) |
+| [视图](../ddl/views/oceanbase.sql) | 普通视图(MySQL/Oracle 兼容)，无物化视图 |
+| [序列与自增](../ddl/sequences/oceanbase.sql) | AUTO_INCREMENT(MySQL)+SEQUENCE(Oracle)，分布式自增 |
+| [数据库/Schema/用户](../ddl/users-databases/oceanbase.sql) | 租户级 MySQL/Oracle 模式切换(独有)，资源隔离 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [oceanbase.sql](../advanced/dynamic-sql/oceanbase.sql) |
-| 错误处理 | [oceanbase.sql](../advanced/error-handling/oceanbase.sql) |
-| 执行计划 | [oceanbase.sql](../advanced/explain/oceanbase.sql) |
-| 锁机制 | [oceanbase.sql](../advanced/locking/oceanbase.sql) |
-| 分区 | [oceanbase.sql](../advanced/partitioning/oceanbase.sql) |
-| 权限 | [oceanbase.sql](../advanced/permissions/oceanbase.sql) |
-| 存储过程 | [oceanbase.sql](../advanced/stored-procedures/oceanbase.sql) |
-| 临时表 | [oceanbase.sql](../advanced/temp-tables/oceanbase.sql) |
-| 事务 | [oceanbase.sql](../advanced/transactions/oceanbase.sql) |
-| 触发器 | [oceanbase.sql](../advanced/triggers/oceanbase.sql) |
+| [动态 SQL](../advanced/dynamic-sql/oceanbase.sql) | PREPARE/EXECUTE(MySQL)+EXECUTE IMMEDIATE(Oracle) |
+| [错误处理](../advanced/error-handling/oceanbase.sql) | DECLARE HANDLER(MySQL)+EXCEPTION(Oracle)，双模式 |
+| [执行计划](../advanced/explain/oceanbase.sql) | EXPLAIN 带分布式 Exchange 信息，并行查询 |
+| [锁机制](../advanced/locking/oceanbase.sql) | 行级锁+MVCC，分布式两阶段锁 |
+| [分区](../advanced/partitioning/oceanbase.sql) | PARTITION BY(MySQL 兼容)，自动分片+手动分区组合 |
+| [权限](../advanced/permissions/oceanbase.sql) | MySQL/Oracle 双兼容权限模型 |
+| [存储过程](../advanced/stored-procedures/oceanbase.sql) | 存储过程(MySQL/Oracle 双兼容)，PL/SQL Package(Oracle 模式) |
+| [临时表](../advanced/temp-tables/oceanbase.sql) | TEMPORARY TABLE(MySQL 兼容) |
+| [事务](../advanced/transactions/oceanbase.sql) | 分布式 ACID 事务(Paxos)，强一致性 |
+| [触发器](../advanced/triggers/oceanbase.sql) | 触发器支持(MySQL/Oracle 兼容) |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [oceanbase.sql](../dml/delete/oceanbase.sql) |
-| 插入 | [oceanbase.sql](../dml/insert/oceanbase.sql) |
-| 更新 | [oceanbase.sql](../dml/update/oceanbase.sql) |
-| Upsert | [oceanbase.sql](../dml/upsert/oceanbase.sql) |
+| [删除](../dml/delete/oceanbase.sql) | DELETE(MySQL/Oracle 兼容)，分布式并行 |
+| [插入](../dml/insert/oceanbase.sql) | INSERT(MySQL/Oracle 兼容)，批量导入 |
+| [更新](../dml/update/oceanbase.sql) | UPDATE(MySQL/Oracle 兼容)，分布式更新 |
+| [Upsert](../dml/upsert/oceanbase.sql) | ON DUPLICATE KEY UPDATE(MySQL)+MERGE(Oracle) |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [oceanbase.sql](../functions/aggregate/oceanbase.sql) |
-| 条件函数 | [oceanbase.sql](../functions/conditional/oceanbase.sql) |
-| 日期函数 | [oceanbase.sql](../functions/date-functions/oceanbase.sql) |
-| 数学函数 | [oceanbase.sql](../functions/math-functions/oceanbase.sql) |
-| 字符串函数 | [oceanbase.sql](../functions/string-functions/oceanbase.sql) |
-| 类型转换 | [oceanbase.sql](../functions/type-conversion/oceanbase.sql) |
+| [聚合函数](../functions/aggregate/oceanbase.sql) | MySQL/Oracle 兼容聚合函数 |
+| [条件函数](../functions/conditional/oceanbase.sql) | IF(MySQL)/DECODE(Oracle) 双兼容 |
+| [日期函数](../functions/date-functions/oceanbase.sql) | MySQL/Oracle 日期函数双兼容 |
+| [数学函数](../functions/math-functions/oceanbase.sql) | MySQL/Oracle 兼容数学函数 |
+| [字符串函数](../functions/string-functions/oceanbase.sql) | MySQL/Oracle 字符串函数双兼容 |
+| [类型转换](../functions/type-conversion/oceanbase.sql) | CAST(MySQL)/TO_NUMBER(Oracle) 双兼容 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [oceanbase.sql](../query/cte/oceanbase.sql) |
-| 全文搜索 | [oceanbase.sql](../query/full-text-search/oceanbase.sql) |
-| 连接查询 | [oceanbase.sql](../query/joins/oceanbase.sql) |
-| 分页 | [oceanbase.sql](../query/pagination/oceanbase.sql) |
-| 行列转换 | [oceanbase.sql](../query/pivot-unpivot/oceanbase.sql) |
-| 集合操作 | [oceanbase.sql](../query/set-operations/oceanbase.sql) |
-| 子查询 | [oceanbase.sql](../query/subquery/oceanbase.sql) |
-| 窗口函数 | [oceanbase.sql](../query/window-functions/oceanbase.sql) |
+| [CTE](../query/cte/oceanbase.sql) | WITH+递归 CTE 支持 |
+| [全文搜索](../query/full-text-search/oceanbase.sql) | 全文索引支持(4.x+) |
+| [连接查询](../query/joins/oceanbase.sql) | Hash/Nested Loop/Merge JOIN，分布式 JOIN 优化 |
+| [分页](../query/pagination/oceanbase.sql) | LIMIT(MySQL)/ROWNUM+FETCH FIRST(Oracle) |
+| [行列转换](../query/pivot-unpivot/oceanbase.sql) | 无原生 PIVOT(MySQL 模式)，PIVOT(Oracle 模式) |
+| [集合操作](../query/set-operations/oceanbase.sql) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/oceanbase.sql) | 关联子查询(MySQL/Oracle 兼容) |
+| [窗口函数](../query/window-functions/oceanbase.sql) | 完整窗口函数(MySQL/Oracle 兼容) |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [oceanbase.sql](../scenarios/date-series-fill/oceanbase.sql) |
-| 去重 | [oceanbase.sql](../scenarios/deduplication/oceanbase.sql) |
-| 区间检测 | [oceanbase.sql](../scenarios/gap-detection/oceanbase.sql) |
-| 层级查询 | [oceanbase.sql](../scenarios/hierarchical-query/oceanbase.sql) |
-| JSON 展开 | [oceanbase.sql](../scenarios/json-flatten/oceanbase.sql) |
-| 迁移速查 | [oceanbase.sql](../scenarios/migration-cheatsheet/oceanbase.sql) |
-| TopN 查询 | [oceanbase.sql](../scenarios/ranking-top-n/oceanbase.sql) |
-| 累计求和 | [oceanbase.sql](../scenarios/running-total/oceanbase.sql) |
-| 缓慢变化维 | [oceanbase.sql](../scenarios/slowly-changing-dim/oceanbase.sql) |
-| 字符串拆分 | [oceanbase.sql](../scenarios/string-split-to-rows/oceanbase.sql) |
-| 窗口分析 | [oceanbase.sql](../scenarios/window-analytics/oceanbase.sql) |
+| [日期填充](../scenarios/date-series-fill/oceanbase.sql) | 递归 CTE/CONNECT BY(Oracle 模式) |
+| [去重](../scenarios/deduplication/oceanbase.sql) | ROW_NUMBER+CTE 去重 |
+| [区间检测](../scenarios/gap-detection/oceanbase.sql) | 窗口函数检测 |
+| [层级查询](../scenarios/hierarchical-query/oceanbase.sql) | 递归 CTE+CONNECT BY(Oracle 模式) |
+| [JSON 展开](../scenarios/json-flatten/oceanbase.sql) | JSON_TABLE/JSON_EXTRACT(MySQL/Oracle 兼容) |
+| [迁移速查](../scenarios/migration-cheatsheet/oceanbase.sql) | MySQL/Oracle 双兼容(租户级)是核心卖点，分布式透明 |
+| [TopN 查询](../scenarios/ranking-top-n/oceanbase.sql) | ROW_NUMBER+LIMIT/ROWNUM(双兼容) |
+| [累计求和](../scenarios/running-total/oceanbase.sql) | SUM() OVER 标准 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/oceanbase.sql) | ON DUPLICATE KEY(MySQL)+MERGE(Oracle) |
+| [字符串拆分](../scenarios/string-split-to-rows/oceanbase.sql) | JSON_TABLE 或递归 CTE 模拟 |
+| [窗口分析](../scenarios/window-analytics/oceanbase.sql) | 完整窗口函数(双兼容) |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [oceanbase.sql](../types/array-map-struct/oceanbase.sql) |
-| 日期时间 | [oceanbase.sql](../types/datetime/oceanbase.sql) |
-| JSON | [oceanbase.sql](../types/json/oceanbase.sql) |
-| 数值类型 | [oceanbase.sql](../types/numeric/oceanbase.sql) |
-| 字符串类型 | [oceanbase.sql](../types/string/oceanbase.sql) |
+| [复合类型](../types/array-map-struct/oceanbase.sql) | 无 ARRAY/STRUCT，JSON 替代 |
+| [日期时间](../types/datetime/oceanbase.sql) | DATETIME/TIMESTAMP(MySQL)+DATE/TIMESTAMP(Oracle) |
+| [JSON](../types/json/oceanbase.sql) | JSON 类型(MySQL 兼容)，JSON_TABLE |
+| [数值类型](../types/numeric/oceanbase.sql) | MySQL/Oracle 兼容数值类型 |
+| [字符串类型](../types/string/oceanbase.sql) | VARCHAR(MySQL)/VARCHAR2(Oracle) 双兼容 |

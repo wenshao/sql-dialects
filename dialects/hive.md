@@ -69,86 +69,86 @@ Hive SQL 方言是大数据领域的"通用语"。以下引擎高度兼容或直
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [hive.sql](../ddl/create-table/hive.sql) |
-| 改表 | [hive.sql](../ddl/alter-table/hive.sql) |
-| 索引 | [hive.sql](../ddl/indexes/hive.sql) |
-| 约束 | [hive.sql](../ddl/constraints/hive.sql) |
-| 视图 | [hive.sql](../ddl/views/hive.sql) |
-| 序列与自增 | [hive.sql](../ddl/sequences/hive.sql) |
-| 数据库/Schema/用户 | [hive.sql](../ddl/users-databases/hive.sql) |
+| [建表](../ddl/create-table/hive.sql) | 外部表/管理表，STORED AS ORC/Parquet，PARTITIONED BY 核心概念 |
+| [改表](../ddl/alter-table/hive.sql) | ADD/REPLACE COLUMNS 追加式，分区管理 MSCK REPAIR TABLE |
+| [索引](../ddl/indexes/hive.sql) | 3.0 后废弃索引，依赖 ORC/Parquet 内置过滤(Predicate Pushdown) |
+| [约束](../ddl/constraints/hive.sql) | PK/FK/UNIQUE/NOT NULL 声明(3.0+)，仅元数据不强制执行 |
+| [视图](../ddl/views/hive.sql) | 普通视图支持，物化视图(3.0+) 自动重写 |
+| [序列与自增](../ddl/sequences/hive.sql) | 无 SEQUENCE/AUTO_INCREMENT，ROW_NUMBER 或 UUID 生成 |
+| [数据库/Schema/用户](../ddl/users-databases/hive.sql) | Database=目录，Ranger/Sentry 权限管理，HMS 元数据服务 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [hive.sql](../advanced/dynamic-sql/hive.sql) |
-| 错误处理 | [hive.sql](../advanced/error-handling/hive.sql) |
-| 执行计划 | [hive.sql](../advanced/explain/hive.sql) |
-| 锁机制 | [hive.sql](../advanced/locking/hive.sql) |
-| 分区 | [hive.sql](../advanced/partitioning/hive.sql) |
-| 权限 | [hive.sql](../advanced/permissions/hive.sql) |
-| 存储过程 | [hive.sql](../advanced/stored-procedures/hive.sql) |
-| 临时表 | [hive.sql](../advanced/temp-tables/hive.sql) |
-| 事务 | [hive.sql](../advanced/transactions/hive.sql) |
-| 触发器 | [hive.sql](../advanced/triggers/hive.sql) |
+| [动态 SQL](../advanced/dynamic-sql/hive.sql) | 无动态 SQL，HiveQL 编译为 MapReduce/Tez/Spark 作业 |
+| [错误处理](../advanced/error-handling/hive.sql) | 无过程式错误处理，作业级别失败重试 |
+| [执行计划](../advanced/explain/hive.sql) | EXPLAIN 展示 MapReduce/Tez DAG 执行计划 |
+| [锁机制](../advanced/locking/hive.sql) | ACID 表支持行级锁(3.0+)，非 ACID 表无锁 |
+| [分区](../advanced/partitioning/hive.sql) | PARTITIONED BY 是核心概念，动态分区插入，MSCK REPAIR |
+| [权限](../advanced/permissions/hive.sql) | Ranger/Sentry 集成，Storage-Based Authorization |
+| [存储过程](../advanced/stored-procedures/hive.sql) | 无存储过程，UDF/UDAF/UDTF 自定义函数(Java) |
+| [临时表](../advanced/temp-tables/hive.sql) | CREATE TEMPORARY TABLE 会话级，生命周期随会话 |
+| [事务](../advanced/transactions/hive.sql) | ACID 事务(3.0+，仅 ORC 格式)，非 ACID 表追加写入 |
+| [触发器](../advanced/triggers/hive.sql) | 无触发器支持 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [hive.sql](../dml/delete/hive.sql) |
-| 插入 | [hive.sql](../dml/insert/hive.sql) |
-| 更新 | [hive.sql](../dml/update/hive.sql) |
-| Upsert | [hive.sql](../dml/upsert/hive.sql) |
+| [删除](../dml/delete/hive.sql) | DELETE(仅 ACID 表)，非 ACID 表只能 DROP PARTITION |
+| [插入](../dml/insert/hive.sql) | INSERT OVERWRITE 覆盖写入（独有语义），LOAD DATA 加载文件 |
+| [更新](../dml/update/hive.sql) | UPDATE(仅 ACID 表 3.0+)，非 ACID 表不支持行级更新 |
+| [Upsert](../dml/upsert/hive.sql) | MERGE(仅 ACID 表 2.2+)，INSERT OVERWRITE 覆盖替代 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [hive.sql](../functions/aggregate/hive.sql) |
-| 条件函数 | [hive.sql](../functions/conditional/hive.sql) |
-| 日期函数 | [hive.sql](../functions/date-functions/hive.sql) |
-| 数学函数 | [hive.sql](../functions/math-functions/hive.sql) |
-| 字符串函数 | [hive.sql](../functions/string-functions/hive.sql) |
-| 类型转换 | [hive.sql](../functions/type-conversion/hive.sql) |
+| [聚合函数](../functions/aggregate/hive.sql) | GROUPING SETS/CUBE/ROLLUP 完整，collect_list/collect_set |
+| [条件函数](../functions/conditional/hive.sql) | IF/CASE/COALESCE/NVL，ASSERT_TRUE 数据校验 |
+| [日期函数](../functions/date-functions/hive.sql) | date_format/datediff/add_months，unix_timestamp 互转 |
+| [数学函数](../functions/math-functions/hive.sql) | 基础数学函数完整 |
+| [字符串函数](../functions/string-functions/hive.sql) | concat/concat_ws，regexp_extract/replace，split 返回 ARRAY |
+| [类型转换](../functions/type-conversion/hive.sql) | CAST 标准，隐式转换较宽松 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [hive.sql](../query/cte/hive.sql) |
-| 全文搜索 | [hive.sql](../query/full-text-search/hive.sql) |
-| 连接查询 | [hive.sql](../query/joins/hive.sql) |
-| 分页 | [hive.sql](../query/pagination/hive.sql) |
-| 行列转换 | [hive.sql](../query/pivot-unpivot/hive.sql) |
-| 集合操作 | [hive.sql](../query/set-operations/hive.sql) |
-| 子查询 | [hive.sql](../query/subquery/hive.sql) |
-| 窗口函数 | [hive.sql](../query/window-functions/hive.sql) |
+| [CTE](../query/cte/hive.sql) | WITH 标准+递归 CTE(3.1+)，常用于简化 HiveQL |
+| [全文搜索](../query/full-text-search/hive.sql) | 无全文搜索，依赖 Elasticsearch 等外部系统 |
+| [连接查询](../query/joins/hive.sql) | Map/Reduce Side JOIN，Broadcast JOIN(小表)，SORT MERGE JOIN |
+| [分页](../query/pagination/hive.sql) | LIMIT+ORDER BY，无 OFFSET，分页需 ROW_NUMBER |
+| [行列转换](../query/pivot-unpivot/hive.sql) | LATERAL VIEW EXPLODE 展开(独有语法)，无 PIVOT |
+| [集合操作](../query/set-operations/hive.sql) | UNION ALL/UNION DISTINCT/INTERSECT/EXCEPT(2.0+) |
+| [子查询](../query/subquery/hive.sql) | IN/EXISTS 子查询(0.13+)，关联子查询有限支持 |
+| [窗口函数](../query/window-functions/hive.sql) | 完整窗口函数支持(0.11+)，Hive 是大数据窗口函数先驱 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [hive.sql](../scenarios/date-series-fill/hive.sql) |
-| 去重 | [hive.sql](../scenarios/deduplication/hive.sql) |
-| 区间检测 | [hive.sql](../scenarios/gap-detection/hive.sql) |
-| 层级查询 | [hive.sql](../scenarios/hierarchical-query/hive.sql) |
-| JSON 展开 | [hive.sql](../scenarios/json-flatten/hive.sql) |
-| 迁移速查 | [hive.sql](../scenarios/migration-cheatsheet/hive.sql) |
-| TopN 查询 | [hive.sql](../scenarios/ranking-top-n/hive.sql) |
-| 累计求和 | [hive.sql](../scenarios/running-total/hive.sql) |
-| 缓慢变化维 | [hive.sql](../scenarios/slowly-changing-dim/hive.sql) |
-| 字符串拆分 | [hive.sql](../scenarios/string-split-to-rows/hive.sql) |
-| 窗口分析 | [hive.sql](../scenarios/window-analytics/hive.sql) |
+| [日期填充](../scenarios/date-series-fill/hive.sql) | 无 generate_series，LATERAL VIEW+POSEXPLODE 或数字表 |
+| [去重](../scenarios/deduplication/hive.sql) | ROW_NUMBER+分区窗口函数去重 |
+| [区间检测](../scenarios/gap-detection/hive.sql) | 窗口函数 LAG/LEAD 检测 |
+| [层级查询](../scenarios/hierarchical-query/hive.sql) | 递归 CTE(3.1+)，之前需多次自连接 |
+| [JSON 展开](../scenarios/json-flatten/hive.sql) | get_json_object/json_tuple，LATERAL VIEW+EXPLODE 展开 |
+| [迁移速查](../scenarios/migration-cheatsheet/hive.sql) | HiveQL 类 SQL 但差异大，分区/存储格式/ACID 是核心概念 |
+| [TopN 查询](../scenarios/ranking-top-n/hive.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 TopN |
+| [累计求和](../scenarios/running-total/hive.sql) | SUM() OVER(0.11+)，大数据窗口函数先驱 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/hive.sql) | MERGE(ACID 表)，INSERT OVERWRITE 全量覆盖替代 |
+| [字符串拆分](../scenarios/string-split-to-rows/hive.sql) | SPLIT+LATERAL VIEW EXPLODE（独有写法） |
+| [窗口分析](../scenarios/window-analytics/hive.sql) | 完整窗口函数(0.11+)，大数据生态窗口函数先驱 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [hive.sql](../types/array-map-struct/hive.sql) |
-| 日期时间 | [hive.sql](../types/datetime/hive.sql) |
-| JSON | [hive.sql](../types/json/hive.sql) |
-| 数值类型 | [hive.sql](../types/numeric/hive.sql) |
-| 字符串类型 | [hive.sql](../types/string/hive.sql) |
+| [复合类型](../types/array-map-struct/hive.sql) | ARRAY/MAP/STRUCT 原生支持，LATERAL VIEW EXPLODE 展开 |
+| [日期时间](../types/datetime/hive.sql) | DATE/TIMESTAMP 两类型，无 TIME 类型，无时区支持 |
+| [JSON](../types/json/hive.sql) | get_json_object 路径查询，json_tuple 批量提取，无 JSON 类型 |
+| [数值类型](../types/numeric/hive.sql) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准 |
+| [字符串类型](../types/string/hive.sql) | STRING 无长度限制，VARCHAR/CHAR(0.12+)，UTF-8 |

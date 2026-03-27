@@ -49,86 +49,86 @@
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [dameng.sql](../ddl/create-table/dameng.sql) |
-| 改表 | [dameng.sql](../ddl/alter-table/dameng.sql) |
-| 索引 | [dameng.sql](../ddl/indexes/dameng.sql) |
-| 约束 | [dameng.sql](../ddl/constraints/dameng.sql) |
-| 视图 | [dameng.sql](../ddl/views/dameng.sql) |
-| 序列与自增 | [dameng.sql](../ddl/sequences/dameng.sql) |
-| 数据库/Schema/用户 | [dameng.sql](../ddl/users-databases/dameng.sql) |
+| [建表](../ddl/create-table/dameng.sql) | Oracle 高度兼容，NUMBER/VARCHAR2，IDENTITY 自增，国产替代首选 |
+| [改表](../ddl/alter-table/dameng.sql) | Oracle 兼容 ALTER 语法，DDL 自动提交(同 Oracle) |
+| [索引](../ddl/indexes/dameng.sql) | B-tree/Bitmap/函数索引(Oracle 兼容) |
+| [约束](../ddl/constraints/dameng.sql) | PK/FK/CHECK/UNIQUE(Oracle 兼容)，延迟约束 |
+| [视图](../ddl/views/dameng.sql) | 物化视图(Oracle 兼容)，刷新策略 |
+| [序列与自增](../ddl/sequences/dameng.sql) | SEQUENCE+IDENTITY(Oracle 兼容) |
+| [数据库/Schema/用户](../ddl/users-databases/dameng.sql) | Schema=用户(Oracle 兼容)，多租户支持 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [dameng.sql](../advanced/dynamic-sql/dameng.sql) |
-| 错误处理 | [dameng.sql](../advanced/error-handling/dameng.sql) |
-| 执行计划 | [dameng.sql](../advanced/explain/dameng.sql) |
-| 锁机制 | [dameng.sql](../advanced/locking/dameng.sql) |
-| 分区 | [dameng.sql](../advanced/partitioning/dameng.sql) |
-| 权限 | [dameng.sql](../advanced/permissions/dameng.sql) |
-| 存储过程 | [dameng.sql](../advanced/stored-procedures/dameng.sql) |
-| 临时表 | [dameng.sql](../advanced/temp-tables/dameng.sql) |
-| 事务 | [dameng.sql](../advanced/transactions/dameng.sql) |
-| 触发器 | [dameng.sql](../advanced/triggers/dameng.sql) |
+| [动态 SQL](../advanced/dynamic-sql/dameng.sql) | EXECUTE IMMEDIATE(Oracle 兼容 PL/SQL) |
+| [错误处理](../advanced/error-handling/dameng.sql) | EXCEPTION WHEN(Oracle 兼容 PL/SQL 异常处理) |
+| [执行计划](../advanced/explain/dameng.sql) | EXPLAIN 文本+图形化工具 |
+| [锁机制](../advanced/locking/dameng.sql) | MVCC+行级锁(Oracle 兼容)，读不阻塞写 |
+| [分区](../advanced/partitioning/dameng.sql) | RANGE/LIST/HASH 分区(Oracle 兼容) |
+| [权限](../advanced/permissions/dameng.sql) | GRANT/REVOKE(Oracle 兼容)，三权分立安全策略(国产特色) |
+| [存储过程](../advanced/stored-procedures/dameng.sql) | PL/SQL 兼容(Package/存储过程/函数)，迁移友好 |
+| [临时表](../advanced/temp-tables/dameng.sql) | 全局临时表(Oracle 兼容)，ON COMMIT 子句 |
+| [事务](../advanced/transactions/dameng.sql) | MVCC，READ COMMITTED 默认(Oracle 兼容)，ACID |
+| [触发器](../advanced/triggers/dameng.sql) | BEFORE/AFTER/INSTEAD OF(Oracle 兼容) |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [dameng.sql](../dml/delete/dameng.sql) |
-| 插入 | [dameng.sql](../dml/insert/dameng.sql) |
-| 更新 | [dameng.sql](../dml/update/dameng.sql) |
-| Upsert | [dameng.sql](../dml/upsert/dameng.sql) |
+| [删除](../dml/delete/dameng.sql) | DELETE 标准(Oracle 兼容)，TRUNCATE |
+| [插入](../dml/insert/dameng.sql) | INSERT INTO/INSERT ALL(Oracle 兼容多表插入) |
+| [更新](../dml/update/dameng.sql) | UPDATE 标准(Oracle 兼容) |
+| [Upsert](../dml/upsert/dameng.sql) | MERGE(Oracle 兼容)，标准实现 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [dameng.sql](../functions/aggregate/dameng.sql) |
-| 条件函数 | [dameng.sql](../functions/conditional/dameng.sql) |
-| 日期函数 | [dameng.sql](../functions/date-functions/dameng.sql) |
-| 数学函数 | [dameng.sql](../functions/math-functions/dameng.sql) |
-| 字符串函数 | [dameng.sql](../functions/string-functions/dameng.sql) |
-| 类型转换 | [dameng.sql](../functions/type-conversion/dameng.sql) |
+| [聚合函数](../functions/aggregate/dameng.sql) | LISTAGG/GROUPING SETS(Oracle 兼容) |
+| [条件函数](../functions/conditional/dameng.sql) | DECODE/CASE/NVL/NVL2(Oracle 兼容) |
+| [日期函数](../functions/date-functions/dameng.sql) | TO_DATE/TO_CHAR(Oracle 兼容格式模型) |
+| [数学函数](../functions/math-functions/dameng.sql) | Oracle 兼容数学函数 |
+| [字符串函数](../functions/string-functions/dameng.sql) | || 拼接(Oracle 兼容)，''=NULL 行为需确认 |
+| [类型转换](../functions/type-conversion/dameng.sql) | CAST/TO_NUMBER/TO_DATE(Oracle 兼容) |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [dameng.sql](../query/cte/dameng.sql) |
-| 全文搜索 | [dameng.sql](../query/full-text-search/dameng.sql) |
-| 连接查询 | [dameng.sql](../query/joins/dameng.sql) |
-| 分页 | [dameng.sql](../query/pagination/dameng.sql) |
-| 行列转换 | [dameng.sql](../query/pivot-unpivot/dameng.sql) |
-| 集合操作 | [dameng.sql](../query/set-operations/dameng.sql) |
-| 子查询 | [dameng.sql](../query/subquery/dameng.sql) |
-| 窗口函数 | [dameng.sql](../query/window-functions/dameng.sql) |
+| [CTE](../query/cte/dameng.sql) | WITH+递归 CTE 支持 |
+| [全文搜索](../query/full-text-search/dameng.sql) | 全文索引支持(内置) |
+| [连接查询](../query/joins/dameng.sql) | JOIN 完整(Oracle 兼容)，(+) 外连接语法 |
+| [分页](../query/pagination/dameng.sql) | ROWNUM(Oracle 兼容)+LIMIT/OFFSET(扩展) |
+| [行列转换](../query/pivot-unpivot/dameng.sql) | PIVOT/UNPIVOT(Oracle 兼容) |
+| [集合操作](../query/set-operations/dameng.sql) | UNION/INTERSECT/MINUS(Oracle 兼容用 MINUS) |
+| [子查询](../query/subquery/dameng.sql) | 关联子查询(Oracle 兼容) |
+| [窗口函数](../query/window-functions/dameng.sql) | 完整窗口函数(Oracle 兼容) |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [dameng.sql](../scenarios/date-series-fill/dameng.sql) |
-| 去重 | [dameng.sql](../scenarios/deduplication/dameng.sql) |
-| 区间检测 | [dameng.sql](../scenarios/gap-detection/dameng.sql) |
-| 层级查询 | [dameng.sql](../scenarios/hierarchical-query/dameng.sql) |
-| JSON 展开 | [dameng.sql](../scenarios/json-flatten/dameng.sql) |
-| 迁移速查 | [dameng.sql](../scenarios/migration-cheatsheet/dameng.sql) |
-| TopN 查询 | [dameng.sql](../scenarios/ranking-top-n/dameng.sql) |
-| 累计求和 | [dameng.sql](../scenarios/running-total/dameng.sql) |
-| 缓慢变化维 | [dameng.sql](../scenarios/slowly-changing-dim/dameng.sql) |
-| 字符串拆分 | [dameng.sql](../scenarios/string-split-to-rows/dameng.sql) |
-| 窗口分析 | [dameng.sql](../scenarios/window-analytics/dameng.sql) |
+| [日期填充](../scenarios/date-series-fill/dameng.sql) | CONNECT BY LEVEL(Oracle 兼容) 或递归 CTE |
+| [去重](../scenarios/deduplication/dameng.sql) | ROW_NUMBER+ROWID(Oracle 兼容) |
+| [区间检测](../scenarios/gap-detection/dameng.sql) | 窗口函数+CONNECT BY 辅助 |
+| [层级查询](../scenarios/hierarchical-query/dameng.sql) | CONNECT BY/递归 CTE(Oracle 兼容) |
+| [JSON 展开](../scenarios/json-flatten/dameng.sql) | JSON_TABLE/JSON_VALUE(标准) |
+| [迁移速查](../scenarios/migration-cheatsheet/dameng.sql) | Oracle 高度兼容是核心卖点，PL/SQL 迁移成本低 |
+| [TopN 查询](../scenarios/ranking-top-n/dameng.sql) | ROWNUM/ROW_NUMBER(Oracle 兼容) |
+| [累计求和](../scenarios/running-total/dameng.sql) | SUM() OVER(Oracle 兼容) |
+| [缓慢变化维](../scenarios/slowly-changing-dim/dameng.sql) | MERGE(Oracle 兼容) |
+| [字符串拆分](../scenarios/string-split-to-rows/dameng.sql) | CONNECT BY+REGEXP_SUBSTR(Oracle 兼容) |
+| [窗口分析](../scenarios/window-analytics/dameng.sql) | 完整窗口函数(Oracle 兼容) |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [dameng.sql](../types/array-map-struct/dameng.sql) |
-| 日期时间 | [dameng.sql](../types/datetime/dameng.sql) |
-| JSON | [dameng.sql](../types/json/dameng.sql) |
-| 数值类型 | [dameng.sql](../types/numeric/dameng.sql) |
-| 字符串类型 | [dameng.sql](../types/string/dameng.sql) |
+| [复合类型](../types/array-map-struct/dameng.sql) | VARRAY/嵌套表(Oracle 兼容) |
+| [日期时间](../types/datetime/dameng.sql) | DATE 含时间(Oracle 兼容)，TIMESTAMP 精确 |
+| [JSON](../types/json/dameng.sql) | JSON 类型+JSON_TABLE(标准实现) |
+| [数值类型](../types/numeric/dameng.sql) | NUMBER/INTEGER/DECIMAL(Oracle 兼容) |
+| [字符串类型](../types/string/dameng.sql) | VARCHAR/VARCHAR2/CLOB(Oracle 兼容)，UTF-8 |

@@ -58,86 +58,86 @@ IBM Db2 是关系型数据库领域的奠基者之一，其前身 System R 是 S
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [db2.sql](../ddl/create-table/db2.sql) |
-| 改表 | [db2.sql](../ddl/alter-table/db2.sql) |
-| 索引 | [db2.sql](../ddl/indexes/db2.sql) |
-| 约束 | [db2.sql](../ddl/constraints/db2.sql) |
-| 视图 | [db2.sql](../ddl/views/db2.sql) |
-| 序列与自增 | [db2.sql](../ddl/sequences/db2.sql) |
-| 数据库/Schema/用户 | [db2.sql](../ddl/users-databases/db2.sql) |
+| [建表](../ddl/create-table/db2.sql) | ORGANIZE BY ROW/COLUMN 行列混存，IDENTITY 自增，隐式 Schema |
+| [改表](../ddl/alter-table/db2.sql) | REORG 后才生效(独特)，在线重组支持 |
+| [索引](../ddl/indexes/db2.sql) | MDC 多维聚集索引独有，块索引+区间索引 |
+| [约束](../ddl/constraints/db2.sql) | CHECK/PK/FK/UNIQUE 完整，信息性约束+优化器利用 |
+| [视图](../ddl/views/db2.sql) | MQT(物化查询表) 自动路由，REFRESH IMMEDIATE/DEFERRED |
+| [序列与自增](../ddl/sequences/db2.sql) | IDENTITY+SEQUENCE 标准实现，缓存策略成熟 |
+| [数据库/Schema/用户](../ddl/users-databases/db2.sql) | Instance→Database→Schema 三级架构，LBAC 标签安全 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [db2.sql](../advanced/dynamic-sql/db2.sql) |
-| 错误处理 | [db2.sql](../advanced/error-handling/db2.sql) |
-| 执行计划 | [db2.sql](../advanced/explain/db2.sql) |
-| 锁机制 | [db2.sql](../advanced/locking/db2.sql) |
-| 分区 | [db2.sql](../advanced/partitioning/db2.sql) |
-| 权限 | [db2.sql](../advanced/permissions/db2.sql) |
-| 存储过程 | [db2.sql](../advanced/stored-procedures/db2.sql) |
-| 临时表 | [db2.sql](../advanced/temp-tables/db2.sql) |
-| 事务 | [db2.sql](../advanced/transactions/db2.sql) |
-| 触发器 | [db2.sql](../advanced/triggers/db2.sql) |
+| [动态 SQL](../advanced/dynamic-sql/db2.sql) | PREPARE/EXECUTE+EXECUTE IMMEDIATE，嵌入式 SQL 传统深厚 |
+| [错误处理](../advanced/error-handling/db2.sql) | DECLARE HANDLER+SQLSTATE/SQLCODE，GET DIAGNOSTICS 标准 |
+| [执行计划](../advanced/explain/db2.sql) | db2expln/db2advis 工具链，EXPLAIN 表方式存储计划 |
+| [锁机制](../advanced/locking/db2.sql) | CS/RR/UR/RS 四隔离级别，锁升级行→表，Currently Committed |
+| [分区](../advanced/partitioning/db2.sql) | DISTRIBUTE BY HASH+ORGANIZE BY 数据分布，DPF 分布式分区 |
+| [权限](../advanced/permissions/db2.sql) | LBAC 标签安全(行/列级)，SECADM 安全管理员角色 |
+| [存储过程](../advanced/stored-procedures/db2.sql) | SQL PL 过程语言，COMPOUND 语句，Package 概念 |
+| [临时表](../advanced/temp-tables/db2.sql) | DECLARE GLOBAL TEMPORARY TABLE 会话级，CGTT(12.1+) |
+| [事务](../advanced/transactions/db2.sql) | ACID 完整，Currently Committed 避免锁等待，日志管理成熟 |
+| [触发器](../advanced/triggers/db2.sql) | BEFORE/AFTER/INSTEAD OF 完整，行级+语句级 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [db2.sql](../dml/delete/db2.sql) |
-| 插入 | [db2.sql](../dml/insert/db2.sql) |
-| 更新 | [db2.sql](../dml/update/db2.sql) |
-| Upsert | [db2.sql](../dml/upsert/db2.sql) |
+| [删除](../dml/delete/db2.sql) | DELETE 标准，TRUNCATE 即时释放空间 |
+| [插入](../dml/insert/db2.sql) | INSERT+SELECT，LOAD 工具批量导入，NOT LOGGED INITIALLY |
+| [更新](../dml/update/db2.sql) | UPDATE 标准，可更新游标 |
+| [Upsert](../dml/upsert/db2.sql) | MERGE 标准实现完整(早期支持) |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [db2.sql](../functions/aggregate/db2.sql) |
-| 条件函数 | [db2.sql](../functions/conditional/db2.sql) |
-| 日期函数 | [db2.sql](../functions/date-functions/db2.sql) |
-| 数学函数 | [db2.sql](../functions/math-functions/db2.sql) |
-| 字符串函数 | [db2.sql](../functions/string-functions/db2.sql) |
-| 类型转换 | [db2.sql](../functions/type-conversion/db2.sql) |
+| [聚合函数](../functions/aggregate/db2.sql) | LISTAGG/GROUPING SETS/CUBE/ROLLUP 完整 |
+| [条件函数](../functions/conditional/db2.sql) | CASE/DECODE/NULLIF/COALESCE 标准 |
+| [日期函数](../functions/date-functions/db2.sql) | DATE/TIME/TIMESTAMP 严格分类，TIMESTAMPDIFF，特殊寄存器 |
+| [数学函数](../functions/math-functions/db2.sql) | 完整数学函数，DECFLOAT 十进制浮点 |
+| [字符串函数](../functions/string-functions/db2.sql) | || 拼接标准，REGEXP_LIKE/REPLACE(10.5+) |
+| [类型转换](../functions/type-conversion/db2.sql) | CAST 标准，DECFLOAT 十进制浮点独有 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [db2.sql](../query/cte/db2.sql) |
-| 全文搜索 | [db2.sql](../query/full-text-search/db2.sql) |
-| 连接查询 | [db2.sql](../query/joins/db2.sql) |
-| 分页 | [db2.sql](../query/pagination/db2.sql) |
-| 行列转换 | [db2.sql](../query/pivot-unpivot/db2.sql) |
-| 集合操作 | [db2.sql](../query/set-operations/db2.sql) |
-| 子查询 | [db2.sql](../query/subquery/db2.sql) |
-| 窗口函数 | [db2.sql](../query/window-functions/db2.sql) |
+| [CTE](../query/cte/db2.sql) | WITH 标准+递归 CTE(业界最早支持之一) |
+| [全文搜索](../query/full-text-search/db2.sql) | TEXT SEARCH INDEX(Net Search Extender)，需单独安装 |
+| [连接查询](../query/joins/db2.sql) | JOIN 完整，LATERAL(9.7+) 支持 |
+| [分页](../query/pagination/db2.sql) | FETCH FIRST N ROWS ONLY(最早实现之一)，OFFSET(11.1+) |
+| [行列转换](../query/pivot-unpivot/db2.sql) | 无原生 PIVOT，CASE+GROUP BY 模拟 |
+| [集合操作](../query/set-operations/db2.sql) | UNION/INTERSECT/EXCEPT 完整(最早标准实现之一) |
+| [子查询](../query/subquery/db2.sql) | 关联子查询优化好，标量子查询支持 |
+| [窗口函数](../query/window-functions/db2.sql) | 早期支持(7.x)，OLAP 函数名称(RANK/DENSE_RANK/ROW_NUMBER) |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [db2.sql](../scenarios/date-series-fill/db2.sql) |
-| 去重 | [db2.sql](../scenarios/deduplication/db2.sql) |
-| 区间检测 | [db2.sql](../scenarios/gap-detection/db2.sql) |
-| 层级查询 | [db2.sql](../scenarios/hierarchical-query/db2.sql) |
-| JSON 展开 | [db2.sql](../scenarios/json-flatten/db2.sql) |
-| 迁移速查 | [db2.sql](../scenarios/migration-cheatsheet/db2.sql) |
-| TopN 查询 | [db2.sql](../scenarios/ranking-top-n/db2.sql) |
-| 累计求和 | [db2.sql](../scenarios/running-total/db2.sql) |
-| 缓慢变化维 | [db2.sql](../scenarios/slowly-changing-dim/db2.sql) |
-| 字符串拆分 | [db2.sql](../scenarios/string-split-to-rows/db2.sql) |
-| 窗口分析 | [db2.sql](../scenarios/window-analytics/db2.sql) |
+| [日期填充](../scenarios/date-series-fill/db2.sql) | 递归 CTE 生成日期序列(CTE 先驱) |
+| [去重](../scenarios/deduplication/db2.sql) | ROW_NUMBER+CTE 去重 |
+| [区间检测](../scenarios/gap-detection/db2.sql) | 窗口函数+递归 CTE |
+| [层级查询](../scenarios/hierarchical-query/db2.sql) | 递归 CTE(最早实现之一)，无 CONNECT BY |
+| [JSON 展开](../scenarios/json-flatten/db2.sql) | JSON_TABLE(11.1+)，BSON 存储支持 |
+| [迁移速查](../scenarios/migration-cheatsheet/db2.sql) | REORG 要求+LBAC 安全+嵌入式 SQL 传统是核心差异 |
+| [TopN 查询](../scenarios/ranking-top-n/db2.sql) | ROW_NUMBER+FETCH FIRST，标准语法 |
+| [累计求和](../scenarios/running-total/db2.sql) | SUM() OVER 标准，早期窗口函数支持 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/db2.sql) | MERGE 标准实现(早期支持) |
+| [字符串拆分](../scenarios/string-split-to-rows/db2.sql) | XMLTABLE+递归 CTE 模拟 |
+| [窗口分析](../scenarios/window-analytics/db2.sql) | 窗口函数完整(早期支持)，OLAP 函数集 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [db2.sql](../types/array-map-struct/db2.sql) |
-| 日期时间 | [db2.sql](../types/datetime/db2.sql) |
-| JSON | [db2.sql](../types/json/db2.sql) |
-| 数值类型 | [db2.sql](../types/numeric/db2.sql) |
-| 字符串类型 | [db2.sql](../types/string/db2.sql) |
+| [复合类型](../types/array-map-struct/db2.sql) | ROW 类型+ARRAY(10.5+)，结构化类型 |
+| [日期时间](../types/datetime/db2.sql) | DATE/TIME/TIMESTAMP 严格分离，TIMESTAMP(12) 皮秒精度 |
+| [JSON](../types/json/db2.sql) | JSON_TABLE/JSON_VALUE(11.1+)，BSON 存储 |
+| [数值类型](../types/numeric/db2.sql) | DECFLOAT 十进制浮点独有，INTEGER/DECIMAL 标准 |
+| [字符串类型](../types/string/db2.sql) | VARCHAR/CLOB，CCSID 字符集管理 |

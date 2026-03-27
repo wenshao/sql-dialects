@@ -49,86 +49,86 @@ PolarDB 的共享存储架构是云原生数据库设计的重要范式之一，
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [polardb.sql](../ddl/create-table/polardb.sql) |
-| 改表 | [polardb.sql](../ddl/alter-table/polardb.sql) |
-| 索引 | [polardb.sql](../ddl/indexes/polardb.sql) |
-| 约束 | [polardb.sql](../ddl/constraints/polardb.sql) |
-| 视图 | [polardb.sql](../ddl/views/polardb.sql) |
-| 序列与自增 | [polardb.sql](../ddl/sequences/polardb.sql) |
-| 数据库/Schema/用户 | [polardb.sql](../ddl/users-databases/polardb.sql) |
+| [建表](../ddl/create-table/polardb.sql) | MySQL 高度兼容(阿里云)，计算存储分离，读写分离透明 |
+| [改表](../ddl/alter-table/polardb.sql) | Online DDL(MySQL 兼容)，Parallel DDL 加速 |
+| [索引](../ddl/indexes/polardb.sql) | InnoDB 索引(MySQL 兼容)，并行构建索引 |
+| [约束](../ddl/constraints/polardb.sql) | PK/FK/CHECK(MySQL 兼容)，CHECK(8.0 兼容) |
+| [视图](../ddl/views/polardb.sql) | MySQL 兼容视图，无物化视图 |
+| [序列与自增](../ddl/sequences/polardb.sql) | AUTO_INCREMENT(MySQL 兼容)，全局自增保证 |
+| [数据库/Schema/用户](../ddl/users-databases/polardb.sql) | MySQL 兼容权限模型 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [polardb.sql](../advanced/dynamic-sql/polardb.sql) |
-| 错误处理 | [polardb.sql](../advanced/error-handling/polardb.sql) |
-| 执行计划 | [polardb.sql](../advanced/explain/polardb.sql) |
-| 锁机制 | [polardb.sql](../advanced/locking/polardb.sql) |
-| 分区 | [polardb.sql](../advanced/partitioning/polardb.sql) |
-| 权限 | [polardb.sql](../advanced/permissions/polardb.sql) |
-| 存储过程 | [polardb.sql](../advanced/stored-procedures/polardb.sql) |
-| 临时表 | [polardb.sql](../advanced/temp-tables/polardb.sql) |
-| 事务 | [polardb.sql](../advanced/transactions/polardb.sql) |
-| 触发器 | [polardb.sql](../advanced/triggers/polardb.sql) |
+| [动态 SQL](../advanced/dynamic-sql/polardb.sql) | PREPARE/EXECUTE(MySQL 兼容) |
+| [错误处理](../advanced/error-handling/polardb.sql) | DECLARE HANDLER(MySQL 兼容) |
+| [执行计划](../advanced/explain/polardb.sql) | EXPLAIN ANALYZE(MySQL 兼容)，并行查询计划 |
+| [锁机制](../advanced/locking/polardb.sql) | InnoDB 行锁(MySQL 兼容)，全局一致性读(存储层) |
+| [分区](../advanced/partitioning/polardb.sql) | RANGE/LIST/HASH(MySQL 兼容)，分区表并行扫描 |
+| [权限](../advanced/permissions/polardb.sql) | MySQL 兼容权限模型 |
+| [存储过程](../advanced/stored-procedures/polardb.sql) | MySQL 兼容存储过程 |
+| [临时表](../advanced/temp-tables/polardb.sql) | TEMPORARY TABLE(MySQL 兼容) |
+| [事务](../advanced/transactions/polardb.sql) | InnoDB MVCC(MySQL 兼容)，计算存储分离下强一致 |
+| [触发器](../advanced/triggers/polardb.sql) | MySQL 兼容触发器 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [polardb.sql](../dml/delete/polardb.sql) |
-| 插入 | [polardb.sql](../dml/insert/polardb.sql) |
-| 更新 | [polardb.sql](../dml/update/polardb.sql) |
-| Upsert | [polardb.sql](../dml/upsert/polardb.sql) |
+| [删除](../dml/delete/polardb.sql) | DELETE(MySQL 兼容)，Parallel DML 加速 |
+| [插入](../dml/insert/polardb.sql) | INSERT(MySQL 兼容)，Parallel INSERT 加速 |
+| [更新](../dml/update/polardb.sql) | UPDATE(MySQL 兼容)，Parallel DML |
+| [Upsert](../dml/upsert/polardb.sql) | ON DUPLICATE KEY UPDATE(MySQL 兼容) |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [polardb.sql](../functions/aggregate/polardb.sql) |
-| 条件函数 | [polardb.sql](../functions/conditional/polardb.sql) |
-| 日期函数 | [polardb.sql](../functions/date-functions/polardb.sql) |
-| 数学函数 | [polardb.sql](../functions/math-functions/polardb.sql) |
-| 字符串函数 | [polardb.sql](../functions/string-functions/polardb.sql) |
-| 类型转换 | [polardb.sql](../functions/type-conversion/polardb.sql) |
+| [聚合函数](../functions/aggregate/polardb.sql) | MySQL 兼容聚合，并行聚合加速 |
+| [条件函数](../functions/conditional/polardb.sql) | IF/CASE(MySQL 兼容) |
+| [日期函数](../functions/date-functions/polardb.sql) | MySQL 兼容日期函数 |
+| [数学函数](../functions/math-functions/polardb.sql) | MySQL 兼容数学函数 |
+| [字符串函数](../functions/string-functions/polardb.sql) | MySQL 兼容字符串函数 |
+| [类型转换](../functions/type-conversion/polardb.sql) | CAST/CONVERT(MySQL 兼容) |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [polardb.sql](../query/cte/polardb.sql) |
-| 全文搜索 | [polardb.sql](../query/full-text-search/polardb.sql) |
-| 连接查询 | [polardb.sql](../query/joins/polardb.sql) |
-| 分页 | [polardb.sql](../query/pagination/polardb.sql) |
-| 行列转换 | [polardb.sql](../query/pivot-unpivot/polardb.sql) |
-| 集合操作 | [polardb.sql](../query/set-operations/polardb.sql) |
-| 子查询 | [polardb.sql](../query/subquery/polardb.sql) |
-| 窗口函数 | [polardb.sql](../query/window-functions/polardb.sql) |
+| [CTE](../query/cte/polardb.sql) | 递归 CTE(MySQL 8.0 兼容) |
+| [全文搜索](../query/full-text-search/polardb.sql) | InnoDB FULLTEXT(MySQL 兼容)，ngram |
+| [连接查询](../query/joins/polardb.sql) | MySQL 兼容 JOIN+Parallel Hash JOIN 加速 |
+| [分页](../query/pagination/polardb.sql) | LIMIT/OFFSET(MySQL 兼容) |
+| [行列转换](../query/pivot-unpivot/polardb.sql) | 无原生 PIVOT(同 MySQL) |
+| [集合操作](../query/set-operations/polardb.sql) | UNION/INTERSECT/EXCEPT(MySQL 8.0 兼容) |
+| [子查询](../query/subquery/polardb.sql) | MySQL 兼容子查询优化+并行加速 |
+| [窗口函数](../query/window-functions/polardb.sql) | MySQL 8.0 兼容窗口函数+并行执行 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [polardb.sql](../scenarios/date-series-fill/polardb.sql) |
-| 去重 | [polardb.sql](../scenarios/deduplication/polardb.sql) |
-| 区间检测 | [polardb.sql](../scenarios/gap-detection/polardb.sql) |
-| 层级查询 | [polardb.sql](../scenarios/hierarchical-query/polardb.sql) |
-| JSON 展开 | [polardb.sql](../scenarios/json-flatten/polardb.sql) |
-| 迁移速查 | [polardb.sql](../scenarios/migration-cheatsheet/polardb.sql) |
-| TopN 查询 | [polardb.sql](../scenarios/ranking-top-n/polardb.sql) |
-| 累计求和 | [polardb.sql](../scenarios/running-total/polardb.sql) |
-| 缓慢变化维 | [polardb.sql](../scenarios/slowly-changing-dim/polardb.sql) |
-| 字符串拆分 | [polardb.sql](../scenarios/string-split-to-rows/polardb.sql) |
-| 窗口分析 | [polardb.sql](../scenarios/window-analytics/polardb.sql) |
+| [日期填充](../scenarios/date-series-fill/polardb.sql) | 递归 CTE(MySQL 兼容) 生成日期序列 |
+| [去重](../scenarios/deduplication/polardb.sql) | ROW_NUMBER+CTE(MySQL 兼容) |
+| [区间检测](../scenarios/gap-detection/polardb.sql) | 窗口函数(MySQL 兼容) |
+| [层级查询](../scenarios/hierarchical-query/polardb.sql) | 递归 CTE(MySQL 兼容) |
+| [JSON 展开](../scenarios/json-flatten/polardb.sql) | JSON_TABLE(MySQL 兼容) |
+| [迁移速查](../scenarios/migration-cheatsheet/polardb.sql) | MySQL 高度兼容，计算存储分离+并行查询是核心增值 |
+| [TopN 查询](../scenarios/ranking-top-n/polardb.sql) | ROW_NUMBER+LIMIT(MySQL 兼容) |
+| [累计求和](../scenarios/running-total/polardb.sql) | SUM() OVER(MySQL 兼容)+并行 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/polardb.sql) | ON DUPLICATE KEY UPDATE(MySQL 兼容) |
+| [字符串拆分](../scenarios/string-split-to-rows/polardb.sql) | JSON_TABLE 或递归 CTE(MySQL 兼容) |
+| [窗口分析](../scenarios/window-analytics/polardb.sql) | MySQL 兼容窗口函数+并行加速 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [polardb.sql](../types/array-map-struct/polardb.sql) |
-| 日期时间 | [polardb.sql](../types/datetime/polardb.sql) |
-| JSON | [polardb.sql](../types/json/polardb.sql) |
-| 数值类型 | [polardb.sql](../types/numeric/polardb.sql) |
-| 字符串类型 | [polardb.sql](../types/string/polardb.sql) |
+| [复合类型](../types/array-map-struct/polardb.sql) | 无 ARRAY/STRUCT，JSON 替代(MySQL 兼容) |
+| [日期时间](../types/datetime/polardb.sql) | DATETIME/TIMESTAMP(MySQL 兼容) |
+| [JSON](../types/json/polardb.sql) | JSON 二进制存储(MySQL 兼容)，多值索引 |
+| [数值类型](../types/numeric/polardb.sql) | MySQL 兼容数值类型 |
+| [字符串类型](../types/string/polardb.sql) | utf8mb4 推荐(MySQL 兼容) |

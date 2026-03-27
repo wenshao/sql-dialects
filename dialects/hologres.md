@@ -56,86 +56,86 @@ Hologres 是阿里云自主研发的实时交互式分析引擎，兼容 Postgre
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [hologres.sql](../ddl/create-table/hologres.sql) |
-| 改表 | [hologres.sql](../ddl/alter-table/hologres.sql) |
-| 索引 | [hologres.sql](../ddl/indexes/hologres.sql) |
-| 约束 | [hologres.sql](../ddl/constraints/hologres.sql) |
-| 视图 | [hologres.sql](../ddl/views/hologres.sql) |
-| 序列与自增 | [hologres.sql](../ddl/sequences/hologres.sql) |
-| 数据库/Schema/用户 | [hologres.sql](../ddl/users-databases/hologres.sql) |
+| [建表](../ddl/create-table/hologres.sql) | PG 兼容(阿里云 HSAP)，行存/列存/行列混存可选 |
+| [改表](../ddl/alter-table/hologres.sql) | ALTER(PG 兼容)，在线变更 |
+| [索引](../ddl/indexes/hologres.sql) | Clustering Key/Segment Key/Bitmap/Dictionary 编码(独有) |
+| [约束](../ddl/constraints/hologres.sql) | PK 执行(行存表)，其他约束有限 |
+| [视图](../ddl/views/hologres.sql) | 普通视图(PG 兼容)，外部表(MaxCompute 联邦) |
+| [序列与自增](../ddl/sequences/hologres.sql) | SERIAL(PG 兼容)，分布式自增 |
+| [数据库/Schema/用户](../ddl/users-databases/hologres.sql) | PG 兼容权限，实例级隔离 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [hologres.sql](../advanced/dynamic-sql/hologres.sql) |
-| 错误处理 | [hologres.sql](../advanced/error-handling/hologres.sql) |
-| 执行计划 | [hologres.sql](../advanced/explain/hologres.sql) |
-| 锁机制 | [hologres.sql](../advanced/locking/hologres.sql) |
-| 分区 | [hologres.sql](../advanced/partitioning/hologres.sql) |
-| 权限 | [hologres.sql](../advanced/permissions/hologres.sql) |
-| 存储过程 | [hologres.sql](../advanced/stored-procedures/hologres.sql) |
-| 临时表 | [hologres.sql](../advanced/temp-tables/hologres.sql) |
-| 事务 | [hologres.sql](../advanced/transactions/hologres.sql) |
-| 触发器 | [hologres.sql](../advanced/triggers/hologres.sql) |
+| [动态 SQL](../advanced/dynamic-sql/hologres.sql) | EXECUTE(PG 兼容，有限) |
+| [错误处理](../advanced/error-handling/hologres.sql) | PG 兼容异常处理(有限) |
+| [执行计划](../advanced/explain/hologres.sql) | EXPLAIN ANALYZE(PG 兼容)，HQE/SQE 双引擎 |
+| [锁机制](../advanced/locking/hologres.sql) | 无行级锁(列存 OLAP)，行存表支持行锁 |
+| [分区](../advanced/partitioning/hologres.sql) | 分区表(PG 兼容)，Segment Key 数据分布 |
+| [权限](../advanced/permissions/hologres.sql) | PG 兼容 RBAC，RAM 云权限集成 |
+| [存储过程](../advanced/stored-procedures/hologres.sql) | PG 兼容(有限支持) |
+| [临时表](../advanced/temp-tables/hologres.sql) | TEMPORARY TABLE(PG 兼容) |
+| [事务](../advanced/transactions/hologres.sql) | 行存表 ACID 事务，列存表最终一致性 |
+| [触发器](../advanced/triggers/hologres.sql) | 不支持触发器 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [hologres.sql](../dml/delete/hologres.sql) |
-| 插入 | [hologres.sql](../dml/insert/hologres.sql) |
-| 更新 | [hologres.sql](../dml/update/hologres.sql) |
-| Upsert | [hologres.sql](../dml/upsert/hologres.sql) |
+| [删除](../dml/delete/hologres.sql) | DELETE(PG 兼容)，行存实时/列存批量 |
+| [插入](../dml/insert/hologres.sql) | INSERT(PG 兼容)，Fixed Plan 加速点查写入 |
+| [更新](../dml/update/hologres.sql) | UPDATE(PG 兼容)，行存实时更新 |
+| [Upsert](../dml/upsert/hologres.sql) | INSERT ON CONFLICT(PG 兼容)，行存表高频 Upsert |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [hologres.sql](../functions/aggregate/hologres.sql) |
-| 条件函数 | [hologres.sql](../functions/conditional/hologres.sql) |
-| 日期函数 | [hologres.sql](../functions/date-functions/hologres.sql) |
-| 数学函数 | [hologres.sql](../functions/math-functions/hologres.sql) |
-| 字符串函数 | [hologres.sql](../functions/string-functions/hologres.sql) |
-| 类型转换 | [hologres.sql](../functions/type-conversion/hologres.sql) |
+| [聚合函数](../functions/aggregate/hologres.sql) | PG 兼容聚合，列存向量化加速 |
+| [条件函数](../functions/conditional/hologres.sql) | CASE/COALESCE(PG 兼容) |
+| [日期函数](../functions/date-functions/hologres.sql) | PG 兼容日期函数 |
+| [数学函数](../functions/math-functions/hologres.sql) | PG 兼容数学函数 |
+| [字符串函数](../functions/string-functions/hologres.sql) | PG 兼容字符串函数 |
+| [类型转换](../functions/type-conversion/hologres.sql) | CAST/::(PG 兼容) |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [hologres.sql](../query/cte/hologres.sql) |
-| 全文搜索 | [hologres.sql](../query/full-text-search/hologres.sql) |
-| 连接查询 | [hologres.sql](../query/joins/hologres.sql) |
-| 分页 | [hologres.sql](../query/pagination/hologres.sql) |
-| 行列转换 | [hologres.sql](../query/pivot-unpivot/hologres.sql) |
-| 集合操作 | [hologres.sql](../query/set-operations/hologres.sql) |
-| 子查询 | [hologres.sql](../query/subquery/hologres.sql) |
-| 窗口函数 | [hologres.sql](../query/window-functions/hologres.sql) |
+| [CTE](../query/cte/hologres.sql) | WITH+递归 CTE(PG 兼容) |
+| [全文搜索](../query/full-text-search/hologres.sql) | GIN 索引全文检索(PG 兼容，有限) |
+| [连接查询](../query/joins/hologres.sql) | Hash/Nested Loop JOIN(PG 兼容)，Shuffle 分布式 |
+| [分页](../query/pagination/hologres.sql) | LIMIT/OFFSET(PG 兼容) |
+| [行列转换](../query/pivot-unpivot/hologres.sql) | 无原生 PIVOT(PG 兼容) |
+| [集合操作](../query/set-operations/hologres.sql) | UNION/INTERSECT/EXCEPT(PG 兼容) |
+| [子查询](../query/subquery/hologres.sql) | 关联子查询(PG 兼容) |
+| [窗口函数](../query/window-functions/hologres.sql) | 完整窗口函数(PG 兼容)，向量化加速 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [hologres.sql](../scenarios/date-series-fill/hologres.sql) |
-| 去重 | [hologres.sql](../scenarios/deduplication/hologres.sql) |
-| 区间检测 | [hologres.sql](../scenarios/gap-detection/hologres.sql) |
-| 层级查询 | [hologres.sql](../scenarios/hierarchical-query/hologres.sql) |
-| JSON 展开 | [hologres.sql](../scenarios/json-flatten/hologres.sql) |
-| 迁移速查 | [hologres.sql](../scenarios/migration-cheatsheet/hologres.sql) |
-| TopN 查询 | [hologres.sql](../scenarios/ranking-top-n/hologres.sql) |
-| 累计求和 | [hologres.sql](../scenarios/running-total/hologres.sql) |
-| 缓慢变化维 | [hologres.sql](../scenarios/slowly-changing-dim/hologres.sql) |
-| 字符串拆分 | [hologres.sql](../scenarios/string-split-to-rows/hologres.sql) |
-| 窗口分析 | [hologres.sql](../scenarios/window-analytics/hologres.sql) |
+| [日期填充](../scenarios/date-series-fill/hologres.sql) | generate_series(PG 兼容) |
+| [去重](../scenarios/deduplication/hologres.sql) | ROW_NUMBER+CTE(PG 兼容) |
+| [区间检测](../scenarios/gap-detection/hologres.sql) | 窗口函数(PG 兼容) |
+| [层级查询](../scenarios/hierarchical-query/hologres.sql) | 递归 CTE(PG 兼容) |
+| [JSON 展开](../scenarios/json-flatten/hologres.sql) | json_each/json_array_elements(PG 兼容) |
+| [迁移速查](../scenarios/migration-cheatsheet/hologres.sql) | PG 兼容+行列混存+MaxCompute 联邦是核心特色 |
+| [TopN 查询](../scenarios/ranking-top-n/hologres.sql) | ROW_NUMBER+LIMIT(PG 兼容) |
+| [累计求和](../scenarios/running-total/hologres.sql) | SUM() OVER(PG 兼容)，向量化加速 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/hologres.sql) | INSERT ON CONFLICT(PG 兼容) |
+| [字符串拆分](../scenarios/string-split-to-rows/hologres.sql) | string_to_array+unnest(PG 兼容) |
+| [窗口分析](../scenarios/window-analytics/hologres.sql) | 完整窗口函数(PG 兼容)，HSAP 混合分析 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [hologres.sql](../types/array-map-struct/hologres.sql) |
-| 日期时间 | [hologres.sql](../types/datetime/hologres.sql) |
-| JSON | [hologres.sql](../types/json/hologres.sql) |
-| 数值类型 | [hologres.sql](../types/numeric/hologres.sql) |
-| 字符串类型 | [hologres.sql](../types/string/hologres.sql) |
+| [复合类型](../types/array-map-struct/hologres.sql) | ARRAY(PG 兼容)，无 STRUCT |
+| [日期时间](../types/datetime/hologres.sql) | DATE/TIMESTAMP/TIMESTAMPTZ(PG 兼容) |
+| [JSON](../types/json/hologres.sql) | JSON/JSONB(PG 兼容)，GIN 索引 |
+| [数值类型](../types/numeric/hologres.sql) | INT/BIGINT/NUMERIC/FLOAT(PG 兼容) |
+| [字符串类型](../types/string/hologres.sql) | TEXT/VARCHAR(PG 兼容) |

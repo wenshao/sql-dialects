@@ -58,86 +58,86 @@ Amazon Redshift 是 AWS 推出的全托管云数据仓库服务，基于 ParAcce
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [redshift.sql](../ddl/create-table/redshift.sql) |
-| 改表 | [redshift.sql](../ddl/alter-table/redshift.sql) |
-| 索引 | [redshift.sql](../ddl/indexes/redshift.sql) |
-| 约束 | [redshift.sql](../ddl/constraints/redshift.sql) |
-| 视图 | [redshift.sql](../ddl/views/redshift.sql) |
-| 序列与自增 | [redshift.sql](../ddl/sequences/redshift.sql) |
-| 数据库/Schema/用户 | [redshift.sql](../ddl/users-databases/redshift.sql) |
+| [建表](../ddl/create-table/redshift.sql) | PG 8.x 分叉，列式存储，DISTKEY/SORTKEY 决定数据分布 |
+| [改表](../ddl/alter-table/redshift.sql) | ALTER 受限，ADD COLUMN 可以，MODIFY TYPE 限制多 |
+| [索引](../ddl/indexes/redshift.sql) | 无传统索引，SORTKEY(COMPOUND/INTERLEAVED) 替代 |
+| [约束](../ddl/constraints/redshift.sql) | PK/FK/UNIQUE 声明但不强制(仅优化器提示) |
+| [视图](../ddl/views/redshift.sql) | 普通视图+LATE BINDING VIEW，物化视图(2019+) |
+| [序列与自增](../ddl/sequences/redshift.sql) | IDENTITY 自增列，无 SEQUENCE 对象 |
+| [数据库/Schema/用户](../ddl/users-databases/redshift.sql) | PG 兼容权限，Datashare 跨集群共享 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [redshift.sql](../advanced/dynamic-sql/redshift.sql) |
-| 错误处理 | [redshift.sql](../advanced/error-handling/redshift.sql) |
-| 执行计划 | [redshift.sql](../advanced/explain/redshift.sql) |
-| 锁机制 | [redshift.sql](../advanced/locking/redshift.sql) |
-| 分区 | [redshift.sql](../advanced/partitioning/redshift.sql) |
-| 权限 | [redshift.sql](../advanced/permissions/redshift.sql) |
-| 存储过程 | [redshift.sql](../advanced/stored-procedures/redshift.sql) |
-| 临时表 | [redshift.sql](../advanced/temp-tables/redshift.sql) |
-| 事务 | [redshift.sql](../advanced/transactions/redshift.sql) |
-| 触发器 | [redshift.sql](../advanced/triggers/redshift.sql) |
+| [动态 SQL](../advanced/dynamic-sql/redshift.sql) | 存储过程内 EXECUTE，PL/pgSQL 子集 |
+| [错误处理](../advanced/error-handling/redshift.sql) | EXCEPTION WHEN(PG 子集)，RAISE EXCEPTION |
+| [执行计划](../advanced/explain/redshift.sql) | EXPLAIN 文本+SVL 系统视图分析，分布式 Slice 信息 |
+| [锁机制](../advanced/locking/redshift.sql) | 表级锁为主，MVCC 快照隔离，序列化隔离(默认) |
+| [分区](../advanced/partitioning/redshift.sql) | 无原生分区，SORTKEY+DISTKEY 替代，Spectrum 外部分区 |
+| [权限](../advanced/permissions/redshift.sql) | PG 兼容 GRANT/REVOKE，Datashare 跨集群安全共享 |
+| [存储过程](../advanced/stored-procedures/redshift.sql) | PL/pgSQL 子集(2018+)，功能弱于 PostgreSQL |
+| [临时表](../advanced/temp-tables/redshift.sql) | CREATE TEMP TABLE(PG 兼容)，会话级 |
+| [事务](../advanced/transactions/redshift.sql) | 序列化隔离(默认)，ACID，自动提交 |
+| [触发器](../advanced/triggers/redshift.sql) | 不支持触发器 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [redshift.sql](../dml/delete/redshift.sql) |
-| 插入 | [redshift.sql](../dml/insert/redshift.sql) |
-| 更新 | [redshift.sql](../dml/update/redshift.sql) |
-| Upsert | [redshift.sql](../dml/upsert/redshift.sql) |
+| [删除](../dml/delete/redshift.sql) | DELETE 标准，TRUNCATE 释放存储，DELETE 标记延迟回收 |
+| [插入](../dml/insert/redshift.sql) | COPY 命令从 S3 批量加载(推荐)，INSERT 逐行较慢 |
+| [更新](../dml/update/redshift.sql) | UPDATE 实为 DELETE+INSERT(列式存储特性)，性能开销大 |
+| [Upsert](../dml/upsert/redshift.sql) | MERGE(2023+)，之前用 DELETE+INSERT 或 staging 表模拟 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [redshift.sql](../functions/aggregate/redshift.sql) |
-| 条件函数 | [redshift.sql](../functions/conditional/redshift.sql) |
-| 日期函数 | [redshift.sql](../functions/date-functions/redshift.sql) |
-| 数学函数 | [redshift.sql](../functions/math-functions/redshift.sql) |
-| 字符串函数 | [redshift.sql](../functions/string-functions/redshift.sql) |
-| 类型转换 | [redshift.sql](../functions/type-conversion/redshift.sql) |
+| [聚合函数](../functions/aggregate/redshift.sql) | LISTAGG，APPROXIMATE COUNT(HLL)，MEDIAN |
+| [条件函数](../functions/conditional/redshift.sql) | CASE/COALESCE/NULLIF/NVL/NVL2/DECODE(PG+Oracle 混合) |
+| [日期函数](../functions/date-functions/redshift.sql) | DATEADD/DATEDIFF/DATE_TRUNC，GETDATE() 当前时间 |
+| [数学函数](../functions/math-functions/redshift.sql) | 完整数学函数，APPROXIMATE PERCENTILE |
+| [字符串函数](../functions/string-functions/redshift.sql) | || 拼接，REGEXP_REPLACE/SUBSTR(PG 兼容) |
+| [类型转换](../functions/type-conversion/redshift.sql) | CAST/:: 运算符(PG 风格)，隐式转换较宽松 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [redshift.sql](../query/cte/redshift.sql) |
-| 全文搜索 | [redshift.sql](../query/full-text-search/redshift.sql) |
-| 连接查询 | [redshift.sql](../query/joins/redshift.sql) |
-| 分页 | [redshift.sql](../query/pagination/redshift.sql) |
-| 行列转换 | [redshift.sql](../query/pivot-unpivot/redshift.sql) |
-| 集合操作 | [redshift.sql](../query/set-operations/redshift.sql) |
-| 子查询 | [redshift.sql](../query/subquery/redshift.sql) |
-| 窗口函数 | [redshift.sql](../query/window-functions/redshift.sql) |
+| [CTE](../query/cte/redshift.sql) | WITH 标准+递归 CTE，PG 兼容 |
+| [全文搜索](../query/full-text-search/redshift.sql) | 无全文搜索，依赖 Elasticsearch/OpenSearch |
+| [连接查询](../query/joins/redshift.sql) | Hash/Merge/Nested Loop JOIN，DISTKEY 优化 co-located JOIN |
+| [分页](../query/pagination/redshift.sql) | LIMIT/OFFSET(PG 兼容) |
+| [行列转换](../query/pivot-unpivot/redshift.sql) | 无原生 PIVOT，CASE+GROUP BY 模拟 |
+| [集合操作](../query/set-operations/redshift.sql) | UNION/INTERSECT/EXCEPT 完整(PG 兼容) |
+| [子查询](../query/subquery/redshift.sql) | 关联子查询支持，标量子查询 |
+| [窗口函数](../query/window-functions/redshift.sql) | 完整窗口函数(PG 兼容)，WLM 查询队列管理 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [redshift.sql](../scenarios/date-series-fill/redshift.sql) |
-| 去重 | [redshift.sql](../scenarios/deduplication/redshift.sql) |
-| 区间检测 | [redshift.sql](../scenarios/gap-detection/redshift.sql) |
-| 层级查询 | [redshift.sql](../scenarios/hierarchical-query/redshift.sql) |
-| JSON 展开 | [redshift.sql](../scenarios/json-flatten/redshift.sql) |
-| 迁移速查 | [redshift.sql](../scenarios/migration-cheatsheet/redshift.sql) |
-| TopN 查询 | [redshift.sql](../scenarios/ranking-top-n/redshift.sql) |
-| 累计求和 | [redshift.sql](../scenarios/running-total/redshift.sql) |
-| 缓慢变化维 | [redshift.sql](../scenarios/slowly-changing-dim/redshift.sql) |
-| 字符串拆分 | [redshift.sql](../scenarios/string-split-to-rows/redshift.sql) |
-| 窗口分析 | [redshift.sql](../scenarios/window-analytics/redshift.sql) |
+| [日期填充](../scenarios/date-series-fill/redshift.sql) | 递归 CTE 或数字表生成日期序列 |
+| [去重](../scenarios/deduplication/redshift.sql) | ROW_NUMBER+CTE 去重 |
+| [区间检测](../scenarios/gap-detection/redshift.sql) | 窗口函数检测间隙 |
+| [层级查询](../scenarios/hierarchical-query/redshift.sql) | 递归 CTE(PG 兼容) |
+| [JSON 展开](../scenarios/json-flatten/redshift.sql) | JSON_EXTRACT_PATH_TEXT，JSON_PARSE，SUPER 类型(半结构化) |
+| [迁移速查](../scenarios/migration-cheatsheet/redshift.sql) | PG 8.x 子集，DISTKEY/SORTKEY 是核心概念，无索引 |
+| [TopN 查询](../scenarios/ranking-top-n/redshift.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 |
+| [累计求和](../scenarios/running-total/redshift.sql) | SUM() OVER 标准，列式存储聚合高效 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/redshift.sql) | MERGE(2023+)，之前用 staging 表+DELETE+INSERT |
+| [字符串拆分](../scenarios/string-split-to-rows/redshift.sql) | SPLIT_PART+递归 CTE 或数字表展开 |
+| [窗口分析](../scenarios/window-analytics/redshift.sql) | 完整窗口函数(PG 兼容)，列式存储加速 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [redshift.sql](../types/array-map-struct/redshift.sql) |
-| 日期时间 | [redshift.sql](../types/datetime/redshift.sql) |
-| JSON | [redshift.sql](../types/json/redshift.sql) |
-| 数值类型 | [redshift.sql](../types/numeric/redshift.sql) |
-| 字符串类型 | [redshift.sql](../types/string/redshift.sql) |
+| [复合类型](../types/array-map-struct/redshift.sql) | SUPER 类型(半结构化)，无原生 ARRAY/STRUCT 列 |
+| [日期时间](../types/datetime/redshift.sql) | DATE/TIMESTAMP/TIMESTAMPTZ，无 TIME 类型 |
+| [JSON](../types/json/redshift.sql) | SUPER 类型(半结构化) + JSON_EXTRACT，PartiQL 查询 |
+| [数值类型](../types/numeric/redshift.sql) | SMALLINT-BIGINT/REAL/DOUBLE/DECIMAL(38)，PG 兼容 |
+| [字符串类型](../types/string/redshift.sql) | VARCHAR(65535) 默认，CHAR 定长，PG 兼容 |

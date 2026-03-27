@@ -57,86 +57,86 @@ Databricks SQL 是 Databricks Lakehouse 平台的 SQL 分析层，构建在 Apac
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [databricks.sql](../ddl/create-table/databricks.sql) |
-| 改表 | [databricks.sql](../ddl/alter-table/databricks.sql) |
-| 索引 | [databricks.sql](../ddl/indexes/databricks.sql) |
-| 约束 | [databricks.sql](../ddl/constraints/databricks.sql) |
-| 视图 | [databricks.sql](../ddl/views/databricks.sql) |
-| 序列与自增 | [databricks.sql](../ddl/sequences/databricks.sql) |
-| 数据库/Schema/用户 | [databricks.sql](../ddl/users-databases/databricks.sql) |
+| [建表](../ddl/create-table/databricks.sql) | Delta Lake 默认，Unity Catalog 治理，CTAS 常用 |
+| [改表](../ddl/alter-table/databricks.sql) | Delta Lake Schema Evolution 自动，ADD/CHANGE COLUMN |
+| [索引](../ddl/indexes/databricks.sql) | 无传统索引，Data Skipping+Z-ORDER+Liquid Clustering |
+| [约束](../ddl/constraints/databricks.sql) | CHECK/NOT NULL(Delta Lake)，PK/FK 信息性不强制 |
+| [视图](../ddl/views/databricks.sql) | VIEW/TEMPORARY VIEW，Dynamic View(行/列级安全) |
+| [序列与自增](../ddl/sequences/databricks.sql) | GENERATED ALWAYS AS IDENTITY(Delta Lake)，自增列 |
+| [数据库/Schema/用户](../ddl/users-databases/databricks.sql) | Unity Catalog 三级命名空间，细粒度权限治理 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [databricks.sql](../advanced/dynamic-sql/databricks.sql) |
-| 错误处理 | [databricks.sql](../advanced/error-handling/databricks.sql) |
-| 执行计划 | [databricks.sql](../advanced/explain/databricks.sql) |
-| 锁机制 | [databricks.sql](../advanced/locking/databricks.sql) |
-| 分区 | [databricks.sql](../advanced/partitioning/databricks.sql) |
-| 权限 | [databricks.sql](../advanced/permissions/databricks.sql) |
-| 存储过程 | [databricks.sql](../advanced/stored-procedures/databricks.sql) |
-| 临时表 | [databricks.sql](../advanced/temp-tables/databricks.sql) |
-| 事务 | [databricks.sql](../advanced/transactions/databricks.sql) |
-| 触发器 | [databricks.sql](../advanced/triggers/databricks.sql) |
+| [动态 SQL](../advanced/dynamic-sql/databricks.sql) | 无动态 SQL，Python/Scala Notebook 替代 |
+| [错误处理](../advanced/error-handling/databricks.sql) | 无过程式错误处理，Notebook 单元格级错误 |
+| [执行计划](../advanced/explain/databricks.sql) | EXPLAIN EXTENDED+Spark UI+Photon 引擎加速 |
+| [锁机制](../advanced/locking/databricks.sql) | Delta Lake 乐观并发+冲突检测，无行级锁 |
+| [分区](../advanced/partitioning/databricks.sql) | PARTITIONED BY+Liquid Clustering(自动优化)替代手动分区 |
+| [权限](../advanced/permissions/databricks.sql) | Unity Catalog RBAC，Row/Column Filter，Data Lineage |
+| [存储过程](../advanced/stored-procedures/databricks.sql) | 无存储过程，Python UDF/Notebook 替代 |
+| [临时表](../advanced/temp-tables/databricks.sql) | CREATE TEMP VIEW 会话级，Delta 表 cache |
+| [事务](../advanced/transactions/databricks.sql) | Delta Lake ACID 事务，Time Travel 版本查询 |
+| [触发器](../advanced/triggers/databricks.sql) | 无触发器，Delta Live Tables 声明式 ETL |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [databricks.sql](../dml/delete/databricks.sql) |
-| 插入 | [databricks.sql](../dml/insert/databricks.sql) |
-| 更新 | [databricks.sql](../dml/update/databricks.sql) |
-| Upsert | [databricks.sql](../dml/upsert/databricks.sql) |
+| [删除](../dml/delete/databricks.sql) | DELETE(Delta Lake) 标准，VACUUM 清理旧版本文件 |
+| [插入](../dml/insert/databricks.sql) | INSERT INTO/OVERWRITE，COPY INTO 批量加载 |
+| [更新](../dml/update/databricks.sql) | UPDATE(Delta Lake) 标准，Photon 引擎加速 |
+| [Upsert](../dml/upsert/databricks.sql) | MERGE INTO(Delta Lake) 功能完整 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [databricks.sql](../functions/aggregate/databricks.sql) |
-| 条件函数 | [databricks.sql](../functions/conditional/databricks.sql) |
-| 日期函数 | [databricks.sql](../functions/date-functions/databricks.sql) |
-| 数学函数 | [databricks.sql](../functions/math-functions/databricks.sql) |
-| 字符串函数 | [databricks.sql](../functions/string-functions/databricks.sql) |
-| 类型转换 | [databricks.sql](../functions/type-conversion/databricks.sql) |
+| [聚合函数](../functions/aggregate/databricks.sql) | GROUPING SETS/CUBE/ROLLUP，collect_list/collect_set |
+| [条件函数](../functions/conditional/databricks.sql) | IF/CASE/COALESCE/NVL/NVL2(Spark 兼容) |
+| [日期函数](../functions/date-functions/databricks.sql) | date_format/date_add/datediff(Spark 兼容) |
+| [数学函数](../functions/math-functions/databricks.sql) | 完整数学函数(Spark 兼容) |
+| [字符串函数](../functions/string-functions/databricks.sql) | concat/concat_ws/regexp_extract(Spark 兼容) |
+| [类型转换](../functions/type-conversion/databricks.sql) | CAST/TRY_CAST(Spark 3.4+)，类型系统同 Spark |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [databricks.sql](../query/cte/databricks.sql) |
-| 全文搜索 | [databricks.sql](../query/full-text-search/databricks.sql) |
-| 连接查询 | [databricks.sql](../query/joins/databricks.sql) |
-| 分页 | [databricks.sql](../query/pagination/databricks.sql) |
-| 行列转换 | [databricks.sql](../query/pivot-unpivot/databricks.sql) |
-| 集合操作 | [databricks.sql](../query/set-operations/databricks.sql) |
-| 子查询 | [databricks.sql](../query/subquery/databricks.sql) |
-| 窗口函数 | [databricks.sql](../query/window-functions/databricks.sql) |
+| [CTE](../query/cte/databricks.sql) | WITH 标准+递归 CTE(Spark 3.4+) |
+| [全文搜索](../query/full-text-search/databricks.sql) | 无内置全文搜索 |
+| [连接查询](../query/joins/databricks.sql) | Broadcast/Sort-Merge/Shuffle Hash JOIN(Spark 引擎) |
+| [分页](../query/pagination/databricks.sql) | LIMIT+ORDER BY(Spark 兼容)，无 OFFSET |
+| [行列转换](../query/pivot-unpivot/databricks.sql) | PIVOT/UNPIVOT 原生(Spark 3.4+) |
+| [集合操作](../query/set-operations/databricks.sql) | UNION/INTERSECT/EXCEPT 完整(Spark 兼容) |
+| [子查询](../query/subquery/databricks.sql) | 关联子查询支持(Spark 兼容) |
+| [窗口函数](../query/window-functions/databricks.sql) | 完整窗口函数(Spark 兼容)，Photon 加速 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [databricks.sql](../scenarios/date-series-fill/databricks.sql) |
-| 去重 | [databricks.sql](../scenarios/deduplication/databricks.sql) |
-| 区间检测 | [databricks.sql](../scenarios/gap-detection/databricks.sql) |
-| 层级查询 | [databricks.sql](../scenarios/hierarchical-query/databricks.sql) |
-| JSON 展开 | [databricks.sql](../scenarios/json-flatten/databricks.sql) |
-| 迁移速查 | [databricks.sql](../scenarios/migration-cheatsheet/databricks.sql) |
-| TopN 查询 | [databricks.sql](../scenarios/ranking-top-n/databricks.sql) |
-| 累计求和 | [databricks.sql](../scenarios/running-total/databricks.sql) |
-| 缓慢变化维 | [databricks.sql](../scenarios/slowly-changing-dim/databricks.sql) |
-| 字符串拆分 | [databricks.sql](../scenarios/string-split-to-rows/databricks.sql) |
-| 窗口分析 | [databricks.sql](../scenarios/window-analytics/databricks.sql) |
+| [日期填充](../scenarios/date-series-fill/databricks.sql) | sequence()+explode 生成日期序列(Spark 兼容) |
+| [去重](../scenarios/deduplication/databricks.sql) | ROW_NUMBER+窗口函数，dropDuplicates(DataFrame) |
+| [区间检测](../scenarios/gap-detection/databricks.sql) | sequence()+窗口函数检测 |
+| [层级查询](../scenarios/hierarchical-query/databricks.sql) | 递归 CTE(Spark 3.4+) |
+| [JSON 展开](../scenarios/json-flatten/databricks.sql) | from_json/explode(Spark 兼容)，可直接查询 JSON 文件 |
+| [迁移速查](../scenarios/migration-cheatsheet/databricks.sql) | Spark SQL 兼容+Delta Lake 扩展，Notebook 工作流 |
+| [TopN 查询](../scenarios/ranking-top-n/databricks.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 |
+| [累计求和](../scenarios/running-total/databricks.sql) | SUM() OVER 标准(Spark 兼容) |
+| [缓慢变化维](../scenarios/slowly-changing-dim/databricks.sql) | MERGE INTO(Delta Lake) 功能完整，Time Travel 辅助 |
+| [字符串拆分](../scenarios/string-split-to-rows/databricks.sql) | split()+explode() 展开(Spark 兼容) |
+| [窗口分析](../scenarios/window-analytics/databricks.sql) | 完整窗口函数(Spark 兼容)，Photon 加速 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [databricks.sql](../types/array-map-struct/databricks.sql) |
-| 日期时间 | [databricks.sql](../types/datetime/databricks.sql) |
-| JSON | [databricks.sql](../types/json/databricks.sql) |
-| 数值类型 | [databricks.sql](../types/numeric/databricks.sql) |
-| 字符串类型 | [databricks.sql](../types/string/databricks.sql) |
+| [复合类型](../types/array-map-struct/databricks.sql) | ARRAY/MAP/STRUCT 原生(Spark 兼容)，explode 展开 |
+| [日期时间](../types/datetime/databricks.sql) | DATE/TIMESTAMP/TIMESTAMP_NTZ(Spark 兼容) |
+| [JSON](../types/json/databricks.sql) | from_json/to_json(Spark 兼容)，可直接读 JSON 文件 |
+| [数值类型](../types/numeric/databricks.sql) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL(Spark 兼容) |
+| [字符串类型](../types/string/databricks.sql) | STRING 无长度限制(Spark 兼容)，UTF-8 |

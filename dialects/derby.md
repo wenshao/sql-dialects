@@ -51,86 +51,86 @@ Derby 的代码库是学习传统 RDBMS 实现的良好教材——完整的 SQL
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [derby.sql](../ddl/create-table/derby.sql) |
-| 改表 | [derby.sql](../ddl/alter-table/derby.sql) |
-| 索引 | [derby.sql](../ddl/indexes/derby.sql) |
-| 约束 | [derby.sql](../ddl/constraints/derby.sql) |
-| 视图 | [derby.sql](../ddl/views/derby.sql) |
-| 序列与自增 | [derby.sql](../ddl/sequences/derby.sql) |
-| 数据库/Schema/用户 | [derby.sql](../ddl/users-databases/derby.sql) |
+| [建表](../ddl/create-table/derby.sql) | Java 嵌入式(Apache)，纯 Java，ANSI SQL 子集 |
+| [改表](../ddl/alter-table/derby.sql) | ALTER ADD/DROP COLUMN，无 MODIFY/CHANGE COLUMN |
+| [索引](../ddl/indexes/derby.sql) | B-tree 索引，无其他索引类型 |
+| [约束](../ddl/constraints/derby.sql) | PK/FK/CHECK/UNIQUE 标准支持 |
+| [视图](../ddl/views/derby.sql) | 普通视图，无物化视图 |
+| [序列与自增](../ddl/sequences/derby.sql) | IDENTITY+SEQUENCE(10.6+)，GENERATED ALWAYS/BY DEFAULT |
+| [数据库/Schema/用户](../ddl/users-databases/derby.sql) | Schema=用户，内置身份验证，LDAP 集成 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [derby.sql](../advanced/dynamic-sql/derby.sql) |
-| 错误处理 | [derby.sql](../advanced/error-handling/derby.sql) |
-| 执行计划 | [derby.sql](../advanced/explain/derby.sql) |
-| 锁机制 | [derby.sql](../advanced/locking/derby.sql) |
-| 分区 | [derby.sql](../advanced/partitioning/derby.sql) |
-| 权限 | [derby.sql](../advanced/permissions/derby.sql) |
-| 存储过程 | [derby.sql](../advanced/stored-procedures/derby.sql) |
-| 临时表 | [derby.sql](../advanced/temp-tables/derby.sql) |
-| 事务 | [derby.sql](../advanced/transactions/derby.sql) |
-| 触发器 | [derby.sql](../advanced/triggers/derby.sql) |
+| [动态 SQL](../advanced/dynamic-sql/derby.sql) | 无动态 SQL，Java JDBC PreparedStatement |
+| [错误处理](../advanced/error-handling/derby.sql) | 无过程式错误处理，SQL 异常由 Java 处理 |
+| [执行计划](../advanced/explain/derby.sql) | EXPLAIN 通过 derby.language.logStatementText 属性 |
+| [锁机制](../advanced/locking/derby.sql) | 行级锁+表级锁，锁升级，死锁检测 |
+| [分区](../advanced/partitioning/derby.sql) | 无分区支持 |
+| [权限](../advanced/permissions/derby.sql) | GRANT/REVOKE 标准，内置身份验证 |
+| [存储过程](../advanced/stored-procedures/derby.sql) | Java 存储过程(EXTERNAL NAME)，无 SQL 过程语言 |
+| [临时表](../advanced/temp-tables/derby.sql) | DECLARE GLOBAL TEMPORARY TABLE 会话级 |
+| [事务](../advanced/transactions/derby.sql) | ACID 完整，READ COMMITTED 默认，Savepoint |
+| [触发器](../advanced/triggers/derby.sql) | BEFORE/AFTER 行/语句级触发器 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [derby.sql](../dml/delete/derby.sql) |
-| 插入 | [derby.sql](../dml/insert/derby.sql) |
-| 更新 | [derby.sql](../dml/update/derby.sql) |
-| Upsert | [derby.sql](../dml/upsert/derby.sql) |
+| [删除](../dml/delete/derby.sql) | DELETE 标准，TRUNCATE(10.11+) |
+| [插入](../dml/insert/derby.sql) | INSERT 标准，批量 INSERT |
+| [更新](../dml/update/derby.sql) | UPDATE 标准 |
+| [Upsert](../dml/upsert/derby.sql) | MERGE 标准(10.11+)，之前需 INSERT+UPDATE |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [derby.sql](../functions/aggregate/derby.sql) |
-| 条件函数 | [derby.sql](../functions/conditional/derby.sql) |
-| 日期函数 | [derby.sql](../functions/date-functions/derby.sql) |
-| 数学函数 | [derby.sql](../functions/math-functions/derby.sql) |
-| 字符串函数 | [derby.sql](../functions/string-functions/derby.sql) |
-| 类型转换 | [derby.sql](../functions/type-conversion/derby.sql) |
+| [聚合函数](../functions/aggregate/derby.sql) | 基础聚合(COUNT/SUM/AVG/MIN/MAX)，无 STRING_AGG/LISTAGG |
+| [条件函数](../functions/conditional/derby.sql) | CASE/COALESCE/NULLIF 标准 |
+| [日期函数](../functions/date-functions/derby.sql) | YEAR/MONTH/DAY 提取函数，TIMESTAMPADD/TIMESTAMPDIFF |
+| [数学函数](../functions/math-functions/derby.sql) | 基础数学函数(ABS/MOD/SQRT 等) |
+| [字符串函数](../functions/string-functions/derby.sql) | || 拼接，SUBSTR/LENGTH/TRIM 标准 |
+| [类型转换](../functions/type-conversion/derby.sql) | CAST 标准，无 TRY_CAST |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [derby.sql](../query/cte/derby.sql) |
-| 全文搜索 | [derby.sql](../query/full-text-search/derby.sql) |
-| 连接查询 | [derby.sql](../query/joins/derby.sql) |
-| 分页 | [derby.sql](../query/pagination/derby.sql) |
-| 行列转换 | [derby.sql](../query/pivot-unpivot/derby.sql) |
-| 集合操作 | [derby.sql](../query/set-operations/derby.sql) |
-| 子查询 | [derby.sql](../query/subquery/derby.sql) |
-| 窗口函数 | [derby.sql](../query/window-functions/derby.sql) |
+| [CTE](../query/cte/derby.sql) | 不支持 CTE(最大局限之一) |
+| [全文搜索](../query/full-text-search/derby.sql) | 无全文搜索 |
+| [连接查询](../query/joins/derby.sql) | INNER/LEFT/RIGHT/FULL JOIN 标准，无 LATERAL |
+| [分页](../query/pagination/derby.sql) | FETCH FIRST N ROWS ONLY，无 LIMIT 语法，OFFSET(10.5+) |
+| [行列转换](../query/pivot-unpivot/derby.sql) | 无原生 PIVOT |
+| [集合操作](../query/set-operations/derby.sql) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/derby.sql) | 关联子查询+IN/EXISTS 标准 |
+| [窗口函数](../query/window-functions/derby.sql) | ROW_NUMBER(10.4+)，窗口函数支持有限 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [derby.sql](../scenarios/date-series-fill/derby.sql) |
-| 去重 | [derby.sql](../scenarios/deduplication/derby.sql) |
-| 区间检测 | [derby.sql](../scenarios/gap-detection/derby.sql) |
-| 层级查询 | [derby.sql](../scenarios/hierarchical-query/derby.sql) |
-| JSON 展开 | [derby.sql](../scenarios/json-flatten/derby.sql) |
-| 迁移速查 | [derby.sql](../scenarios/migration-cheatsheet/derby.sql) |
-| TopN 查询 | [derby.sql](../scenarios/ranking-top-n/derby.sql) |
-| 累计求和 | [derby.sql](../scenarios/running-total/derby.sql) |
-| 缓慢变化维 | [derby.sql](../scenarios/slowly-changing-dim/derby.sql) |
-| 字符串拆分 | [derby.sql](../scenarios/string-split-to-rows/derby.sql) |
-| 窗口分析 | [derby.sql](../scenarios/window-analytics/derby.sql) |
+| [日期填充](../scenarios/date-series-fill/derby.sql) | 无 generate_series，无 CTE，需辅助表 |
+| [去重](../scenarios/deduplication/derby.sql) | ROW_NUMBER(10.4+)+子查询去重 |
+| [区间检测](../scenarios/gap-detection/derby.sql) | 自连接检测(无窗口函数完整支持) |
+| [层级查询](../scenarios/hierarchical-query/derby.sql) | 无递归 CTE(最大限制) |
+| [JSON 展开](../scenarios/json-flatten/derby.sql) | 无 JSON 支持(功能缺失) |
+| [迁移速查](../scenarios/migration-cheatsheet/derby.sql) | Java 嵌入式，功能较少，无 CTE/JSON 是主要限制 |
+| [TopN 查询](../scenarios/ranking-top-n/derby.sql) | ROW_NUMBER(10.4+)+FETCH FIRST |
+| [累计求和](../scenarios/running-total/derby.sql) | 有限窗口函数支持 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/derby.sql) | MERGE(10.11+) |
+| [字符串拆分](../scenarios/string-split-to-rows/derby.sql) | 无拆分函数，需 Java UDF |
+| [窗口分析](../scenarios/window-analytics/derby.sql) | 窗口函数支持有限(ROW_NUMBER/RANK 等基本函数) |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [derby.sql](../types/array-map-struct/derby.sql) |
-| 日期时间 | [derby.sql](../types/datetime/derby.sql) |
-| JSON | [derby.sql](../types/json/derby.sql) |
-| 数值类型 | [derby.sql](../types/numeric/derby.sql) |
-| 字符串类型 | [derby.sql](../types/string/derby.sql) |
+| [复合类型](../types/array-map-struct/derby.sql) | 无 ARRAY/STRUCT/MAP 类型 |
+| [日期时间](../types/datetime/derby.sql) | DATE/TIME/TIMESTAMP 标准，无 INTERVAL |
+| [JSON](../types/json/derby.sql) | 无 JSON 支持 |
+| [数值类型](../types/numeric/derby.sql) | SMALLINT/INTEGER/BIGINT/DECIMAL/FLOAT/DOUBLE 标准 |
+| [字符串类型](../types/string/derby.sql) | VARCHAR/CHAR/CLOB 标准，UTF-8 |

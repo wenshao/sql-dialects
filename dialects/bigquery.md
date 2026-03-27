@@ -64,86 +64,86 @@ BigQuery 标准 SQL 语法自成一体，与 PostgreSQL/MySQL 不兼容。但其
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [bigquery.sql](../ddl/create-table/bigquery.sql) |
-| 改表 | [bigquery.sql](../ddl/alter-table/bigquery.sql) |
-| 索引 | [bigquery.sql](../ddl/indexes/bigquery.sql) |
-| 约束 | [bigquery.sql](../ddl/constraints/bigquery.sql) |
-| 视图 | [bigquery.sql](../ddl/views/bigquery.sql) |
-| 序列与自增 | [bigquery.sql](../ddl/sequences/bigquery.sql) |
-| 数据库/Schema/用户 | [bigquery.sql](../ddl/users-databases/bigquery.sql) |
+| [建表](../ddl/create-table/bigquery.sql) | 无服务器无索引，PARTITION+CLUSTER 替代，约束 NOT ENFORCED |
+| [改表](../ddl/alter-table/bigquery.sql) | ALTER 支持有限，无 MODIFY COLUMN TYPE，Schema 演进受限 |
+| [索引](../ddl/indexes/bigquery.sql) | 无传统索引，SEARCH INDEX 全文索引(2023+)，靠分区裁剪 |
+| [约束](../ddl/constraints/bigquery.sql) | PK/FK NOT ENFORCED 仅元数据提示，不实际校验 |
+| [视图](../ddl/views/bigquery.sql) | 物化视图自动刷新+智能调优，Authorized View 数据共享 |
+| [序列与自增](../ddl/sequences/bigquery.sql) | 无自增列，GENERATE_UUID() 或 ROW_NUMBER 模拟 |
+| [数据库/Schema/用户](../ddl/users-databases/bigquery.sql) | Dataset=Schema，IAM 权限管理，项目级隔离 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [bigquery.sql](../advanced/dynamic-sql/bigquery.sql) |
-| 错误处理 | [bigquery.sql](../advanced/error-handling/bigquery.sql) |
-| 执行计划 | [bigquery.sql](../advanced/explain/bigquery.sql) |
-| 锁机制 | [bigquery.sql](../advanced/locking/bigquery.sql) |
-| 分区 | [bigquery.sql](../advanced/partitioning/bigquery.sql) |
-| 权限 | [bigquery.sql](../advanced/permissions/bigquery.sql) |
-| 存储过程 | [bigquery.sql](../advanced/stored-procedures/bigquery.sql) |
-| 临时表 | [bigquery.sql](../advanced/temp-tables/bigquery.sql) |
-| 事务 | [bigquery.sql](../advanced/transactions/bigquery.sql) |
-| 触发器 | [bigquery.sql](../advanced/triggers/bigquery.sql) |
+| [动态 SQL](../advanced/dynamic-sql/bigquery.sql) | EXECUTE IMMEDIATE 脚本模式，Scripting(2019+) |
+| [错误处理](../advanced/error-handling/bigquery.sql) | BEGIN...EXCEPTION 脚本级错误处理，功能有限 |
+| [执行计划](../advanced/explain/bigquery.sql) | Execution Details 面板，Slot 消耗分析，无传统 EXPLAIN |
+| [锁机制](../advanced/locking/bigquery.sql) | 无用户可见锁，DML 配额限制并发，乐观并发 |
+| [分区](../advanced/partitioning/bigquery.sql) | PARTITION BY 日期/整数范围/时间戳，分区裁剪省钱关键 |
+| [权限](../advanced/permissions/bigquery.sql) | IAM+Dataset/Table/Column 级别权限，Authorized View/Dataset |
+| [存储过程](../advanced/stored-procedures/bigquery.sql) | JavaScript/SQL 存储过程，功能弱于 PL/pgSQL |
+| [临时表](../advanced/temp-tables/bigquery.sql) | CREATE TEMP TABLE 会话级，_SESSION 前缀引用 |
+| [事务](../advanced/transactions/bigquery.sql) | 多语句事务(2020+)，DML 并发配额限制，非 OLTP |
+| [触发器](../advanced/triggers/bigquery.sql) | 无触发器，借助 Cloud Functions/Pub/Sub 实现 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [bigquery.sql](../dml/delete/bigquery.sql) |
-| 插入 | [bigquery.sql](../dml/insert/bigquery.sql) |
-| 更新 | [bigquery.sql](../dml/update/bigquery.sql) |
-| Upsert | [bigquery.sql](../dml/upsert/bigquery.sql) |
+| [删除](../dml/delete/bigquery.sql) | DELETE+WHERE 必须，DML 配额限制，分区删除高效 |
+| [插入](../dml/insert/bigquery.sql) | INSERT+SELECT 为主，流式插入 API，LOAD 批量导入 |
+| [更新](../dml/update/bigquery.sql) | UPDATE+WHERE 必须，STRUCT 嵌套字段不可直接更新 |
+| [Upsert](../dml/upsert/bigquery.sql) | MERGE 标准语法，DML 配额限制写入频率 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [bigquery.sql](../functions/aggregate/bigquery.sql) |
-| 条件函数 | [bigquery.sql](../functions/conditional/bigquery.sql) |
-| 日期函数 | [bigquery.sql](../functions/date-functions/bigquery.sql) |
-| 数学函数 | [bigquery.sql](../functions/math-functions/bigquery.sql) |
-| 字符串函数 | [bigquery.sql](../functions/string-functions/bigquery.sql) |
-| 类型转换 | [bigquery.sql](../functions/type-conversion/bigquery.sql) |
+| [聚合函数](../functions/aggregate/bigquery.sql) | APPROX_COUNT_DISTINCT 近似聚合，ARRAY_AGG 嵌套 |
+| [条件函数](../functions/conditional/bigquery.sql) | IF/IIF/CASE/COALESCE，SAFE_ 前缀安全函数独有 |
+| [日期函数](../functions/date-functions/bigquery.sql) | DATE/DATETIME/TIMESTAMP 三类型，DATE_TRUNC，EXTRACT 标准 |
+| [数学函数](../functions/math-functions/bigquery.sql) | SAFE_DIVIDE 除零安全，IEEE_DIVIDE，GREATEST/LEAST 内置 |
+| [字符串函数](../functions/string-functions/bigquery.sql) | REGEXP_EXTRACT/REPLACE，FORMAT，SPLIT 返回 ARRAY |
+| [类型转换](../functions/type-conversion/bigquery.sql) | SAFE_CAST 安全转换（类似 TRY_CAST），CAST 标准 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [bigquery.sql](../query/cte/bigquery.sql) |
-| 全文搜索 | [bigquery.sql](../query/full-text-search/bigquery.sql) |
-| 连接查询 | [bigquery.sql](../query/joins/bigquery.sql) |
-| 分页 | [bigquery.sql](../query/pagination/bigquery.sql) |
-| 行列转换 | [bigquery.sql](../query/pivot-unpivot/bigquery.sql) |
-| 集合操作 | [bigquery.sql](../query/set-operations/bigquery.sql) |
-| 子查询 | [bigquery.sql](../query/subquery/bigquery.sql) |
-| 窗口函数 | [bigquery.sql](../query/window-functions/bigquery.sql) |
+| [CTE](../query/cte/bigquery.sql) | WITH 标准支持，递归 CTE 支持，自动优化 |
+| [全文搜索](../query/full-text-search/bigquery.sql) | SEARCH INDEX(2023+) 全文索引，SEARCH 函数，LOG-based |
+| [连接查询](../query/joins/bigquery.sql) | JOIN 标准完整，CROSS JOIN UNNEST 展开数组，无 LATERAL 关键字 |
+| [分页](../query/pagination/bigquery.sql) | LIMIT/OFFSET，无 FETCH FIRST，大结果集建议导出 |
+| [行列转换](../query/pivot-unpivot/bigquery.sql) | PIVOT/UNPIVOT 原生支持 |
+| [集合操作](../query/set-operations/bigquery.sql) | UNION/INTERSECT/EXCEPT+ALL/DISTINCT 完整 |
+| [子查询](../query/subquery/bigquery.sql) | 关联子查询+IN/EXISTS，标量子查询优化好 |
+| [窗口函数](../query/window-functions/bigquery.sql) | 完整窗口函数，QUALIFY 过滤独有（无需嵌套） |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [bigquery.sql](../scenarios/date-series-fill/bigquery.sql) |
-| 去重 | [bigquery.sql](../scenarios/deduplication/bigquery.sql) |
-| 区间检测 | [bigquery.sql](../scenarios/gap-detection/bigquery.sql) |
-| 层级查询 | [bigquery.sql](../scenarios/hierarchical-query/bigquery.sql) |
-| JSON 展开 | [bigquery.sql](../scenarios/json-flatten/bigquery.sql) |
-| 迁移速查 | [bigquery.sql](../scenarios/migration-cheatsheet/bigquery.sql) |
-| TopN 查询 | [bigquery.sql](../scenarios/ranking-top-n/bigquery.sql) |
-| 累计求和 | [bigquery.sql](../scenarios/running-total/bigquery.sql) |
-| 缓慢变化维 | [bigquery.sql](../scenarios/slowly-changing-dim/bigquery.sql) |
-| 字符串拆分 | [bigquery.sql](../scenarios/string-split-to-rows/bigquery.sql) |
-| 窗口分析 | [bigquery.sql](../scenarios/window-analytics/bigquery.sql) |
+| [日期填充](../scenarios/date-series-fill/bigquery.sql) | GENERATE_DATE_ARRAY+UNNEST 生成日期序列 |
+| [去重](../scenarios/deduplication/bigquery.sql) | ROW_NUMBER+QUALIFY 最简写法（无需子查询） |
+| [区间检测](../scenarios/gap-detection/bigquery.sql) | 窗口函数+GENERATE_DATE_ARRAY 检测间隙 |
+| [层级查询](../scenarios/hierarchical-query/bigquery.sql) | 递归 CTE 支持，迭代深度有限制 |
+| [JSON 展开](../scenarios/json-flatten/bigquery.sql) | JSON_EXTRACT+UNNEST，JSON_QUERY_ARRAY 展开 |
+| [迁移速查](../scenarios/migration-cheatsheet/bigquery.sql) | INT64/STRING 类型命名差异，无索引，DML 配额限制 |
+| [TopN 查询](../scenarios/ranking-top-n/bigquery.sql) | QUALIFY ROW_NUMBER() 最简写法，无需子查询 |
+| [累计求和](../scenarios/running-total/bigquery.sql) | SUM() OVER 标准，大数据量下 Slot 自动扩展 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/bigquery.sql) | MERGE 标准，快照表+时间旅行(7天) 辅助 |
+| [字符串拆分](../scenarios/string-split-to-rows/bigquery.sql) | SPLIT 返回 ARRAY+UNNEST 展开，原生简洁 |
+| [窗口分析](../scenarios/window-analytics/bigquery.sql) | 完整窗口函数+QUALIFY（最简过滤），WINDOW 命名子句 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [bigquery.sql](../types/array-map-struct/bigquery.sql) |
-| 日期时间 | [bigquery.sql](../types/datetime/bigquery.sql) |
-| JSON | [bigquery.sql](../types/json/bigquery.sql) |
-| 数值类型 | [bigquery.sql](../types/numeric/bigquery.sql) |
-| 字符串类型 | [bigquery.sql](../types/string/bigquery.sql) |
+| [复合类型](../types/array-map-struct/bigquery.sql) | ARRAY/STRUCT 一等公民（Dremel 传统），嵌套查询自然 |
+| [日期时间](../types/datetime/bigquery.sql) | DATE/TIME/DATETIME/TIMESTAMP 四类型，时区处理清晰 |
+| [JSON](../types/json/bigquery.sql) | JSON 类型(2022+)，JSON_EXTRACT 路径查询，无 JSON 索引 |
+| [数值类型](../types/numeric/bigquery.sql) | INT64/FLOAT64/NUMERIC/BIGNUMERIC，命名非标准但清晰 |
+| [字符串类型](../types/string/bigquery.sql) | STRING 无长度限制，BYTES 二进制，REGEXP 内置 |

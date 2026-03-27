@@ -48,86 +48,86 @@ TDengine 的"一设备一表"数据模型是时序数据库领域的独特设计
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [tdengine.sql](../ddl/create-table/tdengine.sql) |
-| 改表 | [tdengine.sql](../ddl/alter-table/tdengine.sql) |
-| 索引 | [tdengine.sql](../ddl/indexes/tdengine.sql) |
-| 约束 | [tdengine.sql](../ddl/constraints/tdengine.sql) |
-| 视图 | [tdengine.sql](../ddl/views/tdengine.sql) |
-| 序列与自增 | [tdengine.sql](../ddl/sequences/tdengine.sql) |
-| 数据库/Schema/用户 | [tdengine.sql](../ddl/users-databases/tdengine.sql) |
+| [建表](../ddl/create-table/tdengine.sql) | 时序数据库，超级表+子表模型(Tag 标签分类)，自动建表 |
+| [改表](../ddl/alter-table/tdengine.sql) | ALTER ADD TAG/COLUMN，超级表结构变更自动同步子表 |
+| [索引](../ddl/indexes/tdengine.sql) | SMA 预计算索引(独有)，Tag 索引，时间列自动索引 |
+| [约束](../ddl/constraints/tdengine.sql) | 无传统约束(时序引擎)，TIMESTAMP 主键必须 |
+| [视图](../ddl/views/tdengine.sql) | Stream 流式计算替代视图(无传统 VIEW) |
+| [序列与自增](../ddl/sequences/tdengine.sql) | 无 SEQUENCE，TIMESTAMP 主键天然有序 |
+| [数据库/Schema/用户](../ddl/users-databases/tdengine.sql) | Database 级别隔离+VNODE 分片，用户权限 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [tdengine.sql](../advanced/dynamic-sql/tdengine.sql) |
-| 错误处理 | [tdengine.sql](../advanced/error-handling/tdengine.sql) |
-| 执行计划 | [tdengine.sql](../advanced/explain/tdengine.sql) |
-| 锁机制 | [tdengine.sql](../advanced/locking/tdengine.sql) |
-| 分区 | [tdengine.sql](../advanced/partitioning/tdengine.sql) |
-| 权限 | [tdengine.sql](../advanced/permissions/tdengine.sql) |
-| 存储过程 | [tdengine.sql](../advanced/stored-procedures/tdengine.sql) |
-| 临时表 | [tdengine.sql](../advanced/temp-tables/tdengine.sql) |
-| 事务 | [tdengine.sql](../advanced/transactions/tdengine.sql) |
-| 触发器 | [tdengine.sql](../advanced/triggers/tdengine.sql) |
+| [动态 SQL](../advanced/dynamic-sql/tdengine.sql) | 无动态 SQL(时序引擎定位) |
+| [错误处理](../advanced/error-handling/tdengine.sql) | 无过程式错误处理 |
+| [执行计划](../advanced/explain/tdengine.sql) | EXPLAIN 查看执行计划 |
+| [锁机制](../advanced/locking/tdengine.sql) | 无行级锁(时序追加写入)，VNODE 级别并发 |
+| [分区](../advanced/partitioning/tdengine.sql) | 自动按时间分 VNODE(核心)，超级表按 Tag 分组 |
+| [权限](../advanced/permissions/tdengine.sql) | 用户+权限管理，READ/WRITE/ALL |
+| [存储过程](../advanced/stored-procedures/tdengine.sql) | 无存储过程，UDF(C/Python) 支持 |
+| [临时表](../advanced/temp-tables/tdengine.sql) | 无临时表(时序引擎) |
+| [事务](../advanced/transactions/tdengine.sql) | 无传统事务(时序追加写入，最终一致性) |
+| [触发器](../advanced/triggers/tdengine.sql) | Stream 流式计算替代触发器 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [tdengine.sql](../dml/delete/tdengine.sql) |
-| 插入 | [tdengine.sql](../dml/insert/tdengine.sql) |
-| 更新 | [tdengine.sql](../dml/update/tdengine.sql) |
-| Upsert | [tdengine.sql](../dml/upsert/tdengine.sql) |
+| [删除](../dml/delete/tdengine.sql) | DELETE 按时间范围删除，不支持条件删除单行 |
+| [插入](../dml/insert/tdengine.sql) | INSERT 多行/多表批量写入(独有高效语法) |
+| [更新](../dml/update/tdengine.sql) | 相同时间戳 INSERT 覆盖(时序 Upsert 语义) |
+| [Upsert](../dml/upsert/tdengine.sql) | INSERT 相同时间戳自动覆盖(时序天然 Upsert) |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [tdengine.sql](../functions/aggregate/tdengine.sql) |
-| 条件函数 | [tdengine.sql](../functions/conditional/tdengine.sql) |
-| 日期函数 | [tdengine.sql](../functions/date-functions/tdengine.sql) |
-| 数学函数 | [tdengine.sql](../functions/math-functions/tdengine.sql) |
-| 字符串函数 | [tdengine.sql](../functions/string-functions/tdengine.sql) |
-| 类型转换 | [tdengine.sql](../functions/type-conversion/tdengine.sql) |
+| [聚合函数](../functions/aggregate/tdengine.sql) | APERTURE/CSUM/DERIVATIVE/IRATE 时序聚合(独有) |
+| [条件函数](../functions/conditional/tdengine.sql) | IF/CASE 基础支持 |
+| [日期函数](../functions/date-functions/tdengine.sql) | NOW/TIMETRUNCATE/TIMEDIFF 时序时间函数 |
+| [数学函数](../functions/math-functions/tdengine.sql) | 基础数学函数+SPREAD/TWA 时序计算(独有) |
+| [字符串函数](../functions/string-functions/tdengine.sql) | CONCAT/SUBSTR/LENGTH 基础函数 |
+| [类型转换](../functions/type-conversion/tdengine.sql) | CAST 基础转换 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [tdengine.sql](../query/cte/tdengine.sql) |
-| 全文搜索 | [tdengine.sql](../query/full-text-search/tdengine.sql) |
-| 连接查询 | [tdengine.sql](../query/joins/tdengine.sql) |
-| 分页 | [tdengine.sql](../query/pagination/tdengine.sql) |
-| 行列转换 | [tdengine.sql](../query/pivot-unpivot/tdengine.sql) |
-| 集合操作 | [tdengine.sql](../query/set-operations/tdengine.sql) |
-| 子查询 | [tdengine.sql](../query/subquery/tdengine.sql) |
-| 窗口函数 | [tdengine.sql](../query/window-functions/tdengine.sql) |
+| [CTE](../query/cte/tdengine.sql) | 不支持 CTE |
+| [全文搜索](../query/full-text-search/tdengine.sql) | 不支持全文搜索(时序引擎) |
+| [连接查询](../query/joins/tdengine.sql) | JOIN 有限支持(超级表+子表)，无复杂 JOIN |
+| [分页](../query/pagination/tdengine.sql) | LIMIT/OFFSET 标准，SLIMIT/SOFFSET 超级表分组分页(独有) |
+| [行列转换](../query/pivot-unpivot/tdengine.sql) | 无 PIVOT 支持 |
+| [集合操作](../query/set-operations/tdengine.sql) | UNION/UNION ALL 支持 |
+| [子查询](../query/subquery/tdengine.sql) | 嵌套子查询支持(有限) |
+| [窗口函数](../query/window-functions/tdengine.sql) | STATE_WINDOW/SESSION_WINDOW/EVENT_WINDOW 时序窗口(独有) |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [tdengine.sql](../scenarios/date-series-fill/tdengine.sql) |
-| 去重 | [tdengine.sql](../scenarios/deduplication/tdengine.sql) |
-| 区间检测 | [tdengine.sql](../scenarios/gap-detection/tdengine.sql) |
-| 层级查询 | [tdengine.sql](../scenarios/hierarchical-query/tdengine.sql) |
-| JSON 展开 | [tdengine.sql](../scenarios/json-flatten/tdengine.sql) |
-| 迁移速查 | [tdengine.sql](../scenarios/migration-cheatsheet/tdengine.sql) |
-| TopN 查询 | [tdengine.sql](../scenarios/ranking-top-n/tdengine.sql) |
-| 累计求和 | [tdengine.sql](../scenarios/running-total/tdengine.sql) |
-| 缓慢变化维 | [tdengine.sql](../scenarios/slowly-changing-dim/tdengine.sql) |
-| 字符串拆分 | [tdengine.sql](../scenarios/string-split-to-rows/tdengine.sql) |
-| 窗口分析 | [tdengine.sql](../scenarios/window-analytics/tdengine.sql) |
+| [日期填充](../scenarios/date-series-fill/tdengine.sql) | FILL(PREV/NEXT/LINEAR/VALUE) 时序填充(独有核心功能) |
+| [去重](../scenarios/deduplication/tdengine.sql) | UNIQUE 函数(独有)，按列去重取最新 |
+| [区间检测](../scenarios/gap-detection/tdengine.sql) | INTERVAL+FILL 检测时序间隙(独有) |
+| [层级查询](../scenarios/hierarchical-query/tdengine.sql) | 不支持(时序引擎) |
+| [JSON 展开](../scenarios/json-flatten/tdengine.sql) | TAG 为 JSON 类型时可查询，JSON_EXTRACT |
+| [迁移速查](../scenarios/migration-cheatsheet/tdengine.sql) | 超级表/子表模型+时序语法+无事务是核心差异 |
+| [TopN 查询](../scenarios/ranking-top-n/tdengine.sql) | TOP/BOTTOM 函数(独有)，取极值行 |
+| [累计求和](../scenarios/running-total/tdengine.sql) | CSUM 累计求和函数(独有) |
+| [缓慢变化维](../scenarios/slowly-changing-dim/tdengine.sql) | 不适用(时序引擎) |
+| [字符串拆分](../scenarios/string-split-to-rows/tdengine.sql) | 不支持字符串拆分展开 |
+| [窗口分析](../scenarios/window-analytics/tdengine.sql) | INTERVAL/STATE/SESSION/EVENT_WINDOW 时序窗口(独有) |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [tdengine.sql](../types/array-map-struct/tdengine.sql) |
-| 日期时间 | [tdengine.sql](../types/datetime/tdengine.sql) |
-| JSON | [tdengine.sql](../types/json/tdengine.sql) |
-| 数值类型 | [tdengine.sql](../types/numeric/tdengine.sql) |
-| 字符串类型 | [tdengine.sql](../types/string/tdengine.sql) |
+| [复合类型](../types/array-map-struct/tdengine.sql) | 无 ARRAY/STRUCT，TAG 支持 JSON |
+| [日期时间](../types/datetime/tdengine.sql) | TIMESTAMP 纳秒精度(核心类型)，无 DATE/TIME |
+| [JSON](../types/json/tdengine.sql) | JSON TAG 类型，json_extract 查询 |
+| [数值类型](../types/numeric/tdengine.sql) | TINYINT-BIGINT/FLOAT/DOUBLE/BOOL，无 DECIMAL |
+| [字符串类型](../types/string/tdengine.sql) | NCHAR(Unicode)/BINARY/VARCHAR(3.0+) |

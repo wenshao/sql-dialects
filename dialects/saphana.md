@@ -57,86 +57,86 @@ SAP HANA 是 SAP 推出的内存计算平台，其核心是一个以列式存储
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [saphana.sql](../ddl/create-table/saphana.sql) |
-| 改表 | [saphana.sql](../ddl/alter-table/saphana.sql) |
-| 索引 | [saphana.sql](../ddl/indexes/saphana.sql) |
-| 约束 | [saphana.sql](../ddl/constraints/saphana.sql) |
-| 视图 | [saphana.sql](../ddl/views/saphana.sql) |
-| 序列与自增 | [saphana.sql](../ddl/sequences/saphana.sql) |
-| 数据库/Schema/用户 | [saphana.sql](../ddl/users-databases/saphana.sql) |
+| [建表](../ddl/create-table/saphana.sql) | 内存列存默认(ROW/COLUMN 可选)，实时 OLAP+OLTP |
+| [改表](../ddl/alter-table/saphana.sql) | ALTER 在线执行，列存/行存表各有限制 |
+| [索引](../ddl/indexes/saphana.sql) | 列存自动索引(无需手动)，行存 B-tree/Fulltext 索引 |
+| [约束](../ddl/constraints/saphana.sql) | PK/FK/UNIQUE/CHECK 完整支持 |
+| [视图](../ddl/views/saphana.sql) | Calculation View(图形化建模) + SQL View，无传统物化视图 |
+| [序列与自增](../ddl/sequences/saphana.sql) | SEQUENCE+GENERATED ALWAYS AS IDENTITY |
+| [数据库/Schema/用户](../ddl/users-databases/saphana.sql) | Multi-Tenant(MDC)，Schema=用户命名空间，XS Advanced |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [saphana.sql](../advanced/dynamic-sql/saphana.sql) |
-| 错误处理 | [saphana.sql](../advanced/error-handling/saphana.sql) |
-| 执行计划 | [saphana.sql](../advanced/explain/saphana.sql) |
-| 锁机制 | [saphana.sql](../advanced/locking/saphana.sql) |
-| 分区 | [saphana.sql](../advanced/partitioning/saphana.sql) |
-| 权限 | [saphana.sql](../advanced/permissions/saphana.sql) |
-| 存储过程 | [saphana.sql](../advanced/stored-procedures/saphana.sql) |
-| 临时表 | [saphana.sql](../advanced/temp-tables/saphana.sql) |
-| 事务 | [saphana.sql](../advanced/transactions/saphana.sql) |
-| 触发器 | [saphana.sql](../advanced/triggers/saphana.sql) |
+| [动态 SQL](../advanced/dynamic-sql/saphana.sql) | EXEC/EXECUTE IMMEDIATE，SQLScript 过程语言 |
+| [错误处理](../advanced/error-handling/saphana.sql) | DECLARE EXIT HANDLER，SIGNAL/RESIGNAL，SQLScript 异常处理 |
+| [执行计划](../advanced/explain/saphana.sql) | EXPLAIN PLAN+PlanViz 图形化(SAP 特色)，Calculation Engine |
+| [锁机制](../advanced/locking/saphana.sql) | MVCC(列存)+行锁(行存)，Snapshot Isolation 默认 |
+| [分区](../advanced/partitioning/saphana.sql) | HASH/RANGE/ROUND_ROBIN 分区，大表自动分区推荐 |
+| [权限](../advanced/permissions/saphana.sql) | 细粒度 Privilege 体系，Analytic Privilege 行级安全 |
+| [存储过程](../advanced/stored-procedures/saphana.sql) | SQLScript 过程语言(CE 函数/SQL)，并行执行优化 |
+| [临时表](../advanced/temp-tables/saphana.sql) | LOCAL/GLOBAL TEMPORARY TABLE，列存/行存可选 |
+| [事务](../advanced/transactions/saphana.sql) | MVCC Snapshot Isolation，READ COMMITTED 默认，ACID |
+| [触发器](../advanced/triggers/saphana.sql) | BEFORE/AFTER 行级触发器，无语句级 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [saphana.sql](../dml/delete/saphana.sql) |
-| 插入 | [saphana.sql](../dml/insert/saphana.sql) |
-| 更新 | [saphana.sql](../dml/update/saphana.sql) |
-| Upsert | [saphana.sql](../dml/upsert/saphana.sql) |
+| [删除](../dml/delete/saphana.sql) | DELETE 标准，TRUNCATE 即时 |
+| [插入](../dml/insert/saphana.sql) | INSERT+UPSERT 标准，IMPORT FROM 批量加载 |
+| [更新](../dml/update/saphana.sql) | UPDATE 标准，UPSERT(REPLACE) 支持 |
+| [Upsert](../dml/upsert/saphana.sql) | UPSERT/REPLACE 语句原生支持(非 MERGE) |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [saphana.sql](../functions/aggregate/saphana.sql) |
-| 条件函数 | [saphana.sql](../functions/conditional/saphana.sql) |
-| 日期函数 | [saphana.sql](../functions/date-functions/saphana.sql) |
-| 数学函数 | [saphana.sql](../functions/math-functions/saphana.sql) |
-| 字符串函数 | [saphana.sql](../functions/string-functions/saphana.sql) |
-| 类型转换 | [saphana.sql](../functions/type-conversion/saphana.sql) |
+| [聚合函数](../functions/aggregate/saphana.sql) | STRING_AGG/GROUPING SETS/CUBE/ROLLUP 完整 |
+| [条件函数](../functions/conditional/saphana.sql) | CASE/IFNULL/NULLIF/COALESCE/MAP(类似 DECODE) |
+| [日期函数](../functions/date-functions/saphana.sql) | ADD_DAYS/ADD_MONTHS/DAYS_BETWEEN，日期函数丰富 |
+| [数学函数](../functions/math-functions/saphana.sql) | 完整数学函数 |
+| [字符串函数](../functions/string-functions/saphana.sql) | || 拼接，LOCATE/SUBSTR/REPLACE 标准 |
+| [类型转换](../functions/type-conversion/saphana.sql) | CAST/TO_DATE/TO_DECIMAL 显式转换 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [saphana.sql](../query/cte/saphana.sql) |
-| 全文搜索 | [saphana.sql](../query/full-text-search/saphana.sql) |
-| 连接查询 | [saphana.sql](../query/joins/saphana.sql) |
-| 分页 | [saphana.sql](../query/pagination/saphana.sql) |
-| 行列转换 | [saphana.sql](../query/pivot-unpivot/saphana.sql) |
-| 集合操作 | [saphana.sql](../query/set-operations/saphana.sql) |
-| 子查询 | [saphana.sql](../query/subquery/saphana.sql) |
-| 窗口函数 | [saphana.sql](../query/window-functions/saphana.sql) |
+| [CTE](../query/cte/saphana.sql) | WITH 标准+递归 CTE 支持 |
+| [全文搜索](../query/full-text-search/saphana.sql) | FULLTEXT INDEX 内置(列存)，CONTAINS/FUZZY/近邻搜索 |
+| [连接查询](../query/joins/saphana.sql) | JOIN 完整，LATERAL(2.0+)，内存计算加速 |
+| [分页](../query/pagination/saphana.sql) | LIMIT/OFFSET 标准 |
+| [行列转换](../query/pivot-unpivot/saphana.sql) | 无原生 PIVOT，CASE+GROUP BY 或 MAP 函数 |
+| [集合操作](../query/set-operations/saphana.sql) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/saphana.sql) | 关联子查询+标量子查询优化 |
+| [窗口函数](../query/window-functions/saphana.sql) | 完整窗口函数，ROWS/RANGE/GROUPS 帧 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [saphana.sql](../scenarios/date-series-fill/saphana.sql) |
-| 去重 | [saphana.sql](../scenarios/deduplication/saphana.sql) |
-| 区间检测 | [saphana.sql](../scenarios/gap-detection/saphana.sql) |
-| 层级查询 | [saphana.sql](../scenarios/hierarchical-query/saphana.sql) |
-| JSON 展开 | [saphana.sql](../scenarios/json-flatten/saphana.sql) |
-| 迁移速查 | [saphana.sql](../scenarios/migration-cheatsheet/saphana.sql) |
-| TopN 查询 | [saphana.sql](../scenarios/ranking-top-n/saphana.sql) |
-| 累计求和 | [saphana.sql](../scenarios/running-total/saphana.sql) |
-| 缓慢变化维 | [saphana.sql](../scenarios/slowly-changing-dim/saphana.sql) |
-| 字符串拆分 | [saphana.sql](../scenarios/string-split-to-rows/saphana.sql) |
-| 窗口分析 | [saphana.sql](../scenarios/window-analytics/saphana.sql) |
+| [日期填充](../scenarios/date-series-fill/saphana.sql) | SERIES_GENERATE_DATE 序列生成(独有函数) |
+| [去重](../scenarios/deduplication/saphana.sql) | ROW_NUMBER+CTE 去重 |
+| [区间检测](../scenarios/gap-detection/saphana.sql) | SERIES_GENERATE+窗口函数 |
+| [层级查询](../scenarios/hierarchical-query/saphana.sql) | HIERARCHY 函数(独有)，递归 CTE 亦支持 |
+| [JSON 展开](../scenarios/json-flatten/saphana.sql) | JSON_TABLE/JSON_QUERY/JSON_VALUE 标准 |
+| [迁移速查](../scenarios/migration-cheatsheet/saphana.sql) | 内存列存+SQLScript+Calculation View 是核心差异 |
+| [TopN 查询](../scenarios/ranking-top-n/saphana.sql) | ROW_NUMBER+LIMIT 标准 |
+| [累计求和](../scenarios/running-total/saphana.sql) | SUM() OVER 标准，内存计算极快 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/saphana.sql) | MERGE+系统版本化表(Temporal Table) |
+| [字符串拆分](../scenarios/string-split-to-rows/saphana.sql) | SERIES_GENERATE+SUBSTR 或 JSON_TABLE |
+| [窗口分析](../scenarios/window-analytics/saphana.sql) | 完整窗口函数，SERIES 时序分析能力 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [saphana.sql](../types/array-map-struct/saphana.sql) |
-| 日期时间 | [saphana.sql](../types/datetime/saphana.sql) |
-| JSON | [saphana.sql](../types/json/saphana.sql) |
-| 数值类型 | [saphana.sql](../types/numeric/saphana.sql) |
-| 字符串类型 | [saphana.sql](../types/string/saphana.sql) |
+| [复合类型](../types/array-map-struct/saphana.sql) | 无原生 ARRAY/STRUCT 列类型，用表类型替代 |
+| [日期时间](../types/datetime/saphana.sql) | DATE/TIME/TIMESTAMP/SECONDDATE 四类型，精度到纳秒 |
+| [JSON](../types/json/saphana.sql) | JSON Document Store+JSON_TABLE 标准，内存加速 |
+| [数值类型](../types/numeric/saphana.sql) | TINYINT-BIGINT/DECIMAL/FLOAT/DOUBLE/SMALLDECIMAL |
+| [字符串类型](../types/string/saphana.sql) | NVARCHAR(UTF-8 默认)，VARCHAR/NCLOB，无 TEXT 别名 |

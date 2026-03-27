@@ -57,86 +57,86 @@ DuckDB 是一款嵌入式列式分析数据库，常被称为"分析领域的 SQ
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [duckdb.sql](../ddl/create-table/duckdb.sql) |
-| 改表 | [duckdb.sql](../ddl/alter-table/duckdb.sql) |
-| 索引 | [duckdb.sql](../ddl/indexes/duckdb.sql) |
-| 约束 | [duckdb.sql](../ddl/constraints/duckdb.sql) |
-| 视图 | [duckdb.sql](../ddl/views/duckdb.sql) |
-| 序列与自增 | [duckdb.sql](../ddl/sequences/duckdb.sql) |
-| 数据库/Schema/用户 | [duckdb.sql](../ddl/users-databases/duckdb.sql) |
+| [建表](../ddl/create-table/duckdb.sql) | 嵌入式 OLAP，列式存储，PG 兼容语法，类型丰富 |
+| [改表](../ddl/alter-table/duckdb.sql) | ALTER 支持有限，ADD/DROP/RENAME COLUMN，无在线 DDL 需求 |
+| [索引](../ddl/indexes/duckdb.sql) | ART 索引（自适应基数树），主要靠 Zone Maps 自动过滤 |
+| [约束](../ddl/constraints/duckdb.sql) | PK/UNIQUE/CHECK/FK 声明支持，部分约束实际执行 |
+| [视图](../ddl/views/duckdb.sql) | 普通视图支持，无物化视图（内存 OLAP 不需要） |
+| [序列与自增](../ddl/sequences/duckdb.sql) | SEQUENCE+自动递增（PG 兼容语法） |
+| [数据库/Schema/用户](../ddl/users-databases/duckdb.sql) | ATTACH 多数据库，无用户权限（嵌入式定位） |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [duckdb.sql](../advanced/dynamic-sql/duckdb.sql) |
-| 错误处理 | [duckdb.sql](../advanced/error-handling/duckdb.sql) |
-| 执行计划 | [duckdb.sql](../advanced/explain/duckdb.sql) |
-| 锁机制 | [duckdb.sql](../advanced/locking/duckdb.sql) |
-| 分区 | [duckdb.sql](../advanced/partitioning/duckdb.sql) |
-| 权限 | [duckdb.sql](../advanced/permissions/duckdb.sql) |
-| 存储过程 | [duckdb.sql](../advanced/stored-procedures/duckdb.sql) |
-| 临时表 | [duckdb.sql](../advanced/temp-tables/duckdb.sql) |
-| 事务 | [duckdb.sql](../advanced/transactions/duckdb.sql) |
-| 触发器 | [duckdb.sql](../advanced/triggers/duckdb.sql) |
+| [动态 SQL](../advanced/dynamic-sql/duckdb.sql) | 无存储过程/动态 SQL，Python/R 集成替代 |
+| [错误处理](../advanced/error-handling/duckdb.sql) | 无过程式错误处理，API 层错误返回 |
+| [执行计划](../advanced/explain/duckdb.sql) | EXPLAIN ANALYZE 带实际行数，Profile 可视化 |
+| [锁机制](../advanced/locking/duckdb.sql) | MVCC 乐观并发，单写者+多读者，无锁竞争 |
+| [分区](../advanced/partitioning/duckdb.sql) | Hive 分区读取支持，内部分区通过 Row Groups |
+| [权限](../advanced/permissions/duckdb.sql) | 无权限系统（嵌入式定位），文件级安全 |
+| [存储过程](../advanced/stored-procedures/duckdb.sql) | 无存储过程，宏(MACRO) 替代简单逻辑 |
+| [临时表](../advanced/temp-tables/duckdb.sql) | CREATE TEMP TABLE 支持，会话级 |
+| [事务](../advanced/transactions/duckdb.sql) | ACID 事务，MVCC，单写者模型（类 SQLite） |
+| [触发器](../advanced/triggers/duckdb.sql) | 无触发器支持 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [duckdb.sql](../dml/delete/duckdb.sql) |
-| 插入 | [duckdb.sql](../dml/insert/duckdb.sql) |
-| 更新 | [duckdb.sql](../dml/update/duckdb.sql) |
-| Upsert | [duckdb.sql](../dml/upsert/duckdb.sql) |
+| [删除](../dml/delete/duckdb.sql) | DELETE 标准，批量操作列式引擎高效 |
+| [插入](../dml/insert/duckdb.sql) | INSERT+COPY，可直接导入 Parquet/CSV/JSON 文件 |
+| [更新](../dml/update/duckdb.sql) | UPDATE 标准，列式存储下更新非最优场景 |
+| [Upsert](../dml/upsert/duckdb.sql) | INSERT OR REPLACE/ON CONFLICT(0.9+)，PG 兼容语法 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [duckdb.sql](../functions/aggregate/duckdb.sql) |
-| 条件函数 | [duckdb.sql](../functions/conditional/duckdb.sql) |
-| 日期函数 | [duckdb.sql](../functions/date-functions/duckdb.sql) |
-| 数学函数 | [duckdb.sql](../functions/math-functions/duckdb.sql) |
-| 字符串函数 | [duckdb.sql](../functions/string-functions/duckdb.sql) |
-| 类型转换 | [duckdb.sql](../functions/type-conversion/duckdb.sql) |
+| [聚合函数](../functions/aggregate/duckdb.sql) | FILTER 子句，GROUPING SETS/CUBE/ROLLUP，list_agg |
+| [条件函数](../functions/conditional/duckdb.sql) | CASE/COALESCE/NULLIF/IF，PG 兼容 |
+| [日期函数](../functions/date-functions/duckdb.sql) | date_trunc/date_part/date_diff，INTERVAL 类型，PG 兼容 |
+| [数学函数](../functions/math-functions/duckdb.sql) | 完整数学函数，GREATEST/LEAST 内置 |
+| [字符串函数](../functions/string-functions/duckdb.sql) | || 拼接，regexp_extract/replace，string_split |
+| [类型转换](../functions/type-conversion/duckdb.sql) | CAST/:: 运算符(PG 风格)，TRY_CAST 安全转换 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [duckdb.sql](../query/cte/duckdb.sql) |
-| 全文搜索 | [duckdb.sql](../query/full-text-search/duckdb.sql) |
-| 连接查询 | [duckdb.sql](../query/joins/duckdb.sql) |
-| 分页 | [duckdb.sql](../query/pagination/duckdb.sql) |
-| 行列转换 | [duckdb.sql](../query/pivot-unpivot/duckdb.sql) |
-| 集合操作 | [duckdb.sql](../query/set-operations/duckdb.sql) |
-| 子查询 | [duckdb.sql](../query/subquery/duckdb.sql) |
-| 窗口函数 | [duckdb.sql](../query/window-functions/duckdb.sql) |
+| [CTE](../query/cte/duckdb.sql) | 递归 CTE 完整支持，自动物化/内联优化 |
+| [全文搜索](../query/full-text-search/duckdb.sql) | fts 扩展全文搜索，基于 BM25 |
+| [连接查询](../query/joins/duckdb.sql) | Hash/Merge/Nested Loop JOIN，LATERAL JOIN，ASOF JOIN 独有 |
+| [分页](../query/pagination/duckdb.sql) | LIMIT/OFFSET 标准，FETCH FIRST 亦支持 |
+| [行列转换](../query/pivot-unpivot/duckdb.sql) | PIVOT/UNPIVOT 原生支持（0.8+） |
+| [集合操作](../query/set-operations/duckdb.sql) | UNION/INTERSECT/EXCEPT+ALL 完整 |
+| [子查询](../query/subquery/duckdb.sql) | LATERAL 子查询支持，优化器自动展开 |
+| [窗口函数](../query/window-functions/duckdb.sql) | 完整窗口函数，QUALIFY 支持，WINDOW 命名子句 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [duckdb.sql](../scenarios/date-series-fill/duckdb.sql) |
-| 去重 | [duckdb.sql](../scenarios/deduplication/duckdb.sql) |
-| 区间检测 | [duckdb.sql](../scenarios/gap-detection/duckdb.sql) |
-| 层级查询 | [duckdb.sql](../scenarios/hierarchical-query/duckdb.sql) |
-| JSON 展开 | [duckdb.sql](../scenarios/json-flatten/duckdb.sql) |
-| 迁移速查 | [duckdb.sql](../scenarios/migration-cheatsheet/duckdb.sql) |
-| TopN 查询 | [duckdb.sql](../scenarios/ranking-top-n/duckdb.sql) |
-| 累计求和 | [duckdb.sql](../scenarios/running-total/duckdb.sql) |
-| 缓慢变化维 | [duckdb.sql](../scenarios/slowly-changing-dim/duckdb.sql) |
-| 字符串拆分 | [duckdb.sql](../scenarios/string-split-to-rows/duckdb.sql) |
-| 窗口分析 | [duckdb.sql](../scenarios/window-analytics/duckdb.sql) |
+| [日期填充](../scenarios/date-series-fill/duckdb.sql) | generate_series 原生支持（PG 兼容），RANGE 生成 |
+| [去重](../scenarios/deduplication/duckdb.sql) | QUALIFY ROW_NUMBER() 或 DISTINCT ON(PG 兼容) |
+| [区间检测](../scenarios/gap-detection/duckdb.sql) | generate_series+窗口函数检测 |
+| [层级查询](../scenarios/hierarchical-query/duckdb.sql) | 递归 CTE 标准实现 |
+| [JSON 展开](../scenarios/json-flatten/duckdb.sql) | json_extract/json_each，可直接查询 JSON 文件 |
+| [迁移速查](../scenarios/migration-cheatsheet/duckdb.sql) | PG 兼容语法+列式引擎，适合从 PG 迁移分析负载 |
+| [TopN 查询](../scenarios/ranking-top-n/duckdb.sql) | QUALIFY ROW_NUMBER() 或 DISTINCT ON |
+| [累计求和](../scenarios/running-total/duckdb.sql) | SUM() OVER 标准，列式引擎聚合极快 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/duckdb.sql) | INSERT OR REPLACE+标准 MERGE(0.9+) |
+| [字符串拆分](../scenarios/string-split-to-rows/duckdb.sql) | string_split+UNNEST 或 regexp_split_to_table |
+| [窗口分析](../scenarios/window-analytics/duckdb.sql) | 完整窗口函数+QUALIFY+WINDOW 子句 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [duckdb.sql](../types/array-map-struct/duckdb.sql) |
-| 日期时间 | [duckdb.sql](../types/datetime/duckdb.sql) |
-| JSON | [duckdb.sql](../types/json/duckdb.sql) |
-| 数值类型 | [duckdb.sql](../types/numeric/duckdb.sql) |
-| 字符串类型 | [duckdb.sql](../types/string/duckdb.sql) |
+| [复合类型](../types/array-map-struct/duckdb.sql) | LIST/STRUCT/MAP/UNION 原生类型，嵌套查询自然 |
+| [日期时间](../types/datetime/duckdb.sql) | DATE/TIME/TIMESTAMP/INTERVAL 完整，纳秒精度 |
+| [JSON](../types/json/duckdb.sql) | 原生 JSON 类型，可直接查询 JSON 文件，json_extract 路径 |
+| [数值类型](../types/numeric/duckdb.sql) | TINYINT-HUGEINT(128位)，DECIMAL 精确，FLOAT/DOUBLE |
+| [字符串类型](../types/string/duckdb.sql) | VARCHAR 无长度限制，BLOB 二进制，正则内置 |

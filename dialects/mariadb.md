@@ -58,86 +58,86 @@ MariaDB 是 MySQL 的社区驱动分叉，由 MySQL 原始创始人 Michael "Mon
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 建表 | [mariadb.sql](../ddl/create-table/mariadb.sql) |
-| 改表 | [mariadb.sql](../ddl/alter-table/mariadb.sql) |
-| 索引 | [mariadb.sql](../ddl/indexes/mariadb.sql) |
-| 约束 | [mariadb.sql](../ddl/constraints/mariadb.sql) |
-| 视图 | [mariadb.sql](../ddl/views/mariadb.sql) |
-| 序列与自增 | [mariadb.sql](../ddl/sequences/mariadb.sql) |
-| 数据库/Schema/用户 | [mariadb.sql](../ddl/users-databases/mariadb.sql) |
+| [建表](../ddl/create-table/mariadb.sql) | MySQL 分叉，兼容 ENGINE 架构，增加 SEQUENCE(10.3+)/虚拟列 |
+| [改表](../ddl/alter-table/mariadb.sql) | Online DDL 改进(INSTANT ADD COLUMN)，ALGORITHM 指定 |
+| [索引](../ddl/indexes/mariadb.sql) | InnoDB/Aria 引擎索引，与 MySQL 高度兼容 |
+| [约束](../ddl/constraints/mariadb.sql) | CHECK 约束真正执行(10.2+，早于 MySQL 8.0.16) |
+| [视图](../ddl/views/mariadb.sql) | 与 MySQL 兼容，无物化视图 |
+| [序列与自增](../ddl/sequences/mariadb.sql) | SEQUENCE 对象(10.3+，MySQL 无此功能)，AUTO_INCREMENT 兼容 |
+| [数据库/Schema/用户](../ddl/users-databases/mariadb.sql) | user@host 模型(同 MySQL)，角色(10.0.5+) |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 动态 SQL | [mariadb.sql](../advanced/dynamic-sql/mariadb.sql) |
-| 错误处理 | [mariadb.sql](../advanced/error-handling/mariadb.sql) |
-| 执行计划 | [mariadb.sql](../advanced/explain/mariadb.sql) |
-| 锁机制 | [mariadb.sql](../advanced/locking/mariadb.sql) |
-| 分区 | [mariadb.sql](../advanced/partitioning/mariadb.sql) |
-| 权限 | [mariadb.sql](../advanced/permissions/mariadb.sql) |
-| 存储过程 | [mariadb.sql](../advanced/stored-procedures/mariadb.sql) |
-| 临时表 | [mariadb.sql](../advanced/temp-tables/mariadb.sql) |
-| 事务 | [mariadb.sql](../advanced/transactions/mariadb.sql) |
-| 触发器 | [mariadb.sql](../advanced/triggers/mariadb.sql) |
+| [动态 SQL](../advanced/dynamic-sql/mariadb.sql) | PREPARE/EXECUTE(同 MySQL)，EXECUTE IMMEDIATE(10.2+)简化 |
+| [错误处理](../advanced/error-handling/mariadb.sql) | DECLARE HANDLER(同 MySQL)，SIGNAL/RESIGNAL |
+| [执行计划](../advanced/explain/mariadb.sql) | EXPLAIN ANALYZE(10.1+)，EXPLAIN FORMAT=JSON |
+| [锁机制](../advanced/locking/mariadb.sql) | InnoDB 行锁+间隙锁(同 MySQL)，Aria 引擎崩溃安全 |
+| [分区](../advanced/partitioning/mariadb.sql) | RANGE/LIST/HASH/KEY 分区(同 MySQL)，SYSTEM_TIME 分区独有 |
+| [权限](../advanced/permissions/mariadb.sql) | user@host 模型，角色(10.0.5+，早于 MySQL 8.0) |
+| [存储过程](../advanced/stored-procedures/mariadb.sql) | PL/SQL 兼容模式(10.3+ sql_mode=ORACLE)，独特卖点 |
+| [临时表](../advanced/temp-tables/mariadb.sql) | CREATE TEMPORARY TABLE(同 MySQL)，Aria 引擎临时表 |
+| [事务](../advanced/transactions/mariadb.sql) | InnoDB MVCC(同 MySQL)，默认 RR，支持 XA 事务 |
+| [触发器](../advanced/triggers/mariadb.sql) | FOR EACH ROW(同 MySQL)，无 INSTEAD OF/语句级 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 删除 | [mariadb.sql](../dml/delete/mariadb.sql) |
-| 插入 | [mariadb.sql](../dml/insert/mariadb.sql) |
-| 更新 | [mariadb.sql](../dml/update/mariadb.sql) |
-| Upsert | [mariadb.sql](../dml/upsert/mariadb.sql) |
+| [删除](../dml/delete/mariadb.sql) | DELETE+LIMIT(同 MySQL)，TRUNCATE 不可回滚 |
+| [插入](../dml/insert/mariadb.sql) | INSERT...SET/RETURNING(10.5+)，LOAD DATA 批量 |
+| [更新](../dml/update/mariadb.sql) | 多表 UPDATE JOIN(同 MySQL)，UPDATE...RETURNING(10.5+) |
+| [Upsert](../dml/upsert/mariadb.sql) | ON DUPLICATE KEY UPDATE(同 MySQL)，INSERT...RETURNING |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 聚合函数 | [mariadb.sql](../functions/aggregate/mariadb.sql) |
-| 条件函数 | [mariadb.sql](../functions/conditional/mariadb.sql) |
-| 日期函数 | [mariadb.sql](../functions/date-functions/mariadb.sql) |
-| 数学函数 | [mariadb.sql](../functions/math-functions/mariadb.sql) |
-| 字符串函数 | [mariadb.sql](../functions/string-functions/mariadb.sql) |
-| 类型转换 | [mariadb.sql](../functions/type-conversion/mariadb.sql) |
+| [聚合函数](../functions/aggregate/mariadb.sql) | GROUP_CONCAT(同 MySQL)，无 GROUPING SETS |
+| [条件函数](../functions/conditional/mariadb.sql) | IF()/CASE(同 MySQL)，DECODE(Oracle 兼容模式) |
+| [日期函数](../functions/date-functions/mariadb.sql) | DATE_FORMAT(同 MySQL)，与 MySQL 高度兼容 |
+| [数学函数](../functions/math-functions/mariadb.sql) | 与 MySQL 兼容，完整数学函数 |
+| [字符串函数](../functions/string-functions/mariadb.sql) | CONCAT(同 MySQL)，|| 在 sql_mode=ORACLE 时为拼接 |
+| [类型转换](../functions/type-conversion/mariadb.sql) | CAST/CONVERT(同 MySQL)，隐式转换行为与 MySQL 一致 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| CTE | [mariadb.sql](../query/cte/mariadb.sql) |
-| 全文搜索 | [mariadb.sql](../query/full-text-search/mariadb.sql) |
-| 连接查询 | [mariadb.sql](../query/joins/mariadb.sql) |
-| 分页 | [mariadb.sql](../query/pagination/mariadb.sql) |
-| 行列转换 | [mariadb.sql](../query/pivot-unpivot/mariadb.sql) |
-| 集合操作 | [mariadb.sql](../query/set-operations/mariadb.sql) |
-| 子查询 | [mariadb.sql](../query/subquery/mariadb.sql) |
-| 窗口函数 | [mariadb.sql](../query/window-functions/mariadb.sql) |
+| [CTE](../query/cte/mariadb.sql) | 递归 CTE(10.2+，早于 MySQL 8.0)，WITH 标准语法 |
+| [全文搜索](../query/full-text-search/mariadb.sql) | InnoDB/Mroonga FULLTEXT，Mroonga 引擎 CJK 分词更强 |
+| [连接查询](../query/joins/mariadb.sql) | 无 FULL OUTER JOIN(同 MySQL)，标准 JOIN 完整 |
+| [分页](../query/pagination/mariadb.sql) | LIMIT/OFFSET(同 MySQL)，LIMIT...ROWS EXAMINED 独有 |
+| [行列转换](../query/pivot-unpivot/mariadb.sql) | 无原生 PIVOT，用 CASE+GROUP BY(同 MySQL) |
+| [集合操作](../query/set-operations/mariadb.sql) | INTERSECT/EXCEPT(10.3+，早于 MySQL 8.0.31) |
+| [子查询](../query/subquery/mariadb.sql) | 优化器改进优于早期 MySQL，semi-join 优化 |
+| [窗口函数](../query/window-functions/mariadb.sql) | 10.2+ 支持（早于 MySQL 8.0），CUME_DIST/PERCENT_RANK |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 日期填充 | [mariadb.sql](../scenarios/date-series-fill/mariadb.sql) |
-| 去重 | [mariadb.sql](../scenarios/deduplication/mariadb.sql) |
-| 区间检测 | [mariadb.sql](../scenarios/gap-detection/mariadb.sql) |
-| 层级查询 | [mariadb.sql](../scenarios/hierarchical-query/mariadb.sql) |
-| JSON 展开 | [mariadb.sql](../scenarios/json-flatten/mariadb.sql) |
-| 迁移速查 | [mariadb.sql](../scenarios/migration-cheatsheet/mariadb.sql) |
-| TopN 查询 | [mariadb.sql](../scenarios/ranking-top-n/mariadb.sql) |
-| 累计求和 | [mariadb.sql](../scenarios/running-total/mariadb.sql) |
-| 缓慢变化维 | [mariadb.sql](../scenarios/slowly-changing-dim/mariadb.sql) |
-| 字符串拆分 | [mariadb.sql](../scenarios/string-split-to-rows/mariadb.sql) |
-| 窗口分析 | [mariadb.sql](../scenarios/window-analytics/mariadb.sql) |
+| [日期填充](../scenarios/date-series-fill/mariadb.sql) | seq_1_to_N 序列引擎独有，无需递归 CTE |
+| [去重](../scenarios/deduplication/mariadb.sql) | ROW_NUMBER+CTE 或 DELETE+JOIN |
+| [区间检测](../scenarios/gap-detection/mariadb.sql) | 窗口函数(10.2+)+seq 序列引擎辅助 |
+| [层级查询](../scenarios/hierarchical-query/mariadb.sql) | 递归 CTE(10.2+)，无 CONNECT BY |
+| [JSON 展开](../scenarios/json-flatten/mariadb.sql) | JSON_TABLE(10.6+)，JSON_EXTRACT 路径查询 |
+| [迁移速查](../scenarios/migration-cheatsheet/mariadb.sql) | 与 MySQL 高度兼容但 10.6+ 出现不可忽略差异 |
+| [TopN 查询](../scenarios/ranking-top-n/mariadb.sql) | ROW_NUMBER(10.2+)+CTE，LIMIT 直接 TopN |
+| [累计求和](../scenarios/running-total/mariadb.sql) | SUM() OVER(10.2+)，窗口函数早于 MySQL |
+| [缓慢变化维](../scenarios/slowly-changing-dim/mariadb.sql) | 无 MERGE 语句，ON DUPLICATE KEY UPDATE 替代 |
+| [字符串拆分](../scenarios/string-split-to-rows/mariadb.sql) | 无原生拆分，JSON_TABLE(10.6+) 或递归 CTE 模拟 |
+| [窗口分析](../scenarios/window-analytics/mariadb.sql) | 10.2+ 窗口函数，早于 MySQL，帧子句完整 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
+| 模块 | 简评 |
 |---|---|
-| 复合类型 | [mariadb.sql](../types/array-map-struct/mariadb.sql) |
-| 日期时间 | [mariadb.sql](../types/datetime/mariadb.sql) |
-| JSON | [mariadb.sql](../types/json/mariadb.sql) |
-| 数值类型 | [mariadb.sql](../types/numeric/mariadb.sql) |
-| 字符串类型 | [mariadb.sql](../types/string/mariadb.sql) |
+| [复合类型](../types/array-map-struct/mariadb.sql) | 无 ARRAY/STRUCT，JSON 替代(同 MySQL) |
+| [日期时间](../types/datetime/mariadb.sql) | DATETIME vs TIMESTAMP(同 MySQL)，微秒精度 |
+| [JSON](../types/json/mariadb.sql) | JSON 别名 LONGTEXT(非二进制)，JSON_TABLE(10.6+)，不如 MySQL JSONB |
+| [数值类型](../types/numeric/mariadb.sql) | 与 MySQL 兼容，DECIMAL 精确，UNSIGNED 保留 |
+| [字符串类型](../types/string/mariadb.sql) | utf8=utf8mb3(同 MySQL)，utf8mb4 推荐 |
