@@ -7,11 +7,12 @@
 --       https://dev.mysql.com/doc/refman/8.0/en/data-types.html
 --   [3] MySQL 8.0 Reference Manual - AUTO_INCREMENT
 --       https://dev.mysql.com/doc/refman/8.0/en/example-auto-increment.html
+--   [4] MySQL Internals - InnoDB Row Formats
+--       https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html
 
 -- ============================================================
--- 基本建表
+-- 1. 基本语法
 -- ============================================================
--- 一个典型的业务表，包含了 MySQL 建表中最常用的特性
 CREATE TABLE users (
     id         BIGINT       NOT NULL AUTO_INCREMENT,
     username   VARCHAR(64)  NOT NULL,
@@ -26,171 +27,178 @@ CREATE TABLE users (
     UNIQUE KEY uk_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 设计要点:
---   1. 主键用 BIGINT 而非 INT: INT 最大约 21 亿，大表容易溢出
---   2. AUTO_INCREMENT: MySQL 特有的自增语法，简单但在分布式场景下有问题（见下文）
---   3. ON UPDATE CURRENT_TIMESTAMP: MySQL 特有，自动更新修改时间，其他数据库需要触发器
---   4. ENGINE=InnoDB: 5.5+ 默认引擎，支持事务、行级锁、外键。MyISAM 已不推荐
---   5. utf8mb4: 真正的 UTF-8（支持 emoji），不要用 utf8（只支持 3 字节，BMP 子集）
---   6. COLLATE utf8mb4_unicode_ci: 大小写不敏感比较，生产环境推荐
---      8.0 默认是 utf8mb4_0900_ai_ci（Unicode 9.0，重音不敏感）
-
 -- ============================================================
--- DATETIME vs TIMESTAMP 选择
+-- 2. 语法设计分析（对 SQL 引擎开发者）
 -- ============================================================
--- 这是 MySQL 中最容易踩坑的类型选择之一
-CREATE TABLE events (
-    id         BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 
-    -- DATETIME: 存什么就是什么，不做时区转换
-    --   存储: 5 字节（5.6.4+），之前 8 字节
-    --   范围: '1000-01-01 00:00:00' ~ '9999-12-31 23:59:59'
-    --   适用: 业务时间（订单时间、出生日期等，不随时区变化的数据）
-    event_time DATETIME NOT NULL,
-
-    -- TIMESTAMP: 存储为 UTC，读取时按 session time_zone 转换
-    --   存储: 4 字节
-    --   范围: '1970-01-01 00:00:01' UTC ~ '2038-01-19 03:14:07' UTC (2038 年问题!)
-    --   适用: 系统时间（created_at、updated_at）
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-
-    -- 建议: 如果不确定，用 DATETIME。TIMESTAMP 的 2038 年问题在长生命周期系统中是真实风险
-);
-
--- ============================================================
--- VARCHAR 长度设计
--- ============================================================
--- VARCHAR(n) 中 n 是字符数，不是字节数
--- utf8mb4 下一个字符最多占 4 字节，但 VARCHAR(255) 不会比 VARCHAR(64) 多占空间
--- 实际占用 = 实际字符数 × 字节/字符 + 1 或 2 字节长度前缀
+-- 2.1 ENGINE 子句: 可插拔存储引擎架构
+-- MySQL 的 CREATE TABLE 语法中最独特的设计是 ENGINE 子句。
+-- 这源于 MySQL 的可插拔存储引擎架构（Pluggable Storage Engine）:
+--   - InnoDB: B+树聚集索引，MVCC，行级锁，事务，外键（5.5+ 默认）
+--   - MyISAM: 表级锁，无事务，全文索引（5.6 前唯一支持全文的引擎）
+--   - MEMORY: 内存表，Hash 索引，重启丢失
+--   - Archive: 只支持 INSERT/SELECT，高压缩比
+--   - NDB: MySQL Cluster 分布式存储引擎
 --
--- 但 n 的选择影响:
---   1. 内存分配: 临时表和排序时按 n × 4 字节分配（InnoDB internal temp table 除外）
---   2. 索引限制: InnoDB 单列索引最大 767 字节（innodb_large_prefix=OFF）或 3072 字节
---      VARCHAR(255) × 4 字节 = 1020 字节，超过 767，需要前缀索引或开启 large_prefix
---   3. 行大小限制: InnoDB 行最大 65535 字节（所有 VARCHAR 列长度之和）
+-- 设计 trade-off:
+--   优点: 允许针对不同负载选择最优存储引擎，支持第三方引擎（如 RocksDB/TokuDB）
+--   缺点: 跨引擎 JOIN 无法利用各引擎的索引优势；DDL 语法复杂度增加；
+--         引擎间行为不一致（MyISAM 不支持事务但 InnoDB 支持）
 --
--- 最佳实践: 按业务含义选择合理的长度，不要无脑 VARCHAR(255)
-
--- ============================================================
--- 自增主键的坑
--- ============================================================
--- AUTO_INCREMENT 在单机场景简单好用，但有几个陷阱:
+-- 对比:
+--   PostgreSQL: 无 ENGINE 概念，统一使用 heap 存储 + MVCC（但可通过 Extension 扩展，如 Citus）
+--   Oracle:     通过 ORGANIZATION（heap/index/external）区分，但远不如 MySQL 灵活
+--   SQL Server: 统一存储引擎，通过 FILEGROUP 和 CLUSTERED/NONCLUSTERED 影响布局
+--   ClickHouse: 也有类似的 ENGINE 概念（MergeTree/Log/Memory），且是建表的必选项
+--   Hive:       STORED AS (ORC/Parquet/TextFile) 类似但作用于文件格式而非引擎
 --
--- 1. 重启后可能回退 (5.7 及之前):
---    MySQL 5.7 中 AUTO_INCREMENT 值存在内存，重启后取 MAX(id)+1
---    如果最大 id 的行被删除了，重启后 id 会被复用
---    8.0 修复: AUTO_INCREMENT 值持久化到 redo log
+-- 对引擎开发者的启示:
+--   如果目标是 OLTP + OLAP 混合负载，可以考虑类似的可插拔架构（如行存 + 列存引擎）。
+--   TiDB 通过 TiKV(行存) + TiFlash(列存) 实现了类似效果但不暴露 ENGINE 语法。
+--   StarRocks/Doris 通过不同的数据模型（Duplicate/Aggregate/Unique/PrimaryKey）实现类似目的。
+
+-- 2.2 AUTO_INCREMENT: 自增主键设计
+-- MySQL 使用 AUTO_INCREMENT 关键字实现自增，这是最早期的自增设计之一。
 --
--- 2. INSERT ... ON DUPLICATE KEY UPDATE 会消耗 AUTO_INCREMENT 值:
---    即使实际执行的是 UPDATE（没有新行），自增值也会 +1，造成 id 跳跃
+-- 语法特点:
+--   - 表级属性: AUTO_INCREMENT = N 可以指定起始值
+--   - 每表最多一个 AUTO_INCREMENT 列，且必须是索引（不要求主键）
+--   - 不支持 INCREMENT BY（步长需要通过 auto_increment_increment 系统变量设置）
 --
--- 3. 批量插入的自增分配:
---    InnoDB 默认 innodb_autoinc_lock_mode=2（8.0+）
---    并发批量插入时 id 可能不连续，但性能更好
---    如果业务要求 id 连续，需要设为 1（不推荐，影响并发性能）
+-- 实现细节:
+--   - InnoDB: 自增锁模式由 innodb_autoinc_lock_mode 控制
+--     0 = traditional（语句级锁，最安全但最慢）
+--     1 = consecutive（简单 INSERT 不锁，批量 INSERT 使用表锁）
+--     2 = interleaved（8.0 默认，最快但批量 INSERT 的 ID 可能不连续）
+--   - 5.7 及之前: 自增值存内存，重启取 MAX(id)+1，可能导致 ID 复用
+--   - 8.0+: 自增值持久化到 redo log，重启不回退
 --
--- 4. 分布式场景不适用:
---    AUTO_INCREMENT 是单机概念，分库分表后会冲突
---    替代方案: UUID, 雪花算法, TiDB 的 AUTO_RANDOM
+-- 对比其他自增方案:
+--   SQL 标准:     GENERATED ALWAYS AS IDENTITY（SQL:2003）
+--   PostgreSQL:   SERIAL（语法糖，自动创建 SEQUENCE）→ IDENTITY（10+）
+--   Oracle:       SEQUENCE 对象（独立于表）→ IDENTITY 列（12c+）
+--   SQL Server:   IDENTITY(seed, increment)，支持步长
+--   SQLite:       INTEGER PRIMARY KEY 自动成为 rowid（不需要 AUTOINCREMENT）
+--   BigQuery:     无自增（设计哲学: 分布式系统不应依赖全局自增序列）
+--   ClickHouse:   无自增（同理，分析型引擎批量写入，ID 应在应用层生成）
+--   TiDB:         AUTO_INCREMENT（MySQL 兼容）+ AUTO_RANDOM（分布式推荐，随机分配避免热点）
+--   Snowflake:    AUTOINCREMENT 或 IDENTITY（但值不保证连续）
+--   Spanner:      无自增（用 UUID 或 bit-reversed sequence 避免热点）
+--
+-- 对引擎开发者的启示:
+--   - OLTP 引擎: 如果要兼容 MySQL，需要实现 AUTO_INCREMENT 及其锁语义
+--   - 分布式引擎: 全局自增的实现成本很高（需要全局协调），建议支持但不推荐:
+--     方案 A: 段分配（每个节点预分配一段 ID），如 TiDB
+--     方案 B: 放弃连续性保证（如 Snowflake）
+--     方案 C: 不支持自增，推荐 UUID（如 Spanner、BigQuery）
+--   - 分析型引擎: 通常不需要自增（数据是批量加载的）
+
+-- 2.3 ON UPDATE CURRENT_TIMESTAMP: 自动更新时间戳
+-- MySQL 独有的列级特性，其他数据库需要触发器实现。
+--
+-- 设计分析:
+--   优点: 简单易用，零开发成本
+--   缺点: 耦合在存储层，应用层无感知；只支持 TIMESTAMP/DATETIME 类型
+--         批量 UPDATE 时所有行的 updated_at 变为同一时间（语句开始时间）
+--
+-- 其他数据库的等价实现:
+--   PostgreSQL: 需要触发器函数 + CREATE TRIGGER ... BEFORE UPDATE
+--   Oracle:     需要 BEFORE UPDATE 触发器，:NEW.updated_at := SYSTIMESTAMP
+--   SQL Server: 需要 AFTER UPDATE 触发器
+--   SQLite:     需要 AFTER UPDATE 触发器
+--
+-- 对引擎开发者的启示:
+--   这是一个权衡：在存储层内置简化了用户体验，但增加了引擎复杂度。
+--   如果引擎已有完善的触发器支持，可能不需要在 DDL 层面增加这个语法。
 
 -- ============================================================
--- CHECK 约束的历史
--- ============================================================
--- MySQL 对 CHECK 约束的支持是一个著名的"坑":
---   5.7 及之前: 语法上接受 CHECK，但解析后直接忽略！不报错也不执行
---   8.0.16+: CHECK 约束真正被执行
-CREATE TABLE products (
-    id    BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name  VARCHAR(100) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    stock INT NOT NULL DEFAULT 0,
-    CHECK (price >= 0),                   -- 8.0.16+ 才真正生效
-    CHECK (stock >= 0)
-) ENGINE=InnoDB;
-
--- 如果需要兼容 5.7，用触发器代替 CHECK
-
--- ============================================================
--- 索引设计
--- ============================================================
-CREATE TABLE orders (
-    id          BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id     BIGINT       NOT NULL,
-    status      TINYINT      NOT NULL DEFAULT 0 COMMENT '0:待支付 1:已支付 2:已发货 3:已完成 4:已取消',
-    amount      DECIMAL(12,2) NOT NULL DEFAULT 0.00,
-    order_no    VARCHAR(32)  NOT NULL COMMENT '订单号',
-    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    -- 索引设计原则:
-    -- 1. 高选择性列放前面（user_id 比 status 选择性高）
-    -- 2. 覆盖索引: 把查询需要的列都放进索引，避免回表
-    -- 3. 最左前缀原则: (a, b, c) 的索引可以用于 WHERE a=? / WHERE a=? AND b=? / 但不能用于 WHERE b=?
-
-    UNIQUE KEY uk_order_no (order_no),
-    INDEX idx_user_status (user_id, status),         -- 复合索引: 查某用户的某状态订单
-    INDEX idx_created (created_at),                   -- 按时间范围查询
-
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='订单表';
-
--- COMMENT: 给表和列加注释是好习惯，很多团队强制要求
--- TINYINT vs ENUM: 状态字段用 TINYINT + 注释比 ENUM 更灵活（ENUM 加值需要 ALTER TABLE）
-
--- ============================================================
--- 8.0+ 新特性
+-- 3. 数据类型设计分析
 -- ============================================================
 
--- 8.0+: 表达式默认值（5.7 只允许常量）
-CREATE TABLE logs (
-    id         BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    log_uuid   BINARY(16) NOT NULL DEFAULT (UUID_TO_BIN(UUID())),  -- 8.0+
-    data       JSON,
-    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),  -- 毫秒精度
+-- 3.1 VARCHAR(n) 的 n: 字符数 vs 字节数
+-- MySQL: VARCHAR(n) 中 n 是字符数（受字符集影响）
+-- Oracle: VARCHAR2(n) 默认是字节数！VARCHAR2(n CHAR) 才是字符数
+-- SQL Server: VARCHAR(n) 是字节数，NVARCHAR(n) 是字符数
+-- PostgreSQL: VARCHAR(n) 是字符数（但通常推荐直接用 TEXT）
+--
+-- 存储开销:
+--   VARCHAR 实际占用 = 实际字符数 × 字节/字符 + 1-2 字节长度前缀
+--   n 的选择影响: 临时表内存分配（按 n × max_bytes_per_char 分配）、索引长度限制
+--
+-- 索引长度限制:
+--   InnoDB: 单列索引最大 3072 字节（innodb_large_prefix=ON，默认）
+--   VARCHAR(768) × 4 字节(utf8mb4) = 3072 字节，刚好是上限
+--   超过需要使用前缀索引: INDEX idx_name (col(191))
 
-    -- 8.0+: 函数索引（表达式索引）
-    -- 可以对 JSON 字段的提取值建索引
-    INDEX idx_data_name ((CAST(data->>'$.name' AS CHAR(64)) COLLATE utf8mb4_bin))
-) ENGINE=InnoDB;
+-- 3.2 DATETIME vs TIMESTAMP: 时间类型的设计选择
+-- 这是 MySQL 中最经典的类型选择问题，反映了两种不同的时间语义设计。
+--
+-- DATETIME: 存储字面值，不做时区转换
+--   适用场景: 业务时间（订单创建时间、生日等）
+--   存储: 5 字节（5.6.4+），范围 1000-01-01 ~ 9999-12-31
+--
+-- TIMESTAMP: 内部存储 UTC，读取时按 session time_zone 转换
+--   适用场景: 系统时间（审计时间、日志时间等）
+--   存储: 4 字节，范围 1970-01-01 ~ 2038-01-19（2038 年问题!）
+--
+-- 对比其他数据库:
+--   PostgreSQL: TIMESTAMP vs TIMESTAMPTZ，官方推荐总是用 TIMESTAMPTZ
+--   Oracle:     TIMESTAMP vs TIMESTAMP WITH TIME ZONE vs TIMESTAMP WITH LOCAL TIME ZONE
+--   SQL Server: DATETIME vs DATETIME2 vs DATETIMEOFFSET
+--   BigQuery:   DATETIME(无时区) vs TIMESTAMP(有时区)
+--   ClickHouse: DateTime vs DateTime64（支持纳秒精度）
+--
+-- 对引擎开发者的启示:
+--   时间类型至少需要两种: 带时区和不带时区。
+--   需要决定: 内部存储 UTC（如 MySQL TIMESTAMP）还是存原值（如 MySQL DATETIME）？
+--   带时区类型推荐内部存 UTC + 显示时转换（PostgreSQL 的做法）。
+--   精度: 现代引擎应至少支持微秒（6 位小数），纳秒（9 位）更佳。
 
--- 8.0+: 不可见索引（优化器忽略，但仍维护）
--- 用途: 想删索引但不确定影响，先设为 INVISIBLE 观察
-ALTER TABLE orders ALTER INDEX idx_created INVISIBLE;
--- 观察一段时间无影响后再真正删除
--- ALTER TABLE orders DROP INDEX idx_created;
--- 确认有影响，恢复可见
-ALTER TABLE orders ALTER INDEX idx_created VISIBLE;
+-- 3.3 TEXT vs VARCHAR: 大文本类型
+-- MySQL 将 TEXT 按大小分为 4 级: TINYTEXT(255) / TEXT(64K) / MEDIUMTEXT(16M) / LONGTEXT(4G)
+-- 这是独特的设计，其他数据库的做法:
+--   PostgreSQL: TEXT 无大小限制（最大 1GB），推荐代替 VARCHAR
+--   Oracle:     CLOB（最大 4GB × 块大小）
+--   SQL Server: VARCHAR(MAX)（最大 2GB）
+--   SQLite:     TEXT（受 SQLITE_MAX_LENGTH 控制）
+--
+-- MySQL TEXT 的限制:
+--   - TEXT 列不能有默认值（8.0.13 之前）
+--   - TEXT 列不能完整索引，只能前缀索引
+--   - TEXT 列不参与内存临时表，会强制使用磁盘临时表（影响 ORDER BY 性能）
+--   - GROUP BY / ORDER BY TEXT 列性能差
+--
+-- 对引擎开发者的启示:
+--   将大文本分级的设计增加了用户认知负担，现代引擎倾向于统一的 STRING/TEXT 类型。
+--   ClickHouse 和 BigQuery 只有 String/STRING，内部自动处理存储。
 
 -- ============================================================
--- CREATE TABLE ... SELECT / LIKE
+-- 4. CHECK 约束: 一个语法设计的教训
 -- ============================================================
--- CTAS: 从查询结果建表（不复制索引和约束，只复制数据和列类型）
-CREATE TABLE active_users AS
-SELECT id, username, email, created_at FROM users WHERE age >= 18;
--- 注意: 新表没有主键、没有索引、没有 AUTO_INCREMENT，需要手动添加
-
--- LIKE: 复制表结构（包括索引和约束，但不复制数据）
-CREATE TABLE users_backup LIKE users;
--- 然后: INSERT INTO users_backup SELECT * FROM users;
-
--- IF NOT EXISTS: 条件建表
-CREATE TABLE IF NOT EXISTS audit_log (
-    id         BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    action     VARCHAR(50) NOT NULL,
-    details    JSON,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+-- MySQL 5.7 及之前: 解析 CHECK 约束语法但不执行！静默忽略。
+-- MySQL 8.0.16+: CHECK 约束真正执行。
+--
+-- 这是一个著名的设计失误:
+--   接受语法但不执行 → 用户误以为约束在工作 → 生产中出现脏数据
+--   PostgreSQL/Oracle/SQL Server 从一开始就执行 CHECK 约束
+--
+-- 更大的约束执行问题（对引擎开发者）:
+--   BigQuery/Snowflake: PRIMARY KEY/UNIQUE/FOREIGN KEY 都是信息性的（不强制执行）
+--   设计理由: 分布式环境下强制执行唯一性约束代价极高
+--   StarRocks/Doris: 同样不强制约束
+--   TiDB: 6.6 之前不支持外键，因为分布式外键的开销太大
+--
+-- 结论: 约束要么执行，要么不接受语法。接受但不执行是最差的设计选择。
 
 -- ============================================================
--- 分区表
+-- 5. 分区表语法
 -- ============================================================
--- 适用场景: 大表按时间或范围分区，加速查询和数据管理（按分区删除历史数据）
 CREATE TABLE access_logs (
     id         BIGINT NOT NULL AUTO_INCREMENT,
     user_id    BIGINT NOT NULL,
     action     VARCHAR(50) NOT NULL,
     created_at DATETIME NOT NULL,
-    PRIMARY KEY (id, created_at)           -- 分区键必须是主键的一部分
+    PRIMARY KEY (id, created_at)           -- 分区键必须是主键的一部分（MySQL 限制）
 ) ENGINE=InnoDB
 PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p2023 VALUES LESS THAN (2024),
@@ -198,27 +206,104 @@ PARTITION BY RANGE (YEAR(created_at)) (
     PARTITION p2025 VALUES LESS THAN (2026),
     PARTITION pmax  VALUES LESS THAN MAXVALUE
 );
--- 注意: 分区键必须包含在主键和所有唯一索引中，这是 MySQL 分区表最大的限制
+
+-- 分区设计对比:
+--   MySQL:      分区键必须包含在所有唯一索引中（最大限制）
+--   PostgreSQL: 10+ 声明式分区，无此限制（分区是独立表）
+--   Oracle:     分区功能最丰富（RANGE/LIST/HASH/INTERVAL/REFERENCE），无 MySQL 的限制
+--   SQL Server: 通过 PARTITION FUNCTION + PARTITION SCHEME 实现（语法最复杂）
+--   Hive/Spark:  分区是目录级别的概念，PARTITIONED BY 定义目录结构
+--   BigQuery:   只支持按 DATE/TIMESTAMP/INT 列分区，语法最简单
+--   ClickHouse: PARTITION BY 表达式非常灵活（可以用任意表达式）
+--   Doris/StarRocks: RANGE/LIST 分区 + HASH 分桶（两级数据分布）
+--
+-- 对引擎开发者的启示:
+--   分区的核心价值是 partition pruning（分区裁剪），语法设计应确保优化器能高效推导。
+--   MySQL 的"分区键必须在唯一索引中"是全局唯一性检查的实现限制，分布式引擎更是如此。
 
 -- ============================================================
--- 临时表
+-- 6. 字符集与排序规则（对引擎开发者重要）
 -- ============================================================
-CREATE TEMPORARY TABLE tmp_results (
-    id    BIGINT PRIMARY KEY,
-    score DECIMAL(5,2)
-) ENGINE=MEMORY;  -- MEMORY 引擎: 全内存，会话结束自动销毁，断电丢失
--- 也可以用 ENGINE=InnoDB（支持事务，但比 MEMORY 慢）
+-- MySQL 的字符集系统是 4 级层次: Server → Database → Table → Column
+-- 每级可以独立设置 CHARACTER SET 和 COLLATE
+--
+-- utf8 vs utf8mb4 教训:
+--   MySQL 的 "utf8" 只支持 3 字节（BMP），不是真正的 UTF-8
+--   真正的 UTF-8 需要 "utf8mb4"（4 字节）
+--   这是历史遗留问题（早期为了性能限制为 3 字节），8.0 默认改为 utf8mb4
+--
+-- COLLATE 对引擎的影响:
+--   排序规则影响: 索引排序、比较运算、UNIQUE 约束判定
+--   utf8mb4_unicode_ci: 大小写不敏感，'a' = 'A'
+--   utf8mb4_bin: 二进制比较，'a' ≠ 'A'
+--   utf8mb4_0900_ai_ci (8.0 默认): 基于 Unicode 9.0，重音不敏感
+--
+-- 对引擎开发者的启示:
+--   字符集和排序规则是数据库引擎中最复杂的子系统之一。
+--   建议: 内部统一 UTF-8，排序规则支持 ICU 库（PostgreSQL 12+ 的做法）。
+--   如果支持多字符集，需要处理: 隐式转换、索引比较、JOIN 条件匹配等场景。
 
 -- ============================================================
--- 版本演进总结
+-- 7. CREATE TABLE ... SELECT / LIKE
 -- ============================================================
--- MySQL 5.6:  InnoDB 全文索引, DATETIME 微秒精度
--- MySQL 5.7:  JSON 类型, 虚拟生成列, sys schema
--- MySQL 8.0:  窗口函数, CTE, CHECK 约束(8.0.16+), 不可见索引,
---             表达式默认值, 函数索引, 原子 DDL, 降序索引,
---             AUTO_INCREMENT 持久化, utf8mb4 为默认字符集
--- MySQL 8.0.13: DEFAULT 支持表达式
--- MySQL 8.0.16: CHECK 约束真正执行
--- MySQL 8.0.17: UNSIGNED/ZEROFILL/显示宽度 废弃
--- MySQL 8.0.19: VALUES ROW() 语法, ON DUPLICATE KEY UPDATE 别名
--- MySQL 8.0.31: INTERSECT / EXCEPT 支持
+-- CTAS (Create Table As Select):
+CREATE TABLE active_users AS SELECT id, username, email FROM users WHERE age >= 18;
+-- 注意: 不复制索引、约束、AUTO_INCREMENT（只复制列定义和数据）
+-- 对比: PostgreSQL 的 CREATE TABLE AS 行为相同
+--       Oracle 的 CREATE TABLE AS 可以通过 INCLUDING INDEXES 复制索引
+--       BigQuery 的 CTAS 是最常用的建表方式（不支持空表 DDL + INSERT 模式）
+
+-- LIKE（复制表结构）:
+CREATE TABLE users_backup LIKE users;
+-- 复制列定义、索引、约束，但不复制数据
+-- 类似 PostgreSQL 的 CREATE TABLE ... (LIKE source INCLUDING ALL)
+
+-- IF NOT EXISTS:
+CREATE TABLE IF NOT EXISTS audit_log (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    action VARCHAR(50) NOT NULL,
+    details JSON,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- 8. MySQL DDL 的实现特点（对引擎开发者）
+-- ============================================================
+
+-- 8.1 Online DDL
+-- MySQL 5.6+ 引入 Online DDL，大部分 ALTER TABLE 操作不需要锁全表
+-- 三种算法: COPY（全表复制）/ INPLACE（原地修改）/ INSTANT（8.0.12+，瞬间完成）
+-- INSTANT 支持: ADD COLUMN（末尾）、修改默认值、RENAME TABLE 等
+-- 对比:
+--   PostgreSQL: ADD COLUMN + DEFAULT 在 11+ 是即时的（之前需要重写全表）
+--   Oracle:     ONLINE DDL + Edition-Based Redefinition（不停机变更）
+
+-- 8.2 原子 DDL（8.0+）
+-- MySQL 8.0 引入原子 DDL: DDL 操作要么完全成功要么完全回滚
+-- 但注意: DDL 仍然会隐式提交当前事务（与 PostgreSQL/SQL Server 不同）
+-- 对比:
+--   PostgreSQL: DDL 是事务性的，可以 BEGIN; CREATE TABLE ...; ROLLBACK;
+--   SQL Server: DDL 是事务性的
+--   Oracle:     DDL 隐式提交（与 MySQL 相同）
+--   SQLite:     DDL 是事务性的
+
+-- 8.3 不可见索引（8.0+）
+-- CREATE INDEX idx ON t(col) INVISIBLE;
+-- 优化器忽略但仍维护，用于安全测试删除索引的影响
+-- 对比: Oracle 也有 INVISIBLE INDEX（11g+），PostgreSQL 没有
+
+-- ============================================================
+-- 9. 版本演进总结
+-- ============================================================
+-- MySQL 5.5:  InnoDB 成为默认引擎
+-- MySQL 5.6:  Online DDL, InnoDB 全文索引, DATETIME 微秒精度
+-- MySQL 5.7:  JSON 类型, 虚拟生成列, sys schema, GROUP REPLICATION
+-- MySQL 8.0:  窗口函数, CTE, 原子 DDL, 不可见索引, 降序索引,
+--             AUTO_INCREMENT 持久化, utf8mb4 默认, CHECK 约束(8.0.16+),
+--             表达式默认值(8.0.13+), 函数索引, 角色(ROLE)
+-- MySQL 8.0.31: INTERSECT / EXCEPT
+-- MySQL 8.4:  LTS 版本（长期支持）
+--
+-- 对引擎开发者的参考:
+--   MySQL 的演进轨迹展示了一个成熟 OLTP 引擎的功能补全路径:
+--   先解决核心存储和事务 → 再补充分析能力（窗口函数、CTE）→ 最后完善标准合规性
