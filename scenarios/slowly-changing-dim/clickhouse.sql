@@ -1,70 +1,110 @@
 -- ClickHouse: 缓慢变化维度 (Slowly Changing Dimension)
 --
 -- 参考资料:
---   [1] ClickHouse Documentation - ReplacingMergeTree
+--   [1] ClickHouse - ReplacingMergeTree
 --       https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/replacingmergetree
---   [2] ClickHouse Documentation - CollapsingMergeTree
---       https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/collapsingmergetree
---   [3] ClickHouse Documentation - VersionedCollapsingMergeTree
+--   [2] ClickHouse - VersionedCollapsingMergeTree
 --       https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/versionedcollapsingmergetree
 
 -- ============================================================
--- 注意: ClickHouse 没有 UPDATE/MERGE 语句（传统意义上的）
--- 使用引擎特性来实现 SCD 模式
+-- 1. SCD Type 1: ReplacingMergeTree（天然支持）
 -- ============================================================
 
--- ============================================================
--- SCD Type 1: ReplacingMergeTree（推荐）
--- 后台自动合并，保留最新版本
--- ============================================================
-CREATE TABLE dim_customer (
-    customer_id    String,
-    name           String,
-    city           String,
-    tier           String,
-    updated_at     DateTime DEFAULT now()
-) ENGINE = ReplacingMergeTree(updated_at)
+-- ReplacingMergeTree 在后台 merge 时保留最新版本:
+CREATE TABLE dim_customers (
+    customer_id UInt64,
+    name        String,
+    address     String,
+    city        String,
+    version     UInt64
+) ENGINE = ReplacingMergeTree(version)
 ORDER BY customer_id;
 
--- 直接插入新数据，旧数据在后台合并时被替换
-INSERT INTO dim_customer (customer_id, name, city, tier)
-SELECT customer_id, name, city, tier FROM stg_customer;
+-- "更新": 插入新版本行（INSERT-only 哲学）
+INSERT INTO dim_customers VALUES (1, 'Alice', '123 Old St', 'NYC', 1);
+INSERT INTO dim_customers VALUES (1, 'Alice', '456 New St', 'Boston', 2);
+-- 后台 merge 保留 version=2 的行
 
--- 查询时用 FINAL 确保去重（或使用子查询）
-SELECT * FROM dim_customer FINAL;
--- 或
-SELECT * FROM dim_customer WHERE (customer_id, updated_at) IN (
-    SELECT customer_id, MAX(updated_at) FROM dim_customer GROUP BY customer_id
+-- 查询最新状态:
+SELECT * FROM dim_customers FINAL WHERE customer_id = 1;
+-- FINAL: 查询时执行 merge 逻辑（保证结果正确但有性能开销）
+
+-- 强制 merge:
+OPTIMIZE TABLE dim_customers FINAL;
+
+-- 设计分析:
+--   ReplacingMergeTree 是 ClickHouse 实现 SCD Type 1 的自然方案。
+--   不需要 UPDATE（INSERT 新版本行即可）。
+--   但代价是: 查询时需要 FINAL（或容忍短暂的数据冗余）。
+
+-- ============================================================
+-- 2. SCD Type 2: 保留历史版本
+-- ============================================================
+
+CREATE TABLE dim_customers_v2 (
+    customer_id UInt64,
+    name        String,
+    address     String,
+    valid_from  DateTime DEFAULT now(),
+    valid_to    DateTime DEFAULT toDateTime('9999-12-31 23:59:59'),
+    is_current  UInt8 DEFAULT 1
+) ENGINE = MergeTree()
+ORDER BY (customer_id, valid_from);
+
+-- SCD2 在 ClickHouse 中较复杂（因为没有 UPDATE）:
+-- 步骤 1: 插入"关闭"旧记录的 mutation
+ALTER TABLE dim_customers_v2 UPDATE
+    valid_to = now(), is_current = 0
+WHERE customer_id = 1 AND is_current = 1;
+
+-- 步骤 2: 插入新记录
+INSERT INTO dim_customers_v2 (customer_id, name, address)
+VALUES (1, 'Alice', '456 New St');
+
+-- 注意: mutation 是异步的! 需要 SETTINGS mutations_sync = 1 保证顺序。
+
+-- ============================================================
+-- 3. SCD Type 2 的替代方案: 版本化表
+-- ============================================================
+
+-- 更适合 ClickHouse 的方案: 直接保留所有版本
+CREATE TABLE dim_customers_history (
+    customer_id UInt64,
+    name        String,
+    address     String,
+    version     UInt64,
+    updated_at  DateTime DEFAULT now()
+) ENGINE = MergeTree()
+ORDER BY (customer_id, version);
+
+-- 每次变更直接 INSERT:
+INSERT INTO dim_customers_history VALUES (1, 'Alice', '123 Old St', 1, now());
+INSERT INTO dim_customers_history VALUES (1, 'Alice', '456 New St', 2, now());
+
+-- 查询最新版本:
+SELECT * FROM dim_customers_history
+WHERE (customer_id, version) IN (
+    SELECT customer_id, max(version) FROM dim_customers_history GROUP BY customer_id
 );
 
--- ============================================================
--- SCD Type 2: VersionedCollapsingMergeTree
--- 保留所有版本，用 sign 标记有效/失效
--- ============================================================
-CREATE TABLE dim_customer_scd2 (
-    customer_id    String,
-    name           String,
-    city           String,
-    tier           String,
-    effective_date Date DEFAULT today(),
-    expiry_date    Date DEFAULT '9999-12-31',
-    sign           Int8,        -- 1: 有效, -1: 失效
-    version        UInt32
-) ENGINE = VersionedCollapsingMergeTree(sign, version)
-ORDER BY (customer_id, effective_date);
+-- 或用 argMax:
+SELECT customer_id, argMax(name, version), argMax(address, version)
+FROM dim_customers_history GROUP BY customer_id;
 
--- 关闭旧版本（插入 sign=-1 的记录）+ 插入新版本（sign=1）
-INSERT INTO dim_customer_scd2
-SELECT customer_id, name, city, tier,
-       effective_date, today() - 1, -1, version  -- 关闭旧版本
-FROM   dim_customer_scd2 FINAL
-WHERE  customer_id IN (SELECT customer_id FROM stg_customer)
-  AND  sign = 1;
-
-INSERT INTO dim_customer_scd2
-SELECT customer_id, name, city, tier,
-       today(), '9999-12-31', 1, 1 + (
-           SELECT max(version) FROM dim_customer_scd2
-           WHERE customer_id = s.customer_id
-       )
-FROM   stg_customer s;
+-- ============================================================
+-- 4. 对比与引擎开发者启示
+-- ============================================================
+-- ClickHouse SCD 的实现:
+--   Type 1: ReplacingMergeTree（最自然，INSERT 新版本）
+--   Type 2: 版本化表 + argMax（比 mutation 更适合）
+--
+-- 对比:
+--   BigQuery: MERGE 语句（最适合 SCD）
+--   PostgreSQL: MERGE 或 CTE + UPDATE + INSERT
+--   SQLite: ON CONFLICT + 事务
+--
+-- 对引擎开发者的启示:
+--   INSERT-only 引擎的 SCD 实现与传统数据库不同:
+--   不需要 UPDATE 旧记录，直接 INSERT 新版本。
+--   ReplacingMergeTree（保留最新）+ 全历史表（保留所有版本）
+--   是 INSERT-only 引擎的标准 SCD 模式。

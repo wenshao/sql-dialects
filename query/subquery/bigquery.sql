@@ -3,61 +3,82 @@
 -- 参考资料:
 --   [1] BigQuery SQL Reference - Subqueries
 --       https://cloud.google.com/bigquery/docs/reference/standard-sql/subqueries
---   [2] BigQuery SQL Reference - Query Syntax
---       https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax
 
--- 标量子查询
-SELECT username, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count
-FROM users;
+-- ============================================================
+-- 1. 标量子查询
+-- ============================================================
 
--- WHERE 子查询
-SELECT * FROM users WHERE id IN (SELECT user_id FROM orders WHERE amount > 100);
-SELECT * FROM users WHERE id NOT IN (SELECT user_id FROM blacklist);
+SELECT username, age,
+       (SELECT AVG(age) FROM myproject.mydataset.users) AS avg_age
+FROM myproject.mydataset.users;
 
--- EXISTS
-SELECT * FROM users u
-WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
-SELECT * FROM users u
-WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
+-- ============================================================
+-- 2. IN / EXISTS
+-- ============================================================
 
--- 比较运算符 + 子查询
-SELECT * FROM users WHERE age > (SELECT AVG(age) FROM users);
+SELECT * FROM myproject.mydataset.users
+WHERE id IN (SELECT user_id FROM myproject.mydataset.orders WHERE amount > 100);
 
--- FROM 子查询
-SELECT t.city, t.cnt FROM (
-    SELECT city, COUNT(*) AS cnt FROM users GROUP BY city
-) t WHERE t.cnt > 10;
+SELECT * FROM myproject.mydataset.users u
+WHERE EXISTS (SELECT 1 FROM myproject.mydataset.orders o WHERE o.user_id = u.id);
 
--- WITH（CTE 代替复杂嵌套子查询，BigQuery 推荐方式）
-WITH high_value_orders AS (
-    SELECT user_id, SUM(amount) AS total
-    FROM orders GROUP BY user_id HAVING SUM(amount) > 1000
-)
-SELECT u.username, h.total
-FROM users u JOIN high_value_orders h ON u.id = h.user_id;
+-- ============================================================
+-- 3. ARRAY 子查询（BigQuery 独有）
+-- ============================================================
 
--- 数组子查询（ARRAY 构造）
+-- ARRAY() 将子查询结果收集为 ARRAY:
 SELECT username,
-    ARRAY(SELECT amount FROM UNNEST(order_amounts) AS amount WHERE amount > 100) AS high_amounts
-FROM users;
+       ARRAY(SELECT amount FROM myproject.mydataset.orders o WHERE o.user_id = u.id) AS order_amounts
+FROM myproject.mydataset.users u;
 
--- IN + UNNEST（在数组中查找）
-SELECT * FROM users
-WHERE 'admin' IN UNNEST(tags);
+-- 设计分析:
+--   ARRAY 子查询是 BigQuery 嵌套类型设计的核心操作。
+--   它将一对多关系"内联"为数组列，避免了 GROUP_CONCAT/STRING_AGG。
+--   对比 ClickHouse: groupArray() 函数实现相同功能。
+--   对比 PostgreSQL: ARRAY() 子查询（语法相同）。
+
+-- ============================================================
+-- 4. FROM 子句子查询 + UNNEST
+-- ============================================================
+
+-- 派生表
+SELECT u.username, stats.total
+FROM myproject.mydataset.users u
+JOIN (
+    SELECT user_id, SUM(amount) AS total
+    FROM myproject.mydataset.orders GROUP BY user_id
+) stats ON u.id = stats.user_id;
+
+-- UNNEST 子查询（展开 ARRAY 列为行）
+SELECT u.username, tag
+FROM myproject.mydataset.users u, UNNEST(u.tags) AS tag;
 
 -- STRUCT 子查询
-SELECT username,
-    (SELECT AS STRUCT COUNT(*) AS cnt, SUM(amount) AS total
-     FROM orders WHERE user_id = users.id) AS order_info
-FROM users;
+SELECT * FROM UNNEST([
+    STRUCT('alice' AS name, 25 AS age),
+    STRUCT('bob' AS name, 30 AS age)
+]);
 
--- IN 子查询 + UNNEST 数组
-SELECT * FROM users
-WHERE id IN (SELECT user_id FROM orders WHERE amount > 100);
+-- ============================================================
+-- 5. 相关子查询与成本
+-- ============================================================
 
--- 关联子查询
-SELECT u.username,
-    (SELECT MAX(amount) FROM orders o WHERE o.user_id = u.id) AS max_order
-FROM users u;
+-- 相关子查询在 BigQuery 中可能很昂贵:
+-- 外部查询的每一行都触发子查询执行。
+-- BigQuery 优化器会尝试去相关化（decorrelation）。
+-- 如果去相关化失败，性能可能很差。
+-- 推荐: 使用 JOIN 或 CTE 替代相关子查询。
 
--- 注意：BigQuery 关联子查询有一些限制（例如不能在 ARRAY 子查询中引用外部关联列的某些操作）
+-- ============================================================
+-- 6. 对比与引擎开发者启示
+-- ============================================================
+-- BigQuery 子查询的特点:
+--   (1) ARRAY 子查询 → 一对多关系内联为数组
+--   (2) UNNEST → 数组展开为行（ARRAY 的反操作）
+--   (3) STRUCT 子查询 → 内联构造结构化数据
+--   (4) 成本影响 → 相关子查询可能扫描多次
+--
+-- 对引擎开发者的启示:
+--   支持 ARRAY/STRUCT 嵌套类型的引擎应提供:
+--   ARRAY() 子查询（行→数组）+ UNNEST（数组→行）
+--   这对消除了大量 JOIN + GROUP BY 的需求。

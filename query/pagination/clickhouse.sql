@@ -3,46 +3,82 @@
 -- 参考资料:
 --   [1] ClickHouse SQL Reference - LIMIT
 --       https://clickhouse.com/docs/en/sql-reference/statements/select/limit
---   [2] ClickHouse SQL Reference - SELECT
---       https://clickhouse.com/docs/en/sql-reference/statements/select
+--   [2] ClickHouse - LIMIT BY
+--       https://clickhouse.com/docs/en/sql-reference/statements/select/limit-by
 
--- LIMIT（取前 N 行）
+-- ============================================================
+-- 1. LIMIT / OFFSET
+-- ============================================================
+
 SELECT * FROM users ORDER BY id LIMIT 10;
-
--- LIMIT / OFFSET
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;
 
--- LIMIT 简写形式：LIMIT offset, count
-SELECT * FROM users ORDER BY id LIMIT 20, 10;
+-- ============================================================
+-- 2. LIMIT BY: ClickHouse 独有的分组分页
+-- ============================================================
 
--- 窗口函数分页（21.1+）
-SELECT * FROM (
-    SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS rn
-    FROM users
-) t
-WHERE rn BETWEEN 21 AND 30;
+-- LIMIT N BY col: 每组最多返回 N 行
+SELECT user_id, order_date, amount
+FROM orders
+ORDER BY order_date DESC
+LIMIT 3 BY user_id;
+-- → 每个用户返回最近的 3 个订单
 
--- 游标分页
-SELECT * FROM users WHERE id > 100 ORDER BY id LIMIT 10;
+-- LIMIT N, M BY col: 每组跳过 N 行后取 M 行
+SELECT user_id, order_date, amount
+FROM orders
+ORDER BY order_date DESC
+LIMIT 3, 3 BY user_id;
+-- → 每个用户的第 4~6 个订单
 
--- LIMIT BY（ClickHouse 特有，分组级别的分页）
-SELECT * FROM users
-ORDER BY city, age DESC
-LIMIT 3 BY city;                -- 每个 city 取前 3 条
+-- 设计分析:
+--   LIMIT BY 是 ClickHouse 独有的语法（其他数据库没有）。
+--   等价于 ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY date DESC) <= 3
+--   但语法更简洁，不需要子查询或 CTE。
+--   非常适合 Top-N per group 查询。
+--
+-- 对比:
+--   MySQL:      子查询 + ROW_NUMBER() 或 LATERAL JOIN
+--   PostgreSQL: LATERAL JOIN 或 DISTINCT ON
+--   BigQuery:   QUALIFY ROW_NUMBER() OVER (...) <= N
 
--- LIMIT BY + OFFSET
-SELECT * FROM users
-ORDER BY city, age DESC
-LIMIT 2, 3 BY city;            -- 每个 city 跳过 2 条取 3 条
+-- ============================================================
+-- 3. OLAP 分页的特殊考虑
+-- ============================================================
 
--- LIMIT WITH TIES（保留同值行）
-SELECT * FROM users ORDER BY age LIMIT 10 WITH TIES;
+-- ClickHouse 不适合传统的 OFFSET 分页:
+-- (a) 列存引擎: OFFSET 100000 需要解压并跳过 100000 行的列数据
+-- (b) 分布式: 每个 shard 返回 OFFSET+LIMIT 行，再由协调节点合并排序
+--     → OFFSET 100000 LIMIT 10 实际上每个 shard 返回 100010 行!
+--
+-- 推荐: 游标分页
+SELECT * FROM events
+WHERE (event_time, id) < ('2024-01-15 10:00:00', 999999)
+ORDER BY event_time DESC, id DESC
+LIMIT 10;
 
--- SAMPLE（近似采样，非精确分页）
-SELECT * FROM users SAMPLE 0.1;             -- 约 10% 的数据
-SELECT * FROM users SAMPLE 10000;           -- 约 10000 行
-SELECT * FROM users SAMPLE 1/10 OFFSET 1/2; -- 采样偏移
+-- 或使用 WHERE + LIMIT 替代 OFFSET:
+-- 前端传递 last_seen_id 和 last_seen_time
 
--- 注意：ClickHouse 不支持 FETCH FIRST ... ROWS ONLY 标准语法
--- 注意：ClickHouse LIMIT BY 是非常实用的分组分页功能
--- 注意：大 OFFSET 性能较差，建议使用游标分页
+-- ============================================================
+-- 4. WITH TIES（返回排名相同的行）
+-- ============================================================
+
+-- ClickHouse 不支持 WITH TIES（但可以用 LIMIT BY 部分替代）
+-- PostgreSQL: FETCH FIRST 10 ROWS WITH TIES
+-- BigQuery: 不支持
+
+-- ============================================================
+-- 5. 对比与引擎开发者启示
+-- ============================================================
+-- ClickHouse 分页的设计:
+--   (1) LIMIT BY → 分组分页（独有，非常实用）
+--   (2) OFFSET 在分布式下低效 → 推荐游标分页
+--   (3) 无 WITH TIES → 可用 LIMIT BY 部分替代
+--
+-- 对引擎开发者的启示:
+--   LIMIT BY 是值得借鉴的语法设计:
+--   Top-N per group 是 OLAP 最常见的查询模式之一。
+--   比 ROW_NUMBER() + 子查询更简洁，也更容易优化。
+--   分布式引擎的 OFFSET 放大问题（每个 shard 多返回数据）
+--   是所有分布式数据库都需要面对的挑战。

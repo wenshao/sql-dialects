@@ -5,55 +5,68 @@
 --       https://www.sqlite.org/lang_select.html
 
 -- ============================================================
--- LIMIT / OFFSET（所有版本）
+-- 1. LIMIT / OFFSET（标准分页）
 -- ============================================================
-SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;
 
--- 简写形式：LIMIT offset, count
-SELECT * FROM users ORDER BY id LIMIT 20, 10;
+SELECT * FROM users ORDER BY id LIMIT 10;              -- 前 10 行
+SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;    -- 第 3 页（每页 10 行）
+SELECT * FROM users ORDER BY id LIMIT 20, 10;           -- 等价语法（MySQL 兼容）
 
--- 仅限制行数
+-- ============================================================
+-- 2. 游标分页（Cursor-based / Keyset Pagination）
+-- ============================================================
+
+-- OFFSET 分页的问题: OFFSET 越大越慢（需要跳过前 N 行）
+-- 游标分页: 使用上一页的最后一个值作为起点
+
+-- 第一页:
 SELECT * FROM users ORDER BY id LIMIT 10;
+-- 假设最后一行 id = 10
 
--- ============================================================
--- 3.25.0+: 窗口函数辅助分页
--- ============================================================
-SELECT * FROM (
-    SELECT *, ROW_NUMBER() OVER (ORDER BY id) AS rn
-    FROM users
-) t
-WHERE rn BETWEEN 21 AND 30;
+-- 第二页:
+SELECT * FROM users WHERE id > 10 ORDER BY id LIMIT 10;
+-- 使用索引直接定位，不需要跳过前 10 行
 
--- 带总行数的分页查询
-SELECT *, COUNT(*) OVER() AS total_count
-FROM users
-ORDER BY id
-LIMIT 10 OFFSET 20;
-
--- ============================================================
--- 键集分页（Keyset Pagination / Cursor-based）
--- 性能优于 OFFSET，适用于大数据集
--- ============================================================
--- 第一页
-SELECT * FROM users ORDER BY id LIMIT 10;
-
--- 后续页（已知上一页最后一条 id = 100）
-SELECT * FROM users WHERE id > 100 ORDER BY id LIMIT 10;
-
--- 多列排序的键集分页
+-- 复合排序的游标分页:
 SELECT * FROM users
-WHERE (created_at, id) > ('2025-01-01', 100)
+WHERE (created_at, id) > ('2024-01-15', 100)
 ORDER BY created_at, id
 LIMIT 10;
 
--- ============================================================
--- 性能说明
--- ============================================================
--- OFFSET 大值性能差：SQLite 仍需扫描跳过的行
--- 推荐为排序列创建索引：
--- CREATE INDEX idx_users_id ON users(id);
--- CREATE INDEX idx_users_created ON users(created_at, id);
+-- 设计分析:
+--   游标分页在 SQLite 中特别重要:
+--   (a) SQLite 没有查询缓存（每次查询从头扫描）
+--   (b) 大 OFFSET 意味着大量无用的 B-Tree 遍历
+--   (c) 嵌入式场景通常是列表滚动加载，天然适合游标分页
 
--- 注意：SQLite 中 LIMIT -1 表示无限制（返回所有行）
--- 注意：OFFSET 不能单独使用，必须搭配 LIMIT
--- 注意：键集分页需要稳定且唯一的排序键
+-- ============================================================
+-- 3. SQLite 分页的特殊语法
+-- ============================================================
+
+-- LIMIT -1: 不限制行数（返回所有行）
+SELECT * FROM users ORDER BY id LIMIT -1 OFFSET 10;
+-- → 跳过前 10 行，返回所有剩余行
+
+-- LIMIT 值可以是表达式:
+-- SELECT * FROM users LIMIT (SELECT setting_value FROM config WHERE key = 'page_size');
+
+-- ============================================================
+-- 4. 对比与引擎开发者启示
+-- ============================================================
+-- SQLite 分页的特点:
+--   (1) LIMIT/OFFSET → 标准语法
+--   (2) LIMIT m, n → MySQL 兼容语法
+--   (3) LIMIT -1 → 无限制（SQLite 特有）
+--   (4) 游标分页 → WHERE id > last_id 模式
+--
+-- 对比:
+--   MySQL: LIMIT offset, count
+--   PostgreSQL: LIMIT count OFFSET offset + FETCH FIRST
+--   ClickHouse: LIMIT count OFFSET offset
+--   BigQuery: LIMIT count OFFSET offset
+--
+-- 对引擎开发者的启示:
+--   LIMIT/OFFSET 是必需语法，但应该鼓励游标分页。
+--   OFFSET 的性能问题是所有数据库的通病:
+--   B-Tree 引擎需要遍历 OFFSET 行，列存引擎需要跳过 OFFSET 行。
+--   游标分页利用索引直接定位，性能恒定。
