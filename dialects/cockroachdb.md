@@ -4,6 +4,48 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4696 行
 
+## 概述与定位
+
+CockroachDB 是 Cockroach Labs 于 2015 年开源的分布式 SQL 数据库，兼容 PostgreSQL 协议和大部分语法。其命名源自蟑螂的生存韧性——设计目标是构建一个"杀不死"的数据库：自动分片、自动故障恢复、跨地域强一致。CockroachDB 定位于需要全球部署、零停机和强一致事务保证的云原生应用场景。
+
+## 历史与演进
+
+- **2014 年**：前 Google 工程师（曾参与 Spanner 项目）创立 Cockroach Labs。
+- **2015 年**：项目开源，基于 Go 语言实现，底层存储采用 RocksDB。
+- **2017 年**：1.0 GA，支持分布式 ACID 事务和自动负载均衡。
+- **2019 年**：19.x 引入 CDC（Change Data Capture）和成本优化器。
+- **2020 年**：20.x 推出多区域（Multi-Region）抽象，简化全球部署。
+- **2021 年**：21.x 引入 REGIONAL BY ROW 行级地域策略。
+- **2022 年**：22.x 切换底层存储引擎为 Pebble（自研 Go LSM 引擎）。
+- **2023-2025 年**：23.x/24.x 持续增强 PG 兼容性、物理集群复制、AI 向量能力。
+
+## 核心设计思路
+
+CockroachDB 将数据存储为有序 KV 对，按 Range（默认 512 MB）自动分片。每个 Range 通过 Raft 共识协议维护多副本。事务模型基于 MVCC + 分布式时间戳排序，**默认使用 SERIALIZABLE 隔离级别**（这是其区别于多数分布式数据库的显著特征）。混合逻辑时钟（HLC）提供跨节点的因果一致时间戳。SQL 层兼容 PostgreSQL 线协议，使用基于成本的优化器生成分布式执行计划。
+
+## 独特特色
+
+- **默认 SERIALIZABLE**：开箱即用的最严格隔离级别，避免所有读写异常。
+- **unique_rowid()**：内置函数生成全局唯一、大致有序的 ID，替代自增序列避免热点。
+- **CHANGEFEED**：原生 CDC 能力，`CREATE CHANGEFEED FOR table INTO 'kafka://...'` 实现实时数据流出。
+- **多区域抽象**：`ALTER DATABASE SET PRIMARY REGION`、`REGIONAL BY ROW`、`GLOBAL TABLE` 等声明式地域策略。
+- **自动 Range 分裂/合并/再平衡**：无需人工干预分片管理。
+- **AS OF SYSTEM TIME**：支持历史时间点读取，用于无锁备份和分析查询。
+- **Pebble 存储引擎**：自研 Go 实现的 LSM-Tree 引擎，消除了 CGo 跨语言开销。
+
+## 已知不足
+
+- 严格的 SERIALIZABLE 隔离在高并发写冲突场景下事务重试率较高。
+- 与 PostgreSQL 的兼容性虽在持续改进，但存储过程（PL/pgSQL）支持仍在完善阶段。
+- 跨地域部署时写延迟受限于多数派提交的 RTT。
+- 不支持 PostgreSQL 扩展生态（如 PostGIS 等，需使用内置空间功能）。
+- 批量导入性能相比专有分析型数据库有差距。
+- 许可证从 Apache 2.0 改为 BSL（Business Source License），影响部分开源使用场景。
+
+## 对引擎开发者的参考价值
+
+CockroachDB 的工程实践展示了如何在分布式环境中实现 SERIALIZABLE 隔离（并发控制与时间戳排序的平衡）、基于 HLC 的分布式时钟方案、以及声明式多区域数据放置的抽象设计。其从 RocksDB 迁移到自研 Pebble 引擎的决策过程也为存储引擎选型提供了重要经验。CHANGEFEED 的实现展示了如何将 CDC 作为数据库原生能力提供。
+
 ## 全部模块
 
 ### DDL — 数据定义

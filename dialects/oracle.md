@@ -4,6 +4,86 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 8199 行
 
+## 概述与定位
+
+Oracle Database 是企业级关系型数据库的标杆，也是 SQL 语言实际演进的最大推动力。在 SQL 标准委员会讨论一个特性之前，Oracle 往往已经实现并在生产中验证了多年。窗口函数、物化视图、Flashback、多租户 — 这些后来被标准化或被其他数据库借鉴的功能，几乎都是 Oracle 先行。
+
+Oracle 的定位极为明确：**为最苛刻的企业级工作负载提供最完善的功能集**。它的客户是银行、电信、政府 — 这些场景对数据一致性、高可用、安全合规的要求远超一般 Web 应用。Oracle 的许可费极高（按 CPU 核心计价），但对这些客户而言，数据库不可用一小时的损失远超许可费。
+
+## 历史与演进
+
+- **1977**: Larry Ellison、Bob Miner、Ed Oates 创立 Software Development Laboratories（后更名 Oracle）
+- **1979**: Oracle V2 发布 — 第一个商业 SQL 关系型数据库（V1 从未发布）
+- **1983**: Oracle V3 用 C 语言重写，实现跨平台可移植
+- **1984**: Oracle V4 引入读一致性（Read Consistency）— 这是 Oracle MVCC 的起点
+- **1988**: Oracle V6 引入行锁和 PL/SQL — 奠定了 Oracle 生态的两块基石
+- **1992**: Oracle 7 引入存储过程、触发器、共享连接池
+- **1999**: Oracle 8i — "i"代表 Internet，引入 Java VM、物化视图
+- **2001**: Oracle 9i — 引入 Oracle RAC（Real Application Clusters）
+- **2003**: Oracle 10g — "g"代表 Grid，引入 ASM（自动存储管理）、Flashback Database
+- **2007**: Oracle 11g — 窗口函数增强、Result Cache、Real Application Testing
+- **2013**: Oracle 12c — "c"代表 Cloud，引入多租户架构（CDB/PDB）、自增列（IDENTITY）
+- **2018**: Oracle 18c/19c — 自治数据库概念，19c 成为长期支持版
+- **2024**: Oracle 23ai — "ai"代表 AI，引入 AI Vector Search、JSON Relational Duality
+
+Oracle 的版本命名史就是一部 IT 潮流史：Internet → Grid → Cloud → AI。
+
+## 核心设计思路
+
+**功能完备主义**：Oracle 的设计哲学是"如果某个功能有用，就在内核中实现它"。不依赖第三方扩展，不留给用户自己解决。这导致 Oracle 的功能集远超其他数据库，但也带来了极高的系统复杂度。
+
+**PL/SQL 生态**：PL/SQL 不仅是一门存储过程语言，它是一个完整的应用开发平台。Package（包）将过程、函数、类型、常量封装为模块；自治事务允许在事务内部开启独立事务（审计日志的关键需求）；批量绑定（FORALL/BULK COLLECT）解决了逐行处理的性能问题。
+
+**Undo-based MVCC**：Oracle 不像 PostgreSQL 那样在表中保留旧版本元组，而是将旧数据写入 Undo 表空间。读操作需要旧版本时，从 Undo 中重建。优点是表不会膨胀（无需 VACUUM），缺点是 Undo 空间耗尽时会报 `ORA-01555: snapshot too old`。
+
+**Shared Pool 缓存**：SQL 语句解析结果缓存在共享池中，相同 SQL 文本可以复用执行计划。这是 Oracle 推荐使用绑定变量的根本原因 — 不同字面量导致硬解析，浪费 CPU 和共享池空间。
+
+## 独特特色（其他引擎没有的）
+
+- **`'' = NULL`**：Oracle 中空字符串等于 NULL，这与 SQL 标准和所有其他数据库都不同。这个 45 年的历史决定至今无法更改，因为无数应用依赖此行为
+- **`CONNECT BY`**：层级查询的原创语法（`START WITH ... CONNECT BY PRIOR`），比标准 CTE 递归更早、对某些场景更简洁
+- **PL/SQL Package**：将相关过程、函数、类型打包为一个逻辑单元，支持 public/private 可见性，是大型数据库应用架构的基石
+- **自治事务（`PRAGMA AUTONOMOUS_TRANSACTION`）**：在事务内部开启独立事务，提交/回滚互不影响。审计日志的标准方案
+- **Flashback 技术族**：Flashback Query（查询过去某时刻的数据）、Flashback Table（恢复误删的表）、Flashback Database（整库时间回退）— 基于 Undo 的时间旅行
+- **物化视图（最完善实现）**：支持增量刷新（Fast Refresh）、Query Rewrite（优化器自动路由查询到物化视图），这两个能力其他数据库至今追赶
+- **Bitmap 索引**：低基数列（性别、状态）的专用索引，多列交叉过滤时效率极高
+- **`DECODE` 函数**：Oracle 版的 CASE 表达式，更紧凑但可读性争议大
+- **DUAL 表**：单行单列的虚拟表，`SELECT sysdate FROM DUAL` — Oracle 的经典写法
+- **`RATIO_TO_REPORT`**：窗口函数，直接计算占比，无需手写除法
+- **`KEEP (DENSE_RANK FIRST/LAST)`**：在分组聚合中同时获取极值对应的其他列值
+- **Virtual Private Database (VPD)**：在 SQL 解析层自动追加 WHERE 条件实现行级隔离，比 PostgreSQL RLS 更早、实现层次更深
+
+## 已知的设计不足与历史包袱
+
+- **`'' = NULL`**：这是 Oracle 最大的历史包袱。`LENGTH('') IS NULL` 为 true，`'' || 'abc' = 'abc'` — 空字符串在连接中消失。迁移到其他数据库时这是最大的痛点
+- **不支持 DDL 回滚**：`CREATE TABLE` 是立即提交的，无法在事务中回滚。这一点不如 PostgreSQL
+- **DUAL 表要求**：不能写 `SELECT 1+1`，必须写 `SELECT 1+1 FROM DUAL`（23ai 终于可以省略）
+- **NUMBER 万能类型**：Oracle 的 NUMBER 类型不区分整数/浮点/定点，内部统一用变长十进制存储。灵活但牺牲了存储效率和计算性能
+- **VARCHAR2 默认字节语义**：`VARCHAR2(100)` 默认是 100 字节而非 100 字符，中文可能只存 33 个。需要显式指定 `VARCHAR2(100 CHAR)`
+- **许可证费用极高**：Enterprise Edition 按处理器核心收费，高级功能（RAC、Partitioning、In-Memory）需单独购买 Option Pack
+- **客户端部署复杂**：历史上需要安装 Oracle Client / Instant Client，配置 tnsnames.ora。虽然近年简化了，但仍比 MySQL/PostgreSQL 的轻量客户端重得多
+- **ALTER TABLE 限制**：不能直接缩短列长度、修改列类型的限制比其他数据库更多
+
+## 兼容生态
+
+Oracle 兼容性是中国国产数据库的主要赛道：
+- **达梦（DM）**：中国最成熟的 Oracle 兼容数据库，政府/军工市场主导
+- **人大金仓（KingbaseES）**：Oracle + PostgreSQL 双兼容模式
+- **OceanBase Oracle 模式**：蚂蚁集团的分布式数据库，同时提供 MySQL 和 Oracle 兼容模式
+- **GaussDB（华为）**：Oracle 兼容为主要目标之一
+- **TDSQL（腾讯）**：部分 Oracle 兼容
+
+Oracle 兼容生态的存在本身说明了一个问题：**Oracle 的锁定效应极强**，大量存量 PL/SQL 代码使迁移成本极高。
+
+## 对引擎开发者的参考价值
+
+- **标量子查询缓存**：Oracle 会缓存标量子查询的输入→输出映射，相同输入直接返回缓存结果。这对关联子查询的性能提升巨大，但其他数据库几乎都没实现
+- **物化视图 Query Rewrite**：优化器自动检测查询是否可以从物化视图中回答，无需修改 SQL。这需要深入的查询等价性判断逻辑
+- **Edition-Based Redefinition（EBR）**：在线应用升级方案 — 新旧版本代码通过"版本"隔离，同时运行。这是数据库领域独一无二的零停机升级设计
+- **Flashback 架构**：基于 Undo 日志的时间旅行查询，不需要额外的历史表。这个设计对时态数据库和审计需求有极高参考价值
+- **自适应游标共享（ACS）**：同一 SQL 根据绑定变量的不同值使用不同执行计划，解决了"绑定变量 vs. 执行计划偏斜"的经典矛盾
+- **Result Cache**：SQL 结果集缓存在 SGA 中，DML 变更自动失效。这是数据库层面的查询缓存，比应用层缓存更精准
+
 ## 全部模块
 
 ### DDL — 数据定义

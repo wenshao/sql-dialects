@@ -4,6 +4,46 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4756 行
 
+## 概述与定位
+
+Materialize 是一个流式物化视图数据库，兼容 PostgreSQL 协议。它的核心能力是让用户用标准 SQL 定义物化视图，然后系统自动对这些视图进行**增量维护**——当上游数据变更时，视图结果在毫秒级内更新，无需完整重算。Materialize 定位于需要低延迟实时分析的场景，如实时仪表盘、监控告警、实时特征工程和事件驱动业务逻辑。
+
+## 历史与演进
+
+- **2019 年**：Materialize 公司成立，核心团队来自 Timely Dataflow 和 Differential Dataflow 研究项目。
+- **2020 年**：首个公开版本发布，展示增量物化视图能力。
+- **2021 年**：引入 SOURCE 和 SINK 连接器，支持 Kafka、PostgreSQL CDC 等数据源。
+- **2022 年**：推出 Materialize Cloud 托管服务，引入 SUBSCRIBE 持续查询。
+- **2023 年**：增强多集群隔离、RBAC 权限管理和性能优化。
+- **2024-2025 年**：持续增强 PG 兼容性、WebSocket 接口和企业级功能。
+
+## 核心设计思路
+
+Materialize 的底层引擎基于 **Timely Dataflow** 和 **Differential Dataflow** 两个 Rust 研究框架。核心理念是将 SQL 查询编译为数据流图（Dataflow Graph），其中每个操作符（Filter、Join、Aggregate 等）维护增量状态。当输入数据发生变更时，变更沿数据流图传播，每个操作符只处理变化的部分（差分计算），而非重算整个结果集。这使得复杂的多表 JOIN 和聚合也能在毫秒级完成增量更新。
+
+## 独特特色
+
+- **增量物化视图**：`CREATE MATERIALIZED VIEW` 定义的视图自动增量维护，数据变更后结果即时更新。
+- **SOURCE/SINK**：`CREATE SOURCE FROM KAFKA ...` 和 `CREATE SINK ... INTO KAFKA ...` 连接外部数据流。
+- **SUBSCRIBE**：`SUBSCRIBE TO view` 持续接收物化视图的变更事件（类似 CDC）。
+- **PG 兼容**：使用 `psql` 或任意 PG 客户端连接，支持标准 SQL（JOIN、CTE、窗口函数等）。
+- **Differential Dataflow**：底层差分数据流引擎支持任意复杂 SQL 的增量计算。
+- **时间概念**：严格的事件时间处理，保证物化视图的一致性。
+- **多集群隔离**：不同工作负载可部署在独立的计算集群中。
+
+## 已知不足
+
+- 不是通用 OLTP 数据库——不直接支持 INSERT/UPDATE/DELETE 到用户表（数据需从 SOURCE 导入）。
+- 对于不断增长的无界数据集，某些物化视图的内存消耗可能不可控。
+- 与 PostgreSQL 的兼容性有限：不支持存储过程、触发器、用户自定义类型等。
+- 首次创建物化视图时需要全量计算一次快照，大数据集可能耗时较长。
+- 生态系统和社区规模相比 PostgreSQL/MySQL 较小。
+- 部分复杂窗口函数和高级 SQL 特性尚未完全支持。
+
+## 对引擎开发者的参考价值
+
+Materialize 是增量计算理论（Differential Dataflow）在数据库中的最完整实现，展示了如何将任意 SQL 查询转换为增量维护的数据流图。其差分数据流引擎的设计——在有向无环图中传播"变更集合"（differences）而非完整数据——是流式计算和物化视图领域的前沿研究成果。SOURCE/SINK 的抽象设计也为理解数据库与流处理系统的边界提供了参考。
+
 ## 全部模块
 
 ### DDL — 数据定义

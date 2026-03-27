@@ -4,6 +4,48 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4726 行
 
+## 概述与定位
+
+YugabyteDB 是 Yugabyte 公司于 2017 年开源的分布式 SQL 数据库，核心设计目标是提供与 PostgreSQL 完全兼容的分布式数据库体验。它采用 Google Spanner 的分布式架构理念，同时复用 PostgreSQL 的查询层代码实现高度 PG 兼容。YugabyteDB 定位于需要水平扩展、高可用和全球分布的 OLTP 应用，特别适合从单机 PostgreSQL 向分布式架构迁移的场景。
+
+## 历史与演进
+
+- **2016 年**：前 Facebook 和 Oracle 工程师创立 Yugabyte 公司。
+- **2017 年**：YugabyteDB 开源，初期仅提供 Cassandra 兼容的 YCQL API。
+- **2018 年**：引入 YSQL API，直接集成 PostgreSQL 查询层实现 SQL 兼容。
+- **2019 年**：2.0 GA，YSQL 基于 PG 11 fork 实现全面 SQL 支持。
+- **2021 年**：2.8+ 引入跨地域部署增强和读副本（Read Replica）。
+- **2022 年**：升级到 PG 11.2 兼容层，增强 xCluster 异步复制。
+- **2023-2024 年**：基于 PG 15 的查询层升级，增强连接管理和性能优化。
+- **2025 年**：持续推进 PG 兼容性和 YugabyteDB Anywhere/Managed 云服务。
+
+## 核心设计思路
+
+YugabyteDB 采用两层架构：**YB-TServer**（Tablet Server）管理数据存储，**YB-Master** 管理元数据和集群协调。数据按表分成多个 **Tablet**（类似 Spanner 的 Split），每个 Tablet 通过 Raft 共识协议维护多副本。存储层使用 DocDB（基于 RocksDB 改造的文档存储引擎），支持 MVCC 和分布式事务。独特之处在于提供**双 API**：YSQL（兼容 PostgreSQL）和 YCQL（兼容 Cassandra Query Language），共享同一底层存储引擎。
+
+## 独特特色
+
+- **YSQL/YCQL 双 API**：同一集群通过不同端口同时提供 PostgreSQL 兼容和 Cassandra 兼容接口。
+- **哈希分片 + Range 分片**：默认使用哈希分片均匀分布数据，也支持 Range 分片用于范围查询优化。
+- **Tablet 分裂与合并**：数据增长时 Tablet 自动分裂，支持手动和自动触发。
+- **高度 PG 兼容**：直接复用 PostgreSQL 查询层代码，支持 PG 扩展、存储过程、触发器。
+- **Colocated Tables**：`CREATE DATABASE ... WITH COLOCATED = true` 将小表共置于单一 Tablet 减少开销。
+- **xCluster 复制**：跨集群异步复制用于异地灾备和读扩展。
+- **地理分区**：`TABLESPACE` 机制控制数据的地域放置。
+
+## 已知不足
+
+- 哈希分片默认策略下范围查询（如 `BETWEEN`、`ORDER BY` 主键）性能不如 Range 分片。
+- 与 PostgreSQL 的兼容虽高但并非 100%，部分扩展和高级特性可能不支持。
+- YCQL API 功能更新速度慢于 YSQL，部分用户反馈 YCQL 的定位逐渐模糊。
+- 分布式事务在高冲突场景下延迟高于单机 PostgreSQL。
+- 集群最小部署需要 3 节点，对小规模应用有一定门槛。
+- 全局二级索引在分布式场景下的性能开销需要关注。
+
+## 对引擎开发者的参考价值
+
+YugabyteDB 展示了如何通过 fork PostgreSQL 查询层快速获得 SQL 兼容性，同时将存储引擎替换为分布式方案的工程策略。其双 API 设计（SQL + NoSQL 共享存储）是多模数据库架构的有益探索。Tablet 的哈希 vs Range 分片选择、Colocated Tables 的小表优化策略、以及 DocDB 存储引擎的设计对分布式存储开发者有直接参考意义。
+
 ## 全部模块
 
 ### DDL — 数据定义

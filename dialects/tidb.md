@@ -4,6 +4,48 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4374 行
 
+## 概述与定位
+
+TiDB 是 PingCAP 于 2015 年开源的分布式关系型数据库，目标是在一套系统中同时满足 OLTP 与 OLAP 工作负载（HTAP）。它在 SQL 层高度兼容 MySQL 协议与语法，使现有 MySQL 应用可以低成本迁移；在存储层则采用分布式 KV 引擎 TiKV 和列存引擎 TiFlash 实现水平扩展与实时分析。TiDB 定位于需要弹性伸缩、强一致事务和实时分析的互联网与金融场景。
+
+## 历史与演进
+
+- **2015 年**：PingCAP 成立并启动 TiDB 项目，受 Google Spanner/F1 论文启发。
+- **2017 年**：TiDB 1.0 GA，基本实现 MySQL 兼容与分布式事务。
+- **2019 年**：3.0 引入 TiFlash 列存引擎，正式支持 HTAP 场景。
+- **2020 年**：4.0 推出 TiDB Dashboard、Placement Rules、BR 备份恢复。
+- **2021 年**：5.0 引入 MPP 计算框架，TiFlash 可独立承担分析查询。
+- **2022 年**：6.0 引入 Placement Rules in SQL、热点小表缓存、Top SQL。
+- **2023-2024 年**：7.x 持续增强资源管控（Resource Control）、全局排序、TiDB Serverless。
+- **2025 年**：8.x 强化多租户隔离、向量搜索和 AI 集成能力。
+
+## 核心设计思路
+
+TiDB 采用计算与存储分离的分层架构：**TiDB Server** 负责 SQL 解析和优化（无状态，可水平扩展）；**TiKV** 以 Region 为单位管理数据、通过 Multi-Raft 协议实现强一致复制；**PD (Placement Driver)** 负责元数据管理和调度。事务模型基于 Percolator（乐观/悲观两种模式），提供 Snapshot Isolation 默认隔离级别。TiFlash 作为列存副本通过 Raft Learner 实时同步数据，查询优化器可自动选择行存或列存路径。
+
+## 独特特色
+
+- **AUTO_RANDOM**：用随机位替代自增 ID 的高位，避免写热点集中在单一 Region。
+- **TiFlash 列存引擎**：通过 `ALTER TABLE t SET TIFLASH REPLICA 1` 即可为任意表创建列存副本，优化器自动路由分析查询。
+- **MPP 框架**：TiFlash 节点之间可协作完成分布式 Join 和聚合，无需额外 OLAP 引擎。
+- **Placement Rules in SQL**：用 `ALTER TABLE ... PLACEMENT POLICY` 控制数据的地域分布与副本策略。
+- **资源管控**：通过 Resource Control 实现多租户间 CPU/IO 配额管理。
+- **AUTO_ID_CACHE**：控制自增 ID 缓存粒度，在分布式场景下平衡性能与连续性。
+- **TTL 表**：支持行级 TTL，到期数据自动清理。
+
+## 已知不足
+
+- 与 MySQL 的兼容性仍有差异：不支持存储过程（仅实验性）、外键约束为实验特性、触发器不支持。
+- 自增 ID 不保证全局连续，跨 TiDB 实例可能出现间隙和乱序。
+- 全文索引不支持（需借助外部搜索引擎）。
+- 单行大事务有大小限制（默认 6 MB TxnTotalSizeLimit）。
+- 部分 MySQL 内置函数和系统变量尚未实现。
+- TiFlash 同步存在短暂延迟，对实时性要求极高的分析场景需注意。
+
+## 对引擎开发者的参考价值
+
+TiDB 的架构设计为 SQL 引擎开发提供了重要参考：Raft 共识在数据库中的工程实现（Multi-Raft 分裂/合并/调度）、Percolator 分布式事务模型的生产化改进（悲观锁扩展）、行列混存的 HTAP 路由决策、以及计算层无状态设计对弹性伸缩的支撑。AUTO_RANDOM 的热点打散思路和 Placement Rules 的数据放置抽象对分布式系统设计有普遍借鉴意义。
+
 ## 全部模块
 
 ### DDL — 数据定义
