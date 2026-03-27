@@ -1,123 +1,85 @@
--- SQL Server: 数据去重策略（Deduplication）
+-- SQL Server: 数据去重（Deduplication）
 --
 -- 参考资料:
---   [1] Microsoft Docs - DELETE with CTE
+--   [1] SQL Server - DELETE with CTE
 --       https://learn.microsoft.com/en-us/sql/t-sql/statements/delete-transact-sql
---   [2] Microsoft Docs - MERGE
---       https://learn.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql
---   [3] Microsoft Docs - Ranking Functions
---       https://learn.microsoft.com/en-us/sql/t-sql/functions/ranking-functions-transact-sql
-
--- ============================================================
--- 示例数据上下文
--- ============================================================
--- 假设表结构:
---   users(user_id INT IDENTITY PRIMARY KEY, email VARCHAR(255), username VARCHAR(64), created_at DATETIME2)
 
 -- ============================================================
 -- 1. 查找重复数据
 -- ============================================================
-
-SELECT email, COUNT(*) AS cnt
-FROM users
-GROUP BY email
-HAVING COUNT(*) > 1;
+SELECT email, COUNT(*) AS cnt FROM users GROUP BY email HAVING COUNT(*) > 1;
 
 -- ============================================================
--- 2. 保留每组一行（ROW_NUMBER）
+-- 2. CTE + DELETE: SQL Server 最优雅的去重方式
 -- ============================================================
 
-SELECT *
-FROM (
-    SELECT user_id, email, username, created_at,
-           ROW_NUMBER() OVER (
-               PARTITION BY email
-               ORDER BY created_at DESC
-           ) AS rn
-    FROM users
-) ranked
-WHERE rn = 1;
-
--- ============================================================
--- 3. 删除重复数据（SQL Server 经典方式：CTE + DELETE）
--- ============================================================
-
--- CTE + ROW_NUMBER 直接删除（SQL Server 支持在 CTE 上直接 DELETE）
-WITH duplicates AS (
+-- SQL Server 允许直接在 CTE 上执行 DELETE——这是其独有的能力。
+;WITH duplicates AS (
     SELECT user_id,
-           ROW_NUMBER() OVER (
-               PARTITION BY email
-               ORDER BY created_at DESC
-           ) AS rn
+           ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
     FROM users
 )
-DELETE FROM duplicates WHERE rn > 1;
+DELETE FROM duplicates WHERE rn > 1;  -- 保留每个 email 的最新记录
 
 -- 保留最早记录
-WITH duplicates AS (
+;WITH duplicates AS (
     SELECT user_id,
-           ROW_NUMBER() OVER (
-               PARTITION BY email
-               ORDER BY created_at ASC
-           ) AS rn
+           ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at ASC) AS rn
     FROM users
 )
 DELETE FROM duplicates WHERE rn > 1;
 
--- 方法二：DELETE + JOIN
-DELETE u1
-FROM users u1
-JOIN users u2
-  ON u1.email = u2.email
-  AND u1.user_id < u2.user_id;
+-- 设计分析（对引擎开发者）:
+--   "可更新 CTE"是 SQL Server 的杀手级特性。
+--   PostgreSQL 的等价需要子查询: DELETE FROM users WHERE id IN (SELECT id FROM ...)
+--   MySQL 的等价更复杂: DELETE FROM users WHERE id NOT IN (SELECT MIN(id) FROM ...)
+--   SQL Server 的方式最直观: 在 CTE 中标记要删除的行，然后直接 DELETE。
 
 -- ============================================================
--- 4. 防止重复（MERGE）
+-- 3. DELETE + JOIN（替代方法）
 -- ============================================================
-
-MERGE INTO users AS target
-USING (VALUES ('a@b.com', 'alice', GETDATE())) AS source (email, username, created_at)
-ON target.email = source.email
-WHEN MATCHED THEN
-    UPDATE SET username = source.username, created_at = source.created_at
-WHEN NOT MATCHED THEN
-    INSERT (email, username, created_at) VALUES (source.email, source.username, source.created_at);
+DELETE u1 FROM users u1
+JOIN users u2 ON u1.email = u2.email AND u1.user_id < u2.user_id;
 
 -- ============================================================
--- 5. DISTINCT vs GROUP BY
+-- 4. 去重到新表
 -- ============================================================
-
-SELECT DISTINCT email FROM users;
-SELECT email FROM users GROUP BY email;
-
-SELECT email, COUNT(*) AS cnt, MAX(created_at) AS latest
-FROM users
-GROUP BY email;
-
--- ============================================================
--- 6. 去重到新表
--- ============================================================
-
-SELECT *
-INTO users_clean
-FROM (
-    SELECT user_id, email, username, created_at,
-           ROW_NUMBER() OVER (
-               PARTITION BY email
-               ORDER BY created_at DESC
-           ) AS rn
-    FROM users
-) ranked
+SELECT * INTO users_clean
+FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
+      FROM users) ranked
 WHERE rn = 1;
 
 -- ============================================================
--- 7. 性能考量
+-- 5. 大表分批去重
 -- ============================================================
+DECLARE @batch INT = 10000;
+WHILE 1 = 1
+BEGIN
+    ;WITH duplicates AS (
+        SELECT TOP (@batch) user_id,
+               ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
+        FROM users
+    )
+    DELETE FROM duplicates WHERE rn > 1;
+    IF @@ROWCOUNT < @batch BREAK;
+END;
 
-CREATE INDEX idx_users_email ON users (email);
+-- ============================================================
+-- 6. APPROX_COUNT_DISTINCT（2019+, 近似去重计数）
+-- ============================================================
+SELECT APPROX_COUNT_DISTINCT(email) FROM users;
+-- 比 COUNT(DISTINCT email) 快 10-100x，误差约 2%
 
--- CTE + DELETE 是 SQL Server 最优雅的去重方式（直接在 CTE 上删除）
--- MERGE 语句可以实现 upsert（插入或更新）
--- 大表去重建议使用 TOP + WHILE 循环分批删除
--- SQL Server 2019+ 的 APPROX_COUNT_DISTINCT 可做近似去重计数
--- APPROX_COUNT_DISTINCT(email) 比 COUNT(DISTINCT email) 更快
+-- ============================================================
+-- 7. 防止未来重复
+-- ============================================================
+CREATE UNIQUE INDEX uk_email ON users (email);
+
+-- 如果需要 NULL 值可重复（多行 email 为 NULL）:
+CREATE UNIQUE INDEX uk_email ON users (email) WHERE email IS NOT NULL;
+-- 过滤索引: 只对非 NULL 的 email 强制唯一
+
+-- 横向对比:
+--   PostgreSQL: CREATE UNIQUE INDEX ON t (col) WHERE col IS NOT NULL（同样支持）
+--   MySQL:      UNIQUE 索引允许多个 NULL（默认行为）
+--   Oracle:     NULL 不参与唯一索引（默认允许多个 NULL）

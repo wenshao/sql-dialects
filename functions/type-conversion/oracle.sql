@@ -1,120 +1,159 @@
--- Oracle: Type Conversion
+-- Oracle: 类型转换
 --
 -- 参考资料:
---   [1] Oracle SQL Reference - Conversion Functions
+--   [1] Oracle SQL Language Reference - Conversion Functions
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Conversion-Functions.html
---   [2] Oracle SQL Reference - CAST
---       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/CAST.html
---   [3] Oracle SQL Reference - Format Models
+--   [2] Oracle SQL Language Reference - Format Models
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Format-Models.html
 
 -- ============================================================
--- CAST
+-- 1. CAST（SQL 标准）
 -- ============================================================
-SELECT CAST(42 AS VARCHAR2(10)) FROM DUAL;       -- '42'
-SELECT CAST('42' AS NUMBER) FROM DUAL;           -- 42
-SELECT CAST(3.14 AS NUMBER(10,0)) FROM DUAL;    -- 3
-SELECT CAST('2024-01-15' AS DATE) FROM DUAL;     -- DATE
-SELECT CAST(SYSDATE AS TIMESTAMP) FROM DUAL;     -- TIMESTAMP
+
+SELECT CAST(42 AS VARCHAR2(10)) FROM DUAL;     -- '42'
+SELECT CAST('42' AS NUMBER) FROM DUAL;          -- 42
+SELECT CAST(3.14 AS NUMBER(10,0)) FROM DUAL;   -- 3
+SELECT CAST(SYSDATE AS TIMESTAMP) FROM DUAL;
 
 -- ============================================================
--- TO_CHAR (数值/日期 → 字符串)
+-- 2. TO_CHAR: 数值/日期 → 字符串（Oracle 最核心的转换函数）
 -- ============================================================
+
 -- 数值格式化
-SELECT TO_CHAR(123456.789, '999,999.99') FROM DUAL;     -- ' 123,456.79'
-SELECT TO_CHAR(123456.789, 'FM999,999.99') FROM DUAL;   -- '123,456.79' (FM 去空格)
-SELECT TO_CHAR(0.5, '990.00') FROM DUAL;                 -- '  0.50'
-SELECT TO_CHAR(42, '0000') FROM DUAL;                    -- '0042'
-SELECT TO_CHAR(1234.5, '$9,999.99') FROM DUAL;          -- ' $1,234.50'
+SELECT TO_CHAR(123456.789, '999,999.99') FROM DUAL;    -- ' 123,456.79'
+SELECT TO_CHAR(123456.789, 'FM999,999.99') FROM DUAL;  -- '123,456.79'
+SELECT TO_CHAR(0.5, '990.00') FROM DUAL;                -- '  0.50'
+SELECT TO_CHAR(42, '0000') FROM DUAL;                   -- '0042'
+SELECT TO_CHAR(1234.5, '$9,999.99') FROM DUAL;         -- ' $1,234.50'
+-- FM 修饰符去除前导空格（Oracle 独有的格式修饰符）
 
 -- 日期格式化
 SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL;
 SELECT TO_CHAR(SYSDATE, 'Day, DD Month YYYY') FROM DUAL;
-SELECT TO_CHAR(SYSDATE, 'DY') FROM DUAL;                 -- 'MON'
-SELECT TO_CHAR(SYSDATE, 'Q') FROM DUAL;                  -- 季度
-SELECT TO_CHAR(SYSDATE, 'WW') FROM DUAL;                 -- 年中的周
 SELECT TO_CHAR(SYSDATE, 'YYYY"年"MM"月"DD"日"') FROM DUAL;
 
 -- ============================================================
--- TO_NUMBER (字符串 → 数值)
+-- 3. TO_NUMBER / TO_DATE / TO_TIMESTAMP
 -- ============================================================
-SELECT TO_NUMBER('123.45') FROM DUAL;                     -- 123.45
-SELECT TO_NUMBER('123,456.78', '999,999.99') FROM DUAL;  -- 123456.78
-SELECT TO_NUMBER('$1,234.56', '$9,999.99') FROM DUAL;    -- 1234.56
-SELECT TO_NUMBER('FF', 'XX') FROM DUAL;                   -- 255 (十六进制)
 
--- ============================================================
--- TO_DATE (字符串 → DATE)
--- ============================================================
+SELECT TO_NUMBER('123,456.78', '999,999.99') FROM DUAL;
+SELECT TO_NUMBER('$1,234.56', '$9,999.99') FROM DUAL;
+SELECT TO_NUMBER('FF', 'XX') FROM DUAL;                 -- 255 (十六进制)
+
 SELECT TO_DATE('2024-01-15', 'YYYY-MM-DD') FROM DUAL;
 SELECT TO_DATE('15/01/2024', 'DD/MM/YYYY') FROM DUAL;
-SELECT TO_DATE('Jan 15, 2024', 'Mon DD, YYYY') FROM DUAL;
-SELECT TO_DATE('20240115', 'YYYYMMDD') FROM DUAL;
 
--- ============================================================
--- TO_TIMESTAMP (字符串 → TIMESTAMP)
--- ============================================================
 SELECT TO_TIMESTAMP('2024-01-15 10:30:00.123', 'YYYY-MM-DD HH24:MI:SS.FF3') FROM DUAL;
 
--- ============================================================
--- TO_TIMESTAMP_TZ (字符串 → TIMESTAMP WITH TIME ZONE)
--- ============================================================
-SELECT TO_TIMESTAMP_TZ('2024-01-15 10:30:00 +08:00', 'YYYY-MM-DD HH24:MI:SS TZH:TZM') FROM DUAL;
+SELECT TO_TIMESTAMP_TZ('2024-01-15 10:30:00 +08:00',
+    'YYYY-MM-DD HH24:MI:SS TZH:TZM') FROM DUAL;
 
 -- ============================================================
--- TO_CLOB / TO_NCHAR / TO_NCLOB
+-- 4. 设计分析: Oracle 的转换函数体系
 -- ============================================================
-SELECT TO_CLOB('hello') FROM DUAL;
-SELECT TO_NCHAR(42) FROM DUAL;
+
+-- Oracle 使用 TO_* 函数族进行显式转换:
+--   TO_CHAR:   任意类型 → VARCHAR2
+--   TO_NUMBER: VARCHAR2 → NUMBER
+--   TO_DATE:   VARCHAR2 → DATE
+--   TO_TIMESTAMP: VARCHAR2 → TIMESTAMP
+--
+-- 横向对比:
+--   Oracle:     TO_CHAR / TO_NUMBER / TO_DATE + Format Model
+--   PostgreSQL: CAST + to_char() / to_number() / to_timestamp()
+--               :: 运算符（简洁: '42'::integer）
+--   MySQL:      CAST / CONVERT + DATE_FORMAT / STR_TO_DATE
+--   SQL Server: CAST / CONVERT(type, expr, style_code) + FORMAT
+--
+-- Oracle 的 Format Model 最丰富（'FM999,999.99' 等），
+-- 但也增加了学习成本。SQL Server 的 CONVERT style code 更简洁但不直观。
+--
+-- 对引擎开发者的启示:
+--   类型转换函数是最常用的函数之一。至少需要:
+--   1. CAST（SQL 标准）
+--   2. 日期格式化/解析函数
+--   3. 数值格式化函数
+--   PostgreSQL 的 :: 运算符非常方便，值得考虑支持。
 
 -- ============================================================
--- 隐式转换规则
+-- 5. 隐式转换（Oracle 较宽松，是 Bug 来源）
 -- ============================================================
--- Oracle 隐式转换较宽松:
--- VARCHAR2 → NUMBER : 在算术运算中自动转换
--- VARCHAR2 → DATE   : 使用 NLS_DATE_FORMAT 自动转换
--- NUMBER → VARCHAR2  : 在字符串拼接中自动转换
-SELECT '42' + 0 FROM DUAL;                       -- 42 (隐式转换)
-SELECT 'Value: ' || 42 FROM DUAL;                -- 'Value: 42' (隐式转换)
+
+-- VARCHAR2 → NUMBER: 在算术运算中自动转换
+SELECT '42' + 0 FROM DUAL;                     -- 42
+
+-- VARCHAR2 → DATE: 使用 NLS_DATE_FORMAT 自动转换
+-- 这是 Oracle 中 Bug 的主要来源之一!
+-- 不同会话的 NLS_DATE_FORMAT 可能不同，导致相同 SQL 在不同环境下行为不一致
+
+-- NUMBER → VARCHAR2: 在字符串拼接中自动转换
+SELECT 'Value: ' || 42 FROM DUAL;              -- 'Value: 42'
+
+-- 对引擎开发者的启示:
+--   隐式转换方便但危险。推荐:
+--   - 算术运算中的字符串→数值: 可以支持（MySQL/Oracle 做法）
+--   - 日期隐式转换: 强烈不推荐（Oracle 的 NLS_DATE_FORMAT 是反面教材）
+--   - 字符串拼接中的数值: 可以支持（用户体验好）
 
 -- ============================================================
--- 常见转换模式
+-- 6. 安全转换（12c R2+）
 -- ============================================================
--- 字符串 ↔ 数字
-SELECT TO_NUMBER('123.45') FROM DUAL;
-SELECT TO_CHAR(123.45, 'FM999.99') FROM DUAL;
 
--- 字符串 ↔ 日期
-SELECT TO_DATE('2024-01-15', 'YYYY-MM-DD') FROM DUAL;
-SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD') FROM DUAL;
+-- VALIDATE_CONVERSION: 检查是否可转换（返回 0/1）
+SELECT VALIDATE_CONVERSION('42' AS NUMBER) FROM DUAL;      -- 1
+SELECT VALIDATE_CONVERSION('abc' AS NUMBER) FROM DUAL;     -- 0
+SELECT VALIDATE_CONVERSION('2024-13-01' AS DATE, 'YYYY-MM-DD') FROM DUAL; -- 0
 
--- Unix 时间戳
-SELECT (CAST(SYSDATE AS DATE) - TO_DATE('1970-01-01','YYYY-MM-DD')) * 86400 FROM DUAL; -- 秒数
+-- DEFAULT ON CONVERSION ERROR: 转换失败时使用默认值
+SELECT CAST('abc' AS NUMBER DEFAULT 0 ON CONVERSION ERROR) FROM DUAL; -- 0
+SELECT CAST('bad-date' AS DATE DEFAULT DATE '2000-01-01'
+    ON CONVERSION ERROR) FROM DUAL;
 
--- RAW / HEXTORAW
-SELECT RAWTOHEX('hello') FROM DUAL;              -- '68656C6C6F'
+-- 横向对比:
+--   Oracle 12c R2+: VALIDATE_CONVERSION + DEFAULT ON CONVERSION ERROR
+--   PostgreSQL:     无原生安全转换（需要自定义函数或 PL/pgSQL）
+--   MySQL:          隐式转换失败时返回 0 或 NULL（不报错，但不安全）
+--   SQL Server:     TRY_CAST / TRY_CONVERT（SQL Server 2012+）
+--
+-- 对引擎开发者的启示:
+--   安全转换（TRY_CAST 或 DEFAULT ON CONVERSION ERROR）是必备功能。
+--   用户经常需要处理脏数据，转换失败不应该终止整个查询。
+
+-- ============================================================
+-- 7. '' = NULL 对类型转换的影响
+-- ============================================================
+
+-- TO_NUMBER('') 报错! 因为 '' = NULL:
+-- SELECT TO_NUMBER('') FROM DUAL;  -- ORA-01722: invalid number
+-- 实际上 TO_NUMBER(NULL) 返回 NULL，但 Oracle 的行为不一致
+
+-- LENGTH('') 返回 NULL:
+SELECT LENGTH('') FROM DUAL;                    -- NULL（不是 0）
+
+-- TO_CHAR(NULL) 返回 NULL:
+SELECT TO_CHAR(NULL) FROM DUAL;                 -- NULL
+-- 由于 '' = NULL，TO_CHAR 结果可能需要 NVL 包装
+
+-- ============================================================
+-- 8. Unix 时间戳转换
+-- ============================================================
+
+-- 日期 → Unix 时间戳
+SELECT (CAST(SYSDATE AS DATE) - TO_DATE('1970-01-01','YYYY-MM-DD')) * 86400
+FROM DUAL;
+
+-- Unix 时间戳 → 日期
+SELECT TO_DATE('1970-01-01','YYYY-MM-DD') + 1700000000/86400 FROM DUAL;
+
+-- RAW / 十六进制转换
+SELECT RAWTOHEX('hello') FROM DUAL;            -- '68656C6C6F'
 SELECT UTL_RAW.CAST_TO_VARCHAR2(HEXTORAW('68656C6C6F')) FROM DUAL; -- 'hello'
 
 -- ============================================================
--- VALIDATE_CONVERSION (安全检查是否可转换)             -- 12c R2+
+-- 9. 对引擎开发者的总结
 -- ============================================================
-SELECT VALIDATE_CONVERSION('42' AS NUMBER) FROM DUAL;     -- 1 (可转换)
-SELECT VALIDATE_CONVERSION('abc' AS NUMBER) FROM DUAL;    -- 0 (不可转换)
-SELECT VALIDATE_CONVERSION('2024-13-01' AS DATE, 'YYYY-MM-DD') FROM DUAL; -- 0
-
--- ============================================================
--- CAST ... DEFAULT ... ON CONVERSION ERROR             -- 12c R2+
--- ============================================================
-SELECT CAST('abc' AS NUMBER DEFAULT 0 ON CONVERSION ERROR) FROM DUAL; -- 0
-SELECT CAST('bad-date' AS DATE DEFAULT DATE '2000-01-01' ON CONVERSION ERROR) FROM DUAL;
-
--- 版本说明：
---   Oracle 全版本  : CAST, TO_CHAR, TO_NUMBER, TO_DATE, TO_TIMESTAMP
---   Oracle 12c R2+ : VALIDATE_CONVERSION, DEFAULT ON CONVERSION ERROR
--- 注意：Oracle TO_CHAR 格式模式非常丰富
--- 注意：FM 修饰符去除前导空格
--- 注意：NLS_DATE_FORMAT 影响隐式日期转换
--- 注意：Oracle 12c R2+ 的 DEFAULT ON CONVERSION ERROR 替代了 TRY_CAST
--- 限制：无 TRY_CAST 关键字（使用 DEFAULT ON CONVERSION ERROR）
--- 限制：无 CONVERT 函数（SQL Server 风格）
--- 限制：无 :: 运算符
+-- 1. Oracle 的 TO_* 函数族 + Format Model 是最成熟的转换体系，但学习曲线陡峭。
+-- 2. 隐式日期转换依赖 NLS_DATE_FORMAT 是 Oracle 最大的设计缺陷之一。
+-- 3. VALIDATE_CONVERSION 和 DEFAULT ON CONVERSION ERROR 是 12c R2 的优秀创新。
+-- 4. FM 修饰符（去前导空格）是 TO_CHAR 中最常忘记的细节。
+-- 5. 安全转换（TRY_CAST 模式）是现代引擎的必备功能。

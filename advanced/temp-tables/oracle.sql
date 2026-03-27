@@ -1,127 +1,119 @@
 -- Oracle: 临时表与临时存储
 --
 -- 参考资料:
---   [1] Oracle Documentation - Global Temporary Tables
+--   [1] Oracle SQL Language Reference - CREATE TABLE (Global Temporary Tables)
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/CREATE-TABLE.html
---   [2] Oracle Documentation - Private Temporary Tables (18c+)
+--   [2] Oracle SQL Language Reference - Private Temporary Tables (18c+)
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/CREATE-TABLE.html
 
 -- ============================================================
--- 全局临时表（Global Temporary Table）
+-- 1. 全局临时表 GTT（Oracle 的独特设计）
 -- ============================================================
 
--- 事务级临时表（事务提交时清空数据）
+-- 事务级（事务提交时自动清空数据）
 CREATE GLOBAL TEMPORARY TABLE gtt_session_calc (
     calc_id   NUMBER,
     user_id   NUMBER,
-    amount    NUMBER(10,2),
-    calc_date DATE
+    amount    NUMBER(10,2)
 ) ON COMMIT DELETE ROWS;
 
--- 会话级临时表（会话结束时清空数据）
+-- 会话级（会话结束时自动清空数据）
 CREATE GLOBAL TEMPORARY TABLE gtt_user_cache (
     user_id   NUMBER,
-    username  VARCHAR2(100),
-    email     VARCHAR2(200)
+    username  VARCHAR2(100)
 ) ON COMMIT PRESERVE ROWS;
 
--- 注意：表结构是永久的（对所有会话可见），但数据对各会话隔离
+-- Oracle GTT 的关键设计决策:
+--   表结构是永久的（CREATE 一次，数据字典中永久存在）
+--   数据是临时的（每个会话独立，互不可见）
+--
+-- 这与其他数据库的临时表设计截然不同:
+--
+-- 横向对比:
+--   Oracle:     GTT 结构永久 + 数据临时（DDL 一次，反复使用）
+--   PostgreSQL: CREATE TEMP TABLE（结构和数据都临时，会话结束时消失）
+--   MySQL:      CREATE TEMPORARY TABLE（同 PostgreSQL）
+--   SQL Server: #table / ##table（# 局部，## 全局，都临时）
+--
+-- Oracle 设计的优缺点:
+--   优点: 结构永久 → 不需要每次创建，减少 DDL 开销和锁竞争
+--         可以预先创建索引和约束
+--   缺点: 结构是全局的 → 不够灵活，不同业务需求可能冲突
+--         需要 DBA 预先创建（不能在存储过程中动态创建）
+--
+-- 对引擎开发者的启示:
+--   PostgreSQL/MySQL 的"按需创建"模型更灵活，适合动态场景。
+--   Oracle 的"预定义结构"模型适合固定的 ETL 流程。
+--   推荐: 支持两种模式（CREATE TEMPORARY TABLE + GTT）。
 
 -- ============================================================
--- 使用全局临时表
+-- 2. GTT 使用
 -- ============================================================
 
--- 插入数据
 INSERT INTO gtt_user_cache
-SELECT id, username, email FROM users WHERE status = 1;
+SELECT id, username FROM users WHERE status = 1;
 
--- 查询（只能看到当前会话的数据）
-SELECT * FROM gtt_user_cache;
+SELECT * FROM gtt_user_cache;                  -- 只能看到当前会话的数据
 
--- 可以创建索引（索引也是临时的）
+-- 索引（也是临时的，但定义是永久的）
 CREATE INDEX idx_gtt_user ON gtt_user_cache(user_id);
 
--- 可以收集统计信息
--- DBMS_STATS.GATHER_TABLE_STATS 对 GTT 不太有效
--- 使用 ON COMMIT 选项或设置默认统计
-EXEC DBMS_STATS.SET_TABLE_STATS('SCHEMA', 'GTT_USER_CACHE', numrows => 10000);
+-- GTT 的存储特点:
+--   不记录 redo 日志（仅记录 undo），写入性能优于普通表
+--   使用临时表空间（TEMPORARY TABLESPACE）
+--   不需要 COMMIT 就可以查询（不像 INSERT /*+ APPEND */ 需要先 COMMIT）
 
 -- ============================================================
--- 私有临时表（18c+）
+-- 3. 私有临时表 PTT（18c+）
 -- ============================================================
 
--- 私有临时表：表结构也是临时的（只在当前会话存在）
+-- PTT 的表结构也是临时的（只在当前会话存在）
+-- 名称必须以 ORA$PTT_ 前缀开头
+
 CREATE PRIVATE TEMPORARY TABLE ora$ptt_results (
     id    NUMBER,
     value NUMBER
 ) ON COMMIT PRESERVE ROWS;
 
--- 注意：私有临时表名称必须以 ORA$PTT_ 前缀开头
-
--- 事务级
+-- 事务级 PTT（提交时删除表结构和数据）
 CREATE PRIVATE TEMPORARY TABLE ora$ptt_calc (
     id NUMBER, result NUMBER
-) ON COMMIT DROP DEFINITION;  -- 事务提交时删除表结构
+) ON COMMIT DROP DEFINITION;
 
--- 不记录 redo/undo 日志，性能更好
+-- PTT 不记录 redo/undo 日志，性能最好
+
 INSERT INTO ora$ptt_results VALUES (1, 100);
 SELECT * FROM ora$ptt_results;
-
 DROP TABLE ora$ptt_results;
 
+-- GTT vs PTT:
+--   GTT: 结构永久、数据临时、需要预先 CREATE
+--   PTT: 结构临时、数据临时、可以动态 CREATE（18c+）
+--   PTT 更接近其他数据库的 TEMPORARY TABLE 行为
+
 -- ============================================================
--- CTE（公共表表达式）
+-- 4. CTE 作为轻量级替代
 -- ============================================================
 
 WITH monthly_sales AS (
-    SELECT user_id,
-           TRUNC(order_date, 'MM') AS month,
+    SELECT user_id, TRUNC(order_date, 'MM') AS month,
            SUM(amount) AS total
-    FROM orders
-    GROUP BY user_id, TRUNC(order_date, 'MM')
+    FROM orders GROUP BY user_id, TRUNC(order_date, 'MM')
 )
 SELECT user_id, month, total,
-       LAG(total) OVER (PARTITION BY user_id ORDER BY month) AS prev_month
+       LAG(total) OVER (PARTITION BY user_id ORDER BY month) AS prev
 FROM monthly_sales;
 
--- 递归 CTE（11gR2+）
-WITH tree (id, name, parent_id, lvl) AS (
-    SELECT id, name, parent_id, 1 FROM departments WHERE parent_id IS NULL
-    UNION ALL
-    SELECT d.id, d.name, d.parent_id, t.lvl + 1
-    FROM departments d JOIN tree t ON d.parent_id = t.id
-)
-SELECT * FROM tree ORDER BY lvl, name;
-
--- Oracle 传统层次查询（CONNECT BY）
-SELECT id, name, LEVEL AS lvl,
-       SYS_CONNECT_BY_PATH(name, '/') AS path
-FROM departments
-START WITH parent_id IS NULL
-CONNECT BY PRIOR id = parent_id
-ORDER SIBLINGS BY name;
-
--- ============================================================
--- 子查询分解（WITH 物化）
--- ============================================================
-
--- Oracle 可以自动决定是否物化 CTE
--- 使用 Hint 控制：
+-- CTE 物化提示
 WITH /*+ MATERIALIZE */ expensive_calc AS (
     SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id
 )
 SELECT * FROM expensive_calc WHERE total > 1000;
 
-WITH /*+ INLINE */ cheap_calc AS (
-    SELECT * FROM users WHERE status = 1
-)
-SELECT * FROM cheap_calc WHERE age > 25;
-
 -- ============================================================
--- PL/SQL 集合（内存表替代）
+-- 5. PL/SQL 集合类型（内存表替代）
 -- ============================================================
 
--- PL/SQL 中使用集合类型代替临时表
 DECLARE
     TYPE t_user_rec IS RECORD (id NUMBER, username VARCHAR2(100));
     TYPE t_user_tab IS TABLE OF t_user_rec INDEX BY PLS_INTEGER;
@@ -129,15 +121,35 @@ DECLARE
 BEGIN
     SELECT id, username BULK COLLECT INTO v_users
     FROM users WHERE status = 1;
-
     FOR i IN 1..v_users.COUNT LOOP
         DBMS_OUTPUT.PUT_LINE(v_users(i).username);
     END LOOP;
 END;
 /
 
+-- PL/SQL 集合 vs 临时表:
+--   集合: 全在内存，适合小数据量，无 I/O 开销
+--   临时表: 可以溢出到磁盘，适合大数据量，支持索引
+
 -- ============================================================
--- 临时表空间
+-- 6. CONNECT BY 生成临时序列（Oracle 特有技巧）
+-- ============================================================
+
+-- 生成数字序列（不需要临时表）
+SELECT LEVEL AS n FROM DUAL CONNECT BY LEVEL <= 100;
+
+-- 生成日期序列
+SELECT DATE '2024-01-01' + LEVEL - 1 AS d
+FROM DUAL CONNECT BY LEVEL <= 31;
+
+-- 横向对比:
+--   Oracle:     CONNECT BY LEVEL（独有语法）
+--   PostgreSQL: generate_series(1, 100)
+--   MySQL:      递归 CTE（8.0+）
+--   SQL Server: master.dbo.spt_values 或递归 CTE
+
+-- ============================================================
+-- 7. 数据字典查询
 -- ============================================================
 
 -- 查看临时表空间使用
@@ -146,12 +158,13 @@ FROM v$temp_space_header;
 
 -- 查看当前会话的临时空间使用
 SELECT username, segtype, blocks
-FROM v$tempseg_usage
-WHERE username = USER;
+FROM v$tempseg_usage WHERE username = USER;
 
--- 注意：Oracle GTT 的表结构是永久的，数据是临时的
--- 注意：18c+ 的私有临时表（ORA$PTT_）表结构也是临时的
--- 注意：GTT 不记录 redo 日志（仅记录 undo），性能好于普通表
--- 注意：私有临时表完全不记录 redo/undo，性能最好
--- 注意：PL/SQL 集合类型可以替代小型临时表
--- 注意：CONNECT BY 是 Oracle 特有的层次查询语法
+-- ============================================================
+-- 8. 对引擎开发者的总结
+-- ============================================================
+-- 1. Oracle GTT 的"结构永久+数据临时"设计与其他数据库不同，各有优劣。
+-- 2. 18c PTT 补充了"动态创建临时表"的能力，更接近行业标准。
+-- 3. GTT 不记录 redo 是性能优势; PTT 连 undo 也不记录，更快。
+-- 4. CONNECT BY LEVEL 是 Oracle 生成序列的独有技巧，其他引擎用 generate_series。
+-- 5. PL/SQL 集合类型可以替代小型临时表，避免 I/O 开销。

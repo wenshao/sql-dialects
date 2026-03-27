@@ -1,10 +1,8 @@
 -- Oracle: 日期序列生成与间隙填充 (Date Series Fill)
 --
 -- 参考资料:
---   [1] Oracle Documentation - CONNECT BY
+--   [1] Oracle Documentation - Hierarchical Queries (CONNECT BY)
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Hierarchical-Queries.html
---   [2] Oracle Documentation - Analytic Functions
---       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Analytic-Functions.html
 
 -- ============================================================
 -- 准备数据
@@ -25,7 +23,7 @@ INSERT ALL
 SELECT 1 FROM DUAL;
 
 -- ============================================================
--- 1. 使用 CONNECT BY LEVEL 生成日期序列
+-- 1. CONNECT BY LEVEL 生成日期序列（Oracle 独有技巧）
 -- ============================================================
 
 SELECT DATE '2024-01-01' + LEVEL - 1 AS d
@@ -34,32 +32,24 @@ CONNECT BY LEVEL <= DATE '2024-01-10' - DATE '2024-01-01' + 1;
 
 -- 按月生成
 SELECT ADD_MONTHS(DATE '2024-01-01', LEVEL - 1) AS month_start
-FROM DUAL
-CONNECT BY LEVEL <= 12;
+FROM DUAL CONNECT BY LEVEL <= 12;
+
+-- 设计分析:
+--   CONNECT BY LEVEL 是 Oracle 最经典的序列生成技巧。
+--   原本用于层次查询的 CONNECT BY 被创造性地用于生成数字/日期序列。
+--   DATE + NUMBER 的算术语义（1 = 1天）使日期序列生成非常简洁。
+--
+-- 横向对比:
+--   Oracle:     CONNECT BY LEVEL（独有，简洁但语义不直观）
+--   PostgreSQL: generate_series(start, end, interval)（专用函数，最清晰）
+--   MySQL:      递归 CTE（8.0+）
+--   SQL Server: 递归 CTE 或 master..spt_values
 
 -- ============================================================
 -- 2. LEFT JOIN 填充间隙
 -- ============================================================
 
-SELECT
-    seq.d                      AS date_val,
-    COALESCE(ds.amount, 0)     AS amount
-FROM (
-    SELECT DATE '2024-01-01' + LEVEL - 1 AS d
-    FROM DUAL
-    CONNECT BY LEVEL <= 10
-) seq
-LEFT JOIN daily_sales ds ON ds.sale_date = seq.d
-ORDER BY seq.d;
-
--- ============================================================
--- 3. COALESCE 填零 + 累计和
--- ============================================================
-
-SELECT
-    seq.d                      AS date_val,
-    COALESCE(ds.amount, 0)     AS amount,
-    SUM(COALESCE(ds.amount, 0)) OVER (ORDER BY seq.d) AS running_total
+SELECT seq.d AS date_val, COALESCE(ds.amount, 0) AS amount
 FROM (
     SELECT DATE '2024-01-01' + LEVEL - 1 AS d
     FROM DUAL CONNECT BY LEVEL <= 10
@@ -68,15 +58,12 @@ LEFT JOIN daily_sales ds ON ds.sale_date = seq.d
 ORDER BY seq.d;
 
 -- ============================================================
--- 4. 用最近已知值填充（Oracle 支持 IGNORE NULLS）
+-- 3. 填零 + 累计和
 -- ============================================================
 
--- Oracle 原生支持 LAST_VALUE ... IGNORE NULLS
-SELECT
-    seq.d AS date_val,
-    LAST_VALUE(ds.amount IGNORE NULLS)
-        OVER (ORDER BY seq.d ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
-        AS filled_amount
+SELECT seq.d AS date_val,
+       COALESCE(ds.amount, 0) AS amount,
+       SUM(COALESCE(ds.amount, 0)) OVER (ORDER BY seq.d) AS running_total
 FROM (
     SELECT DATE '2024-01-01' + LEVEL - 1 AS d
     FROM DUAL CONNECT BY LEVEL <= 10
@@ -84,11 +71,28 @@ FROM (
 LEFT JOIN daily_sales ds ON ds.sale_date = seq.d
 ORDER BY seq.d;
 
--- 也可以使用 LAG IGNORE NULLS
--- LAG(amount IGNORE NULLS) OVER (ORDER BY d)
+-- ============================================================
+-- 4. LAST_VALUE IGNORE NULLS 填充（Oracle 首创特性）
+-- ============================================================
+
+-- 用最近已知值填充间隙（Forward Fill）
+SELECT seq.d AS date_val,
+       LAST_VALUE(ds.amount IGNORE NULLS)
+           OVER (ORDER BY seq.d ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+           AS filled_amount
+FROM (
+    SELECT DATE '2024-01-01' + LEVEL - 1 AS d
+    FROM DUAL CONNECT BY LEVEL <= 10
+) seq
+LEFT JOIN daily_sales ds ON ds.sale_date = seq.d
+ORDER BY seq.d;
+
+-- IGNORE NULLS 是 Oracle 首创的窗口函数修饰符（8i+）。
+-- 其他数据库（PostgreSQL、SQL Server 2022 之前）没有这个能力，
+-- 需要复杂的子查询替代。
 
 -- ============================================================
--- 5. 递归 CTE 方法（Oracle 11gR2+）
+-- 5. 递归 CTE 方法（11g R2+）
 -- ============================================================
 
 WITH date_series(d) AS (
@@ -102,7 +106,7 @@ LEFT JOIN daily_sales ds ON ds.sale_date = ds2.d
 ORDER BY ds2.d;
 
 -- ============================================================
--- 6. MODEL 子句（Oracle 特有的高级间隙填充）
+-- 6. MODEL 子句（Oracle 10g+ 独有的高级间隙填充）
 -- ============================================================
 
 SELECT date_val, amount FROM daily_sales
@@ -116,7 +120,17 @@ MODEL
     )
 ORDER BY date_val;
 
--- 注意：CONNECT BY LEVEL 是 Oracle 特有的序列生成方法
--- 注意：Oracle 原生支持 IGNORE NULLS（LAST_VALUE、LAG、LEAD 等）
--- 注意：MODEL 子句是 Oracle 独特的多维数据处理功能
--- 注意：日期相减在 Oracle 中直接返回天数
+-- MODEL 子句的设计:
+--   Oracle 独有的"电子表格式"SQL 扩展。
+--   DIMENSION BY: 行标识（类似 Excel 行号）
+--   MEASURES: 可计算的值（类似 Excel 单元格）
+--   RULES: 计算规则（类似 Excel 公式）
+--   FOR ... FROM ... TO ... INCREMENT: 自动填充范围
+
+-- ============================================================
+-- 7. 对引擎开发者的总结
+-- ============================================================
+-- 1. CONNECT BY LEVEL 是 Oracle 的经典序列生成技巧，新引擎用 generate_series。
+-- 2. IGNORE NULLS 是 Oracle 首创的窗口函数修饰符，对间隙填充极其实用。
+-- 3. MODEL 子句提供了 SQL 中的"电子表格"能力，但学习成本高，实际使用率低。
+-- 4. 日期算术（DATE + NUMBER = DATE）使 Oracle 的日期序列生成特别简洁。

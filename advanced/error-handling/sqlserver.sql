@@ -1,43 +1,77 @@
--- SQL Server: Error Handling
+-- SQL Server: 错误处理（TRY/CATCH + XACT_ABORT）
 --
 -- 参考资料:
 --   [1] SQL Server T-SQL - TRY...CATCH
 --       https://learn.microsoft.com/en-us/sql/t-sql/language-elements/try-catch-transact-sql
---   [2] SQL Server T-SQL - THROW
+--   [2] SQL Server T-SQL - THROW / RAISERROR
 --       https://learn.microsoft.com/en-us/sql/t-sql/language-elements/throw-transact-sql
---   [3] SQL Server T-SQL - RAISERROR
---       https://learn.microsoft.com/en-us/sql/t-sql/language-elements/raiserror-transact-sql
 
 -- ============================================================
--- TRY...CATCH (核心错误处理)
+-- 1. TRY...CATCH 基本结构
 -- ============================================================
+
 BEGIN TRY
     INSERT INTO users(id, username) VALUES(1, 'test');
-    PRINT 'Insert succeeded';
 END TRY
 BEGIN CATCH
-    PRINT 'Error occurred: ' + ERROR_MESSAGE();
+    SELECT ERROR_NUMBER()    AS ErrorNumber,
+           ERROR_SEVERITY()  AS Severity,
+           ERROR_STATE()     AS State,
+           ERROR_PROCEDURE() AS Procedure,
+           ERROR_LINE()      AS Line,
+           ERROR_MESSAGE()   AS Message;
 END CATCH;
 
--- ============================================================
--- 错误信息函数
--- ============================================================
-BEGIN TRY
-    SELECT 1/0;
-END TRY
-BEGIN CATCH
-    SELECT
-        ERROR_NUMBER()    AS ErrorNumber,
-        ERROR_SEVERITY()  AS ErrorSeverity,
-        ERROR_STATE()     AS ErrorState,
-        ERROR_PROCEDURE() AS ErrorProcedure,
-        ERROR_LINE()      AS ErrorLine,
-        ERROR_MESSAGE()   AS ErrorMessage;
-END CATCH;
+-- 设计分析（对引擎开发者）:
+--   T-SQL 的 TRY/CATCH 是结构化错误处理（2005 引入）。
+--   之前只有 @@ERROR 全局变量——每条语句后都要检查，极易遗漏。
+--
+-- 横向对比:
+--   PostgreSQL: BEGIN ... EXCEPTION WHEN ... THEN ...（PL/pgSQL 块）
+--               支持按错误类型分支: WHEN unique_violation THEN ...
+--   MySQL:      DECLARE HANDLER FOR SQLSTATE ... （类似 COBOL 风格）
+--   Oracle:     EXCEPTION WHEN ... THEN ...（PL/SQL 块）
+--               支持命名异常: WHEN NO_DATA_FOUND, DUP_VAL_ON_INDEX
+--
+--   SQL Server 的 TRY/CATCH 不支持按错误类型分支——必须在 CATCH 中用
+--   IF/CASE 检查 ERROR_NUMBER()。这不如 PostgreSQL/Oracle 的设计优雅。
 
 -- ============================================================
--- TRY...CATCH 与事务
+-- 2. XACT_ABORT: SQL Server 最关键的设置
 -- ============================================================
+
+SET XACT_ABORT ON;  -- 任何运行时错误自动回滚整个事务
+
+-- XACT_ABORT 的重要性（对引擎开发者必须理解）:
+--   默认 XACT_ABORT OFF 时:
+--     错误只终止当前语句，事务保持打开状态。
+--     后续语句继续执行！这导致"部分提交"——数据不一致。
+--   SET XACT_ABORT ON 时:
+--     任何运行时错误立即回滚整个事务并终止批处理。
+
+-- 经典的"部分提交"危险场景:
+-- SET XACT_ABORT OFF;  -- 默认
+-- BEGIN TRANSACTION;
+--     INSERT INTO orders (...) VALUES (...);  -- 成功
+--     INSERT INTO order_items (...) VALUES (...);  -- 失败！
+--     INSERT INTO audit_log (...) VALUES (...);  -- 继续执行！
+-- COMMIT;  -- 提交了部分数据！
+
+-- 横向对比:
+--   PostgreSQL: 事务中的任何错误都会将事务标记为"已中止"（不能继续）
+--   MySQL:      取决于存储引擎和错误类型（行为不一致）
+--   Oracle:     错误只终止当前语句，事务继续（同 SQL Server 默认）
+--
+-- 对引擎开发者的启示:
+--   PostgreSQL 的"错误即中止"是最安全的默认行为。
+--   SQL Server 的 XACT_ABORT OFF 默认值是一个危险的设计决策。
+--   最佳实践: 所有存储过程第一行应该是 SET XACT_ABORT ON。
+
+-- ============================================================
+-- 3. TRY/CATCH + 事务的标准模式
+-- ============================================================
+
+SET XACT_ABORT ON;
 BEGIN TRY
     BEGIN TRANSACTION;
         INSERT INTO orders(user_id, amount) VALUES(1, 100.00);
@@ -47,140 +81,117 @@ END TRY
 BEGIN CATCH
     IF @@TRANCOUNT > 0
         ROLLBACK TRANSACTION;
-
-    -- 记录错误日志
+    -- 记录错误
     INSERT INTO error_log(error_number, error_message, error_time)
     VALUES(ERROR_NUMBER(), ERROR_MESSAGE(), GETDATE());
-
-    -- 重新抛出（不吞没错误）
-    THROW;
+    THROW;  -- 重新抛出
 END CATCH;
 
+-- XACT_STATE() vs @@TRANCOUNT:
+--   @@TRANCOUNT: 事务嵌套深度（> 0 表示有活动事务）
+--   XACT_STATE(): 事务状态
+--     1  = 可提交的活动事务
+--     0  = 无活动事务
+--     -1 = 不可提交的活动事务（XACT_ABORT 触发后）
+-- XACT_STATE() = -1 时只能 ROLLBACK（不能 COMMIT）
+
 -- ============================================================
--- THROW (抛出异常)                                    -- 2012+
+-- 4. THROW vs RAISERROR
 -- ============================================================
--- 抛出自定义错误
+
+-- THROW（2012+, 推荐）
 THROW 50001, N'Custom error: invalid operation', 1;
+-- 在 CATCH 中重抛（无参数）:
+BEGIN TRY SELECT 1/0; END TRY
+BEGIN CATCH THROW; END CATCH;  -- 保留原始错误信息
 
--- 在 CATCH 块中重抛
-BEGIN TRY
-    SELECT 1/0;
-END TRY
-BEGIN CATCH
-    PRINT 'Logging error...';
-    THROW;  -- 重抛原始错误
-END CATCH;
-
--- ============================================================
--- RAISERROR (旧式错误抛出)
--- ============================================================
--- 基本用法
+-- RAISERROR（旧式，仍有独特用途）
 RAISERROR(N'Error: %s (code %d)', 16, 1, N'invalid input', 42);
+-- 严重级别: 0-10 信息性（不触发 CATCH）, 11-19 用户错误, 20+ 致命错误
 
--- 严重级别说明
--- 0-10  : 信息性消息（不触发 CATCH）
--- 11-16 : 用户可修复的错误
--- 17-19 : 资源/软件错误
--- 20-25 : 系统级致命错误（断开连接）
+-- RAISERROR WITH NOWAIT: 立即发送消息到客户端（THROW 不支持）
+RAISERROR(N'Processing step 1...', 0, 1) WITH NOWAIT;
+-- 在长时间运行的脚本中显示进度——THROW 不能替代这个功能
 
--- RAISERROR WITH NOWAIT（立即发送消息）
-RAISERROR(N'Step 1 complete', 0, 1) WITH NOWAIT;
+-- THROW vs RAISERROR 对比:
+--   THROW: 更简洁, 无格式化, 总是严重级别 16, 自动中止批处理
+--   RAISERROR: 支持格式化 (%s %d), 可选严重级别, 不自动中止, 支持 WITH NOWAIT
 
 -- ============================================================
--- 自定义错误消息 (sp_addmessage)
+-- 5. 自定义错误消息
 -- ============================================================
-EXEC sp_addmessage @msgnum = 50001,
-                   @severity = 16,
-                   @msgtext = N'Invalid user: %s. Age must be > %d';
 
--- 使用自定义消息
+EXEC sp_addmessage @msgnum = 50001, @severity = 16,
+    @msgtext = N'Invalid user: %s. Age must be > %d';
 RAISERROR(50001, 16, 1, N'john', 18);
 
 -- ============================================================
--- 存储过程中的错误处理
+-- 6. 存储过程中的错误处理模式
 -- ============================================================
+
 CREATE PROCEDURE dbo.TransferFunds
-    @from_account INT,
-    @to_account INT,
-    @amount DECIMAL(10,2)
+    @from_id INT, @to_id INT, @amount DECIMAL(10,2)
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     IF @amount <= 0
         THROW 50001, N'Transfer amount must be positive', 1;
 
     BEGIN TRY
         BEGIN TRANSACTION;
+            UPDATE accounts SET balance = balance - @amount WHERE id = @from_id;
+            IF @@ROWCOUNT = 0 THROW 50002, N'Source account not found', 1;
 
-        UPDATE accounts SET balance = balance - @amount
-        WHERE id = @from_account;
-
-        IF @@ROWCOUNT = 0
-            THROW 50002, N'Source account not found', 1;
-
-        UPDATE accounts SET balance = balance + @amount
-        WHERE id = @to_account;
-
-        IF @@ROWCOUNT = 0
-            THROW 50003, N'Target account not found', 1;
-
+            UPDATE accounts SET balance = balance + @amount WHERE id = @to_id;
+            IF @@ROWCOUNT = 0 THROW 50003, N'Target account not found', 1;
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        IF @@TRANCOUNT > 0
-            ROLLBACK TRANSACTION;
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         THROW;
     END CATCH;
 END;
 
 -- ============================================================
--- 嵌套 TRY...CATCH
+-- 7. TRY/CATCH 不能捕获的错误
 -- ============================================================
+
+-- 以下错误类型不会被 TRY/CATCH 捕获:
+--   (1) 编译错误（如表名不存在——在执行前解析阶段就失败）
+--   (2) 语句级重编译错误
+--   (3) 严重级别 20+ 的致命错误（断开连接）
+--   (4) 客户端中断（Attention 信号）
+--
+-- 对引擎开发者的启示:
+--   编译错误不被捕获是一个实际限制——如果动态 SQL 引用了不存在的表，
+--   TRY/CATCH 无法捕获。这是因为 SQL Server 在执行前编译整个批处理。
+--   解决方案: 将可能失败的代码放在 sp_executesql 中（独立的编译上下文）。
+
+-- ============================================================
+-- 8. 嵌套 TRY/CATCH
+-- ============================================================
+
 BEGIN TRY
     BEGIN TRY
-        -- 内层操作
         SELECT 1/0;
     END TRY
     BEGIN CATCH
-        -- 内层捕获
-        IF ERROR_NUMBER() = 8134  -- 除以零
+        IF ERROR_NUMBER() = 8134
             PRINT 'Division by zero caught in inner block';
         ELSE
             THROW;  -- 重抛给外层
     END CATCH;
-
-    -- 继续执行
     PRINT 'Continuing after inner block';
 END TRY
 BEGIN CATCH
     PRINT 'Outer catch: ' + ERROR_MESSAGE();
 END CATCH;
 
--- ============================================================
--- XACT_ABORT 与错误处理
--- ============================================================
-SET XACT_ABORT ON;  -- 任何错误自动回滚整个事务
-BEGIN TRY
-    BEGIN TRANSACTION;
-    -- 多个操作...
-    COMMIT;
-END TRY
-BEGIN CATCH
-    -- XACT_ABORT ON 时，事务已被回滚
-    -- 但 @@TRANCOUNT 可能仍 > 0 (事务处于不可提交状态)
-    IF XACT_STATE() <> 0
-        ROLLBACK;
-    THROW;
-END CATCH;
-
--- 版本说明：
---   SQL Server 2005+ : TRY...CATCH
---   SQL Server 2005+ : RAISERROR (增强)
---   SQL Server 2012+ : THROW
--- 注意：THROW 比 RAISERROR 更简洁，推荐使用
--- 注意：THROW 不带参数只能在 CATCH 块中使用（重抛）
--- 注意：严重级别 0-10 的 RAISERROR 不会触发 CATCH
--- 注意：TRY...CATCH 不捕获编译错误和对象名解析错误
--- 限制：TRY...CATCH 不能跨批处理
--- 限制：不支持 EXCEPTION WHEN 或 DECLARE HANDLER
+-- 版本演进:
+-- 2005+ : TRY...CATCH, ERROR_*() 函数
+-- 2012+ : THROW（推荐替代 RAISERROR）
+-- 注意: TRY/CATCH 不能跨批处理（不能跨 GO）
+-- 注意: THROW 无参数只能在 CATCH 中使用（重抛）
+-- 核心建议: 每个存储过程第一行 SET XACT_ABORT ON

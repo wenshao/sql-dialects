@@ -1,87 +1,128 @@
--- SQL Server: 权限管理
+-- SQL Server: 权限管理（Login/User + RLS + Dynamic Data Masking）
 --
 -- 参考资料:
---   [1] SQL Server T-SQL - GRANT
---       https://learn.microsoft.com/en-us/sql/t-sql/statements/grant-transact-sql
---   [2] SQL Server T-SQL - CREATE LOGIN
---       https://learn.microsoft.com/en-us/sql/t-sql/statements/create-login-transact-sql
---   [3] SQL Server T-SQL - CREATE USER
---       https://learn.microsoft.com/en-us/sql/t-sql/statements/create-user-transact-sql
+--   [1] SQL Server - Security
+--       https://learn.microsoft.com/en-us/sql/relational-databases/security/authentication-access/getting-started-with-database-engine-permissions
 
--- 创建登录名（服务器级别）
-CREATE LOGIN alice WITH PASSWORD = 'Password123!';
-CREATE LOGIN alice WITH PASSWORD = 'Password123!',
-    DEFAULT_DATABASE = mydb,
-    CHECK_POLICY = ON;           -- 强制密码策略
+-- ============================================================
+-- 1. Login/User 双层模型（详见 users-databases 章节）
+-- ============================================================
 
--- 创建数据库用户（数据库级别）
+CREATE LOGIN alice WITH PASSWORD = 'Password123!', CHECK_POLICY = ON;
 USE mydb;
-CREATE USER alice FOR LOGIN alice;
 CREATE USER alice FOR LOGIN alice WITH DEFAULT_SCHEMA = dbo;
 
--- 授权
+-- ============================================================
+-- 2. GRANT / DENY / REVOKE 三态权限
+-- ============================================================
+
 GRANT SELECT ON users TO alice;
 GRANT SELECT, INSERT, UPDATE ON users TO alice;
-GRANT SELECT ON SCHEMA::dbo TO alice;                -- Schema 级别
+GRANT SELECT ON SCHEMA::dbo TO alice;
+
+-- DENY: SQL Server 独有的"显式拒绝"——优先级最高
+DENY DELETE ON users TO alice;
+-- 即使 alice 通过 db_datawriter 角色获得了 DELETE 权限，DENY 也会覆盖
+
+REVOKE INSERT ON users FROM alice;
+
+-- 设计分析（对引擎开发者）:
+--   SQL Server 的三态权限模型: GRANT(授予) + DENY(拒绝) + REVOKE(撤销)
+--   DENY 是关键差异——大多数数据库只有 GRANT 和 REVOKE:
+--     PostgreSQL: 无 DENY（通过不授予权限实现拒绝）
+--     MySQL:      无 DENY
+--     Oracle:     无 DENY
+--
+--   DENY 的价值: 在复杂的角色继承中，精确控制"某用户不能做某事"。
+--   DENY 的风险: 权限调试困难——用户可能被某个角色的 DENY 影响而不自知。
 
 -- 列级权限
-GRANT SELECT (username, email) ON users TO alice;
+GRANT SELECT (id, username) ON users TO alice;
 GRANT UPDATE (email) ON users TO alice;
 
--- 角色
-CREATE ROLE app_read;
-CREATE ROLE app_write;
-GRANT SELECT ON users TO app_read;
-GRANT INSERT, UPDATE, DELETE ON users TO app_write;
-ALTER ROLE app_read ADD MEMBER alice;
-ALTER ROLE app_write ADD MEMBER alice;
+-- ============================================================
+-- 3. 角色体系
+-- ============================================================
 
--- 预定义数据库角色
-ALTER ROLE db_datareader ADD MEMBER alice;            -- 所有表的 SELECT
-ALTER ROLE db_datawriter ADD MEMBER alice;            -- 所有表的 INSERT/UPDATE/DELETE
-ALTER ROLE db_owner ADD MEMBER alice;                 -- 完全权限
+-- 固定数据库角色（内置）
+ALTER ROLE db_datareader ADD MEMBER alice;   -- SELECT all
+ALTER ROLE db_datawriter ADD MEMBER alice;   -- INSERT/UPDATE/DELETE all
+ALTER ROLE db_owner ADD MEMBER alice;        -- 全部权限
 
--- 预定义服务器角色
-ALTER SERVER ROLE sysadmin ADD MEMBER alice;           -- 完全管理员
-ALTER SERVER ROLE dbcreator ADD MEMBER alice;          -- 创建数据库
-
--- DENY（显式拒绝，优先级最高）
-DENY DELETE ON users TO alice;
--- 即使 alice 通过角色获得了 DELETE 权限，DENY 也会覆盖
-
--- 撤销权限
-REVOKE INSERT ON users FROM alice;
-REVOKE SELECT ON SCHEMA::dbo FROM alice;
+-- 自定义角色
+CREATE ROLE analyst;
+GRANT SELECT ON SCHEMA::dbo TO analyst;
+ALTER ROLE analyst ADD MEMBER alice;
 
 -- 查看权限
 SELECT * FROM fn_my_permissions('users', 'OBJECT');
-SELECT * FROM sys.database_permissions WHERE grantee_principal_id = USER_ID('alice');
-EXEC sp_helpuser 'alice';
+SELECT * FROM fn_my_permissions(NULL, 'DATABASE');
 
--- 修改密码
-ALTER LOGIN alice WITH PASSWORD = 'NewPassword123!';
-ALTER LOGIN alice WITH PASSWORD = 'NewPassword123!' OLD_PASSWORD = 'Password123!';
+-- ============================================================
+-- 4. 行级安全（Row-Level Security, 2016+）
+-- ============================================================
 
--- 行级安全（2016+）
+-- RLS 通过安全策略自动过滤行——用户查询不需要添加 WHERE 条件
 CREATE FUNCTION dbo.fn_user_predicate(@username NVARCHAR(64))
-RETURNS TABLE
-WITH SCHEMABINDING
-AS
-RETURN SELECT 1 AS result WHERE @username = USER_NAME();
+RETURNS TABLE WITH SCHEMABINDING
+AS RETURN SELECT 1 AS result WHERE @username = USER_NAME();
 
 CREATE SECURITY POLICY user_filter
 ADD FILTER PREDICATE dbo.fn_user_predicate(username) ON dbo.users,
 ADD BLOCK PREDICATE dbo.fn_user_predicate(username) ON dbo.users
 WITH (STATE = ON);
 
--- 动态数据掩码（2016+）
+-- FILTER PREDICATE: 过滤 SELECT/UPDATE/DELETE 返回的行
+-- BLOCK PREDICATE:  阻止 INSERT/UPDATE 违反策略的行
+
+-- 设计分析（对引擎开发者）:
+--   RLS 在查询优化器内部注入谓词——对应用层完全透明。
+--   这比在每个查询中手动添加 WHERE tenant_id = @current_tenant 安全得多。
+--
+-- 横向对比:
+--   PostgreSQL: CREATE POLICY ... ON t USING (tenant_id = current_setting('app.tenant'))
+--               PostgreSQL 的 RLS 更灵活（支持 current_setting 获取运行时上下文）
+--   Oracle:     VPD（Virtual Private Database）——功能最强但语法最复杂
+--   MySQL:      不支持 RLS
+
+-- ============================================================
+-- 5. 动态数据掩码（Dynamic Data Masking, 2016+）
+-- ============================================================
+
 ALTER TABLE users ALTER COLUMN email ADD MASKED WITH (FUNCTION = 'email()');
 ALTER TABLE users ALTER COLUMN phone ADD MASKED WITH (FUNCTION = 'partial(0,"XXX-",4)');
-GRANT UNMASK TO alice;                                -- 允许看到原始数据
+ALTER TABLE users ALTER COLUMN salary ADD MASKED WITH (FUNCTION = 'default()');
 
--- 2012+: CONTAINED DATABASE USERS（无需服务器级别登录）
-CREATE USER alice WITH PASSWORD = 'Password123!';
+-- 掩码函数:
+-- default():            数字→0, 字符串→XXXX, 日期→01.01.2000
+-- email():              aXXX@XXXX.com
+-- partial(前缀, 填充, 后缀字符数):  自定义掩码
+-- random(start, end):   随机数替代
 
--- 删除
-DROP USER alice;
-DROP LOGIN alice;
+GRANT UNMASK TO analyst;  -- 允许看到原始数据
+
+-- 设计分析:
+--   DDM 是展示层掩码——数据在存储中不加密，只在查询结果中替换。
+--   安全性有限: 有权限的用户可以通过推导（如 WHERE salary BETWEEN ...）
+--   逐步缩小范围还原原始值。
+--   真正的数据保护应使用: Always Encrypted（列级加密，客户端解密）
+
+-- ============================================================
+-- 6. 查看权限元数据
+-- ============================================================
+
+SELECT dp.name AS principal, dp.type_desc,
+       perm.permission_name, perm.state_desc,
+       OBJECT_NAME(perm.major_id) AS object_name
+FROM sys.database_permissions perm
+JOIN sys.database_principals dp ON perm.grantee_principal_id = dp.principal_id
+WHERE dp.name = 'alice';
+
+EXEC sp_helpuser 'alice';
+
+-- 版本演进:
+-- 2005+ : Schema 与 User 解耦, 固定角色
+-- 2012+ : Contained Database Users
+-- 2016+ : Row-Level Security, Dynamic Data Masking
+-- 2016+ : Always Encrypted（客户端加密）
+-- 2019+ : Always Encrypted with Secure Enclaves

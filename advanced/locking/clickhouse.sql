@@ -1,158 +1,111 @@
--- ClickHouse: 锁机制 (Locking)
+-- ClickHouse: 锁机制（Locking）
 --
 -- 参考资料:
---   [1] ClickHouse Documentation - Consistency of Data Parts
+--   [1] ClickHouse - MergeTree Consistency
 --       https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree
---   [2] ClickHouse Documentation - system.mutations
+--   [2] ClickHouse - system.mutations / system.processes
 --       https://clickhouse.com/docs/en/operations/system-tables/mutations
---   [3] ClickHouse Documentation - system.processes
---       https://clickhouse.com/docs/en/operations/system-tables/processes
 
 -- ============================================================
--- ClickHouse 并发模型概述
--- ============================================================
--- ClickHouse 是列式分析数据库，设计目标是高吞吐读取:
--- 1. 没有传统的行级锁或事务
--- 2. 写入是追加式的（append-only），通过后台合并处理
--- 3. ALTER/MUTATION 操作异步执行
--- 4. 使用表级别的读写锁保护元数据
--- 5. 不支持 SELECT FOR UPDATE / FOR SHARE
-
--- ============================================================
--- 表级别的元数据锁
+-- 1. 为什么 ClickHouse 几乎没有锁
 -- ============================================================
 
--- DDL 操作（ALTER TABLE、DROP TABLE 等）会获取表的排他元数据锁
--- SELECT/INSERT 获取共享元数据锁
--- 这意味着 DDL 操作会等待正在执行的查询完成
-
--- 查看查询锁等待（ClickHouse 23.3+）
-SELECT * FROM system.locks;  -- 如果可用
-
--- ============================================================
--- Mutation（变更操作）
--- ============================================================
-
--- ClickHouse 的 UPDATE/DELETE 不是即时操作，而是异步 mutation
-ALTER TABLE orders UPDATE status = 'shipped' WHERE id = 100;
-ALTER TABLE orders DELETE WHERE status = 'cancelled';
-
--- Mutation 在后台异步执行，不需要锁定行
--- 查看 mutation 状态
-SELECT
-    database,
-    table,
-    mutation_id,
-    command,
-    create_time,
-    is_done,
-    latest_fail_reason
-FROM system.mutations
-WHERE is_done = 0
-ORDER BY create_time DESC;
-
--- 等待 mutation 完成
--- 使用 mutations_sync 设置（1=等待当前副本, 2=等待所有副本）
-SET mutations_sync = 1;
-ALTER TABLE orders UPDATE status = 'shipped' WHERE id = 100;
-
--- 取消未完成的 mutation
-KILL MUTATION WHERE mutation_id = 'mutation_id_here';
+-- ClickHouse 的核心设计使其几乎不需要传统意义上的锁:
+--
+-- (a) 不可变 data part:
+--     INSERT 创建新的 data part → 不修改已有 part → 读写不冲突
+--     → 没有脏读、不可重复读、幻读问题（因为数据不会被修改）
+--
+-- (b) 无 UPDATE/DELETE 的即时修改:
+--     UPDATE/DELETE 通过 mutation 异步处理 → 创建新 part 替换旧 part
+--     → 查询看到的是某个时间点的 part 集合快照
+--
+-- (c) 列式存储:
+--     不同列存储在不同文件中，不同查询可以并行读取不同列
+--     → 列级并行而非行级竞争
+--
+-- 对比:
+--   MySQL InnoDB: 行级锁 + 间隙锁 + 意向锁 → 复杂的锁管理器
+--   PostgreSQL:   行级锁 + MVCC → 每行有 xmin/xmax 版本号
+--   SQLite:       文件级锁（5 级状态）
+--   ClickHouse:   几乎无锁（不可变 part + 快照读）
 
 -- ============================================================
--- 乐观并发控制
+-- 2. ClickHouse 中存在的"锁"
 -- ============================================================
 
--- 使用 ReplacingMergeTree 引擎实现版本控制
-CREATE TABLE orders (
-    id       UInt64,
-    status   String,
-    version  UInt64,
-    updated_at DateTime
-) ENGINE = ReplacingMergeTree(version)
-ORDER BY id;
+-- 2.1 表级元数据锁
+-- DDL 操作（ALTER TABLE, DROP TABLE）会获取表级元数据锁。
+-- 这不影响查询（查询使用 part 快照），但会阻塞其他 DDL:
+ALTER TABLE users ADD COLUMN phone String;
+-- → 获取元数据锁 → 修改 schema → 释放锁
+-- → 在此期间其他 ALTER TABLE 等待
 
--- 插入新版本（旧版本在后台合并时被删除）
-INSERT INTO orders VALUES (100, 'shipped', 6, now());
+-- 2.2 Part 级锁（merge 操作）
+-- 后台 merge 时，参与 merge 的 part 被标记为"正在 merge"。
+-- 新 INSERT 不受影响（创建新 part），但 merge 的 part 不会被再次 merge。
+-- 这不是锁，更像是"互斥标记"。
 
--- 强制合并以去除旧版本
-OPTIMIZE TABLE orders FINAL;
-
--- 查询最新版本（合并前可能看到多个版本）
-SELECT * FROM orders FINAL WHERE id = 100;
-
--- ============================================================
--- 插入去重 (Insert Deduplication)
--- ============================================================
-
--- ReplicatedMergeTree 自动对相同 insert block 去重
--- 这提供了幂等插入的保证
-
--- 禁用去重
-SET insert_deduplicate = 0;
+-- 2.3 Mutation 锁
+-- mutation（ALTER TABLE UPDATE/DELETE）按顺序执行:
+-- 后提交的 mutation 等待前一个完成后才开始。
+SELECT mutation_id, command, is_done, parts_to_do
+FROM system.mutations WHERE table = 'users';
 
 -- ============================================================
--- 分布式锁（ZooKeeper 协调）
+-- 3. 并发控制机制
 -- ============================================================
 
--- ReplicatedMergeTree 使用 ZooKeeper/ClickHouse Keeper 协调:
--- 1. DDL 操作通过 ZooKeeper 在副本间同步
--- 2. 分布式 DDL 查询使用 ON CLUSTER 子句
+-- 3.1 Part 快照隔离
+-- 每个 SELECT 在执行时获取当前 part 列表的快照。
+-- 查询期间即使有新 INSERT（创建新 part）或 merge（替换 part），
+-- 当前查询仍然读旧的 part 集合。
+-- → 这是天然的快照隔离，不需要 MVCC。
 
-ALTER TABLE orders ON CLUSTER my_cluster
-    UPDATE status = 'shipped' WHERE id = 100;
+-- 3.2 INSERT 并发
+-- 多个连接可以同时 INSERT（各自创建独立的 data part）。
+-- 没有写写冲突，因为每个 INSERT 创建的 part 完全独立。
+-- 唯一的约束: max_parts_in_total 限制 part 总数
 
--- ============================================================
--- 并发控制设置
--- ============================================================
-
--- 最大并发查询数
--- max_concurrent_queries = 100（默认）
-
--- 查看当前运行的查询
-SELECT
-    query_id,
-    user,
-    query,
-    elapsed,
-    read_rows,
-    memory_usage
-FROM system.processes;
+-- 3.3 查看当前运行的查询
+SELECT query_id, user, elapsed, read_rows, memory_usage, query
+FROM system.processes
+WHERE is_cancelled = 0;
 
 -- 终止查询
-KILL QUERY WHERE query_id = 'query_id_here';
-
--- 设置查询超时
-SET max_execution_time = 60;  -- 秒
+KILL QUERY WHERE query_id = 'xxx';
 
 -- ============================================================
--- 锁监控替代方案
+-- 4. 分布式环境的一致性
 -- ============================================================
 
--- 查看系统进程
-SELECT * FROM system.processes;
+-- ZooKeeper 用于分布式协调:
+--   (a) 副本间数据同步（ReplicatedMergeTree）
+--   (b) 分布式 DDL（ON CLUSTER 语句）
+--   (c) Leader 选举（哪个副本执行 merge）
+--
+-- insert_quorum: 写入确认机制
+SET insert_quorum = 2;
+INSERT INTO orders VALUES (...);
+-- → 等待 2 个副本确认才返回成功
 
--- 查看合并操作
-SELECT
-    database,
-    table,
-    elapsed,
-    progress,
-    num_parts,
-    result_part_name
-FROM system.merges;
-
--- 查看分布式 DDL 队列
-SELECT * FROM system.distributed_ddl_queue
-ORDER BY entry ASC;
+-- select_sequential_consistency: 读取一致性
+SET select_sequential_consistency = 1;
+SELECT * FROM orders;
+-- → 确保读取到最新确认的数据（有延迟开销）
 
 -- ============================================================
--- 注意事项
+-- 5. 对比与引擎开发者启示
 -- ============================================================
-
--- 1. ClickHouse 不支持传统事务 (BEGIN/COMMIT/ROLLBACK)
--- 2. 不支持 SELECT FOR UPDATE / FOR SHARE / LOCK TABLE
--- 3. UPDATE/DELETE 通过 ALTER TABLE ... UPDATE/DELETE 异步执行
--- 4. 适合追加写入场景，不适合频繁的单行更新
--- 5. 使用 ReplacingMergeTree + FINAL 实现更新语义
--- 6. 高并发写入使用 Buffer 引擎或批量插入
+-- ClickHouse 的"无锁"设计:
+--   (1) 不可变 part → 读写不冲突
+--   (2) 快照隔离天然实现 → 不需要 MVCC
+--   (3) INSERT 完全并发 → 无写写冲突
+--   (4) mutation 串行执行 → 简化实现
+--   (5) ZooKeeper 协调 → 分布式一致性
+--
+-- 对引擎开发者的启示:
+--   不可变数据结构（immutable data parts）是消除锁的最佳方案。
+--   LSM-Tree（RocksDB）、列式存储（ClickHouse）、时序数据库（InfluxDB）
+--   都采用类似的"追加写入 + 后台合并"模式来避免锁竞争。
+--   如果引擎设计为 INSERT-heavy，应该优先考虑不可变存储模型。

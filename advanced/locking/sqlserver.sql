@@ -1,224 +1,162 @@
--- SQL Server: 锁机制 (Locking)
+-- SQL Server: 锁机制（Lock Hints + 锁升级 + 快照隔离）
 --
 -- 参考资料:
---   [1] Microsoft Docs - Transaction Locking and Row Versioning Guide
+--   [1] SQL Server - Locking and Row Versioning Guide
 --       https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide
---   [2] Microsoft Docs - Table Hints
---       https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table
---   [3] Microsoft Docs - sys.dm_tran_locks
---       https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-tran-locks-transact-sql
---   [4] Microsoft Docs - sp_getapplock
---       https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql
 
 -- ============================================================
--- 锁提示 (Lock Hints) — SQL Server 特有
+-- 1. 锁提示系统: SQL Server 最独特的并发控制机制
 -- ============================================================
 
--- NOLOCK (= READUNCOMMITTED): 不获取共享锁，允许脏读
-SELECT * FROM orders WITH (NOLOCK) WHERE status = 'pending';
+-- SQL Server 允许在查询中通过 WITH (...) 指定锁行为——这是其他数据库没有的。
+SELECT * FROM orders WITH (NOLOCK) WHERE status = 'pending';        -- 不获取锁
+SELECT * FROM orders WITH (HOLDLOCK) WHERE id = 100;                -- 持锁到事务结束
+SELECT * FROM orders WITH (UPDLOCK) WHERE id = 100;                 -- 更新锁
+SELECT * FROM orders WITH (XLOCK) WHERE id = 100;                   -- 排他锁
+SELECT * FROM orders WITH (ROWLOCK, UPDLOCK) WHERE id = 100;        -- 强制行锁+更新锁
+SELECT * FROM orders WITH (PAGLOCK) WHERE status = 'pending';       -- 强制页锁
+SELECT * FROM orders WITH (TABLOCK);                                -- 表级共享锁
+SELECT * FROM orders WITH (TABLOCKX);                               -- 表级排他锁
+SELECT * FROM orders WITH (READPAST, UPDLOCK) WHERE status = 'pending'; -- 跳过被锁行
+SELECT * FROM orders WITH (NOWAIT) WHERE id = 100;                  -- 获取不到锁立即报错
 
--- HOLDLOCK (= SERIALIZABLE): 持有共享锁直到事务结束
-SELECT * FROM orders WITH (HOLDLOCK) WHERE id = 100;
-
--- UPDLOCK: 获取更新锁，防止死锁
-SELECT * FROM orders WITH (UPDLOCK) WHERE id = 100;
-
--- XLOCK: 获取排他锁
-SELECT * FROM orders WITH (XLOCK) WHERE id = 100;
-
--- ROWLOCK: 强制使用行锁（而非页锁或表锁）
-SELECT * FROM orders WITH (ROWLOCK, UPDLOCK) WHERE id = 100;
-
--- PAGLOCK: 强制使用页锁
-SELECT * FROM orders WITH (PAGLOCK) WHERE status = 'pending';
-
--- TABLOCK: 强制使用表级共享锁
-SELECT * FROM orders WITH (TABLOCK);
-
--- TABLOCKX: 强制使用表级排他锁
-SELECT * FROM orders WITH (TABLOCKX);
-
--- READPAST: 跳过被锁定的行（类似 SKIP LOCKED）
-SELECT TOP 5 * FROM tasks WITH (READPAST, UPDLOCK)
-WHERE status = 'pending'
-ORDER BY created_at;
-
--- NOWAIT: 无法获取锁时立即报错
-SELECT * FROM orders WITH (NOWAIT) WHERE id = 100;
-
--- 组合使用
-SELECT * FROM orders WITH (UPDLOCK, ROWLOCK, HOLDLOCK)
-WHERE id = 100;
+-- 设计分析（对引擎开发者）:
+--   SQL Server 的锁提示是 T-SQL 与 SQL 标准最大的偏离之一。
+--   其他数据库使用 SELECT ... FOR UPDATE 实现悲观锁:
+--     PostgreSQL: SELECT * FROM t WHERE id = 1 FOR UPDATE
+--     MySQL:      SELECT * FROM t WHERE id = 1 FOR UPDATE
+--     Oracle:     SELECT * FROM t WHERE id = 1 FOR UPDATE
+--   SQL Server 不支持 FOR UPDATE（唯一不支持的主流数据库）。
+--
+--   锁提示的优势: 更精细的控制（可以指定锁粒度: 行/页/表）
+--   锁提示的劣势: 非标准、学习曲线陡、容易误用（尤其是 NOLOCK）
 
 -- ============================================================
--- 行级锁 — 通过事务实现
+-- 2. WITH (NOLOCK) 文化及其危害
+-- ============================================================
+
+-- NOLOCK 是 SQL Server 生态中最广泛使用（和滥用）的提示。
+-- 它等价于 READ UNCOMMITTED 隔离级别。
+
+-- 为什么 NOLOCK 如此流行:
+--   SQL Server 默认 READ COMMITTED + 共享锁模型：读操作获取 S 锁，
+--   S 锁与写操作的 X 锁冲突 → 读写互斥 → 长查询阻塞 DML。
+--   DBA 的"快速修复": 加 NOLOCK → 读不获取锁 → 不阻塞。
+
+-- NOLOCK 的实际风险:
+--   (1) 脏读: 读到未提交的数据
+--   (2) 页分裂期间重复读或跳行（最危险，聚合结果可能偏差数个百分点）
+--   (3) 读到半更新的行（宽行跨页时）
+
+-- 正确解决方案: READ_COMMITTED_SNAPSHOT
+ALTER DATABASE mydb SET READ_COMMITTED_SNAPSHOT ON;
+-- 此后 READ COMMITTED 使用行版本（类似 PostgreSQL 的 MVCC）——读不阻塞写
+
+-- 对引擎开发者的启示:
+--   MVCC 应该是默认行为——PostgreSQL 从第一天就是 MVCC。
+--   SQL Server 的锁模型是历史遗留，READ_COMMITTED_SNAPSHOT 是后来的修补。
+--   新引擎不应该重复这个错误——默认使用 MVCC。
+
+-- ============================================================
+-- 3. 锁升级: SQL Server 独有机制
+-- ============================================================
+
+-- 当单个事务在一个表上持有超过约 5000 个行/页锁时，
+-- SQL Server 自动将它们升级为表锁（减少锁管理器内存开销）。
+-- 副作用: 表锁阻塞所有并发访问。
+
+-- 控制锁升级:
+ALTER TABLE orders SET (LOCK_ESCALATION = TABLE);    -- 默认：直接升级到表锁
+ALTER TABLE orders SET (LOCK_ESCALATION = DISABLE);  -- 禁用升级（锁管理器压力大）
+ALTER TABLE orders SET (LOCK_ESCALATION = AUTO);     -- 分区表：逐分区升级
+
+-- 横向对比:
+--   PostgreSQL: 无锁升级机制（行锁永远是行锁）
+--   MySQL:      无锁升级（InnoDB 只有行锁和表锁，无中间级别）
+--   Oracle:     无锁升级（行锁永远是行锁）
+
+-- ============================================================
+-- 4. 行级锁: SELECT FOR UPDATE 的 SQL Server 等价
 -- ============================================================
 
 BEGIN TRANSACTION;
-    -- 使用 UPDLOCK 获取更新锁（类似 SELECT FOR UPDATE）
     SELECT * FROM accounts WITH (UPDLOCK, ROWLOCK)
-    WHERE id = 1;
-
-    UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-    UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-COMMIT;
-
--- ============================================================
--- 表级锁
--- ============================================================
-
--- SQL Server 没有 LOCK TABLE 语句，使用表提示代替
-BEGIN TRANSACTION;
-    SELECT * FROM orders WITH (TABLOCKX, HOLDLOCK);
-    -- 此时 orders 表被排他锁定
-COMMIT;
-
--- sp_tableoption 禁止锁升级
-EXEC sp_tableoption 'orders', 'lock escalation', 'DISABLE';
-
--- ALTER TABLE 控制锁升级行为（SQL Server 2008+）
-ALTER TABLE orders SET (LOCK_ESCALATION = TABLE);     -- 默认
-ALTER TABLE orders SET (LOCK_ESCALATION = DISABLE);   -- 禁用
-ALTER TABLE orders SET (LOCK_ESCALATION = AUTO);      -- 分区表逐分区升级
-
--- ============================================================
--- 乐观锁 (Optimistic Locking)
--- ============================================================
-
--- 使用 rowversion/timestamp 列（SQL Server 自动更新）
-ALTER TABLE orders ADD row_ver ROWVERSION;
-
--- rowversion 在每次更新时自动递增
-UPDATE orders
-SET status = 'shipped'
-WHERE id = 100 AND row_ver = 0x00000000000007D1;
--- 检查 @@ROWCOUNT 是否为 1
-
--- 使用自定义版本号
-ALTER TABLE orders ADD version INT NOT NULL DEFAULT 1;
-
-UPDATE orders
-SET status = 'shipped', version = version + 1
-WHERE id = 100 AND version = 5;
-
--- ============================================================
--- 悲观锁 (Pessimistic Locking)
--- ============================================================
-
-BEGIN TRANSACTION;
-    SELECT * FROM accounts WITH (UPDLOCK, HOLDLOCK)
-    WHERE id = 1;
-    -- 其他事务无法修改该行直到当前事务结束
+    WHERE id = 1;                     -- 等价于 SELECT ... FOR UPDATE
     UPDATE accounts SET balance = balance - 100 WHERE id = 1;
 COMMIT;
 
+-- UPDLOCK vs XLOCK:
+--   UPDLOCK: 允许其他事务读（S 锁兼容），但不允许其他事务也获取 U 锁
+--   XLOCK:   不允许任何其他锁
+-- UPDLOCK 是防止"转换死锁"的关键——两个事务同时获取 S 锁再试图升级为 X 锁。
+
 -- ============================================================
--- 应用锁 (Application Locks)
+-- 5. 应用锁（sp_getapplock）
 -- ============================================================
 
--- sp_getapplock: 获取应用级锁
 BEGIN TRANSACTION;
     DECLARE @result INT;
     EXEC @result = sp_getapplock
-        @Resource = 'my_lock',
+        @Resource = 'process_order_123',
         @LockMode = 'Exclusive',
-        @LockOwner = 'Transaction',
-        @LockTimeout = 5000;        -- 超时毫秒
-
-    -- @result: 0=成功, 1=成功(等待后), -1=超时, -2=取消, -3=死锁
+        @LockTimeout = 5000;
     IF @result >= 0
     BEGIN
-        -- ... 执行需要互斥的操作 ...
-        EXEC sp_releaseapplock @Resource = 'my_lock';
+        -- 执行需要互斥的操作
+        EXEC sp_releaseapplock @Resource = 'process_order_123';
     END;
 COMMIT;
 
--- LockMode 选项: Shared, Update, IntentShared, IntentExclusive, Exclusive
--- LockOwner 选项: Transaction (默认), Session
+-- 设计分析: 应用锁是逻辑锁（不绑定到任何数据库对象），
+-- 用于实现跨表、跨操作的互斥。PostgreSQL 的等价: pg_advisory_lock。
 
 -- ============================================================
--- 死锁检测与预防
+-- 6. 死锁处理
 -- ============================================================
 
--- SQL Server 自动检测死锁，选择一个事务作为死锁牺牲者
--- 设置死锁优先级
-SET DEADLOCK_PRIORITY LOW;      -- 优先被选为牺牲者
-SET DEADLOCK_PRIORITY NORMAL;   -- 默认
-SET DEADLOCK_PRIORITY HIGH;     -- 最后被选为牺牲者
-SET DEADLOCK_PRIORITY 5;        -- -10 到 10 的数值
+SET DEADLOCK_PRIORITY LOW;     -- 优先被选为牺牲者
+SET DEADLOCK_PRIORITY HIGH;    -- 最后被选为牺牲者
+SET LOCK_TIMEOUT 5000;         -- 等锁超时（毫秒），-1 = 无限等待（默认）
 
--- 锁超时
-SET LOCK_TIMEOUT 5000;          -- 毫秒，-1 = 无限等待（默认）
-SET LOCK_TIMEOUT 0;             -- 立即超时
-
--- 启用死锁跟踪标志
-DBCC TRACEON(1222, -1);         -- 详细死锁信息写入错误日志
-
--- 使用扩展事件捕获死锁
-CREATE EVENT SESSION deadlock_monitor
-ON SERVER
+-- 扩展事件捕获死锁:
+CREATE EVENT SESSION deadlock_monitor ON SERVER
 ADD EVENT sqlserver.xml_deadlock_report
 ADD TARGET package0.event_file(SET filename = N'deadlocks.xel');
 ALTER EVENT SESSION deadlock_monitor ON SERVER STATE = START;
 
 -- ============================================================
--- 锁监控 (Lock Monitoring)
+-- 7. 快照隔离（SNAPSHOT ISOLATION）
 -- ============================================================
 
--- sys.dm_tran_locks: 查看当前所有锁
-SELECT
-    resource_type,
-    resource_database_id,
-    resource_associated_entity_id,
-    request_mode,
-    request_status,
-    request_session_id
-FROM sys.dm_tran_locks;
-
--- 查看锁等待
-SELECT
-    wt.session_id           AS waiting_session_id,
-    wt.blocking_session_id,
-    st1.text                AS waiting_query,
-    st2.text                AS blocking_query,
-    tl.resource_type,
-    tl.request_mode
-FROM sys.dm_os_waiting_tasks wt
-JOIN sys.dm_exec_sessions es
-    ON wt.session_id = es.session_id
-JOIN sys.dm_tran_locks tl
-    ON wt.session_id = tl.request_session_id
-CROSS APPLY sys.dm_exec_sql_text(es.most_recent_sql_handle) st1
-OUTER APPLY sys.dm_exec_sql_text(
-    (SELECT most_recent_sql_handle FROM sys.dm_exec_sessions
-     WHERE session_id = wt.blocking_session_id)
-) st2
-WHERE wt.blocking_session_id IS NOT NULL;
-
--- sp_lock（旧版，不推荐）
-EXEC sp_lock;
-
--- 活动监视器
--- SSMS -> Activity Monitor -> Processes / Resource Waits
-
--- ============================================================
--- 快照隔离 (Snapshot Isolation)
--- ============================================================
-
--- 启用数据库级别快照隔离（使用 tempdb 中的行版本存储）
 ALTER DATABASE MyDB SET ALLOW_SNAPSHOT_ISOLATION ON;
 
--- 使用快照隔离
 SET TRANSACTION ISOLATION LEVEL SNAPSHOT;
 BEGIN TRANSACTION;
     SELECT * FROM orders WHERE id = 100;  -- 读取事务开始时的快照
 COMMIT;
 
--- READ_COMMITTED_SNAPSHOT: 使 READ COMMITTED 使用行版本
-ALTER DATABASE MyDB SET READ_COMMITTED_SNAPSHOT ON;
+-- SNAPSHOT vs READ_COMMITTED_SNAPSHOT:
+--   SNAPSHOT:                  事务级快照（事务开始时拍快照，整个事务看到一致视图）
+--   READ_COMMITTED_SNAPSHOT:   语句级快照（每条语句看到语句开始时的数据）
+--
+-- PostgreSQL 的等价:
+--   REPEATABLE READ → SQL Server SNAPSHOT
+--   READ COMMITTED  → SQL Server READ_COMMITTED_SNAPSHOT
 
--- 标准隔离级别
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED;     -- 默认
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+-- ============================================================
+-- 8. 锁监控
+-- ============================================================
+
+-- 当前所有锁
+SELECT resource_type, request_mode, request_status, request_session_id
+FROM sys.dm_tran_locks;
+
+-- 锁等待链
+SELECT wt.session_id AS waiting, wt.blocking_session_id AS blocking,
+       t.text AS waiting_query
+FROM sys.dm_os_waiting_tasks wt
+CROSS APPLY sys.dm_exec_sql_text(
+    (SELECT most_recent_sql_handle FROM sys.dm_exec_sessions
+     WHERE session_id = wt.session_id)
+) t
+WHERE wt.blocking_session_id IS NOT NULL;

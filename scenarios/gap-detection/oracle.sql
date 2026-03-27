@@ -1,19 +1,14 @@
 -- Oracle: 间隙检测与岛屿问题 (Gap Detection & Islands)
 --
 -- 参考资料:
---   [1] Oracle Documentation - Analytic Functions
+--   [1] Oracle SQL Language Reference - Analytic Functions
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Analytic-Functions.html
---   [2] Oracle Documentation - CONNECT BY
---       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/Hierarchical-Queries.html
 
 -- ============================================================
 -- 准备数据
 -- ============================================================
 
-CREATE TABLE orders (
-    id    NUMBER(10) PRIMARY KEY,
-    info  VARCHAR2(100)
-);
+CREATE TABLE orders (id NUMBER(10) PRIMARY KEY, info VARCHAR2(100));
 INSERT ALL
     INTO orders VALUES (1, 'a') INTO orders VALUES (2, 'b')
     INTO orders VALUES (3, 'c') INTO orders VALUES (5, 'e')
@@ -22,83 +17,57 @@ INSERT ALL
     INTO orders VALUES (15, 'o')
 SELECT 1 FROM DUAL;
 
-CREATE TABLE daily_sales (
-    sale_date DATE PRIMARY KEY,
-    amount    NUMBER(10,2)
-);
+CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount NUMBER(10,2));
 INSERT ALL
     INTO daily_sales VALUES (DATE '2024-01-01', 100)
     INTO daily_sales VALUES (DATE '2024-01-02', 150)
     INTO daily_sales VALUES (DATE '2024-01-04', 200)
     INTO daily_sales VALUES (DATE '2024-01-05', 120)
     INTO daily_sales VALUES (DATE '2024-01-08', 300)
-    INTO daily_sales VALUES (DATE '2024-01-09', 250)
-    INTO daily_sales VALUES (DATE '2024-01-10', 180)
 SELECT 1 FROM DUAL;
 
 -- ============================================================
--- 1. 使用 LAG/LEAD 窗口函数查找数值间隙
+-- 1. LAG/LEAD 查找间隙
 -- ============================================================
 
-SELECT
-    id            AS gap_start_after,
-    next_id       AS gap_end_before,
-    next_id - id - 1 AS gap_size
-FROM (
-    SELECT id, LEAD(id) OVER (ORDER BY id) AS next_id
-    FROM orders
-)
+SELECT id AS gap_start_after, next_id AS gap_end_before,
+       next_id - id - 1 AS gap_size
+FROM (SELECT id, LEAD(id) OVER (ORDER BY id) AS next_id FROM orders)
 WHERE next_id - id > 1;
 
--- ============================================================
--- 2. 查找日期间隙
--- ============================================================
-
-SELECT
-    sale_date                          AS last_date,
-    next_date                          AS next_date,
-    next_date - sale_date - 1          AS missing_days
+-- 日期间隙
+SELECT sale_date AS last_date, next_date,
+       next_date - sale_date - 1 AS missing_days
 FROM (
-    SELECT sale_date,
-           LEAD(sale_date) OVER (ORDER BY sale_date) AS next_date
+    SELECT sale_date, LEAD(sale_date) OVER (ORDER BY sale_date) AS next_date
     FROM daily_sales
-)
-WHERE next_date - sale_date > 1;
+) WHERE next_date - sale_date > 1;
+
+-- Oracle 的优势: DATE 相减直接得到天数（无需 DATEDIFF 函数）
 
 -- ============================================================
--- 3. 岛屿问题 —— 找出连续范围
+-- 2. 岛屿问题: 找出连续范围
 -- ============================================================
 
-SELECT
-    MIN(id) AS island_start,
-    MAX(id) AS island_end,
-    COUNT(*) AS island_size
+-- Tabibitosan 方法（id - ROW_NUMBER 产生分组标识）
+SELECT MIN(id) AS island_start, MAX(id) AS island_end,
+       COUNT(*) AS island_size
 FROM (
-    SELECT id,
-           id - ROW_NUMBER() OVER (ORDER BY id) AS grp
+    SELECT id, id - ROW_NUMBER() OVER (ORDER BY id) AS grp
     FROM orders
-)
-GROUP BY grp
-ORDER BY island_start;
+) GROUP BY grp ORDER BY island_start;
+
+-- 设计分析:
+--   Tabibitosan（旅人算法）利用了"连续数列中值-序号恒定"的数学性质。
+--   id: 1,2,3,5,6,10,11,12,15
+--   rn: 1,2,3,4,5,6,7,8,9
+--   差: 0,0,0,1,1,4,4,4,6  → 相同差值的行属于同一个"岛屿"
 
 -- ============================================================
--- 4. 自连接方法（兼容 Oracle 8i 以上）
+-- 3. CONNECT BY LEVEL 生成序列找缺失值（Oracle 独有）
 -- ============================================================
 
-SELECT
-    a.id + 1 AS gap_start,
-    MIN(b.id) - 1 AS gap_end
-FROM orders a
-JOIN orders b ON b.id > a.id
-GROUP BY a.id
-HAVING MIN(b.id) > a.id + 1
-ORDER BY gap_start;
-
--- ============================================================
--- 5. 使用 CONNECT BY LEVEL 生成序列（Oracle 特有）
--- ============================================================
-
--- 生成数值序列找缺失 id
+-- 生成完整序列，与实际数据 LEFT JOIN 找缺失
 SELECT lvl AS missing_id
 FROM (
     SELECT LEVEL + (SELECT MIN(id) - 1 FROM orders) AS lvl
@@ -109,7 +78,7 @@ LEFT JOIN orders o ON o.id = seq.lvl
 WHERE o.id IS NULL
 ORDER BY lvl;
 
--- 生成日期序列找缺失日期
+-- 日期序列找缺失日期（MINUS 集合操作）
 SELECT (SELECT MIN(sale_date) FROM daily_sales) + LEVEL - 1 AS missing_date
 FROM DUAL
 CONNECT BY LEVEL <= (SELECT MAX(sale_date) - MIN(sale_date) + 1 FROM daily_sales)
@@ -117,45 +86,34 @@ MINUS
 SELECT sale_date FROM daily_sales
 ORDER BY 1;
 
--- 递归 CTE 方法（Oracle 11gR2+）
+-- ============================================================
+-- 4. 递归 CTE 方法（11g R2+）
+-- ============================================================
+
 WITH seq (n) AS (
     SELECT MIN(id) FROM orders
     UNION ALL
     SELECT n + 1 FROM seq WHERE n < (SELECT MAX(id) FROM orders)
 )
 SELECT s.n AS missing_id
-FROM seq s
-LEFT JOIN orders o ON o.id = s.n
-WHERE o.id IS NULL
-ORDER BY s.n;
+FROM seq s LEFT JOIN orders o ON o.id = s.n
+WHERE o.id IS NULL ORDER BY s.n;
 
 -- ============================================================
--- 6. Tabibitosan 方法（日本式间隙与岛屿方法）
+-- 5. 自连接方法（兼容 Oracle 8i+）
 -- ============================================================
 
--- 岛屿
-SELECT MIN(id) AS island_start,
-       MAX(id) AS island_end,
-       COUNT(*) AS island_size
-FROM (
-    SELECT id,
-           id - ROW_NUMBER() OVER (ORDER BY id) AS grp
-    FROM orders
-)
-GROUP BY grp
-ORDER BY island_start;
+SELECT a.id + 1 AS gap_start, MIN(b.id) - 1 AS gap_end
+FROM orders a JOIN orders b ON b.id > a.id
+GROUP BY a.id
+HAVING MIN(b.id) > a.id + 1
+ORDER BY gap_start;
 
--- 间隙
-SELECT prev_id + 1 AS gap_start,
-       id - 1      AS gap_end,
-       id - prev_id - 1 AS gap_size
-FROM (
-    SELECT id, LAG(id) OVER (ORDER BY id) AS prev_id
-    FROM orders
-)
-WHERE id - prev_id > 1;
-
--- 注意：CONNECT BY LEVEL 是 Oracle 特有的序列生成方式
--- 注意：LAG/LEAD 分析函数从 Oracle 8i 开始支持
--- 注意：递归 CTE (WITH RECURSIVE) 从 Oracle 11gR2 开始支持
--- 注意：Oracle 日期相减直接得到天数（数值型）
+-- ============================================================
+-- 6. 对引擎开发者的总结
+-- ============================================================
+-- 1. LAG/LEAD 是间隙检测的标准方法（Oracle 8i 首创）。
+-- 2. Tabibitosan（id - ROW_NUMBER）是岛屿问题的经典解法。
+-- 3. CONNECT BY LEVEL 生成序列是 Oracle 独有的技巧。
+-- 4. DATE 相减直接得到天数是 Oracle 的便利设计，简化了日期间隙检测。
+-- 5. MINUS 集合操作（Oracle 特有关键字）可以简洁地找出缺失值。

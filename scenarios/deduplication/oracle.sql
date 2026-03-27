@@ -1,132 +1,109 @@
--- Oracle: 数据去重策略（Deduplication）
+-- Oracle: 数据去重策略 (Deduplication)
 --
 -- 参考资料:
---   [1] Oracle Documentation - DELETE
---       https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/DELETE.html
---   [2] Oracle Documentation - MERGE
---       https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/MERGE.html
---   [3] Oracle Documentation - Analytic Functions
---       https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/Analytic-Functions.html
-
--- ============================================================
--- 示例数据上下文
--- ============================================================
--- 假设表结构:
---   users(user_id NUMBER, email VARCHAR2(255), username VARCHAR2(64), created_at TIMESTAMP)
+--   [1] Oracle SQL Language Reference - ROWID Pseudocolumn
+--       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/ROWID-Pseudocolumn.html
 
 -- ============================================================
 -- 1. 查找重复数据
 -- ============================================================
 
 SELECT email, COUNT(*) AS cnt
-FROM users
-GROUP BY email
-HAVING COUNT(*) > 1;
+FROM users GROUP BY email HAVING COUNT(*) > 1;
 
 -- ============================================================
 -- 2. 保留每组一行（ROW_NUMBER）
 -- ============================================================
 
-SELECT *
-FROM (
+SELECT * FROM (
     SELECT user_id, email, username, created_at,
-           ROW_NUMBER() OVER (
-               PARTITION BY email
-               ORDER BY created_at DESC
-           ) AS rn
+           ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
     FROM users
-) ranked
-WHERE rn = 1;
+) ranked WHERE rn = 1;
 
 -- ============================================================
--- 3. 删除重复数据
+-- 3. 删除重复数据（Oracle 的 ROWID 优势）
 -- ============================================================
 
--- 方法一：使用 ROWID（Oracle 物理行 ID）
+-- 方法一: ROWID 去重（Oracle 经典方式，最高效）
 DELETE FROM users
 WHERE ROWID NOT IN (
-    SELECT MIN(ROWID)
-    FROM users
-    GROUP BY email
+    SELECT MIN(ROWID) FROM users GROUP BY email
 );
 
--- 方法二：保留最新记录（使用 ROWID + 分析函数）
+-- ROWID 的设计:
+--   ROWID 是 Oracle 的物理行地址（file# + block# + row# within block）。
+--   它是访问单行最快的方式（直接定位到物理位置，不需要索引）。
+--   ROWID 在 UPDATE/DELETE WHERE 中使用可以跳过索引查找。
+--
+-- 横向对比:
+--   Oracle:     ROWID（物理地址，18 字符 Base64）
+--   PostgreSQL: ctid（物理地址，(block, offset) 元组）
+--   MySQL:      无等价物（InnoDB 通过主键定位行）
+--   SQL Server: %%physloc%%（未文档化的物理地址）
+
+-- 方法二: 保留最新记录
 DELETE FROM users
 WHERE ROWID IN (
     SELECT rid FROM (
         SELECT ROWID AS rid,
-               ROW_NUMBER() OVER (
-                   PARTITION BY email
-                   ORDER BY created_at DESC
-               ) AS rn
+               ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
         FROM users
     ) WHERE rn > 1
 );
 
--- 方法三：使用 KEEP (DENSE_RANK)
+-- 方法三: KEEP (DENSE_RANK)（Oracle 独有的聚合函数）
 DELETE FROM users
 WHERE ROWID NOT IN (
     SELECT MIN(ROWID) KEEP (DENSE_RANK FIRST ORDER BY created_at DESC)
-    FROM users
-    GROUP BY email
+    FROM users GROUP BY email
 );
+-- KEEP 在 GROUP BY 中直接取"按排序排名第一的 ROWID"
 
 -- ============================================================
--- 4. 防止重复（MERGE）
+-- 4. 防止重复: MERGE（Oracle 9i+ 首创）
 -- ============================================================
 
 MERGE INTO users target
-USING (SELECT 'a@b.com' AS email, 'alice' AS username, SYSTIMESTAMP AS created_at FROM dual) source
+USING (SELECT 'a@b.com' AS email, 'alice' AS username FROM DUAL) source
 ON (target.email = source.email)
 WHEN MATCHED THEN
-    UPDATE SET target.username = source.username, target.created_at = source.created_at
+    UPDATE SET target.username = source.username
 WHEN NOT MATCHED THEN
-    INSERT (user_id, email, username, created_at)
-    VALUES (user_seq.NEXTVAL, source.email, source.username, source.created_at);
+    INSERT (user_id, email, username)
+    VALUES (user_seq.NEXTVAL, source.email, source.username);
 
 -- ============================================================
--- 5. DISTINCT vs GROUP BY
+-- 5. APPROX_COUNT_DISTINCT（12c+，近似去重计数）
 -- ============================================================
 
-SELECT DISTINCT email FROM users;
-SELECT email FROM users GROUP BY email;
-
-SELECT email, COUNT(*) AS cnt, MAX(created_at) AS latest
-FROM users
-GROUP BY email;
+SELECT APPROX_COUNT_DISTINCT(email) AS approx_distinct FROM users;
+-- HyperLogLog 算法，大数据量下比 COUNT(DISTINCT) 快 10-100 倍
 
 -- ============================================================
--- 6. 去重到新表
+-- 6. '' = NULL 对去重的影响
+-- ============================================================
+
+-- GROUP BY email: 所有 NULL 和 '' 的行被归为同一组
+-- DISTINCT email: '' 和 NULL 被视为同一个值
+-- 这可能导致去重结果与其他数据库不同（其他数据库中 '' 和 NULL 是不同值）
+
+-- ============================================================
+-- 7. 去重到新表（CTAS）
 -- ============================================================
 
 CREATE TABLE users_clean AS
-SELECT *
-FROM (
+SELECT * FROM (
     SELECT user_id, email, username, created_at,
-           ROW_NUMBER() OVER (
-               PARTITION BY email
-               ORDER BY created_at DESC
-           ) AS rn
+           ROW_NUMBER() OVER (PARTITION BY email ORDER BY created_at DESC) AS rn
     FROM users
-) ranked
-WHERE rn = 1;
+) ranked WHERE rn = 1;
 
 -- ============================================================
--- 7. 近似去重（APPROX_COUNT_DISTINCT，Oracle 12c+）
+-- 8. 对引擎开发者的总结
 -- ============================================================
-
--- 近似不重复计数（比 COUNT(DISTINCT) 快得多）
-SELECT APPROX_COUNT_DISTINCT(email) AS approx_distinct_emails
-FROM users;
-
--- ============================================================
--- 8. 性能考量
--- ============================================================
-
-CREATE INDEX idx_users_email ON users (email);
-
--- ROWID 方式是 Oracle 去重的经典方式
--- KEEP (DENSE_RANK) 在 GROUP BY 中非常高效
--- MERGE 可实现 upsert
--- APPROX_COUNT_DISTINCT 使用 HyperLogLog 算法（Oracle 12c+）
--- 大表去重建议分批操作或使用 CTAS 重建表
+-- 1. ROWID 是 Oracle 去重的经典利器（直接使用物理行地址）。
+-- 2. KEEP (DENSE_RANK) 在 GROUP BY 中取排名值，是 Oracle 独有的高效聚合。
+-- 3. MERGE 最早由 Oracle 9i 实现，是 UPSERT 和防重复的标准方案。
+-- 4. APPROX_COUNT_DISTINCT 使用 HyperLogLog，大数据量场景必备。
+-- 5. '' = NULL 导致空字符串和 NULL 在去重时被视为同一值。

@@ -1,114 +1,83 @@
 -- PostgreSQL: 缓慢变化维度 (Slowly Changing Dimension)
 --
 -- 参考资料:
---   [1] PostgreSQL Documentation - INSERT ... ON CONFLICT (UPSERT)
+--   [1] PostgreSQL Documentation - INSERT ... ON CONFLICT
 --       https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT
---   [2] PostgreSQL Documentation - MERGE (PostgreSQL 15+)
+--   [2] PostgreSQL Documentation - MERGE (15+)
 --       https://www.postgresql.org/docs/15/sql-merge.html
---   [3] Kimball Group - SCD Types
---       https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/kimball-techniques/dimensional-modeling-techniques/
 
 -- ============================================================
--- 维度表和源数据表
+-- 1. 维度表结构
 -- ============================================================
+
 CREATE TABLE dim_customer (
     customer_key   SERIAL PRIMARY KEY,
-    customer_id    VARCHAR(20) NOT NULL,      -- 业务键
-    name           VARCHAR(100),
-    city           VARCHAR(100),
-    tier           VARCHAR(20),
+    customer_id    VARCHAR(20) NOT NULL,
+    name           VARCHAR(100), city VARCHAR(100), tier VARCHAR(20),
     effective_date DATE NOT NULL DEFAULT CURRENT_DATE,
     expiry_date    DATE NOT NULL DEFAULT '9999-12-31',
-    is_current     BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE stg_customer (
-    customer_id    VARCHAR(20),
-    name           VARCHAR(100),
-    city           VARCHAR(100),
-    tier           VARCHAR(20)
+    is_current     BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- ============================================================
--- SCD Type 1: 直接覆盖（Overwrite）
--- 不保留历史，直接更新
+-- 2. SCD Type 1: 直接覆盖（不保留历史）
 -- ============================================================
--- 方法 1: INSERT ... ON CONFLICT (PostgreSQL 9.5+)
+
+-- INSERT ... ON CONFLICT (9.5+)
 INSERT INTO dim_customer (customer_id, name, city, tier)
 SELECT customer_id, name, city, tier FROM stg_customer
-ON CONFLICT (customer_id)          -- 需要唯一索引/约束
-DO UPDATE SET
-    name       = EXCLUDED.name,
-    city       = EXCLUDED.city,
-    tier       = EXCLUDED.tier,
-    updated_at = CURRENT_TIMESTAMP;
+ON CONFLICT (customer_id)
+DO UPDATE SET name = EXCLUDED.name, city = EXCLUDED.city,
+              tier = EXCLUDED.tier, updated_at = NOW();
 
--- 方法 2: MERGE (PostgreSQL 15+)
-MERGE INTO dim_customer AS t
-USING stg_customer AS s
+-- MERGE (15+)
+MERGE INTO dim_customer AS t USING stg_customer AS s
 ON t.customer_id = s.customer_id AND t.is_current = TRUE
-WHEN MATCHED AND (t.name <> s.name OR t.city <> s.city OR t.tier <> s.tier)
-    THEN UPDATE SET
-        name       = s.name,
-        city       = s.city,
-        tier       = s.tier,
-        updated_at = CURRENT_TIMESTAMP
+WHEN MATCHED AND (t.name <> s.name OR t.city <> s.city)
+    THEN UPDATE SET name = s.name, city = s.city
 WHEN NOT MATCHED
-    THEN INSERT (customer_id, name, city, tier)
-         VALUES (s.customer_id, s.name, s.city, s.tier);
+    THEN INSERT (customer_id, name, city, tier) VALUES (s.customer_id, s.name, s.city, s.tier);
 
 -- ============================================================
--- SCD Type 2: 版本化（Versioning with start/end dates）
--- 保留完整历史，新版本标记为当前
+-- 3. SCD Type 2: 可写 CTE 版本化（保留历史，PostgreSQL 最佳方式）
 -- ============================================================
--- 步骤 1: 将已变化的当前记录标记为过期
-UPDATE dim_customer AS t
-SET    expiry_date = CURRENT_DATE - INTERVAL '1 day',
-       is_current  = FALSE,
-       updated_at  = CURRENT_TIMESTAMP
-FROM   stg_customer AS s
-WHERE  t.customer_id = s.customer_id
-  AND  t.is_current = TRUE
-  AND  (t.name <> s.name OR t.city <> s.city OR t.tier <> s.tier);
 
--- 步骤 2: 插入新版本
-INSERT INTO dim_customer (customer_id, name, city, tier, effective_date, expiry_date, is_current)
-SELECT s.customer_id, s.name, s.city, s.tier,
-       CURRENT_DATE, '9999-12-31', TRUE
-FROM   stg_customer s
-WHERE  EXISTS (
-    SELECT 1 FROM dim_customer d
-    WHERE  d.customer_id = s.customer_id
-      AND  d.is_current = FALSE
-      AND  d.expiry_date = CURRENT_DATE - INTERVAL '1 day'
-)
-   OR NOT EXISTS (
-    SELECT 1 FROM dim_customer d WHERE d.customer_id = s.customer_id
-);
-
--- ============================================================
--- SCD Type 2: 使用 MERGE（PostgreSQL 15+，单语句）
--- ============================================================
--- PostgreSQL 15 的 MERGE 不支持同一行多个动作，
--- 所以 SCD Type 2 仍需要两步（UPDATE + INSERT）或使用 CTE
-
--- 用 CTE 方式（推荐）
+-- 使用 PostgreSQL 独有的可写 CTE，单语句原子完成:
 WITH changed AS (
     UPDATE dim_customer AS t
-    SET    expiry_date = CURRENT_DATE - 1,
-           is_current  = FALSE,
-           updated_at  = CURRENT_TIMESTAMP
-    FROM   stg_customer AS s
-    WHERE  t.customer_id = s.customer_id
-      AND  t.is_current = TRUE
-      AND  (t.name <> s.name OR t.city <> s.city OR t.tier <> s.tier)
+    SET expiry_date = CURRENT_DATE - 1, is_current = FALSE
+    FROM stg_customer AS s
+    WHERE t.customer_id = s.customer_id AND t.is_current = TRUE
+      AND (t.name <> s.name OR t.city <> s.city OR t.tier <> s.tier)
     RETURNING t.customer_id
 )
-INSERT INTO dim_customer (customer_id, name, city, tier, effective_date, expiry_date, is_current)
-SELECT s.customer_id, s.name, s.city, s.tier,
-       CURRENT_DATE, '9999-12-31', TRUE
-FROM   stg_customer s
-WHERE  s.customer_id IN (SELECT customer_id FROM changed)
-   OR  NOT EXISTS (SELECT 1 FROM dim_customer d WHERE d.customer_id = s.customer_id);
+INSERT INTO dim_customer (customer_id, name, city, tier, effective_date)
+SELECT s.customer_id, s.name, s.city, s.tier, CURRENT_DATE
+FROM stg_customer s
+WHERE s.customer_id IN (SELECT customer_id FROM changed)
+   OR NOT EXISTS (SELECT 1 FROM dim_customer d WHERE d.customer_id = s.customer_id);
+
+-- 设计分析: 可写 CTE 的优势
+--   UPDATE + INSERT 在单语句中原子完成（无需两步操作）。
+--   RETURNING 将更新的行传递给后续 INSERT。
+--   这是 PostgreSQL 独有的能力——其他数据库需要两个语句或存储过程。
+
+-- ============================================================
+-- 4. 横向对比与对引擎开发者的启示
+-- ============================================================
+
+-- 1. SCD Type 2 实现方式:
+--   PostgreSQL: 可写 CTE（单语句原子操作）— 最简洁
+--   MySQL:      两条 SQL（UPDATE + INSERT）— 需要事务包裹
+--   Oracle:     MERGE（SQL:2003，但不支持同一行多个动作）
+--   SQL Server: MERGE + OUTPUT（可以，但 MERGE 有已知 bug）
+--
+-- 2. PostgreSQL 的优势:
+--   (a) 可写 CTE 让 SCD Type 2 成为单语句操作
+--   (b) RETURNING 传递中间结果，无需临时表
+--   (c) DDL 事务性保证了 schema 变更的安全性
+--
+-- 对引擎开发者:
+--   可写 CTE（DML in WITH + RETURNING）是 PostgreSQL 最独特的特性之一。
+--   它将多步骤的 ETL 操作压缩为单语句，减少事务复杂度。
+--   新引擎如果支持 RETURNING + 可写 CTE，将极大简化数据仓库 ETL。

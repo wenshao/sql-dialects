@@ -1,187 +1,98 @@
--- PostgreSQL: Top-N 查询（排名与分组取前 N 条）
+-- PostgreSQL: Top-N 查询与排名 (Ranking & Top-N)
 --
 -- 参考资料:
---   [1] PostgreSQL Documentation - Window Functions
---       https://www.postgresql.org/docs/current/tutorial-window.html
---   [2] PostgreSQL Documentation - LIMIT and OFFSET
+--   [1] PostgreSQL Documentation - LIMIT / FETCH
 --       https://www.postgresql.org/docs/current/queries-limit.html
---   [3] PostgreSQL Documentation - Lateral Subqueries
---       https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-LATERAL
+--   [2] PostgreSQL Documentation - DISTINCT ON
+--       https://www.postgresql.org/docs/current/sql-select.html#SQL-DISTINCT
 
 -- ============================================================
--- 示例数据上下文
--- ============================================================
--- 假设表结构:
---   orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date DATE)
---   products(product_id SERIAL, category VARCHAR, price NUMERIC(10,2), product_name VARCHAR)
-
--- ============================================================
--- 1. Top-N 整体（最简单场景）
+-- 1. 全局 Top-N
 -- ============================================================
 
--- LIMIT 语法（PostgreSQL 经典方式）
-SELECT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC
-LIMIT 10;
-
--- LIMIT + OFFSET（分页）
-SELECT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC
-LIMIT 10 OFFSET 20;
-
--- FETCH FIRST（SQL 标准语法，PostgreSQL 8.4+）
-SELECT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC
-FETCH FIRST 10 ROWS ONLY;
-
--- WITH TIES（PostgreSQL 13+，包含并列行）
-SELECT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC
-FETCH FIRST 10 ROWS WITH TIES;
+SELECT * FROM orders ORDER BY amount DESC LIMIT 10;
+SELECT * FROM orders ORDER BY amount DESC FETCH FIRST 10 ROWS ONLY;     -- SQL 标准
+SELECT * FROM orders ORDER BY amount DESC FETCH FIRST 10 ROWS WITH TIES;-- 含并列(13+)
 
 -- ============================================================
--- 2. Top-N 分组（每组取前 N 条）
+-- 2. 分组 Top-N: 三种方式的对比
 -- ============================================================
 
--- ROW_NUMBER() 方式
-SELECT *
-FROM (
-    SELECT order_id, customer_id, amount, order_date,
-           ROW_NUMBER() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS rn
+-- 方式 1: ROW_NUMBER（最通用）
+SELECT * FROM (
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rn
     FROM orders
-) ranked
-WHERE rn <= 3;
+) ranked WHERE rn <= 3;
 
--- RANK() 方式（有并列时可能超过 N 条）
-SELECT *
-FROM (
-    SELECT order_id, customer_id, amount, order_date,
-           RANK() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS rnk
-    FROM orders
-) ranked
-WHERE rnk <= 3;
+-- 方式 2: DISTINCT ON（每组第 1 名，PostgreSQL 独有）
+SELECT DISTINCT ON (customer_id) *
+FROM orders ORDER BY customer_id, amount DESC;
 
--- DENSE_RANK() 方式
-SELECT *
-FROM (
-    SELECT order_id, customer_id, amount, order_date,
-           DENSE_RANK() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS drnk
-    FROM orders
-) ranked
-WHERE drnk <= 3;
-
--- ============================================================
--- 3. DISTINCT ON（PostgreSQL 独有特性）
--- ============================================================
-
--- 每个客户金额最大的一笔订单
-SELECT DISTINCT ON (customer_id)
-       order_id, customer_id, amount, order_date
-FROM orders
-ORDER BY customer_id, amount DESC;
-
--- DISTINCT ON 取每个类别价格最高的产品
-SELECT DISTINCT ON (category)
-       product_id, category, price, product_name
-FROM products
-ORDER BY category, price DESC;
-
--- ============================================================
--- 4. LATERAL 子查询（PostgreSQL 9.3+）
--- ============================================================
-
--- 每个客户取前 3 笔订单（高效方式，可利用索引）
-SELECT c.customer_id, t.order_id, t.amount, t.order_date
-FROM (SELECT DISTINCT customer_id FROM orders) c
-CROSS JOIN LATERAL (
-    SELECT order_id, amount, order_date
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
-    ORDER BY amount DESC
-    LIMIT 3
-) t;
-
--- 配合实际 customers 表使用
-SELECT c.customer_id, c.username, t.order_id, t.amount
+-- 方式 3: LATERAL + LIMIT（有索引时最快）
+SELECT c.customer_id, t.*
 FROM customers c
 CROSS JOIN LATERAL (
-    SELECT order_id, amount
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
-    ORDER BY amount DESC
-    LIMIT 3
+    SELECT order_id, amount FROM orders o
+    WHERE o.customer_id = c.customer_id ORDER BY amount DESC LIMIT 3
 ) t;
-
--- LEFT JOIN LATERAL（包含没有订单的客户）
-SELECT c.customer_id, c.username, t.order_id, t.amount
-FROM customers c
-LEFT JOIN LATERAL (
-    SELECT order_id, amount
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
-    ORDER BY amount DESC
-    LIMIT 3
-) t ON true;
+-- LEFT JOIN LATERAL 保留没有订单的客户:
+-- LEFT JOIN LATERAL (...) t ON TRUE
 
 -- ============================================================
--- 5. 关联子查询方式
+-- 3. 性能对比分析
 -- ============================================================
 
-SELECT o.*
-FROM orders o
-WHERE (
-    SELECT COUNT(*)
-    FROM orders o2
-    WHERE o2.customer_id = o.customer_id
-      AND (o2.amount > o.amount
-           OR (o2.amount = o.amount AND o2.order_id < o.order_id))
-) < 3
-ORDER BY o.customer_id, o.amount DESC;
+-- ROW_NUMBER 方式:
+--   全表扫描 + 窗口计算 → O(n log n)
+--   不需要特定索引，但对大表可能慢
+
+-- DISTINCT ON 方式:
+--   Sort + Unique → O(n log n)
+--   只能取每组第 1 名，不能取 Top-3
+--   有 (customer_id, amount DESC) 索引时可走 Index Scan
+
+-- LATERAL + LIMIT 方式:
+--   对每个客户做索引扫描 → O(k * log n)（k=客户数）
+--   有 (customer_id, amount DESC) 索引时最快
+--   推荐索引:
+CREATE INDEX idx_orders_cust_amt ON orders (customer_id, amount DESC);
+
+-- 经验法则:
+--   Top-1 → DISTINCT ON（最简洁）
+--   Top-N + 有索引 → LATERAL + LIMIT（最快）
+--   Top-N + 无索引 → ROW_NUMBER（通用）
 
 -- ============================================================
--- 6. CTE + 窗口函数
+-- 4. RANK / DENSE_RANK: 处理并列
 -- ============================================================
 
-WITH ranked_orders AS (
-    SELECT order_id, customer_id, amount, order_date,
-           ROW_NUMBER() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS rn
+SELECT * FROM (
+    SELECT *, RANK() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rnk
     FROM orders
-)
-SELECT order_id, customer_id, amount, order_date
-FROM ranked_orders
-WHERE rn <= 3;
+) ranked WHERE rnk <= 3;
+-- RANK: 并列时跳号（1,1,3）
+-- DENSE_RANK: 并列不跳号（1,1,2）
+-- ROW_NUMBER: 无并列（1,2,3）
 
 -- ============================================================
--- 7. 性能考量
+-- 5. 横向对比与对引擎开发者的启示
 -- ============================================================
 
--- 推荐索引
-CREATE INDEX idx_orders_customer_amount ON orders (customer_id, amount DESC);
-
--- DISTINCT ON + 索引通常最快（取每组第 1 名）
--- LATERAL + LIMIT + 索引在分组 Top-N 中性能最优
--- ROW_NUMBER 方式需要全表窗口计算，大表可能较慢
--- 关联子查询 O(n^2)，仅适合小数据集
-
--- EXPLAIN ANALYZE 查看执行计划
-EXPLAIN ANALYZE
-SELECT DISTINCT ON (customer_id)
-       order_id, customer_id, amount
-FROM orders
-ORDER BY customer_id, amount DESC;
+-- 1. WITH TIES (13+):
+--   PostgreSQL: FETCH FIRST N ROWS WITH TIES
+--   Oracle:     FETCH FIRST N ROWS WITH TIES (12c+)
+--   SQL Server: TOP N WITH TIES
+--   MySQL:      不支持
+--
+-- 2. DISTINCT ON:
+--   PostgreSQL: 独有（最简洁的 Top-1）
+--   其他:       均需 ROW_NUMBER 子查询
+--
+-- 3. LATERAL:
+--   PostgreSQL: LATERAL JOIN (9.3+)
+--   SQL Server: CROSS APPLY (2005+, 等价)
+--
+-- 对引擎开发者:
+--   LATERAL + LIMIT 是"分组 Top-N"的最优执行路径:
+--   利用索引的有序性，每组只扫描 N 条，避免全表窗口计算。
+--   优化器应能识别这种模式并自动选择。

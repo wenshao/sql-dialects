@@ -5,20 +5,35 @@
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/cncpt/data-concurrency-and-consistency.html
 --   [2] Oracle SQL Language Reference - SELECT FOR UPDATE
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/sqlrf/SELECT.html
---   [3] Oracle PL/SQL Packages - DBMS_LOCK
---       https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/DBMS_LOCK.html
---   [4] Oracle Database Reference - V$LOCK
---       https://docs.oracle.com/en/database/oracle/oracle-database/23/refrn/V-LOCK.html
 
 -- ============================================================
--- 行级锁 (Row-Level Locks)
+-- 1. Oracle 锁设计哲学: 读不阻塞写
 -- ============================================================
 
--- SELECT FOR UPDATE: 排他行锁
+-- Oracle MVCC 的核心原则:
+--   1. 读操作永远不阻塞写操作
+--   2. 写操作永远不阻塞读操作
+--   3. 只有写-写冲突需要等待
+--
+-- 因此 Oracle 没有 SELECT FOR SHARE（不需要!）
+-- 读一致性通过 Undo 段实现（MVCC），不需要读锁。
+--
+-- 横向对比:
+--   Oracle:     读不阻塞写（MVCC via Undo），无 FOR SHARE
+--   PostgreSQL: 读不阻塞写（MVCC），有 FOR SHARE
+--   MySQL/InnoDB: 读不阻塞写（MVCC），有 FOR SHARE (8.0+)
+--   SQL Server: 默认读阻塞写!（除非 READ_COMMITTED_SNAPSHOT ON）
+
+-- ============================================================
+-- 2. 行级锁: SELECT FOR UPDATE
+-- ============================================================
+
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;
 
--- 锁定特定列（Oracle 特有）
-SELECT * FROM orders WHERE id = 100 FOR UPDATE OF orders.status;
+-- 锁定特定列（Oracle 独有，指定哪个表的行被锁定）
+SELECT * FROM orders o JOIN users u ON o.user_id = u.id
+WHERE o.id = 100
+FOR UPDATE OF o.status;                        -- 只锁定 orders 表的行
 
 -- NOWAIT: 无法获取锁时立即报错
 SELECT * FROM orders WHERE id = 100 FOR UPDATE NOWAIT;
@@ -26,175 +41,152 @@ SELECT * FROM orders WHERE id = 100 FOR UPDATE NOWAIT;
 -- WAIT n: 等待指定秒数后超时
 SELECT * FROM orders WHERE id = 100 FOR UPDATE WAIT 5;
 
--- SKIP LOCKED（Oracle 11g+）
+-- SKIP LOCKED（11g+，队列处理的关键特性）
 SELECT * FROM tasks WHERE status = 'pending'
-  AND ROWNUM <= 5
-FOR UPDATE SKIP LOCKED;
+AND ROWNUM <= 5 FOR UPDATE SKIP LOCKED;
 
--- 注意：Oracle 没有 SELECT FOR SHARE（读不阻塞写，MVCC 设计）
+-- 设计分析: SKIP LOCKED
+--   SKIP LOCKED 跳过已被其他事务锁定的行，返回下一批可用行。
+--   典型场景: 多消费者队列（每个消费者取不同的任务）。
+--
+-- 横向对比:
+--   Oracle 11g+:    FOR UPDATE SKIP LOCKED
+--   PostgreSQL 9.5+: FOR UPDATE SKIP LOCKED
+--   MySQL 8.0+:     FOR UPDATE SKIP LOCKED
+--   SQL Server:     READPAST Hint
 
 -- ============================================================
--- 表级锁 (Table-Level Locks)
+-- 3. 表级锁
 -- ============================================================
 
--- LOCK TABLE 语句
-LOCK TABLE orders IN ROW SHARE MODE;             -- RS (= SS)
-LOCK TABLE orders IN ROW EXCLUSIVE MODE;          -- RX (= SX)
-LOCK TABLE orders IN SHARE MODE;                  -- S
-LOCK TABLE orders IN SHARE ROW EXCLUSIVE MODE;    -- SRX (= SSX)
-LOCK TABLE orders IN EXCLUSIVE MODE;              -- X
+LOCK TABLE orders IN ROW SHARE MODE;           -- RS
+LOCK TABLE orders IN ROW EXCLUSIVE MODE;        -- RX
+LOCK TABLE orders IN SHARE MODE;                -- S
+LOCK TABLE orders IN SHARE ROW EXCLUSIVE MODE;  -- SRX
+LOCK TABLE orders IN EXCLUSIVE MODE;            -- X
 
--- NOWAIT
 LOCK TABLE orders IN EXCLUSIVE MODE NOWAIT;
-
--- WAIT n
 LOCK TABLE orders IN EXCLUSIVE MODE WAIT 10;
 
 -- ============================================================
--- 乐观锁 (Optimistic Locking)
+-- 4. 乐观锁（推荐的并发控制方式）
 -- ============================================================
 
--- 使用版本号列
-ALTER TABLE orders ADD version NUMBER DEFAULT 1 NOT NULL;
-
-UPDATE orders
-SET status = 'shipped', version = version + 1
+-- 方式 1: 版本号
+UPDATE orders SET status = 'shipped', version = version + 1
 WHERE id = 100 AND version = 5;
--- 检查 SQL%ROWCOUNT 是否为 1
+-- SQL%ROWCOUNT = 0 表示乐观锁冲突
 
--- 使用 ORA_ROWSCN（Oracle 特有的行变更 SCN）
+-- 方式 2: ORA_ROWSCN（Oracle 独有的行级变更 SCN）
 SELECT id, ORA_ROWSCN FROM orders WHERE id = 100;
--- 更新时检查 ORA_ROWSCN 是否变化
 UPDATE orders SET status = 'shipped'
 WHERE id = 100 AND ORA_ROWSCN = 123456789;
--- 注意：默认 ORA_ROWSCN 精度为块级，需要 ROWDEPENDENCIES 表选项才能行级
 
--- 创建支持行级 ORA_ROWSCN 的表
-CREATE TABLE orders_v2 (
-    id     NUMBER PRIMARY KEY,
-    status VARCHAR2(20)
-) ROWDEPENDENCIES;
+-- ORA_ROWSCN 的设计:
+--   默认精度为块级（同一个数据块的所有行共享 SCN）
+--   要获得行级精度: CREATE TABLE t (...) ROWDEPENDENCIES;
+--   这是 MVCC 的副产品: SCN 本来就是事务管理的一部分
 
 -- ============================================================
--- 悲观锁 (Pessimistic Locking)
+-- 5. 应用锁 / 用户锁（DBMS_LOCK）
 -- ============================================================
 
--- 典型悲观锁模式
-BEGIN
-    SELECT * INTO v_account FROM accounts WHERE id = 1 FOR UPDATE;
-    UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-    UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-    COMMIT;
-EXCEPTION
-    WHEN OTHERS THEN
-        ROLLBACK;
-        RAISE;
-END;
-/
-
--- ============================================================
--- 应用锁 / 用户锁 (DBMS_LOCK)
--- ============================================================
-
--- 分配锁句柄
 DECLARE
     v_lockhandle VARCHAR2(128);
     v_result     NUMBER;
 BEGIN
-    -- 将锁名称转换为句柄
     DBMS_LOCK.ALLOCATE_UNIQUE('my_lock', v_lockhandle);
-
-    -- 请求锁
     v_result := DBMS_LOCK.REQUEST(
         lockhandle        => v_lockhandle,
-        lockmode          => DBMS_LOCK.X_MODE,    -- 排他模式
-        timeout           => 10,                   -- 超时秒数
-        release_on_commit => TRUE                  -- 提交时释放
+        lockmode          => DBMS_LOCK.X_MODE,
+        timeout           => 10,
+        release_on_commit => TRUE
     );
-    -- v_result: 0=成功, 1=超时, 2=死锁, 3=参数错误, 4=已持有, 5=非法句柄
-
-    -- ... 执行需要互斥的操作 ...
-
-    -- 释放锁
+    -- 0=成功, 1=超时, 2=死锁, 4=已持有
+    -- ... 互斥操作 ...
     v_result := DBMS_LOCK.RELEASE(v_lockhandle);
 END;
 /
 
--- 锁模式:
--- DBMS_LOCK.SS_MODE (2) = Sub-Shared
--- DBMS_LOCK.SX_MODE (3) = Sub-Exclusive
--- DBMS_LOCK.S_MODE  (4) = Shared
--- DBMS_LOCK.SSX_MODE(5) = Shared-Sub-Exclusive
--- DBMS_LOCK.X_MODE  (6) = Exclusive
+-- 横向对比:
+--   Oracle:     DBMS_LOCK（应用锁包，功能丰富）
+--   PostgreSQL: pg_advisory_lock()（轻量级，更易用）
+--   MySQL:      GET_LOCK() / RELEASE_LOCK()
+--   SQL Server: sp_getapplock / sp_releaseapplock
 
 -- ============================================================
--- 死锁检测与预防
+-- 6. 死锁检测
 -- ============================================================
 
--- Oracle 自动检测死锁（通常在 3 秒内），回滚其中一个事务的语句
+-- Oracle 自动检测死锁（通常 3 秒内），回滚其中一个事务的当前语句
 -- ORA-00060: deadlock detected while waiting for resource
 
--- 设置 DDL 锁超时（Oracle 11g+）
-ALTER SESSION SET DDL_LOCK_TIMEOUT = 10;   -- 秒
-
--- 预防死锁：按固定顺序锁定行
+-- 预防死锁: 按固定顺序锁定行
 SELECT * FROM accounts WHERE id IN (1, 2) ORDER BY id FOR UPDATE;
 
--- 查看死锁跟踪文件
--- 死锁信息自动写入 alert log 和 trace 文件
+-- DDL 锁超时（11g+）
+ALTER SESSION SET DDL_LOCK_TIMEOUT = 10;
 
 -- ============================================================
--- 锁监控 (Lock Monitoring)
+-- 7. 锁监控
 -- ============================================================
 
--- V$LOCK: 查看当前所有锁
+-- V$LOCK: 当前所有锁
 SELECT * FROM V$LOCK WHERE TYPE IN ('TX', 'TM');
 
--- 查看锁等待
+-- 查看锁等待（谁阻塞了谁）
 SELECT
-    s1.username       AS blocking_user,
-    s1.sid            AS blocking_sid,
-    s2.username       AS waiting_user,
-    s2.sid            AS waiting_sid,
-    s2.event          AS wait_event,
+    s1.username AS blocking_user, s1.sid AS blocking_sid,
+    s2.username AS waiting_user, s2.sid AS waiting_sid,
     s2.seconds_in_wait
 FROM V$SESSION s1
 JOIN V$SESSION s2 ON s1.sid = s2.blocking_session
 WHERE s2.blocking_session IS NOT NULL;
 
--- DBA_BLOCKERS / DBA_WAITERS
+-- DBA_BLOCKERS / DBA_WAITERS（便捷视图）
 SELECT * FROM DBA_BLOCKERS;
 SELECT * FROM DBA_WAITERS;
-
--- V$LOCKED_OBJECT: 查看被锁定的对象
-SELECT
-    lo.session_id,
-    lo.oracle_username,
-    o.object_name,
-    o.object_type,
-    lo.locked_mode
-FROM V$LOCKED_OBJECT lo
-JOIN DBA_OBJECTS o ON lo.object_id = o.object_id;
 
 -- 终止阻塞会话
 ALTER SYSTEM KILL SESSION 'sid,serial#' IMMEDIATE;
 
 -- ============================================================
--- MVCC 与事务隔离
+-- 8. 事务隔离级别
 -- ============================================================
 
--- Oracle 使用 MVCC (Undo Segments) 实现一致性读
--- 读操作永远不阻塞写操作（不需要 FOR SHARE）
-
--- 隔离级别（Oracle 只支持两种）
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED;    -- 默认
+-- Oracle 只支持两种隔离级别:
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;  -- 默认
 SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 
 -- 只读事务
 SET TRANSACTION READ ONLY;
 
--- 使用 AS OF (闪回查询) 实现历史数据读取
+-- 横向对比:
+--   Oracle:     只有 READ COMMITTED 和 SERIALIZABLE
+--   PostgreSQL: READ UNCOMMITTED(=RC) / RC / REPEATABLE READ / SERIALIZABLE
+--   MySQL:      所有 4 种标准隔离级别
+--   SQL Server: 所有 4 种 + SNAPSHOT
+
+-- Oracle 没有脏读（READ UNCOMMITTED）:
+-- 这是 MVCC 的自然结果: 未提交的数据在 Undo 中，读操作看到的是已提交的版本。
+
+-- ============================================================
+-- 9. Flashback Query（历史数据读取，基于 MVCC）
+-- ============================================================
+
 SELECT * FROM orders AS OF TIMESTAMP SYSTIMESTAMP - INTERVAL '5' MINUTE
 WHERE id = 100;
 
 SELECT * FROM orders AS OF SCN 123456789;
+
+-- Flashback 是 MVCC Undo 段的高价值复用（见 DELETE 文件的详细分析）
+
+-- ============================================================
+-- 10. 对引擎开发者的总结
+-- ============================================================
+-- 1. "读不阻塞写"是 Oracle MVCC 的核心优势，通过 Undo 段实现。
+-- 2. FOR UPDATE OF 指定锁定哪个表的行，在 JOIN 场景下更精确。
+-- 3. SKIP LOCKED 是队列处理的关键特性，所有现代数据库已跟进。
+-- 4. ORA_ROWSCN 是 MVCC 的副产品，提供了优雅的乐观锁实现。
+-- 5. Oracle 只有 2 种隔离级别（RC + SERIALIZABLE），设计哲学是"简化选择"。
+-- 6. V$SESSION 和 V$LOCK 是生产环境锁诊断的核心视图。

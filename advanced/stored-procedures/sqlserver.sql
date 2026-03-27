@@ -1,4 +1,4 @@
--- SQL Server: 存储过程和函数（T-SQL）
+-- SQL Server: 存储过程与函数（T-SQL）
 --
 -- 参考资料:
 --   [1] SQL Server T-SQL - CREATE PROCEDURE
@@ -6,108 +6,166 @@
 --   [2] SQL Server T-SQL - CREATE FUNCTION
 --       https://learn.microsoft.com/en-us/sql/t-sql/statements/create-function-transact-sql
 
--- 创建存储过程
-CREATE OR ALTER PROCEDURE get_user    -- 2016 SP1+: CREATE OR ALTER
+-- ============================================================
+-- 1. 存储过程基本语法
+-- ============================================================
+
+CREATE OR ALTER PROCEDURE dbo.GetUser  -- CREATE OR ALTER（2016 SP1+）
     @username NVARCHAR(64)
 AS
 BEGIN
+    SET NOCOUNT ON;  -- 禁止返回"受影响的行数"消息（性能优化）
     SELECT * FROM users WHERE username = @username;
 END;
 
 -- 调用
-EXEC get_user 'alice';
-EXEC get_user @username = 'alice';
+EXEC GetUser 'alice';
+EXEC GetUser @username = 'alice';  -- 命名参数
 
--- OUTPUT 参数
-CREATE PROCEDURE get_user_count
-    @count INT OUTPUT
-AS
-BEGIN
+-- ============================================================
+-- 2. OUTPUT 参数
+-- ============================================================
+
+CREATE PROCEDURE dbo.GetUserCount @count INT OUTPUT
+AS BEGIN
     SELECT @count = COUNT(*) FROM users;
 END;
 
 DECLARE @cnt INT;
-EXEC get_user_count @cnt OUTPUT;
+EXEC GetUserCount @cnt OUTPUT;
 SELECT @cnt;
 
--- 带事务和错误处理
-CREATE PROCEDURE transfer
-    @from_id BIGINT,
-    @to_id BIGINT,
-    @amount DECIMAL(10,2)
+-- ============================================================
+-- 3. 带事务和错误处理的存储过程（标准模板）
+-- ============================================================
+
+CREATE PROCEDURE dbo.TransferFunds
+    @from_id BIGINT, @to_id BIGINT, @amount DECIMAL(10,2)
 AS
 BEGIN
     SET NOCOUNT ON;
-    DECLARE @balance DECIMAL(10,2);
+    SET XACT_ABORT ON;  -- 关键: 错误时自动回滚
+
+    IF @amount <= 0 THROW 50001, N'Amount must be positive', 1;
 
     BEGIN TRY
-        BEGIN TRAN;
+        BEGIN TRANSACTION;
+            DECLARE @balance DECIMAL(10,2);
+            SELECT @balance = balance FROM accounts WITH (UPDLOCK) WHERE id = @from_id;
+            IF @balance < @amount THROW 50002, N'Insufficient balance', 1;
 
-        SELECT @balance = balance FROM accounts WITH (UPDLOCK) WHERE id = @from_id;
-
-        IF @balance < @amount
-        BEGIN
-            RAISERROR('Insufficient balance', 16, 1);
-            RETURN;
-        END
-
-        UPDATE accounts SET balance = balance - @amount WHERE id = @from_id;
-        UPDATE accounts SET balance = balance + @amount WHERE id = @to_id;
-
+            UPDATE accounts SET balance = balance - @amount WHERE id = @from_id;
+            UPDATE accounts SET balance = balance + @amount WHERE id = @to_id;
         COMMIT;
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK;
-        THROW;  -- 2012+
-    END CATCH
+        THROW;
+    END CATCH;
 END;
 
--- 函数（标量函数）
-CREATE FUNCTION dbo.full_name(@first NVARCHAR(50), @last NVARCHAR(50))
+-- ============================================================
+-- 4. 函数类型: 标量函数 vs 表值函数（对引擎开发者）
+-- ============================================================
+
+-- 标量函数（返回单个值）
+CREATE FUNCTION dbo.FullName(@first NVARCHAR(50), @last NVARCHAR(50))
 RETURNS NVARCHAR(101)
-AS
-BEGIN
+AS BEGIN
     RETURN @first + N' ' + @last;
 END;
+-- 调用时必须加 schema 前缀: SELECT dbo.FullName('Alice', 'Smith');
 
-SELECT dbo.full_name('Alice', 'Smith');  -- 必须加 schema 前缀
+-- 设计分析（标量函数的性能陷阱）:
+--   SQL Server 的标量 UDF 在 2019 之前有严重的性能问题:
+--   (1) 逐行调用（不能并行执行）
+--   (2) 不能内联到查询计划中（每行一次函数调用）
+--   (3) 禁用并行执行（整个查询变为串行）
+--   SELECT dbo.FullName(first_name, last_name) FROM users;  -- 100万行 = 100万次函数调用
+--
+--   2019+: Scalar UDF Inlining（标量函数内联）
+--   优化器将简单的标量函数内联到查询中，消除逐行调用开销。
+--   但只有满足条件的函数才能内联（不能有循环、游标、临时表等）。
 
--- 表值函数（内联）
-CREATE FUNCTION dbo.active_users()
-RETURNS TABLE
-AS
+-- 内联表值函数（ITVF, 推荐）
+CREATE FUNCTION dbo.ActiveUsers()
+RETURNS TABLE AS
 RETURN (SELECT * FROM users WHERE status = 1);
 
-SELECT * FROM dbo.active_users();
+SELECT * FROM dbo.ActiveUsers();
 
--- 表值函数（多语句）
-CREATE FUNCTION dbo.get_user_stats()
+-- ITVF 没有标量 UDF 的性能问题——它被优化器完全内联（像视图一样展开）。
+-- 这是 SQL Server 中最推荐的函数类型。
+
+-- 多语句表值函数（MSTVF, 不推荐）
+CREATE FUNCTION dbo.GetUserStats()
 RETURNS @stats TABLE (city NVARCHAR(64), cnt INT, avg_age DECIMAL(5,2))
-AS
-BEGIN
+AS BEGIN
     INSERT INTO @stats
     SELECT city, COUNT(*), AVG(CAST(age AS DECIMAL))
     FROM users GROUP BY city;
     RETURN;
 END;
 
--- 游标
+-- MSTVF 有与标量 UDF 类似的问题——优化器假设它返回 1 行（导致错误的计划）
+-- 2019+: Table Variable Deferred Compilation 改善了行数估算
+
+-- ============================================================
+-- 5. 函数 vs 存储过程: 选择策略
+-- ============================================================
+
+-- 存储过程:
+--   + 可以执行 DML（INSERT/UPDATE/DELETE）
+--   + 可以有事务控制
+--   + 可以调用其他存储过程
+--   + 支持 TRY/CATCH
+--   - 不能在 SELECT 中调用
+
+-- 函数:
+--   + 可以在 SELECT/WHERE/JOIN 中使用
+--   + ITVF 可以被优化器内联
+--   - 不能执行 DML（只读）
+--   - 不能有事务控制
+--   - 不能调用存储过程
+--   - 标量 UDF 在 2019 之前有严重性能问题
+
+-- ============================================================
+-- 6. 游标（应尽量避免）
+-- ============================================================
+
 DECLARE @username NVARCHAR(64);
-DECLARE cur CURSOR FOR SELECT username FROM users;
+DECLARE cur CURSOR LOCAL FAST_FORWARD FOR
+    SELECT username FROM users;
 OPEN cur;
 FETCH NEXT FROM cur INTO @username;
 WHILE @@FETCH_STATUS = 0
 BEGIN
     PRINT @username;
     FETCH NEXT FROM cur INTO @username;
-END
+END;
 CLOSE cur;
 DEALLOCATE cur;
 
--- 临时存储过程
-CREATE PROCEDURE #temp_proc AS SELECT 1;   -- 会话级
-CREATE PROCEDURE ##global_proc AS SELECT 1; -- 全局临时
+-- FAST_FORWARD = 只进只读（性能最好的游标类型）
+-- 游标性能差的原因: 逐行处理，无法利用集合操作的优化。
+-- 替代方案: 窗口函数、CROSS APPLY、递归 CTE
 
--- 删除
-DROP PROCEDURE IF EXISTS get_user;  -- 2016+
-DROP FUNCTION IF EXISTS dbo.full_name;
+-- ============================================================
+-- 7. 临时存储过程
+-- ============================================================
+
+CREATE PROCEDURE #temp_proc AS SELECT 1;    -- 会话级（# 前缀）
+CREATE PROCEDURE ##global_proc AS SELECT 1; -- 全局（## 前缀）
+
+-- ============================================================
+-- 8. 删除
+-- ============================================================
+
+DROP PROCEDURE IF EXISTS GetUser;     -- 2016+
+DROP FUNCTION IF EXISTS dbo.FullName; -- 2016+
+
+-- 版本演进:
+-- 2005+ : TRY/CATCH, 表值函数
+-- 2012+ : THROW
+-- 2016+ : CREATE OR ALTER, DROP IF EXISTS
+-- 2019+ : Scalar UDF Inlining, Table Variable Deferred Compilation

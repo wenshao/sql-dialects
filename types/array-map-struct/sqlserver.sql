@@ -1,149 +1,131 @@
--- SQL Server: 复合/复杂类型 (Array, Map, Struct)
+-- SQL Server: 复合类型（Array / Map / Struct 替代方案）
 --
 -- 参考资料:
---   [1] Microsoft Docs - JSON Data in SQL Server
+--   [1] SQL Server - JSON Data
 --       https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server
---   [2] Microsoft Docs - OPENJSON
---       https://learn.microsoft.com/en-us/sql/t-sql/functions/openjson-transact-sql
---   [3] Microsoft Docs - JSON_ARRAY / JSON_OBJECT (SQL Server 2022)
---       https://learn.microsoft.com/en-us/sql/t-sql/functions/json-array-transact-sql
---   [4] Microsoft Docs - Table-Valued Parameters
+--   [2] SQL Server - Table-Valued Parameters
 --       https://learn.microsoft.com/en-us/sql/relational-databases/tables/use-table-valued-parameters-database-engine
 
 -- ============================================================
--- SQL Server 没有原生的 ARRAY / MAP / STRUCT 类型
--- 使用 JSON 或 XML 作为替代
+-- 1. SQL Server 没有原生 ARRAY / MAP / STRUCT 类型
 -- ============================================================
 
+-- SQL Server 使用以下替代方案:
+--   ARRAY  → JSON 数组 (NVARCHAR(MAX)) 或 表值参数 (TVP)
+--   MAP    → JSON 对象
+--   STRUCT → JSON 对象 或 用户定义表类型
+
+-- 横向对比:
+--   PostgreSQL: ARRAY[], JSON/JSONB, 复合类型（真正的原生支持）
+--   MySQL:      JSON（5.7+）
+--   ClickHouse: Array(T), Map(K,V), Tuple(T1,T2,...), Nested
+--   BigQuery:   ARRAY, STRUCT, JSON
+--
+-- 对引擎开发者的启示:
+--   原生复合类型（如 PostgreSQL 的 ARRAY）比 JSON 模拟更高效:
+--   (1) 类型检查在插入时完成（不是查询时）
+--   (2) 存储更紧凑（无 JSON 语法开销）
+--   (3) 索引支持更好（GIN 索引直接支持 ARRAY 包含查询）
+--   SQL Server 选择"用 JSON 模拟一切"简化了实现但牺牲了性能。
+
 -- ============================================================
--- JSON 数组（代替 ARRAY）— SQL Server 2016+
+-- 2. JSON 数组代替 ARRAY（2016+）
 -- ============================================================
 
 CREATE TABLE users (
     id       BIGINT IDENTITY(1,1) PRIMARY KEY,
     name     NVARCHAR(100) NOT NULL,
-    tags     NVARCHAR(MAX),                   -- 存储 JSON 数组
-    metadata NVARCHAR(MAX),                   -- 存储 JSON 对象
-    CONSTRAINT chk_tags CHECK (ISJSON(tags) = 1),
-    CONSTRAINT chk_meta CHECK (ISJSON(metadata) = 1)
+    tags     NVARCHAR(MAX),
+    CONSTRAINT chk_tags CHECK (ISJSON(tags) = 1)
 );
 
--- 插入 JSON 数组
 INSERT INTO users (name, tags) VALUES
     ('Alice', '["admin", "dev"]'),
     ('Bob',   '["user", "tester"]');
 
--- JSON_ARRAY 构造函数（SQL Server 2022+）
-INSERT INTO users (name, tags) VALUES
-    ('Carol', JSON_ARRAY('dev', 'ops'));
+-- 2022+: JSON_ARRAY 构造函数
+INSERT INTO users (name, tags) VALUES ('Carol', JSON_ARRAY('dev', 'ops'));
 
--- 访问 JSON 数组元素
-SELECT JSON_VALUE(tags, '$[0]') AS first_tag FROM users;    -- 标量值
-SELECT JSON_QUERY(tags, '$[0]') AS first_elem FROM users;   -- JSON 片段
+-- 访问元素
+SELECT JSON_VALUE(tags, '$[0]') AS first_tag FROM users;
 
--- ============================================================
--- OPENJSON: 展开 JSON 数组为行（= UNNEST）
--- ============================================================
-
--- 展开 JSON 数组
+-- OPENJSON 展开数组为行（= PostgreSQL 的 unnest()）
 SELECT u.name, j.value AS tag
-FROM users u
-CROSS APPLY OPENJSON(u.tags) j;
+FROM users u CROSS APPLY OPENJSON(u.tags) j;
 
--- 带类型的展开
+-- 带类型信息的展开
 SELECT u.name, j.value AS tag, j.[key] AS idx
-FROM users u
-CROSS APPLY OPENJSON(u.tags) j;
+FROM users u CROSS APPLY OPENJSON(u.tags) j;
+
+-- ============================================================
+-- 3. JSON 对象代替 MAP / STRUCT
+-- ============================================================
+
+-- 2022+: JSON_OBJECT
+UPDATE users SET tags = JSON_OBJECT('city': 'NYC', 'country': 'US') WHERE id = 1;
+
+-- 读取
+SELECT JSON_VALUE(tags, '$.city') FROM users;
+
+-- 展开为键值对
+SELECT u.name, j.[key], j.value FROM users u CROSS APPLY OPENJSON(u.tags) j;
 
 -- 展开为强类型列
-SELECT u.name, j.tag
-FROM users u
-CROSS APPLY OPENJSON(u.tags) WITH (
-    tag NVARCHAR(50) '$'
-) j;
+SELECT * FROM OPENJSON('{"name":"Alice","age":30}')
+WITH (name NVARCHAR(50) '$.name', age INT '$.age');
 
 -- ============================================================
--- JSON 对象（代替 MAP / STRUCT）
+-- 4. 表值参数 (TVP): 传递数组到存储过程
 -- ============================================================
 
--- JSON_OBJECT 构造（SQL Server 2022+）
-UPDATE users
-SET metadata = JSON_OBJECT('city': 'New York', 'country': 'US',
-                           'settings': JSON_OBJECT('theme': 'dark'))
-WHERE id = 1;
+-- 创建用户定义表类型（类似声明一个"数组类型"）
+CREATE TYPE dbo.IntArray AS TABLE (value INT NOT NULL);
+CREATE TYPE dbo.StringArray AS TABLE (value NVARCHAR(100));
 
--- 字面量
-UPDATE users
-SET metadata = '{"city": "Boston", "country": "US"}'
-WHERE id = 2;
+-- 在存储过程中使用
+CREATE PROCEDURE GetUsersByIds
+    @ids dbo.IntArray READONLY  -- 必须是 READONLY
+AS
+BEGIN
+    SELECT u.* FROM users u
+    INNER JOIN @ids i ON u.id = i.value;
+END;
 
--- 访问字段
-SELECT JSON_VALUE(metadata, '$.city') FROM users;
-SELECT JSON_VALUE(metadata, '$.settings.theme') FROM users;
+-- 调用
+DECLARE @my_ids dbo.IntArray;
+INSERT INTO @my_ids VALUES (1), (2), (3);
+EXEC GetUsersByIds @ids = @my_ids;
 
--- JSON_MODIFY: 修改 JSON（SQL Server 2016+）
-UPDATE users
-SET metadata = JSON_MODIFY(metadata, '$.zip', '10001')
-WHERE id = 1;
-
--- 删除键
-UPDATE users
-SET metadata = JSON_MODIFY(metadata, '$.city', NULL)
-WHERE id = 1;
-
--- ============================================================
--- OPENJSON 展开对象
--- ============================================================
-
--- 展开 JSON 对象为键值对
-SELECT u.name, j.[key], j.value, j.type
-FROM users u
-CROSS APPLY OPENJSON(u.metadata) j;
--- type: 0=null, 1=string, 2=number, 3=boolean, 4=array, 5=object
-
--- 展开为强类型列
-SELECT *
-FROM OPENJSON('{"name":"Alice","age":30,"city":"NYC"}')
-WITH (
-    name NVARCHAR(50) '$.name',
-    age  INT          '$.age',
-    city NVARCHAR(50) '$.city'
-);
+-- 设计分析（对引擎开发者）:
+--   TVP 是 SQL Server 向存储过程传递"表数据"的唯一方式。
+--   它解决了一个经典问题: 如何将 IN 列表作为参数传递。
+--   其他方案: 拼接逗号分隔字符串 + STRING_SPLIT（易出错）
+--            或 XML/JSON（性能差）
+--
+-- 横向对比:
+--   PostgreSQL: 直接传递 ARRAY 类型（ANYARRAY 参数）
+--   Oracle:     嵌套表类型（TABLE OF type）
+--   MySQL:      不支持（只能用临时表或 JSON）
 
 -- ============================================================
--- 聚合为 JSON — FOR JSON
+-- 5. FOR JSON: 关系数据聚合为 JSON
 -- ============================================================
 
--- FOR JSON PATH: 将结果集转为 JSON 数组
-SELECT name, salary
-FROM employees
-FOR JSON PATH;
--- [{"name":"Alice","salary":50000},{"name":"Bob","salary":60000}]
-
--- FOR JSON AUTO
-SELECT d.dept_name, e.name
-FROM departments d
-JOIN employees e ON d.id = e.dept_id
-FOR JSON AUTO;
+SELECT name, salary FROM employees FOR JSON PATH;
 
 -- STRING_AGG 模拟 ARRAY_AGG
 SELECT department, STRING_AGG(name, ', ') AS members
-FROM employees
-GROUP BY department;
-
--- JSON_ARRAYAGG (SQL Server 2022+)
--- 注意：截至 SQL Server 2022 未直接提供，可用 FOR JSON PATH 替代
+FROM employees GROUP BY department;
 
 -- ============================================================
--- 嵌套 JSON
+-- 6. 嵌套 JSON 处理
 -- ============================================================
 
-DECLARE @json NVARCHAR(MAX) = '{
+DECLARE @json NVARCHAR(MAX) = N'{
     "users": [
         {"name": "Alice", "roles": ["admin", "dev"]},
         {"name": "Bob", "roles": ["user"]}
-    ],
-    "settings": {"theme": "dark"}
+    ]
 }';
 
 -- 多层 OPENJSON
@@ -155,50 +137,29 @@ FROM OPENJSON(@json, '$.users') WITH (
 CROSS APPLY OPENJSON(u.roles) r;
 
 -- ============================================================
--- XML 替代方案
+-- 7. XML 替代方案（SQL Server 原生支持 XML 类型）
 -- ============================================================
 
--- SQL Server 原生支持 XML 类型
+-- XML 类型是 SQL Server 2005 引入的原生复杂类型（早于 JSON 支持）
 DECLARE @xml XML = '<tags><tag>admin</tag><tag>dev</tag></tags>';
-
--- 查询 XML
 SELECT t.c.value('.', 'NVARCHAR(50)') AS tag
 FROM @xml.nodes('/tags/tag') AS t(c);
 
--- ============================================================
--- 用户定义表类型（Table-Valued Parameters）
--- ============================================================
-
--- 创建表类型（用于传递数组到存储过程）
-CREATE TYPE StringArray AS TABLE (value NVARCHAR(100));
-CREATE TYPE IntArray AS TABLE (value INT);
-
--- 在存储过程中使用
-CREATE PROCEDURE GetUsersByTags
-    @tags StringArray READONLY
-AS
-BEGIN
-    SELECT u.*
-    FROM users u
-    CROSS APPLY OPENJSON(u.tags) j
-    WHERE j.value IN (SELECT value FROM @tags);
-END;
+-- XML vs JSON:
+--   XML: 原生类型, 支持 XQuery/XPath, 支持 XML Schema 验证, 支持 XML 索引
+--   JSON: 文本存储, 更轻量, 2016+ 才支持
+--   现代开发更倾向 JSON（更简洁，与 API/前端一致）
 
 -- ============================================================
--- JSON 索引（计算列 + 索引）
+-- 8. JSON 路径索引（计算列方案）
 -- ============================================================
 
--- 在 JSON 路径上创建索引
-ALTER TABLE users ADD city AS JSON_VALUE(metadata, '$.city');
-CREATE INDEX idx_city ON users (city);
+ALTER TABLE users ADD city AS JSON_VALUE(tags, '$.city');
+CREATE INDEX ix_city ON users (city);
 
--- ============================================================
--- 注意事项
--- ============================================================
-
--- 1. SQL Server 没有原生 ARRAY / MAP / STRUCT 类型
--- 2. 使用 NVARCHAR(MAX) + JSON 约束存储 JSON
--- 3. OPENJSON (2016+) 提供 UNNEST 功能
--- 4. JSON_ARRAY/JSON_OBJECT (2022+) 简化 JSON 构造
--- 5. 可以在 JSON 路径上创建计算列索引
--- 6. XML 类型是更早的原生复杂类型支持
+-- 版本演进:
+-- 2005  : XML 类型（原生支持, XQuery）
+-- 2008  : 表值参数 (TVP)
+-- 2016  : JSON_VALUE, JSON_QUERY, JSON_MODIFY, OPENJSON
+-- 2022  : JSON_OBJECT, JSON_ARRAY
+-- 缺失: 无原生 ARRAY/MAP/STRUCT, 无 jsonb 等价, 无 JSON_ARRAYAGG

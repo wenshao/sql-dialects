@@ -1,163 +1,101 @@
 -- ClickHouse: 权限管理
 --
 -- 参考资料:
---   [1] ClickHouse SQL Reference - GRANT
---       https://clickhouse.com/docs/en/sql-reference/statements/grant
---   [2] ClickHouse - CREATE USER
---       https://clickhouse.com/docs/en/sql-reference/statements/create/user
---   [3] ClickHouse - Access Control
+--   [1] ClickHouse Documentation - Access Control
 --       https://clickhouse.com/docs/en/operations/access-rights
-
--- ClickHouse 20.1+ 支持 RBAC（基于角色的访问控制）
-
--- ============================================================
--- 创建用户
--- ============================================================
-
-CREATE USER alice IDENTIFIED WITH sha256_password BY 'StrongP@ss123';
-CREATE USER bob IDENTIFIED WITH sha256_hash BY 'hash_value';
-CREATE USER app_user IDENTIFIED WITH double_sha1_password BY 'password';
-
--- 无密码用户（仅限 localhost）
-CREATE USER local_user NOT IDENTIFIED HOST LOCAL;
-
--- 限制访问来源
-CREATE USER alice
-    IDENTIFIED WITH sha256_password BY 'password'
-    HOST IP '192.168.1.0/24';
-
-CREATE USER alice HOST IP '10.0.0.0/8', IP '172.16.0.0/12';
-
--- 修改密码
-ALTER USER alice IDENTIFIED WITH sha256_password BY 'NewP@ss456';
-
--- 删除用户
-DROP USER IF EXISTS alice;
+--   [2] ClickHouse - RBAC (Role-Based Access Control)
+--       https://clickhouse.com/docs/en/operations/access-rights#role-based-access-control
 
 -- ============================================================
--- 创建角色
+-- 1. 权限体系演进（对引擎开发者）
 -- ============================================================
 
-CREATE ROLE analyst;
-CREATE ROLE data_engineer;
-CREATE ROLE app_reader;
-
--- 授予角色给用户
-GRANT analyst TO alice;
-GRANT data_engineer TO bob;
-
--- 角色继承
-GRANT analyst TO data_engineer;  -- data_engineer 继承 analyst
-
--- 设置默认角色
-SET DEFAULT ROLE analyst TO alice;
-SET DEFAULT ROLE ALL TO bob;
+-- ClickHouse 的权限管理经历了从配置文件到 SQL 的演进:
+--
+-- 阶段 1 (2016-2020): 配置文件管理（users.xml）
+-- 阶段 2 (20.5+): SQL 方式的 RBAC
+--   需要在配置中启用: <access_management>1</access_management>
 
 -- ============================================================
--- 数据库权限
+-- 2. 用户管理
 -- ============================================================
 
-GRANT SHOW DATABASES ON *.* TO analyst;
-GRANT CREATE DATABASE ON *.* TO data_engineer;
-GRANT ALL ON mydb.* TO data_engineer;
+CREATE USER analyst IDENTIFIED BY 'secure_password';
+CREATE USER IF NOT EXISTS analyst IDENTIFIED WITH sha256_password BY 'pass';
+
+CREATE USER etl_user
+    IDENTIFIED WITH sha256_password BY 'pass'
+    HOST IP '10.0.0.0/8'
+    DEFAULT DATABASE analytics
+    DEFAULT ROLE data_reader
+    SETTINGS max_memory_usage = 10000000000;
+
+ALTER USER analyst IDENTIFIED BY 'new_password';
+ALTER USER analyst SETTINGS max_execution_time = 300;
+DROP USER analyst;
 
 -- ============================================================
--- 表权限
+-- 3. 角色管理（RBAC）
 -- ============================================================
 
-GRANT SELECT ON mydb.users TO analyst;
-GRANT SELECT, INSERT ON mydb.users TO data_engineer;
-GRANT ALL ON mydb.users TO data_engineer;
+CREATE ROLE data_reader;
+CREATE ROLE data_writer;
+CREATE ROLE admin;
 
--- 所有表
-GRANT SELECT ON mydb.* TO analyst;
-
--- 所有数据库的所有表
-GRANT SELECT ON *.* TO analyst;
+GRANT data_reader TO data_writer;    -- 角色继承
+GRANT data_reader TO analyst;
+SET DEFAULT ROLE data_reader TO analyst;
 
 -- ============================================================
--- 列级权限
+-- 4. 权限粒度
 -- ============================================================
 
-GRANT SELECT(username, email) ON mydb.users TO analyst;
-GRANT SELECT(id, username) ON mydb.users TO app_reader;
+-- 数据库级
+GRANT SELECT ON analytics.* TO data_reader;
+GRANT INSERT ON analytics.* TO data_writer;
+
+-- 表级
+GRANT SELECT ON analytics.users TO analyst;
+
+-- 列级（ClickHouse 独有的细粒度!）
+GRANT SELECT(id, username, email) ON analytics.users TO analyst;
+
+SHOW GRANTS FOR analyst;
+REVOKE SELECT ON analytics.users FROM analyst;
 
 -- ============================================================
--- 行级安全（Row Policy，20.3+）
+-- 5. Quota（资源配额，ClickHouse 独有）
 -- ============================================================
 
-CREATE ROW POLICY policy_region ON mydb.orders
-    FOR SELECT
-    USING region = 'US'
-    TO analyst;
+CREATE QUOTA monthly_limit
+    FOR INTERVAL 1 MONTH
+    MAX QUERIES 10000
+    MAX RESULT_ROWS 1000000000
+    MAX READ_ROWS 10000000000
+    TO data_reader;
 
--- 多个策略（取并集）
-CREATE ROW POLICY policy_admin ON mydb.orders
-    FOR SELECT
-    USING 1 = 1
-    TO data_engineer;
-
--- 限制性策略（取交集）
-CREATE ROW POLICY policy_active ON mydb.orders
-    AS RESTRICTIVE
-    FOR SELECT
-    USING status = 'active'
-    TO ALL;
-
--- 删除
-DROP ROW POLICY policy_region ON mydb.orders;
+-- OLAP 查询资源消耗不可预测，Quota 是必需的安全网。
 
 -- ============================================================
--- 特定权限
+-- 6. Settings Profile + Row Policy
 -- ============================================================
 
--- 字典权限
-GRANT dictGet ON mydb.my_dict TO analyst;
+CREATE SETTINGS PROFILE restricted
+    SETTINGS max_memory_usage = 10000000000, max_execution_time = 300
+    TO data_reader;
 
--- 系统权限
-GRANT SYSTEM RELOAD DICTIONARIES TO data_engineer;
-GRANT SYSTEM MERGES ON mydb.users TO data_engineer;
-GRANT SYSTEM MOVES ON mydb.users TO data_engineer;
-
--- 设置配额（限制资源使用）
-CREATE QUOTA analyst_quota
-    FOR INTERVAL 1 HOUR MAX QUERIES = 1000, MAX RESULT_ROWS = 1000000
-    TO analyst;
-
--- 设置资源配置
-CREATE SETTINGS PROFILE analyst_profile
-    SETTINGS max_memory_usage = 10000000000,  -- 10 GB
-             max_execution_time = 300          -- 5 分钟
-    TO analyst;
+CREATE ROW POLICY region_filter ON analytics.sales
+    FOR SELECT USING region = 'APAC' TO analyst;
 
 -- ============================================================
--- 撤销权限
+-- 7. 对比与引擎开发者启示
 -- ============================================================
-
-REVOKE SELECT ON mydb.users FROM analyst;
-REVOKE ALL ON mydb.* FROM analyst;
-REVOKE analyst FROM alice;
-
--- ============================================================
--- 查看权限
--- ============================================================
-
-SHOW GRANTS FOR alice;
-SHOW GRANTS FOR ROLE analyst;
-SHOW CREATE USER alice;
-SHOW USERS;
-SHOW ROLES;
-SHOW ROW POLICIES ON mydb.orders;
-
--- 系统表查询
-SELECT * FROM system.users;
-SELECT * FROM system.roles;
-SELECT * FROM system.grants;
-SELECT * FROM system.row_policies;
-SELECT * FROM system.quotas;
-
--- 注意：RBAC 从 20.1 版本引入
--- 注意：之前版本使用 users.xml 配置文件管理权限
--- 注意：Row Policy 提供行级安全
--- 注意：Quota 限制用户资源使用
--- 注意：Settings Profile 控制用户的查询参数限制
+-- ClickHouse 权限的特色:
+--   (1) 列级权限 → 比大多数数据库更细粒度
+--   (2) Quota → 资源消耗控制，OLAP 引擎必需
+--   (3) Settings Profile → 用户级查询设置限制
+--   (4) Row Policy → 行级安全
+--
+-- 对引擎开发者的启示:
+--   OLAP 引擎的权限不仅是"谁能做什么"，
+--   更重要的是"谁能消耗多少资源"（Quota 应是核心组件）。

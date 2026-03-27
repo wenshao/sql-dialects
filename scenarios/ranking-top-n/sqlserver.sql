@@ -1,153 +1,106 @@
 -- SQL Server: Top-N 查询（排名与分组取前 N 条）
 --
 -- 参考资料:
---   [1] Microsoft Docs - TOP (Transact-SQL)
+--   [1] SQL Server - TOP / CROSS APPLY
 --       https://learn.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql
---   [2] Microsoft Docs - Ranking Functions
---       https://learn.microsoft.com/en-us/sql/t-sql/functions/ranking-functions-transact-sql
---   [3] Microsoft Docs - CROSS APPLY / OUTER APPLY
---       https://learn.microsoft.com/en-us/sql/t-sql/queries/from-transact-sql
 
 -- ============================================================
--- 示例数据上下文
--- ============================================================
--- 假设表结构:
---   orders(order_id INT IDENTITY, customer_id INT, amount DECIMAL(10,2), order_date DATE)
-
--- ============================================================
--- 1. Top-N 整体
+-- 1. 全局 Top-N
 -- ============================================================
 
--- TOP 语法（SQL Server 经典方式）
-SELECT TOP 10 order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC;
+SELECT TOP 10 order_id, customer_id, amount FROM orders ORDER BY amount DESC;
 
 -- TOP WITH TIES（包含并列行）
-SELECT TOP 10 WITH TIES order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC;
+SELECT TOP 10 WITH TIES order_id, amount FROM orders ORDER BY amount DESC;
 
--- TOP + PERCENT
-SELECT TOP 10 PERCENT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC;
+-- TOP PERCENT
+SELECT TOP 10 PERCENT order_id, amount FROM orders ORDER BY amount DESC;
 
--- OFFSET-FETCH（SQL Server 2012+，标准语法）
-SELECT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC
+-- OFFSET-FETCH（2012+ 标准语法）
+SELECT order_id, amount FROM orders ORDER BY amount DESC
 OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
 
--- 分页
-SELECT order_id, customer_id, amount
-FROM orders
-ORDER BY amount DESC
-OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
-
 -- ============================================================
--- 2. Top-N 分组
+-- 2. 分组 Top-N: ROW_NUMBER 方法
 -- ============================================================
 
--- ROW_NUMBER() 方式
-SELECT *
-FROM (
-    SELECT order_id, customer_id, amount, order_date,
-           ROW_NUMBER() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS rn
+SELECT * FROM (
+    SELECT order_id, customer_id, amount,
+           ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rn
     FROM orders
-) ranked
-WHERE rn <= 3;
+) ranked WHERE rn <= 3;
 
--- RANK() 方式
-SELECT *
-FROM (
-    SELECT order_id, customer_id, amount, order_date,
-           RANK() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS rnk
+-- RANK（含并列）vs DENSE_RANK
+SELECT * FROM (
+    SELECT *, RANK() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rnk
     FROM orders
-) ranked
-WHERE rnk <= 3;
-
--- DENSE_RANK() 方式
-SELECT *
-FROM (
-    SELECT order_id, customer_id, amount, order_date,
-           DENSE_RANK() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS drnk
-    FROM orders
-) ranked
-WHERE drnk <= 3;
+) ranked WHERE rnk <= 3;
 
 -- ============================================================
--- 3. CROSS APPLY（SQL Server 特色，高效分组 Top-N）
+-- 3. CROSS APPLY: SQL Server 最高效的分组 Top-N
 -- ============================================================
 
 -- 每个客户的前 3 笔最大订单
-SELECT c.customer_id, t.order_id, t.amount, t.order_date
+SELECT c.customer_id, t.order_id, t.amount
 FROM (SELECT DISTINCT customer_id FROM orders) c
 CROSS APPLY (
-    SELECT TOP 3 order_id, amount, order_date
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
+    SELECT TOP 3 order_id, amount
+    FROM orders o WHERE o.customer_id = c.customer_id
     ORDER BY amount DESC
 ) t;
+
+-- 设计分析（对引擎开发者）:
+--   CROSS APPLY + TOP 是 SQL Server 分组 Top-N 的最优方案:
+--   如果 (customer_id, amount DESC) 上有索引，每组只需 3 次 Index Seek。
+--   总代价 = 客户数 × 3 次 Seek（远优于 ROW_NUMBER 的全表扫描 + 排序）。
+--
+--   ROW_NUMBER 方法: 需要全表扫描 → 排序 → 过滤（O(n log n)）
+--   CROSS APPLY 方法: 每组 Index Seek（O(m × log n)，m = 组数）
+--
+-- 横向对比:
+--   PostgreSQL: LATERAL JOIN + LIMIT（语义等价）
+--   MySQL:      8.0.14+ LATERAL JOIN + LIMIT
+--   Oracle:     12c+ CROSS APPLY 或 LATERAL
+--
+-- 对引擎开发者的启示:
+--   分组 Top-N 是一个频率极高的查询模式。
+--   引擎优化器应该能自动将 ROW_NUMBER + filter 转换为 per-group index seek。
+--   SQL Server 的优化器有时会做这个转换（Top N Sort），但不总是。
 
 -- OUTER APPLY（包含没有订单的客户）
-SELECT c.customer_id, c.username, t.order_id, t.amount
+SELECT c.customer_id, c.name, t.order_id, t.amount
 FROM customers c
 OUTER APPLY (
-    SELECT TOP 3 order_id, amount
-    FROM orders o
-    WHERE o.customer_id = c.customer_id
-    ORDER BY amount DESC
+    SELECT TOP 3 order_id, amount FROM orders o
+    WHERE o.customer_id = c.customer_id ORDER BY amount DESC
 ) t;
 
 -- ============================================================
--- 4. 关联子查询方式（兼容旧版本）
+-- 4. CTE + 窗口函数（最常见的写法）
 -- ============================================================
+;WITH ranked_orders AS (
+    SELECT order_id, customer_id, amount,
+           ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY amount DESC) AS rn
+    FROM orders
+)
+SELECT order_id, customer_id, amount FROM ranked_orders WHERE rn <= 3;
 
-SELECT o.*
-FROM orders o
-WHERE (
-    SELECT COUNT(*)
-    FROM orders o2
-    WHERE o2.customer_id = o.customer_id
-      AND o2.amount > o.amount
-) < 3
+-- ============================================================
+-- 5. 关联子查询方式（兼容旧版本）
+-- ============================================================
+SELECT o.* FROM orders o
+WHERE (SELECT COUNT(*) FROM orders o2
+       WHERE o2.customer_id = o.customer_id AND o2.amount > o.amount) < 3
 ORDER BY o.customer_id, o.amount DESC;
 
 -- ============================================================
--- 5. CTE + 窗口函数
+-- 6. 性能优化
 -- ============================================================
 
-WITH ranked_orders AS (
-    SELECT order_id, customer_id, amount, order_date,
-           ROW_NUMBER() OVER (
-               PARTITION BY customer_id
-               ORDER BY amount DESC
-           ) AS rn
-    FROM orders
-)
-SELECT order_id, customer_id, amount, order_date
-FROM ranked_orders
-WHERE rn <= 3;
+-- 推荐索引（覆盖分组 Top-N 查询）
+CREATE INDEX ix_orders_customer_amount
+ON orders (customer_id, amount DESC) INCLUDE (order_id);
 
--- ============================================================
--- 6. 性能考量
--- ============================================================
-
--- 推荐索引
-CREATE INDEX idx_orders_customer_amount ON orders (customer_id, amount DESC);
-
--- CROSS APPLY + TOP + 索引：最优方案，每组只扫描 N 行
--- ROW_NUMBER 方式需要全表计算，大表较慢
--- TOP WITH TIES 对整体排名很方便
--- OFFSET-FETCH 从 SQL Server 2012 开始支持
--- SQL Server 2005+ 支持所有窗口排名函数
+-- CROSS APPLY + TOP + 上述索引 = 最优方案
+-- ROW_NUMBER 在无索引时需要全表排序
+-- TOP WITH TIES 适用于全局排名（不适用于分组）

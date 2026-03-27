@@ -5,32 +5,110 @@
 --       https://www.sqlite.org/c3ref/set_authorizer.html
 --   [2] SQLite Documentation - Compile-Time Authorization
 --       https://www.sqlite.org/compile.html
+--   [3] SQLCipher - Full Database Encryption
+--       https://www.zetetic.net/sqlcipher/
 
--- SQLite 没有内置的用户和权限系统！
+-- ============================================================
+-- 1. 为什么 SQLite 没有内置权限系统
+-- ============================================================
 
--- 安全机制依赖于:
--- 1. 文件系统权限（数据库就是一个文件）
--- 2. 应用层权限控制
+-- SQLite 没有 GRANT / REVOKE / CREATE USER / CREATE ROLE。
+-- 这不是功能缺失，而是架构设计的必然:
+--
+-- (a) 无服务器: 没有独立进程来验证身份和检查权限
+--     传统数据库: 客户端 → 服务器（验证身份）→ 数据
+--     SQLite:     应用代码 → 直接读写文件
+--
+-- (b) 单进程嵌入: 数据库运行在应用进程内
+--     "用户"就是应用本身，没有"谁在访问"的概念
+--
+-- (c) 信任模型不同:
+--     MySQL/PostgreSQL: 不信任客户端（需要认证和授权）
+--     SQLite: 信任应用代码（应用负责安全）
+--
+-- 对比:
+--   MySQL:      CREATE USER + GRANT（SQL 层权限）
+--   PostgreSQL: CREATE ROLE + GRANT（SQL 层权限）
+--   ClickHouse: CREATE USER + GRANT（20.5+，SQL 层权限）
+--   BigQuery:   IAM（云平台层权限）
+--   SQLite:     无（应用层/OS 层权限）
 
--- 文件权限示例（操作系统层面）：
--- chmod 640 database.db      -- 所有者读写，组只读
--- chown app:app database.db  -- 设置所有者
+-- ============================================================
+-- 2. 安全机制替代方案
+-- ============================================================
 
--- SQLite 授权回调（C API，在应用层面控制）
--- sqlite3_set_authorizer() 可以拦截所有 SQL 操作
--- 回调返回:
---   SQLITE_OK     -- 允许
---   SQLITE_DENY   -- 拒绝（报错）
---   SQLITE_IGNORE -- 忽略（SELECT 返回 NULL，其他忽略）
+-- 2.1 文件系统权限（最基本的安全层）
+-- chmod 640 database.db      -- 所有者读写，组只读，其他人无权限
+-- chown app:app database.db  -- 设置文件所有者
+-- → 限制谁可以打开数据库文件
 
+-- 2.2 Authorizer 回调（C API，最强大的安全机制）
+-- sqlite3_set_authorizer(db, callback, user_data);
+--
+-- 每次执行 SQL 语句前，SQLite 调用 authorizer 回调函数。
+-- 回调参数: (action_code, arg1, arg2, database_name, trigger_name)
+-- 返回值:
+--   SQLITE_OK     → 允许操作
+--   SQLITE_DENY   → 拒绝操作（返回错误）
+--   SQLITE_IGNORE → 忽略操作（SELECT 列返回 NULL，其他操作跳过）
+--
+-- action_code 涵盖所有 SQL 操作:
+--   SQLITE_SELECT, SQLITE_INSERT, SQLITE_UPDATE, SQLITE_DELETE
+--   SQLITE_CREATE_TABLE, SQLITE_DROP_TABLE, SQLITE_CREATE_INDEX, ...
+--   SQLITE_READ (每次读取列时触发!)
+--   SQLITE_PRAGMA, SQLITE_TRANSACTION, ...
+--
 -- Python 示例:
 -- def authorizer(action, arg1, arg2, db_name, trigger_name):
 --     if action == sqlite3.SQLITE_DELETE:
---         return sqlite3.SQLITE_DENY
+--         return sqlite3.SQLITE_DENY        # 禁止所有 DELETE
+--     if action == sqlite3.SQLITE_READ and arg2 == 'password':
+--         return sqlite3.SQLITE_IGNORE      # 读取 password 列返回 NULL
 --     return sqlite3.SQLITE_OK
 -- conn.set_authorizer(authorizer)
+--
+-- 设计分析:
+--   Authorizer 可以实现列级安全（SQLITE_IGNORE 某些列）
+--   和操作级安全（SQLITE_DENY 某些操作类型）。
+--   这比 SQL GRANT 更灵活（可以基于任意逻辑判断），
+--   但需要应用层实现（不是声明式的）。
 
--- 注意：没有 GRANT/REVOKE 语句
--- 注意：没有用户/角色概念
--- 注意：没有行级安全
--- 注意：加密需要第三方扩展（如 SQLCipher）
+-- 2.3 数据库加密
+-- SQLite 本身不加密数据库文件。两种加密方案:
+--
+-- (a) SQLCipher（开源，社区广泛使用）:
+--     PRAGMA key = 'my-encryption-key';        -- 打开加密数据库时
+--     PRAGMA rekey = 'new-encryption-key';      -- 修改密钥
+--     AES-256-CBC 加密每个页面
+--
+-- (b) SEE（SQLite Encryption Extension，官方商业版）:
+--     与 SQLCipher 类似，但由 SQLite 团队维护
+
+-- ============================================================
+-- 3. 应用层安全模式
+-- ============================================================
+
+-- 由于 SQLite 常用于移动应用和桌面应用，安全模式通常是:
+--
+-- (a) Android/iOS: 数据库文件在应用沙箱中，其他应用无法访问
+-- (b) Desktop: 数据库文件在用户目录下，文件权限控制访问
+-- (c) 服务端: SQLite 通常不用于多用户服务端（但 Litestream/Turso 正在改变这一点）
+--
+-- 对于 Turso/LiteFS 等分布式 SQLite 方案:
+-- 它们在 SQLite 之上添加了身份验证和授权层。
+
+-- ============================================================
+-- 4. 对比与引擎开发者启示
+-- ============================================================
+-- SQLite 的安全模型:
+--   (1) 无内置权限 → 安全性交给应用层和 OS
+--   (2) Authorizer API → 可以实现任意粒度的访问控制
+--   (3) 文件加密 → 通过扩展实现（SQLCipher/SEE）
+--
+-- 对引擎开发者的启示:
+--   嵌入式数据库不需要内置用户管理。
+--   但应该提供 Authorizer 风格的回调 API:
+--   - 让应用层按需实现访问控制
+--   - 比固定的 GRANT/REVOKE 模型更灵活
+--   - 开销更低（不需要维护权限表）
+--   SQLite 的 Authorizer 设计是嵌入式安全的最佳实践。

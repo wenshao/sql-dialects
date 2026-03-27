@@ -1,152 +1,84 @@
 -- BigQuery: 权限管理
 --
 -- 参考资料:
---   [1] BigQuery - Access Control
+--   [1] BigQuery Documentation - IAM & Access Control
 --       https://cloud.google.com/bigquery/docs/access-control
---   [2] BigQuery SQL Reference - GRANT / REVOKE
---       https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-language#grant_statement
-
--- BigQuery 使用 Google Cloud IAM（Identity and Access Management）
--- 不使用传统的 GRANT/REVOKE SQL 语法
+--   [2] BigQuery - Row Level Security
+--       https://cloud.google.com/bigquery/docs/row-level-security-intro
 
 -- ============================================================
--- IAM 角色层级
+-- 1. IAM 模型: 与传统数据库权限的根本区别
 -- ============================================================
 
--- 组织级别 (Organization)
--- └── 文件夹级别 (Folder)
---     └── 项目级别 (Project)
---         └── 数据集级别 (Dataset)
---             └── 表/视图级别 (Table/View)
+-- BigQuery 使用 GCP IAM，不使用 SQL CREATE USER:
+--   身份 = Google Account / Service Account
+--   权限 = IAM Role
+-- 无服务器 → 无数据库连接 → 无数据库用户
+
+-- 预定义角色:
+--   roles/bigquery.dataViewer     → SELECT
+--   roles/bigquery.dataEditor     → SELECT + DML
+--   roles/bigquery.dataOwner      → 完全数据控制
+--   roles/bigquery.jobUser        → 运行查询
+--   roles/bigquery.admin          → 全部权限
 
 -- ============================================================
--- 预定义角色
+-- 2. SQL GRANT（映射到 IAM）
 -- ============================================================
 
--- BigQuery Admin: 完全控制
--- roles/bigquery.admin
+GRANT `roles/bigquery.dataViewer`
+ON SCHEMA myproject.mydataset
+TO 'user:alice@example.com';
 
--- BigQuery Data Owner: 数据集和表的完全控制
--- roles/bigquery.dataOwner
+GRANT `roles/bigquery.dataEditor`
+ON SCHEMA myproject.mydataset
+TO 'serviceAccount:etl@myproject.iam.gserviceaccount.com';
 
--- BigQuery Data Editor: 读写数据
--- roles/bigquery.dataEditor
-
--- BigQuery Data Viewer: 只读
--- roles/bigquery.dataViewer
-
--- BigQuery User: 运行查询
--- roles/bigquery.user
-
--- BigQuery Job User: 创建和运行作业
--- roles/bigquery.jobUser
+REVOKE `roles/bigquery.dataViewer`
+ON SCHEMA myproject.mydataset
+FROM 'user:alice@example.com';
 
 -- ============================================================
--- 通过 gcloud CLI 管理权限
+-- 3. 行级安全（Row Access Policy）
 -- ============================================================
 
--- 项目级别授权
--- gcloud projects add-iam-policy-binding myproject \
---     --member="user:alice@example.com" \
---     --role="roles/bigquery.dataViewer"
+CREATE ROW ACCESS POLICY region_filter
+ON myproject.mydataset.sales
+GRANT TO ('user:alice@example.com', 'group:analysts@example.com')
+FILTER USING (region = 'APAC');
 
--- 数据集级别授权
--- bq show --format=prettyjson mydataset > policy.json
--- 编辑 policy.json 添加 access 条目
--- bq update --source policy.json mydataset
+DROP ROW ACCESS POLICY region_filter ON myproject.mydataset.sales;
 
 -- ============================================================
--- SQL 数据集权限管理（DCL 语法）
+-- 4. 列级安全（Data Catalog Policy Tag）
 -- ============================================================
 
--- 授予数据集权限
-GRANT `roles/bigquery.dataViewer` ON SCHEMA mydataset
-TO "user:alice@example.com";
-
-GRANT `roles/bigquery.dataEditor` ON SCHEMA mydataset
-TO "group:data-team@example.com";
-
--- 撤销数据集权限
-REVOKE `roles/bigquery.dataViewer` ON SCHEMA mydataset
-FROM "user:alice@example.com";
+-- 通过 Data Catalog 的 Policy Tag 标记敏感列:
+-- SSN 列标记为 "PII-Restricted"
+-- 只有拥有 datacatalog.categoryFineGrainedReader 的用户才能查询
+-- 比 SQL GRANT SELECT(col) 更强大: 跨表统一、集中管理、可审计
 
 -- ============================================================
--- SQL 表级权限管理
+-- 5. 成本控制（BigQuery 独有的"权限"维度）
 -- ============================================================
 
--- 授予表权限
-GRANT `roles/bigquery.dataViewer` ON TABLE myproject.mydataset.users
-TO "user:alice@example.com";
+-- 查询成本历史
+SELECT user_email, SUM(total_bytes_billed) / POWER(1024, 4) AS tb_billed
+FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
+WHERE creation_time > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 DAY)
+GROUP BY user_email ORDER BY tb_billed DESC;
 
-GRANT `roles/bigquery.dataEditor` ON TABLE myproject.mydataset.users
-TO "serviceAccount:my-sa@myproject.iam.gserviceaccount.com";
-
--- 撤销表权限
-REVOKE `roles/bigquery.dataViewer` ON TABLE myproject.mydataset.users
-FROM "user:alice@example.com";
+-- 项目级配额防止意外大查询（通过 GCP Console 设置）
 
 -- ============================================================
--- 列级安全（Column-Level Security）
+-- 6. 对比与引擎开发者启示
 -- ============================================================
-
--- 使用 Policy Tag 控制列级访问
--- 1. 在 Data Catalog 中创建 Policy Tag
--- 2. 将 Policy Tag 关联到列
--- 3. 设置 IAM 策略控制谁可以看到受保护的列
-
-ALTER TABLE users ALTER COLUMN email
-SET OPTIONS (policy_tags = ['projects/myproject/locations/us/taxonomies/123/policyTags/456']);
-
--- ============================================================
--- 行级安全（Row-Level Security）
--- ============================================================
-
--- 创建行级访问策略
-CREATE ROW ACCESS POLICY region_filter ON orders
-GRANT TO ("user:alice@example.com", "group:us-team@example.com")
-FILTER USING (region = 'US');
-
--- 多个策略（取并集，任意策略通过即可访问）
-CREATE ROW ACCESS POLICY admin_access ON orders
-GRANT TO ("group:admin@example.com")
-FILTER USING (TRUE);  -- 管理员可以看到所有行
-
--- 删除行级策略
-DROP ROW ACCESS POLICY region_filter ON orders;
-DROP ALL ROW ACCESS POLICIES ON orders;
-
--- ============================================================
--- 数据掩码（Dynamic Data Masking）
--- ============================================================
-
--- 通过 Data Catalog Policy Tag + Masking Rule 实现
--- 不同用户看到不同程度的数据掩码
-
--- ============================================================
--- 授权视图（Authorized View）
--- ============================================================
-
--- 授权视图可以访问底层数据集的数据
--- 即使用户没有底层数据集的直接权限
-
-CREATE VIEW mydataset.safe_users AS
-SELECT id, username, REGEXP_REPLACE(email, r'(.).*@', r'\1***@') AS masked_email
-FROM mydataset.users;
-
--- 在数据集设置中添加授权视图
-
--- ============================================================
--- 服务账户
--- ============================================================
-
--- 推荐使用服务账户进行应用程序访问
--- gcloud iam service-accounts create my-app-sa
--- gcloud projects add-iam-policy-binding myproject \
---     --member="serviceAccount:my-app-sa@myproject.iam.gserviceaccount.com" \
---     --role="roles/bigquery.dataViewer"
-
--- 注意：BigQuery 使用 IAM，不使用传统的 CREATE USER / GRANT
--- 注意：权限继承：组织 -> 文件夹 -> 项目 -> 数据集 -> 表
--- 注意：列级安全通过 Policy Tag 实现
--- 注意：行级安全通过 Row Access Policy 实现
--- 注意：推荐使用最小权限原则
+-- BigQuery 权限模型的核心:
+--   (1) 身份由云平台管理（不存储密码 → 更安全）
+--   (2) IAM 角色替代 SQL GRANT
+--   (3) Data Catalog 列级安全（跨表统一）
+--   (4) 成本控制作为权限的一等公民
+--
+-- 对引擎开发者的启示:
+--   云原生引擎应集成云 IAM，而非自建用户系统。
+--   成本控制应该是云数仓权限的核心组件。

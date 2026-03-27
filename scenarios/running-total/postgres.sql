@@ -1,137 +1,109 @@
--- PostgreSQL: 累计/滚动合计（Running Total）
+-- PostgreSQL: 累计/滚动合计 (Running Total)
 --
 -- 参考资料:
 --   [1] PostgreSQL Documentation - Window Functions
 --       https://www.postgresql.org/docs/current/tutorial-window.html
---   [2] PostgreSQL Documentation - Window Function Calls
---       https://www.postgresql.org/docs/current/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
-
--- ============================================================
--- 示例数据上下文
--- ============================================================
--- 假设表结构:
---   transactions(txn_id SERIAL, account_id INT, amount NUMERIC(10,2), txn_date DATE, category VARCHAR)
 
 -- ============================================================
 -- 1. 累计求和
 -- ============================================================
 
-SELECT txn_id, account_id, amount, txn_date,
+SELECT txn_id, amount, txn_date,
        SUM(amount) OVER (ORDER BY txn_date) AS running_total
 FROM transactions;
 
--- 显式指定帧
-SELECT txn_id, account_id, amount, txn_date,
-       SUM(amount) OVER (
-           ORDER BY txn_date
-           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-       ) AS running_total
-FROM transactions;
-
--- ============================================================
--- 2. 累计平均值
--- ============================================================
-
+-- 显式帧（等价于默认行为）
 SELECT txn_id, amount, txn_date,
-       AVG(amount) OVER (ORDER BY txn_date) AS running_avg,
-       ROUND(AVG(amount) OVER (ORDER BY txn_date), 2) AS running_avg_rounded
+       SUM(amount) OVER (ORDER BY txn_date
+           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
 FROM transactions;
 
 -- ============================================================
--- 3. 累计计数
--- ============================================================
-
-SELECT txn_id, amount, txn_date,
-       COUNT(*) OVER (ORDER BY txn_date) AS running_count
-FROM transactions;
-
--- ============================================================
--- 4. 分组累计
+-- 2. 分组累计
 -- ============================================================
 
 SELECT txn_id, account_id, amount, txn_date,
-       SUM(amount) OVER (
-           PARTITION BY account_id
-           ORDER BY txn_date
-       ) AS running_total_per_account
+       SUM(amount) OVER (PARTITION BY account_id ORDER BY txn_date) AS acct_running
 FROM transactions;
 
 -- ============================================================
--- 5. 滑动窗口
+-- 3. 滑动窗口
 -- ============================================================
 
 -- 最近 7 行移动平均
 SELECT txn_id, amount, txn_date,
-       AVG(amount) OVER (
-           ORDER BY txn_date
-           ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
-       ) AS moving_avg_7
+       AVG(amount) OVER (ORDER BY txn_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)
 FROM transactions;
 
--- 最近 30 天移动总和（RANGE 帧）
+-- 最近 30 天移动总和（RANGE + INTERVAL，PostgreSQL 特有支持）
 SELECT txn_id, amount, txn_date,
-       SUM(amount) OVER (
-           ORDER BY txn_date
-           RANGE BETWEEN INTERVAL '30 days' PRECEDING AND CURRENT ROW
-       ) AS moving_sum_30d
+       SUM(amount) OVER (ORDER BY txn_date
+           RANGE BETWEEN INTERVAL '30 days' PRECEDING AND CURRENT ROW) AS sum_30d
+FROM transactions;
+
+-- 设计分析: ROWS vs RANGE vs GROUPS
+--   ROWS:   按物理行数计算窗口（精确 N 行）
+--   RANGE:  按值范围计算窗口（支持 INTERVAL，PostgreSQL 特有优势）
+--   GROUPS: 按分组计算窗口（11+，每个分组是排序键相同的行集合）
+--
+--   RANGE + INTERVAL 是 PostgreSQL 的优势:
+--     MySQL 不支持 RANGE + INTERVAL
+--     Oracle 支持 RANGE + INTERVAL
+--     SQL Server 不支持 RANGE + INTERVAL
+
+-- ============================================================
+-- 4. 累计百分比
+-- ============================================================
+
+SELECT txn_id, amount, txn_date,
+       SUM(amount) OVER (ORDER BY txn_date) AS running_total,
+       ROUND(SUM(amount) OVER (ORDER BY txn_date) * 100.0 /
+             SUM(amount) OVER (), 2) AS running_pct
 FROM transactions;
 
 -- ============================================================
--- 6. 条件重置累计
+-- 5. 条件重置累计
 -- ============================================================
 
 WITH groups AS (
     SELECT txn_id, amount, txn_date,
            SUM(CASE WHEN amount < 0 THEN 1 ELSE 0 END) OVER (
-               ORDER BY txn_date
-               ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+               ORDER BY txn_date ROWS UNBOUNDED PRECEDING
            ) AS grp
     FROM transactions
 )
 SELECT txn_id, amount, txn_date,
-       SUM(amount) OVER (PARTITION BY grp ORDER BY txn_date) AS running_total_reset
+       SUM(amount) OVER (PARTITION BY grp ORDER BY txn_date) AS reset_total
 FROM groups;
 
 -- ============================================================
--- 7. 累计百分比
+-- 6. 性能考量
 -- ============================================================
 
-SELECT txn_id, amount, txn_date,
-       SUM(amount) OVER (ORDER BY txn_date) AS running_total,
-       ROUND(
-           SUM(amount) OVER (ORDER BY txn_date) * 100.0 /
-           SUM(amount) OVER (), 2
-       ) AS running_pct
-FROM transactions;
+CREATE INDEX idx_txn_date ON transactions (txn_date);
+CREATE INDEX idx_txn_acct_date ON transactions (account_id, txn_date);
+
+-- ROWS 帧 比 RANGE 帧 性能更好（RANGE 需要处理 peer rows）
+-- 窗口函数对 ORDER BY 列有索引时，可能避免排序
+-- WINDOW 子句复用窗口定义（减少重复计算）:
+SELECT txn_id, amount,
+       SUM(amount) OVER w AS running_sum,
+       AVG(amount) OVER w AS running_avg
+FROM transactions
+WINDOW w AS (ORDER BY txn_date);
 
 -- ============================================================
--- 8. 无窗口函数的替代方案
+-- 7. 对引擎开发者的启示
 -- ============================================================
 
--- 自连接
-SELECT t1.txn_id, t1.amount, t1.txn_date,
-       SUM(t2.amount) AS running_total
-FROM transactions t1
-JOIN transactions t2 ON t2.txn_date <= t1.txn_date
-GROUP BY t1.txn_id, t1.amount, t1.txn_date
-ORDER BY t1.txn_date;
-
--- 关联子查询
-SELECT t1.txn_id, t1.amount, t1.txn_date,
-       (SELECT SUM(t2.amount)
-        FROM transactions t2
-        WHERE t2.txn_date <= t1.txn_date) AS running_total
-FROM transactions t1
-ORDER BY t1.txn_date;
-
--- ============================================================
--- 9. 性能考量
--- ============================================================
-
-CREATE INDEX idx_transactions_date ON transactions (txn_date);
-CREATE INDEX idx_transactions_account_date ON transactions (account_id, txn_date);
-
--- PostgreSQL 窗口函数支持 ROWS 和 RANGE 帧
--- ROWS 帧性能优于 RANGE 帧
--- RANGE + INTERVAL 需要 PostgreSQL 支持日期运算
--- 大表建议使用分区表 + 索引
+-- (1) RANGE + INTERVAL 是时序分析的关键能力:
+--     "最近30天移动平均"在日期有间隙时，ROWS 按行数不正确，
+--     RANGE 按日期范围才是正确语义。
+--
+-- (2) WINDOW 子句（命名窗口）减少了 SQL 冗余:
+--     多个窗口函数共享同一窗口定义时，
+--     PostgreSQL 可以优化为单次排序、多次聚合。
+--
+-- (3) 11+ 的 GROUPS 帧模式:
+--     介于 ROWS 和 RANGE 之间——按"排序键相同的行组"计数。
+--     配合 EXCLUDE 子句（EXCLUDE CURRENT ROW / TIES / GROUP）更灵活。

@@ -1,23 +1,22 @@
--- Oracle: Dynamic SQL
+-- Oracle: 动态 SQL (Dynamic SQL)
 --
 -- 参考资料:
 --   [1] Oracle PL/SQL Reference - EXECUTE IMMEDIATE
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/lnpls/EXECUTE-IMMEDIATE-statement.html
 --   [2] Oracle PL/SQL Reference - DBMS_SQL Package
 --       https://docs.oracle.com/en/database/oracle/oracle-database/23/arpls/DBMS_SQL.html
---   [3] Oracle PL/SQL Reference - Dynamic SQL
---       https://docs.oracle.com/en/database/oracle/oracle-database/23/lnpls/dynamic-sql.html
 
 -- ============================================================
--- EXECUTE IMMEDIATE (原生动态 SQL, NDS)
+-- 1. EXECUTE IMMEDIATE（原生动态 SQL, NDS）
 -- ============================================================
--- 基本用法
+
+-- 基本 DDL
 BEGIN
     EXECUTE IMMEDIATE 'CREATE TABLE test_tbl (id NUMBER, name VARCHAR2(100))';
 END;
 /
 
--- 带 INTO 子句（单行查询）
+-- 带 INTO（单行查询）
 DECLARE
     v_count NUMBER;
 BEGIN
@@ -27,8 +26,9 @@ END;
 /
 
 -- ============================================================
--- EXECUTE IMMEDIATE ... USING (参数化，防止 SQL 注入)
+-- 2. 绑定变量: USING 子句（防止 SQL 注入 + 提高性能）
 -- ============================================================
+
 DECLARE
     v_name VARCHAR2(100);
     v_age  NUMBER;
@@ -41,7 +41,7 @@ BEGIN
 END;
 /
 
--- DML 带参数
+-- DML 带绑定变量
 DECLARE
     v_rows NUMBER;
 BEGIN
@@ -49,13 +49,27 @@ BEGIN
         'UPDATE users SET status = :s WHERE age > :a'
         USING 'active', 18;
     v_rows := SQL%ROWCOUNT;
-    DBMS_OUTPUT.PUT_LINE('Updated: ' || v_rows || ' rows');
 END;
 /
 
+-- 设计分析: 绑定变量的重要性
+--   Oracle 使用 :name 命名绑定变量（按位置绑定，不是按名称!）。
+--   绑定变量的核心价值:
+--   1. 防止 SQL 注入（参数与 SQL 文本分离）
+--   2. 共享游标（相同 SQL 文本复用执行计划，减少硬解析）
+--   Oracle 的共享池（Shared Pool）依赖绑定变量实现高并发。
+--   不使用绑定变量 → 每次硬解析 → 共享池争用 → 性能崩溃
+--
+-- 横向对比:
+--   Oracle:     :name（位置绑定）/ USING 子句
+--   PostgreSQL: $1, $2（位置绑定）/ EXECUTE ... USING
+--   MySQL:      ?（位置绑定）/ EXECUTE ... USING
+--   SQL Server: @name（命名绑定）/ sp_executesql
+
 -- ============================================================
--- EXECUTE IMMEDIATE 返回结果集 (BULK COLLECT)
+-- 3. BULK COLLECT（批量返回结果集）
 -- ============================================================
+
 DECLARE
     TYPE user_tab IS TABLE OF users%ROWTYPE;
     v_users user_tab;
@@ -64,7 +78,6 @@ BEGIN
         'SELECT * FROM users WHERE status = :s'
         BULK COLLECT INTO v_users
         USING 'active';
-
     FOR i IN 1..v_users.COUNT LOOP
         DBMS_OUTPUT.PUT_LINE(v_users(i).username);
     END LOOP;
@@ -72,8 +85,9 @@ END;
 /
 
 -- ============================================================
--- 动态游标 (REF CURSOR)
+-- 4. 动态游标（REF CURSOR）
 -- ============================================================
+
 DECLARE
     TYPE ref_cur IS REF CURSOR;
     v_cur   ref_cur;
@@ -93,8 +107,9 @@ END;
 /
 
 -- ============================================================
--- DBMS_SQL 包 (完全动态 SQL)
+-- 5. DBMS_SQL 包（完全动态 SQL，列数/类型运行时确定）
 -- ============================================================
+
 DECLARE
     v_cursor INTEGER;
     v_rows   INTEGER;
@@ -102,12 +117,12 @@ DECLARE
     v_name   VARCHAR2(100);
 BEGIN
     v_cursor := DBMS_SQL.OPEN_CURSOR;
-    DBMS_SQL.PARSE(v_cursor, 'SELECT id, name FROM users WHERE age > :age', DBMS_SQL.NATIVE);
+    DBMS_SQL.PARSE(v_cursor, 'SELECT id, name FROM users WHERE age > :age',
+                   DBMS_SQL.NATIVE);
     DBMS_SQL.BIND_VARIABLE(v_cursor, ':age', 25);
     DBMS_SQL.DEFINE_COLUMN(v_cursor, 1, v_id);
     DBMS_SQL.DEFINE_COLUMN(v_cursor, 2, v_name, 100);
     v_rows := DBMS_SQL.EXECUTE(v_cursor);
-
     WHILE DBMS_SQL.FETCH_ROWS(v_cursor) > 0 LOOP
         DBMS_SQL.COLUMN_VALUE(v_cursor, 1, v_id);
         DBMS_SQL.COLUMN_VALUE(v_cursor, 2, v_name);
@@ -117,9 +132,15 @@ BEGIN
 END;
 /
 
+-- NDS vs DBMS_SQL:
+--   NDS (EXECUTE IMMEDIATE): 简洁，列数/类型编译时已知
+--   DBMS_SQL: 灵活，列数/类型运行时确定（如动态 PIVOT）
+--   推荐: 优先使用 NDS，只在需要完全动态时使用 DBMS_SQL
+
 -- ============================================================
--- 存储过程中的动态 SQL
+-- 6. SQL 注入防护: DBMS_ASSERT
 -- ============================================================
+
 CREATE OR REPLACE PROCEDURE dynamic_search(
     p_table  IN VARCHAR2,
     p_column IN VARCHAR2,
@@ -128,7 +149,7 @@ CREATE OR REPLACE PROCEDURE dynamic_search(
 ) AS
     v_sql VARCHAR2(4000);
 BEGIN
-    -- DBMS_ASSERT 防止 SQL 注入
+    -- DBMS_ASSERT 验证标识符（防止表名/列名注入）
     v_sql := 'SELECT * FROM '
              || DBMS_ASSERT.SQL_OBJECT_NAME(p_table)
              || ' WHERE '
@@ -138,25 +159,35 @@ BEGIN
 END;
 /
 
+-- DBMS_ASSERT 函数:
+--   SQL_OBJECT_NAME: 验证是否为合法的已存在对象名
+--   SIMPLE_SQL_NAME: 验证是否为合法的简单标识符
+--   SCHEMA_NAME: 验证是否为合法的 schema 名
+--   ENQUOTE_NAME: 给标识符加双引号
+--   NOOP: 不做任何验证（用于测试）
+
 -- ============================================================
--- 动态 DDL
+-- 7. 动态 DDL
 -- ============================================================
-CREATE OR REPLACE PROCEDURE create_partition_table(p_year IN NUMBER) AS
+
+CREATE OR REPLACE PROCEDURE create_partition(p_year IN NUMBER) AS
 BEGIN
     EXECUTE IMMEDIATE
-        'CREATE TABLE orders_' || p_year || ' AS SELECT * FROM orders WHERE EXTRACT(YEAR FROM order_date) = :yr'
+        'CREATE TABLE orders_' || p_year ||
+        ' AS SELECT * FROM orders WHERE EXTRACT(YEAR FROM order_date) = :yr'
         USING p_year;
 END;
 /
 
--- 版本说明：
---   Oracle 8i+   : EXECUTE IMMEDIATE (NDS)
---   Oracle 8i+   : DBMS_SQL 包
---   Oracle 11g+  : DBMS_ASSERT 安全验证
---   Oracle 12c+  : DBMS_SQL.RETURN_RESULT
--- 注意：NDS (EXECUTE IMMEDIATE) 比 DBMS_SQL 更简洁，首选
--- 注意：DBMS_SQL 适用于列数量/类型在运行时才知道的场景
--- 注意：使用绑定变量 (:name) 防止 SQL 注入和提高性能
--- 注意：DBMS_ASSERT 可用于验证标识符（表名、列名）
--- 限制：EXECUTE IMMEDIATE 每次只能返回单行（多行需 BULK COLLECT）
--- 限制：DDL 不支持绑定变量
+-- 注意: DDL 不支持绑定变量!
+-- 表名/列名不能作为绑定变量（必须拼接字符串）
+-- 但值可以作为绑定变量
+
+-- ============================================================
+-- 8. 对引擎开发者的总结
+-- ============================================================
+-- 1. 绑定变量是 Oracle 性能的基石（共享游标 + 防注入），新引擎必须支持。
+-- 2. NDS (EXECUTE IMMEDIATE) 和 DBMS_SQL 对应两种动态程度，优先实现 NDS。
+-- 3. DBMS_ASSERT 提供标识符验证，是防止 SQL 注入的最后一道防线。
+-- 4. DDL 不支持绑定变量是所有数据库的共同限制（标识符不能参数化）。
+-- 5. BULK COLLECT + 动态 SQL 结合，实现了灵活且高效的批量数据处理。

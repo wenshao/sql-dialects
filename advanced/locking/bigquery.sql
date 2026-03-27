@@ -1,156 +1,108 @@
--- BigQuery: 锁机制 (Locking)
+-- BigQuery: 锁机制（Locking）
 --
 -- 参考资料:
---   [1] BigQuery Documentation - Transactions
---       https://cloud.google.com/bigquery/docs/reference/standard-sql/transactions
---   [2] BigQuery Documentation - Concurrency Control
+--   [1] BigQuery Documentation - Concurrency Control
 --       https://cloud.google.com/bigquery/docs/multi-statement-queries#concurrency
---   [3] BigQuery Documentation - INFORMATION_SCHEMA.JOBS
---       https://cloud.google.com/bigquery/docs/information-schema-jobs
+--   [2] BigQuery Documentation - DML Concurrency
+--       https://cloud.google.com/bigquery/docs/reference/standard-sql/dml-syntax
 
 -- ============================================================
--- BigQuery 并发模型概述
--- ============================================================
--- BigQuery 是无服务器分析型数据仓库，与传统 RDBMS 的锁机制不同:
--- 1. 无行级锁或表级锁
--- 2. 使用快照隔离和乐观并发控制
--- 3. DML 操作使用表级别的槽（slot）来串行化写入
--- 4. 多个读取可以并行执行
--- 5. 对同一表的并发 DML 有限制
-
--- ============================================================
--- 多语句事务（BigQuery 事务支持）
+-- 1. BigQuery 的并发模型（对引擎开发者）
 -- ============================================================
 
--- BigQuery 支持多语句事务（预览版 -> GA）
-BEGIN TRANSACTION;
-    INSERT INTO mydataset.accounts (id, balance)
-    VALUES (1, 1000);
-
-    UPDATE mydataset.accounts
-    SET balance = balance - 100
-    WHERE id = 1;
-COMMIT TRANSACTION;
-
--- 回滚
-BEGIN TRANSACTION;
-    UPDATE mydataset.accounts SET balance = balance - 100 WHERE id = 1;
-    -- 发现错误
-ROLLBACK TRANSACTION;
-
--- ============================================================
--- 快照隔离 (Snapshot Isolation)
--- ============================================================
-
--- BigQuery 使用快照隔离:
--- 事务开始时创建数据快照，事务内的所有读取都基于该快照
--- 如果事务提交时发现冲突（其他事务已修改相同数据），则当前事务失败
-
--- 并发 DML 限制:
--- 同一表的并发 DML 语句受到限制
--- 如果两个事务同时修改同一张表，后提交的事务可能失败
+-- BigQuery 没有传统意义上的锁（行锁、表锁、意向锁）。
+-- 它使用乐观并发控制（Optimistic Concurrency Control, OCC）:
+--
+-- (a) SELECT: 完全无锁
+--     任意数量的 SELECT 可以并发执行，互不影响。
+--     每个 SELECT 读取提交时的数据快照。
+--
+-- (b) DML: 表级乐观锁
+--     多个 DML 可以同时开始执行。
+--     COMMIT 时检查冲突: 如果两个 DML 修改了同一个表的同一个分区，
+--     后提交的 DML 失败（需要应用层重试）。
+--
+-- (c) DDL: 元数据锁
+--     DDL 修改表结构时获取元数据锁。
+--     DDL 执行期间该表的 DML 等待。
+--
+-- 为什么选择乐观并发控制?
+-- BigQuery 的 DML 并发度很低（配额限制每表 ~5 个并发 DML）。
+-- 在低并发环境中，OCC 比悲观锁更高效:
+--   悲观锁: 每次操作都获取锁 → 锁管理开销
+--   OCC:    只在提交时检查冲突 → 大部分操作无额外开销
 
 -- ============================================================
--- 乐观并发控制
+-- 2. DML 并发行为
 -- ============================================================
 
--- BigQuery 内部使用乐观并发控制
--- 写入冲突时后提交的事务会收到错误并需要重试
+-- 2.1 同一表的多个 DML
+-- 配额: 每个表最多约 5 个并发 DML
+-- 超出配额: 排队等待（不是立即失败）
+--
+-- 冲突场景:
+-- 事务 A: UPDATE t SET x = 1 WHERE date = '2024-01-15'
+-- 事务 B: DELETE FROM t WHERE date = '2024-01-15'
+-- → 修改同一分区 → 后提交的失败
 
--- 应用层乐观锁模式
--- 使用版本号或时间戳字段
-CREATE TABLE mydataset.orders (
-    id         INT64 NOT NULL,
-    status     STRING,
-    version    INT64 NOT NULL,
-    updated_at TIMESTAMP NOT NULL
-);
+-- 2.2 不同表的 DML: 完全并行，无冲突
 
--- 更新时检查版本
-BEGIN TRANSACTION;
-    -- 读取当前版本
-    -- 假设 version = 5
-    UPDATE mydataset.orders
-    SET status = 'shipped',
-        version = version + 1,
-        updated_at = CURRENT_TIMESTAMP()
-    WHERE id = 100 AND version = 5;
-
-    -- 检查是否更新成功（BigQuery 中需要在应用层验证）
-COMMIT TRANSACTION;
+-- 2.3 SELECT + DML: SELECT 不被 DML 阻塞
+-- 查询读取 DML 开始前的快照（快照隔离）
 
 -- ============================================================
--- 并发限制与配额
+-- 3. 事务中的锁行为
 -- ============================================================
 
--- DML 并发限制:
--- 每个表每天最多 1,500 个 DML 语句（INSERT/UPDATE/DELETE/MERGE）
--- 每 10 秒最多 25 个 DML 操作（对同一表）
--- 并发事务对同一表最多 20 个
+-- 多语句事务持有快照:
+-- BEGIN TRANSACTION;
+-- SELECT * FROM t;              -- 快照时间点
+-- UPDATE t SET x = 1 WHERE ...;  -- 基于快照检查冲突
+-- COMMIT TRANSACTION;            -- 提交时验证无冲突
+--
+-- 事务最长持续 6 小时。
+-- 长事务增加冲突概率（快照越旧，其他 DML 修改同一分区的概率越高）。
 
--- 查看作业状态（替代锁监控）
-SELECT
-    job_id,
-    user_email,
-    state,
-    creation_time,
-    start_time,
-    end_time,
-    statement_type,
-    total_bytes_processed
+-- ============================================================
+-- 4. 查看并发状态
+-- ============================================================
+
+-- 查看正在运行的作业
+SELECT job_id, user_email, state, query, creation_time
 FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
-WHERE state = 'RUNNING'
-ORDER BY creation_time DESC;
+WHERE state = 'RUNNING';
 
--- 查看特定表的活跃作业
-SELECT
-    job_id,
-    statement_type,
-    state,
-    creation_time,
-    destination_table.table_id
+-- 查看最近的 DML 操作
+SELECT job_id, statement_type, total_bytes_processed,
+       dml_statistics.inserted_row_count,
+       dml_statistics.updated_row_count,
+       dml_statistics.deleted_row_count
 FROM `region-us`.INFORMATION_SCHEMA.JOBS_BY_PROJECT
-WHERE destination_table.table_id = 'orders'
-  AND state IN ('RUNNING', 'PENDING')
-ORDER BY creation_time DESC;
+WHERE statement_type IN ('INSERT', 'UPDATE', 'DELETE', 'MERGE')
+ORDER BY creation_time DESC LIMIT 20;
+
+-- 取消正在运行的作业
+-- bq cancel job_id
 
 -- ============================================================
--- 替代方案：表复制与原子替换
+-- 5. 对比与引擎开发者启示
 -- ============================================================
-
--- 对于需要大批量更新的场景，使用 CTAS + 原子替换
-CREATE OR REPLACE TABLE mydataset.orders AS
-SELECT
-    id,
-    CASE WHEN id = 100 THEN 'shipped' ELSE status END AS status,
-    version + CASE WHEN id = 100 THEN 1 ELSE 0 END AS version,
-    updated_at
-FROM mydataset.orders;
-
--- ============================================================
--- 元数据锁 / Schema 变更
--- ============================================================
-
--- DDL 操作（ALTER TABLE 等）与 DML 操作是互斥的
--- 如果有正在运行的 DML，DDL 会等待
--- 如果有正在运行的 DDL，DML 会失败
-
--- 查看表的元数据修改历史
-SELECT
-    table_name,
-    ddl,
-    creation_time
-FROM mydataset.INFORMATION_SCHEMA.TABLES
-WHERE table_name = 'orders';
-
--- ============================================================
--- 注意事项
--- ============================================================
-
--- 1. BigQuery 不支持 SELECT FOR UPDATE / FOR SHARE
--- 2. 没有传统的行级锁或表级锁
--- 3. 并发写入同一表可能导致事务失败
--- 4. 建议使用批量操作减少 DML 次数
--- 5. 对于高并发写入场景，考虑使用流式插入 (streaming insert)
--- 6. 使用 MERGE 语句可以在单个 DML 中完成 upsert 操作
--- 7. 事务隔离级别固定为快照隔离，不可配置
+-- BigQuery 的并发设计:
+--   (1) SELECT 完全无锁 → 分析查询不受 DML 影响
+--   (2) DML 乐观并发 → 低并发环境最高效
+--   (3) 分区级冲突检测 → 不同分区的 DML 不冲突
+--   (4) 无行级锁 → 简化实现但不适合 OLTP
+--
+-- 对比:
+--   MySQL:      行级锁 + MVCC（高并发 OLTP）
+--   PostgreSQL: 行级锁 + MVCC（高并发 OLTP）
+--   SQLite:     文件级锁 + WAL（嵌入式）
+--   ClickHouse: 几乎无锁（不可变 part）
+--   BigQuery:   乐观并发（低并发云数仓）
+--
+-- 对引擎开发者的启示:
+--   锁设计应该匹配目标并发度:
+--   - OLTP（数千并发）: 行级锁 + MVCC
+--   - 嵌入式（10 以下并发）: 文件级锁 + WAL
+--   - 云数仓（5 以下 DML 并发）: 乐观并发控制
+--   - OLAP 追加写入: 不可变存储 → 无需锁
