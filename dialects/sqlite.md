@@ -88,86 +88,86 @@ SQLite 的兼容生态围绕"分布式化"和"OLAP 化"两个方向：
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
-|---|---|
-| 建表 | [sqlite.sql](../ddl/create-table/sqlite.sql) |
-| 改表 | [sqlite.sql](../ddl/alter-table/sqlite.sql) |
-| 索引 | [sqlite.sql](../ddl/indexes/sqlite.sql) |
-| 约束 | [sqlite.sql](../ddl/constraints/sqlite.sql) |
-| 视图 | [sqlite.sql](../ddl/views/sqlite.sql) |
-| 序列与自增 | [sqlite.sql](../ddl/sequences/sqlite.sql) |
-| 数据库/Schema/用户 | [sqlite.sql](../ddl/users-databases/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 建表 | [sqlite.sql](../ddl/create-table/sqlite.sql) | ✗ 动态类型（FLUFFY BUNNY 也是合法类型名）；✦ STRICT(3.37+) 可选严格模式 |
+| 改表 | [sqlite.sql](../ddl/alter-table/sqlite.sql) | ✗ 不支持修改列类型/ALTER COLUMN，复杂变更需建新表拷贝数据 |
+| 索引 | [sqlite.sql](../ddl/indexes/sqlite.sql) | ✦ 部分索引 + 表达式索引支持，INTEGER PRIMARY KEY = rowid 零开销 |
+| 约束 | [sqlite.sql](../ddl/constraints/sqlite.sql) | ✗ 外键默认关闭需 PRAGMA foreign_keys = ON，CHECK 约束基本 |
+| 视图 | [sqlite.sql](../ddl/views/sqlite.sql) | ✗ 无物化视图，视图仅虚拟 |
+| 序列与自增 | [sqlite.sql](../ddl/sequences/sqlite.sql) | ✦ AUTOINCREMENT 保证单调递增但有性能开销，rowid 默认自增 |
+| 数据库/Schema/用户 | [sqlite.sql](../ddl/users-databases/sqlite.sql) | ✗ 无用户/权限系统；✦ ATTACH DATABASE 跨库查询独有 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
-|---|---|
-| 动态 SQL | [sqlite.sql](../advanced/dynamic-sql/sqlite.sql) |
-| 错误处理 | [sqlite.sql](../advanced/error-handling/sqlite.sql) |
-| 执行计划 | [sqlite.sql](../advanced/explain/sqlite.sql) |
-| 锁机制 | [sqlite.sql](../advanced/locking/sqlite.sql) |
-| 分区 | [sqlite.sql](../advanced/partitioning/sqlite.sql) |
-| 权限 | [sqlite.sql](../advanced/permissions/sqlite.sql) |
-| 存储过程 | [sqlite.sql](../advanced/stored-procedures/sqlite.sql) |
-| 临时表 | [sqlite.sql](../advanced/temp-tables/sqlite.sql) |
-| 事务 | [sqlite.sql](../advanced/transactions/sqlite.sql) |
-| 触发器 | [sqlite.sql](../advanced/triggers/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 动态 SQL | [sqlite.sql](../advanced/dynamic-sql/sqlite.sql) | ✗ 无服务端动态 SQL，需在应用层拼接 |
+| 错误处理 | [sqlite.sql](../advanced/error-handling/sqlite.sql) | ✗ 无 TRY...CATCH，错误处理完全依赖宿主语言 |
+| 执行计划 | [sqlite.sql](../advanced/explain/sqlite.sql) | ✦ EXPLAIN 输出字节码，EXPLAIN QUERY PLAN 人类可读，极致透明 |
+| 锁机制 | [sqlite.sql](../advanced/locking/sqlite.sql) | ✗ 文件级锁，单写者限制；✦ WAL 模式读写并发 |
+| 分区 | [sqlite.sql](../advanced/partitioning/sqlite.sql) | ✗ 不支持表分区（嵌入式定位不需要） |
+| 权限 | [sqlite.sql](../advanced/permissions/sqlite.sql) | ✗ 无 GRANT/REVOKE；✦ Authorizer API 在编译阶段逐语句拦截 |
+| 存储过程 | [sqlite.sql](../advanced/stored-procedures/sqlite.sql) | ✗ 不支持存储过程（嵌入式定位），逻辑在应用层实现 |
+| 临时表 | [sqlite.sql](../advanced/temp-tables/sqlite.sql) | ✦ TEMP 表存于独立临时文件，ATTACH ':memory:' 内存库 |
+| 事务 | [sqlite.sql](../advanced/transactions/sqlite.sql) | ✗ 文件级锁，BEGIN IMMEDIATE 避免死锁；✦ WAL 模式是关键优化 |
+| 触发器 | [sqlite.sql](../advanced/triggers/sqlite.sql) | ✦ BEFORE/AFTER/INSTEAD OF 完整支持，RAISE() 抛出错误 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
-|---|---|
-| 删除 | [sqlite.sql](../dml/delete/sqlite.sql) |
-| 插入 | [sqlite.sql](../dml/insert/sqlite.sql) |
-| 更新 | [sqlite.sql](../dml/update/sqlite.sql) |
-| Upsert | [sqlite.sql](../dml/upsert/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 删除 | [sqlite.sql](../dml/delete/sqlite.sql) | ✦ RETURNING(3.35+) 返回被删行，VACUUM 回收空间 |
+| 插入 | [sqlite.sql](../dml/insert/sqlite.sql) | ✦ RETURNING(3.35+)，INSERT OR REPLACE/IGNORE 冲突处理 |
+| 更新 | [sqlite.sql](../dml/update/sqlite.sql) | ✦ RETURNING(3.35+)；✗ 无 UPDATE FROM 多表更新(3.33+才有) |
+| Upsert | [sqlite.sql](../dml/upsert/sqlite.sql) | ✦ ON CONFLICT(3.24+) 语法与 PostgreSQL 兼容 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
-|---|---|
-| 聚合函数 | [sqlite.sql](../functions/aggregate/sqlite.sql) |
-| 条件函数 | [sqlite.sql](../functions/conditional/sqlite.sql) |
-| 日期函数 | [sqlite.sql](../functions/date-functions/sqlite.sql) |
-| 数学函数 | [sqlite.sql](../functions/math-functions/sqlite.sql) |
-| 字符串函数 | [sqlite.sql](../functions/string-functions/sqlite.sql) |
-| 类型转换 | [sqlite.sql](../functions/type-conversion/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 聚合函数 | [sqlite.sql](../functions/aggregate/sqlite.sql) | ✗ 内置聚合函数较少，无 FILTER 子句；✦ group_concat 可用 |
+| 条件函数 | [sqlite.sql](../functions/conditional/sqlite.sql) | ✦ IIF(3.32+)，标准 CASE/COALESCE/NULLIF 完整 |
+| 日期函数 | [sqlite.sql](../functions/date-functions/sqlite.sql) | ✗ 无原生日期类型，date()/time()/datetime() 函数操作字符串 |
+| 数学函数 | [sqlite.sql](../functions/math-functions/sqlite.sql) | ✦ 数学函数(3.35+)内置化，之前需编译扩展 |
+| 字符串函数 | [sqlite.sql](../functions/string-functions/sqlite.sql) | ✗ 无正则替换，LIKE 不区分大小写默认行为因编译选项而异 |
+| 类型转换 | [sqlite.sql](../functions/type-conversion/sqlite.sql) | ✗ CAST 基本可用，动态类型下类型转换语义与其他数据库不同 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
-|---|---|
-| CTE | [sqlite.sql](../query/cte/sqlite.sql) |
-| 全文搜索 | [sqlite.sql](../query/full-text-search/sqlite.sql) |
-| 连接查询 | [sqlite.sql](../query/joins/sqlite.sql) |
-| 分页 | [sqlite.sql](../query/pagination/sqlite.sql) |
-| 行列转换 | [sqlite.sql](../query/pivot-unpivot/sqlite.sql) |
-| 集合操作 | [sqlite.sql](../query/set-operations/sqlite.sql) |
-| 子查询 | [sqlite.sql](../query/subquery/sqlite.sql) |
-| 窗口函数 | [sqlite.sql](../query/window-functions/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| CTE | [sqlite.sql](../query/cte/sqlite.sql) | ✦ WITH RECURSIVE 完整支持(3.8.3+)，MATERIALIZED 提示(3.35+) |
+| 全文搜索 | [sqlite.sql](../query/full-text-search/sqlite.sql) | ✦ FTS5 虚拟表内置，BM25 排序，嵌入式全文搜索最佳方案 |
+| 连接查询 | [sqlite.sql](../query/joins/sqlite.sql) | ✗ 无 LATERAL JOIN；RIGHT/FULL JOIN 3.39+ 才支持 |
+| 分页 | [sqlite.sql](../query/pagination/sqlite.sql) | ✦ LIMIT/OFFSET 语法最简洁 |
+| 行列转换 | [sqlite.sql](../query/pivot-unpivot/sqlite.sql) | ✗ 无原生 PIVOT/UNPIVOT，需 CASE + 聚合手动模拟 |
+| 集合操作 | [sqlite.sql](../query/set-operations/sqlite.sql) | ✦ UNION/INTERSECT/EXCEPT 完整支持 |
+| 子查询 | [sqlite.sql](../query/subquery/sqlite.sql) | ✦ 关联子查询 + EXISTS，优化器自动展开 |
+| 窗口函数 | [sqlite.sql](../query/window-functions/sqlite.sql) | ✦ 3.25+ 完整支持窗口函数，包括 NTH_VALUE 和 FILTER(3.30+) |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
-|---|---|
-| 日期填充 | [sqlite.sql](../scenarios/date-series-fill/sqlite.sql) |
-| 去重 | [sqlite.sql](../scenarios/deduplication/sqlite.sql) |
-| 区间检测 | [sqlite.sql](../scenarios/gap-detection/sqlite.sql) |
-| 层级查询 | [sqlite.sql](../scenarios/hierarchical-query/sqlite.sql) |
-| JSON 展开 | [sqlite.sql](../scenarios/json-flatten/sqlite.sql) |
-| 迁移速查 | [sqlite.sql](../scenarios/migration-cheatsheet/sqlite.sql) |
-| TopN 查询 | [sqlite.sql](../scenarios/ranking-top-n/sqlite.sql) |
-| 累计求和 | [sqlite.sql](../scenarios/running-total/sqlite.sql) |
-| 缓慢变化维 | [sqlite.sql](../scenarios/slowly-changing-dim/sqlite.sql) |
-| 字符串拆分 | [sqlite.sql](../scenarios/string-split-to-rows/sqlite.sql) |
-| 窗口分析 | [sqlite.sql](../scenarios/window-analytics/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 日期填充 | [sqlite.sql](../scenarios/date-series-fill/sqlite.sql) | ✗ 无 generate_series，需递归 CTE 模拟日期序列 |
+| 去重 | [sqlite.sql](../scenarios/deduplication/sqlite.sql) | ✦ rowid 直接定位行，DELETE WHERE rowid NOT IN 简洁 |
+| 区间检测 | [sqlite.sql](../scenarios/gap-detection/sqlite.sql) | ✦ 窗口函数 + 递归 CTE 配合 |
+| 层级查询 | [sqlite.sql](../scenarios/hierarchical-query/sqlite.sql) | ✦ WITH RECURSIVE 标准实现 |
+| JSON 展开 | [sqlite.sql](../scenarios/json-flatten/sqlite.sql) | ✗ json_each/json_tree 函数展开，无 JSON 索引；✦ JSONB(3.45+) |
+| 迁移速查 | [sqlite.sql](../scenarios/migration-cheatsheet/sqlite.sql) | ✗ 动态类型 + ALTER TABLE 限制是迁移主要障碍 |
+| TopN 查询 | [sqlite.sql](../scenarios/ranking-top-n/sqlite.sql) | ✦ LIMIT + 窗口函数，简洁够用 |
+| 累计求和 | [sqlite.sql](../scenarios/running-total/sqlite.sql) | ✦ 窗口函数(3.25+) ROWS/RANGE 帧 |
+| 缓慢变化维 | [sqlite.sql](../scenarios/slowly-changing-dim/sqlite.sql) | ✗ 无 MERGE，需 INSERT OR REPLACE + 触发器模拟 |
+| 字符串拆分 | [sqlite.sql](../scenarios/string-split-to-rows/sqlite.sql) | ✗ 无原生 split 函数，需递归 CTE + substr 逐字符拆分 |
+| 窗口分析 | [sqlite.sql](../scenarios/window-analytics/sqlite.sql) | ✦ 窗口函数完整支持(3.25+)，嵌入式中功能最强 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
-|---|---|
-| 复合类型 | [sqlite.sql](../types/array-map-struct/sqlite.sql) |
-| 日期时间 | [sqlite.sql](../types/datetime/sqlite.sql) |
-| JSON | [sqlite.sql](../types/json/sqlite.sql) |
-| 数值类型 | [sqlite.sql](../types/numeric/sqlite.sql) |
-| 字符串类型 | [sqlite.sql](../types/string/sqlite.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 复合类型 | [sqlite.sql](../types/array-map-struct/sqlite.sql) | ✗ 无原生数组/结构体类型，需 JSON 模拟 |
+| 日期时间 | [sqlite.sql](../types/datetime/sqlite.sql) | ✗ 无原生日期类型，TEXT/REAL/INTEGER 三种存储方式 |
+| JSON | [sqlite.sql](../types/json/sqlite.sql) | ✗ TEXT 存储 + 函数查询，无索引；✦ JSONB(3.45+) 二进制格式 |
+| 数值类型 | [sqlite.sql](../types/numeric/sqlite.sql) | ✗ 无精确 DECIMAL 类型，REAL 是 IEEE 754 浮点 |
+| 字符串类型 | [sqlite.sql](../types/string/sqlite.sql) | ✦ TEXT 无长度限制，UTF-8 原生；✗ 排序规则有限(BINARY/NOCASE/RTRIM) |

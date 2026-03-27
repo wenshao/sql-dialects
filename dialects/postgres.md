@@ -95,86 +95,86 @@ PostgreSQL 协议已成为新一代数据库的"通用语言"：
 
 ### DDL — 数据定义
 
-| 模块 | 链接 |
-|---|---|
-| 建表 | [postgres.sql](../ddl/create-table/postgres.sql) |
-| 改表 | [postgres.sql](../ddl/alter-table/postgres.sql) |
-| 索引 | [postgres.sql](../ddl/indexes/postgres.sql) |
-| 约束 | [postgres.sql](../ddl/constraints/postgres.sql) |
-| 视图 | [postgres.sql](../ddl/views/postgres.sql) |
-| 序列与自增 | [postgres.sql](../ddl/sequences/postgres.sql) |
-| 数据库/Schema/用户 | [postgres.sql](../ddl/users-databases/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 建表 | [postgres.sql](../ddl/create-table/postgres.sql) | ✦ IDENTITY(10+) 替代 SERIAL，TEXT=VARCHAR 无性能差异，DDL 可回滚 |
+| 改表 | [postgres.sql](../ddl/alter-table/postgres.sql) | ✦ DDL 事务性，PG 11+ ADD COLUMN WITH DEFAULT 不再重写全表 |
+| 索引 | [postgres.sql](../ddl/indexes/postgres.sql) | ✦ GiST/GIN/BRIN/SP-GiST 四大可扩展索引框架，部分索引独有 |
+| 约束 | [postgres.sql](../ddl/constraints/postgres.sql) | ✦ EXCLUDE 排斥约束独有，可表达区间不重叠等复杂规则 |
+| 视图 | [postgres.sql](../ddl/views/postgres.sql) | ✦ 可写 CTE + 物化视图 CONCURRENTLY 刷新 |
+| 序列与自增 | [postgres.sql](../ddl/sequences/postgres.sql) | ✦ GENERATED ALWAYS AS IDENTITY 是标准写法，SERIAL 已不推荐 |
+| 数据库/Schema/用户 | [postgres.sql](../ddl/users-databases/postgres.sql) | ✦ Schema 隔离 + RLS 行级安全，多租户方案完善 |
 
 ### Advanced — 高级特性
 
-| 模块 | 链接 |
-|---|---|
-| 动态 SQL | [postgres.sql](../advanced/dynamic-sql/postgres.sql) |
-| 错误处理 | [postgres.sql](../advanced/error-handling/postgres.sql) |
-| 执行计划 | [postgres.sql](../advanced/explain/postgres.sql) |
-| 锁机制 | [postgres.sql](../advanced/locking/postgres.sql) |
-| 分区 | [postgres.sql](../advanced/partitioning/postgres.sql) |
-| 权限 | [postgres.sql](../advanced/permissions/postgres.sql) |
-| 存储过程 | [postgres.sql](../advanced/stored-procedures/postgres.sql) |
-| 临时表 | [postgres.sql](../advanced/temp-tables/postgres.sql) |
-| 事务 | [postgres.sql](../advanced/transactions/postgres.sql) |
-| 触发器 | [postgres.sql](../advanced/triggers/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 动态 SQL | [postgres.sql](../advanced/dynamic-sql/postgres.sql) | ✦ EXECUTE format() 防注入，比拼字符串安全 |
+| 错误处理 | [postgres.sql](../advanced/error-handling/postgres.sql) | ✦ EXCEPTION 块 + SQLSTATE 体系完善 |
+| 执行计划 | [postgres.sql](../advanced/explain/postgres.sql) | ✦ EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) 信息最丰富 |
+| 锁机制 | [postgres.sql](../advanced/locking/postgres.sql) | ✦ Advisory Locks 独有，应用层分布式锁无需中间件 |
+| 分区 | [postgres.sql](../advanced/partitioning/postgres.sql) | ✦ 声明式分区(10+)，支持 RANGE/LIST/HASH，自动路由 |
+| 权限 | [postgres.sql](../advanced/permissions/postgres.sql) | ✦ RLS 行级安全策略，内核级多租户隔离 |
+| 存储过程 | [postgres.sql](../advanced/stored-procedures/postgres.sql) | ✗ PL/pgSQL 无 Package 概念，无法打包相关函数为逻辑单元 |
+| 临时表 | [postgres.sql](../advanced/temp-tables/postgres.sql) | ✦ 会话/事务级临时表，ON COMMIT DROP/DELETE ROWS 灵活 |
+| 事务 | [postgres.sql](../advanced/transactions/postgres.sql) | ✦ SSI 可串行化(9.1+) 无需两阶段锁，DDL 事务性，Advisory Locks |
+| 触发器 | [postgres.sql](../advanced/triggers/postgres.sql) | ✦ 函数分离设计，事件触发器(9.3+) 独有，行+语句级完整支持 |
 
 ### DML — 数据操作
 
-| 模块 | 链接 |
-|---|---|
-| 删除 | [postgres.sql](../dml/delete/postgres.sql) |
-| 插入 | [postgres.sql](../dml/insert/postgres.sql) |
-| 更新 | [postgres.sql](../dml/update/postgres.sql) |
-| Upsert | [postgres.sql](../dml/upsert/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 删除 | [postgres.sql](../dml/delete/postgres.sql) | ✦ DELETE RETURNING 直接返回被删行，可写 CTE 归档一步到位 |
+| 插入 | [postgres.sql](../dml/insert/postgres.sql) | ✦ INSERT RETURNING，多值 VALUES，COPY 批量最快 |
+| 更新 | [postgres.sql](../dml/update/postgres.sql) | ✦ UPDATE FROM 多表更新，RETURNING 返回更新结果 |
+| Upsert | [postgres.sql](../dml/upsert/postgres.sql) | ✦ ON CONFLICT(9.5+) 并发安全，MERGE(15+) 标准语法 |
 
 ### Functions — 内置函数
 
-| 模块 | 链接 |
-|---|---|
-| 聚合函数 | [postgres.sql](../functions/aggregate/postgres.sql) |
-| 条件函数 | [postgres.sql](../functions/conditional/postgres.sql) |
-| 日期函数 | [postgres.sql](../functions/date-functions/postgres.sql) |
-| 数学函数 | [postgres.sql](../functions/math-functions/postgres.sql) |
-| 字符串函数 | [postgres.sql](../functions/string-functions/postgres.sql) |
-| 类型转换 | [postgres.sql](../functions/type-conversion/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 聚合函数 | [postgres.sql](../functions/aggregate/postgres.sql) | ✦ FILTER 子句独有，条件聚合最优雅写法 |
+| 条件函数 | [postgres.sql](../functions/conditional/postgres.sql) | ✦ 标准 CASE + COALESCE + NULLIF，无隐式转换陷阱 |
+| 日期函数 | [postgres.sql](../functions/date-functions/postgres.sql) | ✦ INTERVAL 运算 + generate_series() 生成时间序列 |
+| 数学函数 | [postgres.sql](../functions/math-functions/postgres.sql) | ✦ 标准完备，支持精确 NUMERIC 运算 |
+| 字符串函数 | [postgres.sql](../functions/string-functions/postgres.sql) | ✦ 正则表达式 ~ 运算符，regexp_matches/split 功能丰富 |
+| 类型转换 | [postgres.sql](../functions/type-conversion/postgres.sql) | ✗ 无 TRY_CAST，转换失败直接报错，需自定义函数包装 |
 
 ### Query — 查询
 
-| 模块 | 链接 |
-|---|---|
-| CTE | [postgres.sql](../query/cte/postgres.sql) |
-| 全文搜索 | [postgres.sql](../query/full-text-search/postgres.sql) |
-| 连接查询 | [postgres.sql](../query/joins/postgres.sql) |
-| 分页 | [postgres.sql](../query/pagination/postgres.sql) |
-| 行列转换 | [postgres.sql](../query/pivot-unpivot/postgres.sql) |
-| 集合操作 | [postgres.sql](../query/set-operations/postgres.sql) |
-| 子查询 | [postgres.sql](../query/subquery/postgres.sql) |
-| 窗口函数 | [postgres.sql](../query/window-functions/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| CTE | [postgres.sql](../query/cte/postgres.sql) | ✦ 可写 CTE 独有，WITH RECURSIVE + CYCLE 检测(14+) |
+| 全文搜索 | [postgres.sql](../query/full-text-search/postgres.sql) | ✦ tsvector/tsquery + GIN 索引，内置分词，无需外部引擎 |
+| 连接查询 | [postgres.sql](../query/joins/postgres.sql) | ✦ LATERAL JOIN 标准实现，支持所有 JOIN 类型 |
+| 分页 | [postgres.sql](../query/pagination/postgres.sql) | ✦ LIMIT/OFFSET + 标准 FETCH FIRST 均支持 |
+| 行列转换 | [postgres.sql](../query/pivot-unpivot/postgres.sql) | ✗ 无原生 PIVOT/UNPIVOT，需 crosstab 扩展或 FILTER 模拟 |
+| 集合操作 | [postgres.sql](../query/set-operations/postgres.sql) | ✦ UNION/INTERSECT/EXCEPT 全支持，含 ALL 变体 |
+| 子查询 | [postgres.sql](../query/subquery/postgres.sql) | ✦ 关联子查询 + LATERAL 子查询，优化器展开能力强 |
+| 窗口函数 | [postgres.sql](../query/window-functions/postgres.sql) | ✦ 8.4 即支持，FILTER 子句独有，GROUPS 帧(11+) |
 
 ### Scenarios — 实战场景
 
-| 模块 | 链接 |
-|---|---|
-| 日期填充 | [postgres.sql](../scenarios/date-series-fill/postgres.sql) |
-| 去重 | [postgres.sql](../scenarios/deduplication/postgres.sql) |
-| 区间检测 | [postgres.sql](../scenarios/gap-detection/postgres.sql) |
-| 层级查询 | [postgres.sql](../scenarios/hierarchical-query/postgres.sql) |
-| JSON 展开 | [postgres.sql](../scenarios/json-flatten/postgres.sql) |
-| 迁移速查 | [postgres.sql](../scenarios/migration-cheatsheet/postgres.sql) |
-| TopN 查询 | [postgres.sql](../scenarios/ranking-top-n/postgres.sql) |
-| 累计求和 | [postgres.sql](../scenarios/running-total/postgres.sql) |
-| 缓慢变化维 | [postgres.sql](../scenarios/slowly-changing-dim/postgres.sql) |
-| 字符串拆分 | [postgres.sql](../scenarios/string-split-to-rows/postgres.sql) |
-| 窗口分析 | [postgres.sql](../scenarios/window-analytics/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 日期填充 | [postgres.sql](../scenarios/date-series-fill/postgres.sql) | ✦ generate_series() 生成日期维度，最简洁方案 |
+| 去重 | [postgres.sql](../scenarios/deduplication/postgres.sql) | ✦ DISTINCT ON 独有语法，比 ROW_NUMBER 子查询简洁 |
+| 区间检测 | [postgres.sql](../scenarios/gap-detection/postgres.sql) | ✦ 窗口函数 + generate_series 配合检测 |
+| 层级查询 | [postgres.sql](../scenarios/hierarchical-query/postgres.sql) | ✦ WITH RECURSIVE 标准实现，CYCLE 检测(14+) |
+| JSON 展开 | [postgres.sql](../scenarios/json-flatten/postgres.sql) | ✦ JSONB + jsonb_each/jsonb_array_elements，GIN 索引加速 |
+| 迁移速查 | [postgres.sql](../scenarios/migration-cheatsheet/postgres.sql) | ✦ DDL 事务性使迁移脚本可原子执行 |
+| TopN 查询 | [postgres.sql](../scenarios/ranking-top-n/postgres.sql) | ✦ DISTINCT ON + LATERAL 两种独有方案 |
+| 累计求和 | [postgres.sql](../scenarios/running-total/postgres.sql) | ✦ 窗口函数 ROWS/RANGE/GROUPS 三种帧类型 |
+| 缓慢变化维 | [postgres.sql](../scenarios/slowly-changing-dim/postgres.sql) | ✦ daterange + EXCLUDE 约束保证区间不重叠 |
+| 字符串拆分 | [postgres.sql](../scenarios/string-split-to-rows/postgres.sql) | ✦ regexp_split_to_table/unnest(string_to_array()) |
+| 窗口分析 | [postgres.sql](../scenarios/window-analytics/postgres.sql) | ✦ FILTER + GROUPS 帧 + 命名 WINDOW 子句 |
 
 ### Types — 数据类型
 
-| 模块 | 链接 |
-|---|---|
-| 复合类型 | [postgres.sql](../types/array-map-struct/postgres.sql) |
-| 日期时间 | [postgres.sql](../types/datetime/postgres.sql) |
-| JSON | [postgres.sql](../types/json/postgres.sql) |
-| 数值类型 | [postgres.sql](../types/numeric/postgres.sql) |
-| 字符串类型 | [postgres.sql](../types/string/postgres.sql) |
+| 模块 | 链接 | 简评 |
+|---|---|---|
+| 复合类型 | [postgres.sql](../types/array-map-struct/postgres.sql) | ✦ 原生 ARRAY + hstore + 自定义复合类型，可扩展性最强 |
+| 日期时间 | [postgres.sql](../types/datetime/postgres.sql) | ✦ TIMESTAMPTZ 默认带时区，INTERVAL 运算完善 |
+| JSON | [postgres.sql](../types/json/postgres.sql) | ✦ JSONB + GIN 索引（最强 JSON 实现），JSON_TABLE(17+) |
+| 数值类型 | [postgres.sql](../types/numeric/postgres.sql) | ✦ NUMERIC 任意精度，类型严格无隐式转换 |
+| 字符串类型 | [postgres.sql](../types/string/postgres.sql) | ✦ TEXT=VARCHAR 无性能差异，无长度限制的 TEXT 推荐使用 |
