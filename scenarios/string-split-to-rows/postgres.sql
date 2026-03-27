@@ -1,64 +1,76 @@
--- PostgreSQL: 将分隔字符串拆分为多行 (String Split to Rows)
+-- PostgreSQL: 字符串拆分为多行 (String Split to Rows)
 --
 -- 参考资料:
 --   [1] PostgreSQL Documentation - String Functions
 --       https://www.postgresql.org/docs/current/functions-string.html
---   [2] PostgreSQL Documentation - regexp_split_to_table
---       https://www.postgresql.org/docs/current/functions-string.html#FUNCTIONS-STRING-OTHER
---   [3] PostgreSQL Documentation - STRING_TO_ARRAY / UNNEST
---       https://www.postgresql.org/docs/current/functions-array.html
 
 -- ============================================================
--- 示例数据
+-- 1. STRING_TO_ARRAY + UNNEST（推荐, 8.1+）
 -- ============================================================
-CREATE TABLE tags_csv (
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    tags VARCHAR(500)          -- 逗号分隔的标签
-);
 
-INSERT INTO tags_csv (name, tags) VALUES
-    ('Alice', 'python,java,sql'),
-    ('Bob',   'go,rust'),
-    ('Carol', 'sql,python,javascript,typescript');
-
--- ============================================================
--- 方法 1: STRING_TO_ARRAY + UNNEST（推荐）
--- 适用版本: PostgreSQL 8.1+
--- ============================================================
 SELECT id, name, UNNEST(STRING_TO_ARRAY(tags, ',')) AS tag
-FROM   tags_csv;
+FROM tags_csv;
+
+-- 设计分析: 两步组合
+--   STRING_TO_ARRAY: 字符串 → 数组（'a,b,c' → {a,b,c}）
+--   UNNEST: 数组 → 多行（{a,b,c} → 3行）
+--   PostgreSQL 的数组类型让这个操作自然且高效。
 
 -- ============================================================
--- 方法 2: regexp_split_to_table
--- 适用版本: PostgreSQL 8.3+
+-- 2. regexp_split_to_table (8.3+)
 -- ============================================================
+
 SELECT id, name, regexp_split_to_table(tags, ',') AS tag
-FROM   tags_csv;
+FROM tags_csv;
+
+-- 支持正则分隔符: regexp_split_to_table(tags, ',\s*')（逗号+可选空格）
 
 -- ============================================================
--- 方法 3: LATERAL + UNNEST（保留序号）
--- 适用版本: PostgreSQL 9.3+
+-- 3. LATERAL + UNNEST + WITH ORDINALITY（保留序号, 9.3+/9.4+）
 -- ============================================================
+
 SELECT t.id, t.name, s.ordinality, s.tag
-FROM   tags_csv t,
-       LATERAL UNNEST(STRING_TO_ARRAY(t.tags, ','))
-              WITH ORDINALITY AS s(tag, ordinality);
+FROM tags_csv t,
+     LATERAL UNNEST(STRING_TO_ARRAY(t.tags, ','))
+            WITH ORDINALITY AS s(tag, ordinality);
+
+-- WITH ORDINALITY 为每个展开的元素添加序号列（从 1 开始）
+-- 这在需要保留原始顺序时非常有用
 
 -- ============================================================
--- 方法 4: 递归 CTE
--- 适用版本: PostgreSQL 8.4+
+-- 4. 递归 CTE（通用方法, 8.4+）
 -- ============================================================
-WITH RECURSIVE split_cte AS (
+
+WITH RECURSIVE split AS (
     SELECT id, name,
-           LEFT(tags, POSITION(',' IN tags || ',') - 1)   AS tag,
+           LEFT(tags, POSITION(',' IN tags || ',') - 1) AS tag,
            SUBSTRING(tags FROM POSITION(',' IN tags || ',') + 1) AS remaining
-    FROM   tags_csv
+    FROM tags_csv
     UNION ALL
     SELECT id, name,
            LEFT(remaining, POSITION(',' IN remaining || ',') - 1),
            SUBSTRING(remaining FROM POSITION(',' IN remaining || ',') + 1)
-    FROM   split_cte
-    WHERE  remaining <> ''
+    FROM split WHERE remaining <> ''
 )
-SELECT id, name, tag FROM split_cte ORDER BY id;
+SELECT id, name, tag FROM split ORDER BY id;
+
+-- ============================================================
+-- 5. 横向对比与对引擎开发者的启示
+-- ============================================================
+
+-- 1. 拆分函数:
+--   PostgreSQL: STRING_TO_ARRAY + UNNEST 或 regexp_split_to_table
+--   MySQL:      无内置拆分函数（需递归CTE, 8.0+）
+--   Oracle:     REGEXP_SUBSTR + CONNECT BY LEVEL
+--   SQL Server: STRING_SPLIT (2016+, 不保证顺序) 或 OPENJSON
+--   BigQuery:   SPLIT() + UNNEST()
+--
+-- 2. PostgreSQL 的优势:
+--   (a) 数组是一等类型 → STRING_TO_ARRAY 自然
+--   (b) UNNEST 是通用的数组展开函数（不仅限于字符串拆分）
+--   (c) WITH ORDINALITY 保留顺序（SQL Server STRING_SPLIT 无此能力到 2022）
+--
+-- 对引擎开发者:
+--   内置数组类型 + UNNEST 函数是字符串拆分的最优基础设施。
+--   不需要专门的 STRING_SPLIT 函数——组合已有原语更优雅。
+--   WITH ORDINALITY 对保留顺序至关重要（很多场景需要知道"第几个元素"）。
