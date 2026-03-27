@@ -115,3 +115,15 @@
 | **DELETE RETURNING** | 3.35.0+ 支持 RETURNING | 不支持 | 不支持 | PG 支持 |
 | **软删除替代** | 应用层实现 | TTL 自动过期删除是更好的替代方案 | 表/分区过期策略替代手动删除 | 应用层实现或 Oracle VPD |
 | **性能代价** | 轻量操作 | 重量级：重写 data part，推荐用 TTL 或分区 DROP 替代 | 消耗 DML 配额，大批量删除建议按分区操作 | 行级操作，大批量建议分批 |
+
+## 引擎开发者视角
+
+**核心设计决策**：DELETE 的实现方式取决于存储引擎的数据组织方式。行存引擎的原地删除与列存/LSM 引擎的标记删除是完全不同的技术路线。
+
+**实现建议**：
+- MVCC 引擎中 DELETE 通常是标记删除（标记行为不可见），物理空间回收延迟到 VACUUM/compaction 阶段。这是正确的设计——即时物理删除会破坏并发读事务的快照
+- TRUNCATE TABLE 必须与 DELETE FROM table 有本质区别：TRUNCATE 应直接释放数据文件/段，复杂度为 O(1)，不写入行级日志。但 TRUNCATE 的事务性需要明确——PostgreSQL 的 TRUNCATE 可回滚（写入 WAL），MySQL 的不可回滚
+- DELETE ... RETURNING（返回被删除的行）实现成本低但对用户很有用——审计、级联操作等场景都需要。推荐从第一天就支持
+- 分批删除（DELETE ... ORDER BY ... LIMIT）是 MySQL 的特色语法，对大批量删除避免长事务很有价值。标准方案是用 CTE + DELETE：`WITH to_delete AS (SELECT id FROM t LIMIT 1000) DELETE FROM t WHERE id IN (SELECT id FROM to_delete)`
+- 列式/分析型引擎中 DELETE 代价极高（需要重写整个数据块），推荐引导用户使用 TTL 自动过期或分区 DROP 替代。ClickHouse 的轻量级 DELETE（标记删除 + 后台清理）是列式引擎的实用折中
+- 常见错误：DELETE 不触发外键的 CASCADE/SET NULL 操作。外键级联删除的递归深度需要有限制以防止意外的大规模数据删除

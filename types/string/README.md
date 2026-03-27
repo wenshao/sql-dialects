@@ -113,3 +113,16 @@
 | **空字符串** | `''` 与 NULL 不同（标准行为） | `''` 与 NULL 不同 | `''` 与 NULL 不同 | Oracle 中 `''` = NULL（独特陷阱） |
 | **长度限制** | 无实际限制（受磁盘空间限制） | 无硬性限制，列式压缩高效 | 无硬性限制 | MySQL 65535 字节 / PG 1GB / Oracle 4000/32767 |
 | **CHAR 补空格** | CHAR(n) 不补空格（动态类型无此语义） | FixedString(N) 补零字节（非空格） | 无 CHAR 类型 | CHAR(n) 补空格且比较时忽略尾部空格 |
+
+## 引擎开发者视角
+
+**核心设计决策**：字符串类型的内部表示（编码方式、存储格式）和排序规则（collation）系统直接影响引擎的国际化能力和查询性能。
+
+**实现建议**：
+- 内部编码推荐统一使用 UTF-8——这是现代系统的事实标准。MySQL 的 utf8（3 字节，不完整 UTF-8）vs utf8mb4（4 字节，完整 UTF-8）的历史包袱是设计教训。新引擎应从第一天就用完整的 UTF-8
+- VARCHAR(n) vs TEXT 的选择：推荐 PostgreSQL 的方式——VARCHAR(n) 和 TEXT 在存储上完全相同，VARCHAR(n) 只是增加了长度检查。不要像 MySQL 那样让 VARCHAR 的最大长度影响行格式
+- COLLATION（排序规则）是字符串系统中最复杂的部分：决定了比较、排序、LIKE 匹配的行为。推荐默认使用 Unicode Collation Algorithm（UCA），并支持大小写不敏感的排序规则（如 utf8_general_ci）
+- 字符串比较的 padding 语义需要明确：SQL 标准定义 CHAR(n) 比较时忽略尾部空格，但 VARCHAR 不忽略。Oracle 的空字符串等于 NULL 是独特的实现选择——新引擎不应采用
+- 列式引擎的字符串压缩潜力巨大：字典编码（dictionary encoding）可以将重复字符串压缩为整数索引。ClickHouse 的 LowCardinality(String) 是成功案例
+- 固定长度字符串（CHAR/FixedString）在某些场景下更高效（如国家代码、状态码），因为不需要存储长度前缀
+- 常见错误：LENGTH 函数在单字节编码（latin1）和多字节编码（UTF-8）下返回不同类型的"长度"——字符数 vs 字节数。引擎必须明确 LENGTH 返回字符数，OCTET_LENGTH 返回字节数

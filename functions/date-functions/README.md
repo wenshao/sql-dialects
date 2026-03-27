@@ -114,3 +114,15 @@
 | **DATE_TRUNC** | 无原生 DATE_TRUNC（用 strftime 模拟） | toStartOfMonth/toStartOfDay 等专用函数 | DATE_TRUNC（设计最一致） | PG 有 DATE_TRUNC，MySQL 无原生支持 |
 | **时区处理** | 无时区概念（存储什么就是什么） | DateTime 可指定时区（'Asia/Shanghai'） | TIMESTAMP 自动 UTC 处理 | PG TIMESTAMPTZ 最佳 / MySQL TIMESTAMP 自动转 UTC |
 | **动态类型影响** | 日期存为字符串时，比较和排序可能不符预期 | 严格类型确保日期计算正确 | 严格类型 | 严格类型 |
+
+## 引擎开发者视角
+
+**核心设计决策**：日期函数是方言差异最大的领域，引擎在函数命名和行为上的选择直接决定了与现有生态的兼容程度。
+
+**实现建议**：
+- 推荐采用统一命名模式：DATE_ADD/DATE_SUB/DATE_DIFF/DATE_TRUNC/DATE_PART——BigQuery 的设计最一致，用户学习成本低。避免 MySQL 的多套等价函数（DATE_ADD = ADDDATE, DATE_SUB = SUBDATE）
+- DATE_TRUNC（按指定粒度截断时间戳）是分析查询的核心函数，MySQL 至今不支持是重大缺失。新引擎必须从第一天就支持
+- INTERVAL 类型是否作为一等公民存储：PostgreSQL 的做法（INTERVAL 可以存储为列类型）更灵活但实现复杂，MySQL 的做法（INTERVAL 仅用于函数参数）更简单
+- 时区处理是最容易出错的领域：推荐内部统一使用 UTC 存储，输入输出时根据会话时区转换。PostgreSQL 的 TIMESTAMPTZ 模型是黄金标准——存储 UTC，显示时自动转换
+- date_bin()（PostgreSQL 14+，按任意间隔对齐时间戳）是新兴的高价值函数——比 DATE_TRUNC 更灵活（可以按 15 分钟、6 小时等任意间隔对齐），时序分析场景价值极大
+- 常见错误：一周的第一天不可配置。ISO 标准定义周一为一周的第一天，但美国用户期望周日是第一天——引擎应提供会话级配置参数

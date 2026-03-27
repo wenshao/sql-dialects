@@ -115,3 +115,16 @@
 | **INSERT RETURNING** | 不支持 | 不支持 | 不支持 | PG 支持，MySQL 不支持（用 LAST_INSERT_ID） |
 | **INSERT OVERWRITE** | 不支持 | 不支持（用 DROP + INSERT 或 ALTER TABLE DELETE） | 支持 INSERT OVERWRITE（覆盖表/分区） | 不支持（Hive/Spark 支持） |
 | **事务保证** | 每条 INSERT 在事务中原子执行 | 无传统事务，INSERT 批次要么全成功要么全失败 | DML 操作有快照隔离但无跨语句事务 | 完整 ACID 事务保证 |
+
+## 引擎开发者视角
+
+**核心设计决策**：INSERT 是数据写入的主要入口，其性能直接决定引擎的写入吞吐量。批量 INSERT 的效率和单行 INSERT 的延迟是两个不同的优化方向。
+
+**实现建议**：
+- 多行 VALUES 语法（INSERT INTO t VALUES (1,'a'),(2,'b'),...）是基本要求，批量写入性能可以比逐行 INSERT 快 10-100 倍（减少解析和事务开销）
+- COPY/LOAD DATA（批量导入）应作为独立的高速通道实现——跳过 SQL 解析、使用二进制协议、直接写入存储层。PostgreSQL 的 COPY 和 MySQL 的 LOAD DATA INFILE 是成熟参考
+- INSERT ... RETURNING 对 ORM 框架至关重要——插入后立即获取自增 ID 和默认值列，避免额外的 SELECT 查询。这个特性对用户体验影响巨大
+- INSERT INTO ... SELECT 的执行必须避免源表和目标表是同一张表时的读写冲突。PostgreSQL 的做法是先物化 SELECT 结果再 INSERT
+- 列式引擎应优化批量写入而非单行写入：ClickHouse 推荐每批至少数千行的设计哲学是正确的。可以提供客户端缓冲机制将小批量合并为大批量
+- INSERT OVERWRITE（覆盖写入）对 ETL 场景很重要，Hive/Spark 的支持证明了其价值。RDBMS 中可以用 TRUNCATE + INSERT 或分区替换模拟
+- 常见错误：INSERT 性能受索引维护拖累——每个索引在 INSERT 时都需要更新。应提供批量插入时延迟索引更新的选项

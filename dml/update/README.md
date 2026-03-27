@@ -114,3 +114,15 @@
 | **UPDATE RETURNING** | 3.35.0+ 支持 RETURNING | 不支持 | 不支持 | PG 支持，MySQL/Oracle 不支持 |
 | **性能影响** | 轻量操作 | 重量级操作：重写整个 data part，不适合频繁小批量更新 | 每次 UPDATE 消耗 DML 配额且扫描受影响分区 | 行级操作，性能高 |
 | **并发限制** | 单写模型，UPDATE 时阻塞其他写入 | mutation 队列串行执行 | 同一表的并发 DML 有限制 | 行级锁支持并发 UPDATE |
+
+## 引擎开发者视角
+
+**核心设计决策**：UPDATE 在不同存储架构中的实现差异巨大。行存引擎可以原地更新，列存引擎通常需要 delete + insert（因为同一行的不同列分散存储），LSM 引擎写入新版本等待合并。
+
+**实现建议**：
+- MVCC 下的 UPDATE 通常实现为 delete-old-version + insert-new-version：PostgreSQL 的 HOT（Heap-Only Tuple）优化在更新不改变索引列时避免索引更新，这对更新频繁的场景性能提升显著
+- UPDATE ... FROM（多表关联更新）的语法选择：PostgreSQL 的 FROM 子句 vs MySQL 的 JOIN 语法 vs SQL 标准的 MERGE。推荐至少支持一种，MERGE 是最灵活的但实现最复杂
+- UPDATE ... RETURNING 是 PostgreSQL 的杀手级特性——获取更新前后的值不需要额外查询，对乐观锁实现（version 列）尤其有用
+- 列式引擎的 UPDATE 代价极高：整个数据块都需要重写。ClickHouse 的异步 mutation 方式（后台合并时执行）是现实的折中方案。引擎应明确文档化 UPDATE 的成本并引导用户使用替代方案
+- 部分列更新的优化：UPDATE 只修改了一个列时，不应该重写整行的所有列数据。PostgreSQL 的 TOAST 机制（大值外部存储，未修改的不动）是参考
+- 常见错误：UPDATE 没有正确处理自引用（UPDATE t SET a = a + 1）——同一语句中读取的值应该是更新前的旧值（SQL 标准的 snapshot 语义），而非已经更新的新值

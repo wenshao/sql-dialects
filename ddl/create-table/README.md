@@ -116,3 +116,15 @@
 | **约束执行** | 支持但外键默认关闭（需 PRAGMA foreign_keys=ON） | 不支持外键，PRIMARY KEY 影响排序但不强制唯一 | 约束为信息性（NOT ENFORCED），不实际执行 | 完整约束执行（PK/FK/UNIQUE/CHECK） |
 | **分区/分桶** | 不支持 | 通过 PARTITION BY 表达式分区，ORDER BY 定义排序键 | PARTITION BY（仅支持日期/整数等）+ CLUSTER BY 代替索引 | 支持 RANGE/LIST/HASH 分区 |
 | **并发架构** | 文件级锁，单写多读（WAL 模式下允许并发读） | 多节点分布式写入，列式存储优化批量写入 | Serverless 无限扩展，按查询量计费 | 客户端-服务器架构，行级锁支持高并发读写 |
+
+## 引擎开发者视角
+
+**核心设计决策**：建表语法是引擎的第一印象。需要决定：是否支持 ENGINE 子句（可插拔存储）？约束是强制执行还是信息性的？自增用列属性还是独立 SEQUENCE 对象？
+
+**实现建议**：
+- IF NOT EXISTS 必须从第一天就支持——DDL 脚本的幂等性依赖此特性，缺失会导致部署脚本无法重复执行
+- 分布式引擎不推荐全局自增（实现成本高、热点问题），推荐 UUID 或 AUTO_RANDOM（TiDB 的做法是好范例）
+- CREATE TABLE AS SELECT（CTAS）实现简单但价值大，应尽早支持——它是 ETL 和数据探索的核心操作
+- 存储引擎子句（ENGINE=xxx）如果走 MySQL 兼容路线可以保留但默认只支持一种存储引擎。ClickHouse 的强制指定引擎（MergeTree/Log/Memory）面向不同场景是好设计
+- 列式引擎需要额外的建表参数：排序键（ORDER BY）、分区表达式（PARTITION BY）、TTL 设置等。这些参数的语法设计要尽量声明式而非过程式
+- 常见错误：TEMPORARY TABLE 和普通表共享命名空间导致意外冲突。临时表应在独立的命名空间中，并且临时表始终优先于同名永久表被解析

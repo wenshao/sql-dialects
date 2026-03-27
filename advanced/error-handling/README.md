@@ -112,3 +112,15 @@
 | **错误代码** | SQLITE_xxx 返回码体系 | HTTP 错误码 + 内部错误消息 | 标准 GoogleSQL 错误消息 | PG SQLSTATE / MySQL 错误号 / Oracle ORA-xxxxx |
 | **重试机制** | 应用层处理 SQLITE_BUSY 重试 | 应用层重试失败查询 | 应用层重试，Scripting 中可 CATCH 后重试 | 存储过程内可 RETRY 逻辑 |
 | **事务回滚** | 错误时应用层决定是否 ROLLBACK | 无事务回滚概念 | 无跨语句事务 | PG EXCEPTION 自动回滚到 SAVEPOINT |
+
+## 引擎开发者视角
+
+**核心设计决策**：错误处理模型的选择直接影响引擎的可用性和调试体验。TRY-CATCH（结构化异常处理）vs DECLARE HANDLER（条件处理器）vs EXCEPTION WHEN（PL/pgSQL 风格）三种范式各有优劣。
+
+**实现建议**：
+- 推荐采用 TRY-CATCH 模型——用户学习成本低，与应用层编程语言的异常处理模式一致
+- 错误码体系设计至关重要：推荐遵循 SQL 标准的 5 字符 SQLSTATE 编码（如 23505 唯一违反），而非自定义数字错误码。SQLSTATE 已被广泛认知且有标准分类
+- RAISE/SIGNAL 语句应同时支持设置 SQLSTATE、错误消息和错误详情，PostgreSQL 的 RAISE EXCEPTION '消息' USING DETAIL='详情', HINT='建议' 是优秀设计范例
+- 异常与事务的交互是实现难点：PostgreSQL 模式（异常自动回滚到 SAVEPOINT）用户体验更好但实现更复杂，MySQL 模式（不自动回滚）实现简单但容易导致数据不一致
+- 错误堆栈信息（GET DIAGNOSTICS / GET STACKED DIAGNOSTICS）对调试至关重要，不要只返回错误码和消息
+- 常见错误：异常处理后不清理事务状态。还有一个陷阱是 HANDLER 的作用域规则——MySQL 的 CONTINUE HANDLER 和 EXIT HANDLER 语义复杂，新引擎不建议采用

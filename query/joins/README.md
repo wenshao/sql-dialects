@@ -115,3 +115,15 @@
 | **JOIN 性能** | 嵌套循环为主，适合小数据集 | JOIN 可能触发数据 shuffle，提供 JOIN 算法提示优化 | Serverless 自动优化，大表 JOIN 按扫描量计费 | 优化器选择 nested loop/hash/merge join |
 | **JOIN 哲学** | 传统关系型 JOIN | 列式存储偏好宽表，JOIN 代价较高，推荐预 JOIN 写入 | 按扫描数据量计费，JOIN 大表成本高 | JOIN 是核心操作，优化器高度成熟 |
 | **存储模型影响** | 行存储，JOIN 操作自然 | 列存储 + 分布式，JOIN 需要网络传输和内存 | 列存储 + Serverless，按扫描量计费影响 JOIN 策略 | 行存储，JOIN 依赖索引高效执行 |
+
+## 引擎开发者视角
+
+**核心设计决策**：JOIN 是查询处理最复杂的部分。实现哪些 JOIN 算法、优化器如何选择 JOIN 顺序和算法，直接决定了引擎处理复杂查询的能力。
+
+**实现建议**：
+- 三大 JOIN 算法必须全部实现：Nested Loop（小表/有索引时最优）、Hash Join（等值 JOIN 的通用选择）、Sort-Merge Join（已排序数据或不等值 JOIN）。只实现 Nested Loop 的引擎在大表 JOIN 时完全不可用
+- JOIN 顺序优化是 NP-hard 问题：小于 10 个表时可以穷举，超过时需要启发式算法（如 PostgreSQL 的 GEQO——遗传算法）或动态规划剪枝。这是查询优化器中最复杂的模块之一
+- FULL OUTER JOIN 的实现比 LEFT/RIGHT JOIN 复杂得多——MySQL/MariaDB 至今不支持证明了这一点。推荐实现方式：LEFT JOIN + ANTI JOIN（找出右表中未匹配的行）
+- LATERAL JOIN 是现代 SQL 的重要特性——允许子查询引用同级 FROM 子句中的列。实现上相当于对外层每一行执行一次参数化子查询
+- 分布式 JOIN 的数据移动策略至关重要：Broadcast（小表广播到所有节点）vs Shuffle（按 JOIN 键重新分布两个表）vs Co-located（数据已按 JOIN 键分布时无需移动）。优化器必须根据表大小自动选择策略
+- 常见错误：JOIN 条件中的隐式类型转换导致无法使用索引。如果 JOIN 列类型不同（如 INT JOIN VARCHAR），引擎应发出警告而非静默做类型转换

@@ -114,3 +114,16 @@
 | **精度范围** | 取决于存储格式（TEXT 可存任意精度字符串） | DateTime64 可指定精度（毫秒/微秒/纳秒） | DATETIME 微秒级，TIMESTAMP 微秒级 | MySQL DATETIME(6)微秒 / PG 微秒级 |
 | **日期范围** | 无限制（TEXT 存储任意字符串） | Date: 1970-2149，DateTime64: 1900-2299 | 0001-01-01 到 9999-12-31 | MySQL TIMESTAMP 有 2038 问题 |
 | **INTERVAL 类型** | 不支持原生 INTERVAL，用字符串参数模拟 | 支持 INTERVAL（在函数中使用） | 支持 INTERVAL | PG/Oracle 原生 INTERVAL / MySQL 仅函数中可用 |
+
+## 引擎开发者视角
+
+**核心设计决策**：日期时间类型的内部表示和精度选择直接影响存储效率和计算准确性。时区处理策略是最容易出错的领域。
+
+**实现建议**：
+- 内部表示推荐使用 Unix 时间戳（微秒级 int64）——计算简单、比较高效、存储紧凑。4 字节 Date 类型（距 epoch 的天数）和 8 字节 DateTime（微秒级时间戳）是合理的空间分配
+- TIMESTAMP WITH TIME ZONE 的正确实现是存储 UTC 值 + 显示时根据会话时区转换——PostgreSQL 的做法是黄金标准。MySQL 的 TIMESTAMP 也转 UTC 但 DATETIME 不转，这种不一致是设计失误
+- 精度（秒/毫秒/微秒/纳秒）应由类型参数控制——DATETIME(3) 毫秒级、DATETIME(6) 微秒级。ClickHouse 的 DateTime64(precision) 设计灵活
+- DATE 类型（纯日期无时间）应独立于 DATETIME 实现——很多业务场景只需要日期（生日、截止日）。DATE 的比较和计算比 DATETIME 更简单
+- INTERVAL 类型的设计需要处理"日-时间"（day-time）和"年-月"（year-month）两类间隔——两者不能混合（因为一个月的天数不固定）。PostgreSQL 的 INTERVAL 允许混合但存在歧义
+- 2038 问题（32 位 Unix 时间戳溢出）：新引擎应使用 64 位时间戳从根源避免此问题
+- 常见错误：夏令时切换时的时间运算。`'2024-03-10 02:30:00' AT TIME ZONE 'US/Eastern'` 这个时间不存在（被跳过）——引擎应报错或自动调整而非返回不正确的结果

@@ -111,3 +111,15 @@
 | **数据库层次** | 单文件即一个数据库，无 schema 概念 | database → table 两层结构 | project → dataset → table 三层结构 | PG: database→schema→table，MySQL: database=schema |
 | **多租户隔离** | 每个租户一个数据库文件实现隔离 | 通过 database 或行级权限隔离 | 通过 dataset 权限 + IAM 策略隔离 | schema 隔离（PG）或 database 隔离（MySQL） |
 | **跨库查询** | 通过 ATTACH DATABASE 可跨文件查询 | 支持跨 database 查询 | 支持跨 dataset/跨 project 查询 | 各方言支持程度不同（PG 需 dblink/FDW） |
+
+## 引擎开发者视角
+
+**核心设计决策**：命名空间层次结构直接影响多租户隔离能力和跨库查询能力。PostgreSQL 的 database -> schema -> table 三层模型和 MySQL 的 database = schema 二层模型代表两种设计哲学。
+
+**实现建议**：
+- 推荐采用三层命名空间（catalog -> schema -> table）——SQL 标准定义的就是三层模型。schema 层提供逻辑隔离但共享连接，database 层提供物理隔离
+- 跨 database 查询是否支持是重大架构决策：PostgreSQL 不支持（需要 dblink/FDW），这简化了实现但限制了使用灵活性。如果引擎的存储层支持跨 database 访问，开放跨库查询会更受用户欢迎
+- 用户认证应设计为可插拔的——密码认证、LDAP、Kerberos、证书认证、OAuth 等应通过统一接口接入。PostgreSQL 的 pg_hba.conf 方式灵活但配置复杂，可以在此基础上增加 SQL 级配置
+- 系统用户/超级用户的设计要谨慎：PostgreSQL 的 SUPERUSER 跳过所有权限检查，这在安全审计中是隐患。推荐细粒度的系统权限（如 CREATE DATABASE、CREATE USER 等独立权限）
+- database/schema 的创建应支持 IF NOT EXISTS——与 CREATE TABLE 同理，DDL 脚本需要幂等性
+- 常见错误：public schema 的默认权限过于宽松。PostgreSQL 15 收紧了 public schema 的默认权限——新引擎应从一开始就采用最小权限默认值

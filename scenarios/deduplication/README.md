@@ -95,3 +95,15 @@
 | **去重时机** | 即时（DML 操作立即生效） | 最终一致：后台合并时去重，查询时可能看到重复 | DML 操作即时但受配额限制 | 即时 |
 | **DISTINCT 性能** | 适合小数据集 | 列式存储 DISTINCT 高效，有 APPROX 近似去重 | 大数据集 DISTINCT 按扫描量计费 | 取决于索引和数据量 |
 | **INSERT 防重** | UNIQUE 约束 + ON CONFLICT | PRIMARY KEY/ReplacingMergeTree（不强制即时唯一） | 约束不强制，需应用层防重 | UNIQUE 约束强制去重 |
+
+## 引擎开发者视角
+
+**核心设计决策**：去重是引擎级还是 SQL 级的责任。OLTP 引擎通过唯一约束在写入时防重，分析型引擎（如 ClickHouse 的 ReplacingMergeTree）在后台合并时去重——两种哲学适合不同场景。
+
+**实现建议**：
+- 写入时去重（UNIQUE 约束）是 OLTP 引擎的标准方案。实现依赖唯一索引——INSERT 时检查是否冲突，冲突时报错或执行 UPSERT 逻辑
+- 读取时去重（查询时 DISTINCT/ROW_NUMBER）适合分析场景。优化器应将 DISTINCT 尽可能下推——如果能在扫描阶段去重就不要等到排序阶段
+- ROW_NUMBER + DELETE（删除重复行保留一条）的模式在 CTE 中实现：`WITH dups AS (SELECT *, ROW_NUMBER() OVER(PARTITION BY key ORDER BY id) AS rn FROM t) DELETE FROM t WHERE id IN (SELECT id FROM dups WHERE rn > 1)`。引擎应确保这种模式的执行效率
+- ClickHouse 的引擎级去重（ReplacingMergeTree 在后台合并时按版本号保留最新行）是列式引擎的创新方案——适合数据最终一致的场景
+- DISTINCT 的实现与 GROUP BY 共享相同的去重基础设施（哈希或排序）。优化器应能将 `SELECT DISTINCT a, b FROM t` 转换为 `SELECT a, b FROM t GROUP BY a, b`
+- 常见错误：DISTINCT ON（PostgreSQL 特有语法，按部分列去重）在其他引擎中没有等价语法。如果兼容 PostgreSQL，实现此特性可以减少用户需要写的 ROW_NUMBER 样板代码

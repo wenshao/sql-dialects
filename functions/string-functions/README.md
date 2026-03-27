@@ -114,3 +114,15 @@
 | **正则表达式** | 不内置（需加载 regexp 扩展） | 丰富的正则函数（match/extract/replaceRegexpAll） | REGEXP_CONTAINS/REGEXP_EXTRACT/REGEXP_REPLACE | PG 内置强大正则 / MySQL 8.0+ 支持 |
 | **LIKE 性能** | 无全文索引，LIKE '%x%' 全表扫描 | 列式存储下 LIKE 可利用跳数索引优化 | LIKE 按扫描量计费 | 可利用索引优化前缀 LIKE |
 | **动态类型影响** | 任何类型可存入 TEXT 列，字符串函数容错性高 | 严格类型，非 String 需先转换 | 严格类型 | 严格类型 |
+
+## 引擎开发者视角
+
+**核心设计决策**：字符串函数的实现需要处理编码、排序规则（collation）和多字节字符等复杂性。函数的 NULL 传播行为和字符串拼接运算符的选择影响兼容性。
+
+**实现建议**：
+- 字符串拼接推荐同时支持 `||` 运算符（SQL 标准）和 CONCAT() 函数（MySQL 兼容）。关键决策：`NULL || 'abc'` 返回 NULL（SQL 标准/PostgreSQL）还是 'abc'（Oracle）？推荐遵循 SQL 标准
+- LENGTH vs CHAR_LENGTH vs OCTET_LENGTH 三个函数必须同时提供且语义清晰：LENGTH 返回字符数（UTF-8 中一个中文字符 = 1），OCTET_LENGTH 返回字节数（UTF-8 中一个中文字符 = 3）
+- 正则表达式支持是高价值特性：REGEXP_REPLACE/REGEXP_EXTRACT/REGEXP_MATCH 覆盖复杂文本处理需求。推荐使用 RE2 或 PCRE 库而非自研正则引擎——正则引擎的性能和正确性极难保证
+- COLLATION（排序规则）是字符串系统的深层复杂性：决定了字符串比较、排序和 LIKE 匹配的行为。推荐默认使用 Unicode 排序算法（UCA），并支持大小写不敏感的排序规则
+- LIKE 的优化至关重要：前缀匹配（`LIKE 'abc%'`）应能利用 B-Tree 索引，但通配符开头（`LIKE '%abc'`）只能全表扫描——引擎应在 EXPLAIN 中明确标注这一点
+- 常见错误：SUBSTRING 的索引是从 1 开始（SQL 标准）还是从 0 开始（编程语言惯例）。SQL 标准明确从 1 开始——不要偏离标准

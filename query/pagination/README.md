@@ -114,3 +114,15 @@
 | **键集分页** | 支持 WHERE id > last_id 键集分页 | 支持且推荐，避免大 OFFSET | 支持但更推荐利用分区裁剪 | 均支持且推荐 |
 | **FETCH FIRST** | 不支持 SQL 标准 FETCH FIRST 语法 | 不支持 | 不支持 | PG/Oracle 12c+/SQL Server 2012+ 支持 |
 | **计费影响** | 无计费概念 | 无直接计费影响 | OFFSET 不减少扫描量，分页仍按全量扫描计费 | 无计费概念 |
+
+## 引擎开发者视角
+
+**核心设计决策**：分页是 Web 应用最常见的查询模式。LIMIT/OFFSET 的性能特性和 SQL 标准 FETCH FIRST 的支持程度直接影响用户体验。
+
+**实现建议**：
+- LIMIT/OFFSET 是最直观的分页语法，必须支持。但引擎应在内部将 OFFSET 优化为跳过操作而非物化前 N 行——对于 `LIMIT 10 OFFSET 1000000`，不应真正构造一百万行的中间结果
+- SQL 标准的 FETCH FIRST n ROWS ONLY / OFFSET n ROWS 语法推荐同时支持（PostgreSQL 已同时支持两种）——标准语法对企业用户迁移有价值
+- 键集分页（keyset pagination，`WHERE id > last_id ORDER BY id LIMIT n`）的优化对引擎来说更自然——可以直接利用索引定位起始位置，O(1) 而非 O(offset)。引擎应确保这种模式能触发 Index Scan
+- WITH TIES 选项（FETCH FIRST 10 ROWS WITH TIES，返回排序值相同的所有行）实现简单但语义有用——排行榜场景中并列排名应全部返回
+- 对于分布式引擎，LIMIT 的实现需要注意：各节点先取 LIMIT+OFFSET 行，协调节点再做全局 LIMIT——如果 OFFSET 很大会导致各节点传输大量数据
+- 常见错误：没有 ORDER BY 的 LIMIT 返回不确定的结果集——引擎应对此发出警告（结果随执行计划变化而变化，用户可能以为结果是稳定的）

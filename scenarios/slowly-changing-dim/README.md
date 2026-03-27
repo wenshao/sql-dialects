@@ -95,3 +95,15 @@
 | **SCD Type 2** | INSERT 新行 + UPDATE 旧行关闭 | INSERT 新行 + UPDATE 关闭旧行（mutation 代价高） | MERGE 语法实现 SCD2（最简洁） | MERGE / INSERT + UPDATE |
 | **时间旅行** | 不支持（需手动管理版本） | 不支持时间旅行查询 | 支持 FOR SYSTEM_TIME（7 天时间旅行查询） | Oracle Flashback / PG 无原生支持 |
 | **适用场景** | 小型数仓的维度管理 | 大数据量维度表，但 UPDATE 代价高 | 云数仓 SCD 管理的首选方案 | 传统数仓标准方案 |
+
+## 引擎开发者视角
+
+**核心设计决策**：缓慢变化维（SCD）是数仓的经典模式。引擎是否提供内置的时间旅行查询（temporal query）或版本化表决定了 SCD 实现的复杂度。
+
+**实现建议**：
+- SCD Type 2（保留历史版本，用 valid_from/valid_to 标记有效期）在引擎层面可以通过 SYSTEM VERSIONING（SQL:2011 的时态表标准）原生支持——MariaDB 的 System-Versioned Tables 是参考实现
+- MERGE 语句是 SCD Type 2 的最自然实现方式：WHEN MATCHED AND data_changed THEN UPDATE（关闭旧行）+ INSERT（新版本行）。引擎如果支持 MERGE 的多分支语义，SCD 实现会非常简洁
+- 时间旅行查询（`SELECT * FROM t FOR SYSTEM_TIME AS OF '2024-01-01'`）对审计和历史分析至关重要。BigQuery 的 7 天时间旅行和 Snowflake 的 90 天时间旅行基于存储层的版本保留实现
+- 对于列式引擎，SCD Type 1（直接覆盖更新）代价高昂（需要重写数据块）。替代方案：用 SCD Type 2（追加新版本）+ 查询时取最新版本（ROW_NUMBER 过滤），这与列式引擎的 append-only 哲学更契合
+- DELETE + INSERT 模式在 SCD 中常见——引擎应确保这两个操作在同一事务中的原子性
+- 常见错误：SCD Type 2 的 valid_to 列使用 NULL 表示"当前有效"还是使用极大日期（如 '9999-12-31'）。NULL 语义上更正确但 JOIN 条件中 NULL 需要特殊处理——引擎应在文档中给出最佳实践建议

@@ -94,3 +94,15 @@
 | **拆分函数** | 无内置拆分函数（递归 CTE + substr 模拟） | splitByChar/splitByString 返回 Array + arrayJoin 展开 | SPLIT() 返回 ARRAY + UNNEST() 展开 | PG STRING_TO_TABLE()/unnest / MySQL JSON_TABLE 模拟 / Oracle REGEXP_SUBSTR |
 | **ARRAY 支持** | 无原生 ARRAY 类型 | 原生 Array 类型，拆分天然高效 | 原生 ARRAY + UNNEST | PG 原生 ARRAY / MySQL 无原生 ARRAY |
 | **性能** | 递归 CTE 拆分效率低 | 列式 Array 操作高效 | Serverless 弹性处理 | 取决于方法和数据量 |
+
+## 引擎开发者视角
+
+**核心设计决策**：字符串拆分为多行涉及两个子问题——拆分函数（split string -> array）和展开操作（array -> rows）。引擎是否有原生 ARRAY 类型直接决定实现方案。
+
+**实现建议**：
+- 最优方案是 SPLIT + UNNEST 组合：先将字符串拆分为数组，再将数组展开为多行。PostgreSQL 的 STRING_TO_TABLE() 函数直接一步完成是最优雅的实现
+- 如果引擎有原生 ARRAY 类型，SPLIT(string, delimiter) -> ARRAY 是自然的实现。ClickHouse 的 splitByChar/splitByString -> arrayJoin 组合紧凑高效
+- 没有 ARRAY 类型的引擎需要用递归 CTE + SUBSTRING 模拟拆分——性能差且代码冗长。这是 MySQL 长期的痛点（直到 JSON_TABLE 才有了可用的替代方案）
+- UNNEST/展开操作的关键决策：展开空数组时是否保留原始行（LEFT JOIN 语义 vs INNER JOIN 语义）。PostgreSQL 的 unnest 默认是 INNER 语义（空数组丢失行），CROSS JOIN LATERAL 可以用 LEFT JOIN LATERAL 保留
+- 正则拆分（按正则表达式模式拆分）是高级需求——PostgreSQL 的 regexp_split_to_table() 直接支持，值得借鉴
+- 常见错误：拆分结果中的空字符串处理。`'a,,b'` 按逗号拆分应该产生 `['a', '', 'b']` 三个元素还是 `['a', 'b']` 两个元素？应遵循标准的拆分语义保留空字符串，并让用户自行过滤

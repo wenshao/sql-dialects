@@ -116,3 +116,15 @@
 | **在线 DDL** | 无此概念，文件级操作天然轻量 | ALTER 操作多为异步 mutation，不阻塞查询 | 完全在线，Serverless 架构无锁表概念 | MySQL ALGORITHM=INSTANT/PG 即时 ADD COLUMN |
 | **ADD COLUMN** | 支持但只能追加到末尾，不能指定位置 | 支持，可用 AFTER 指定位置 | 支持 | 均支持，MySQL 可用 AFTER/FIRST 指定位置 |
 | **权限需求** | 无权限系统，文件访问权即操作权 | 需要 ALTER TABLE 权限 | 需要 IAM bigquery.tables.update 权限 | 需要 ALTER 权限（GRANT/REVOKE 控制） |
+
+## 引擎开发者视角
+
+**核心设计决策**：ALTER TABLE 的在线能力直接影响生产环境的可用性。需要决定：哪些 ALTER 操作可以即时完成（metadata-only），哪些需要重写表数据，以及是否支持并发 DML。
+
+**实现建议**：
+- ADD COLUMN（无默认值或默认值为常量）应设计为即时操作（只修改元数据）——PostgreSQL 11+ 和 MySQL 8.0 的 ALGORITHM=INSTANT 都证明这是可行的。对行格式中未出现的列返回默认值即可
+- DROP COLUMN 的物理删除可以延迟到后台 compaction 阶段执行，前台操作只标记列为已删除。ClickHouse 的异步 mutation 模式值得参考
+- MODIFY COLUMN TYPE 是最复杂的操作：如果新旧类型存储兼容（如 INT -> BIGINT），可以只修改元数据；否则需要全表重写。重写时必须支持并发读写（shadow copy 或 online DDL 方式）
+- RENAME TABLE/COLUMN 应始终是即时操作——只修改元数据字典
+- 分布式引擎的 ALTER TABLE 需要跨节点协调元数据变更：推荐使用 schema version + 两阶段方案，确保所有节点在查询时使用一致的 schema 版本
+- 常见错误：ALTER TABLE 获取排他锁的时间过长导致查询阻塞。MySQL 的 MDL（Metadata Lock）等待是经典问题——应支持 LOCK TIMEOUT 或 NOWAIT 选项

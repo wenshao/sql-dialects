@@ -114,3 +114,15 @@
 | **行级安全** | 不支持（应用层实现） | 支持行级策略（Row Policy） | 通过 IAM 条件和行级访问策略实现 | PG Row-Level Security / Oracle VPD / SQL Server 2016+ |
 | **列级权限** | 不支持 | 支持列级 GRANT | 支持列级 IAM 绑定 | PG/MySQL 支持列级权限 |
 | **安全模型** | 文件系统安全是唯一防线 | 数据库级安全 | 云平台级安全（IAM + VPC + 加密） | 数据库级安全 |
+
+## 引擎开发者视角
+
+**核心设计决策**：权限系统是安全性的基石，设计不当会导致安全漏洞或管理噩梦。核心抉择：RBAC（基于角色的访问控制）vs ABAC（基于属性的访问控制），以及权限检查的粒度和性能开销。
+
+**实现建议**：
+- 从第一天就采用 ROLE 统一模型（PostgreSQL 方式）——USER 和 ROLE 使用相同的底层对象，ROLE 可以继承、嵌套和授权。MySQL 直到 8.0 才加入 ROLE 是设计教训
+- GRANT/REVOKE 的粒度层次推荐：全局 -> 数据库 -> 表 -> 列 -> 行。列级权限实现不复杂但很有用，行级安全（Row-Level Security）实现复杂但对多租户场景至关重要
+- DEFAULT PRIVILEGES（PostgreSQL 特性）应从一开始就支持——新创建的对象自动继承权限，否则 DBA 需要在每次 CREATE TABLE 后手动 GRANT，运维成本极高
+- 权限检查的性能需要特别关注：每条查询都要做权限验证，缓存权限检查结果（per-session 或 per-transaction）是必要的优化
+- 云原生引擎应考虑 IAM 集成（如 BigQuery 的做法），但同时保留 SQL GRANT 接口以兼容传统工具链
+- 常见错误：GRANT WITH GRANT OPTION 的级联撤销语义容易出错。REVOKE 级联时是否自动撤销被授权者再授出去的权限，需要明确定义并文档化

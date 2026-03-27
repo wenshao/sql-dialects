@@ -113,3 +113,15 @@
 | **UDF 支持** | 可通过 C API 注册自定义函数 | 支持 UDF（C++/SQL） | 支持 UDF（SQL/JavaScript） | 各方言支持 UDF |
 | **事务控制** | 应用层管理事务 | 无事务控制 | Scripting 中无显式事务控制 | PG 11+ PROCEDURE 支持事务控制 |
 | **调试能力** | 无数据库端调试 | 无存储过程调试 | 有限的错误信息 | 各方言有不同的调试工具 |
+
+## 引擎开发者视角
+
+**核心设计决策**：是否实现存储过程，以及选择什么过程式语言。这是引擎功能范围的重大决策——存储过程为引擎增加了一个完整的编程运行时。
+
+**实现建议**：
+- 新引擎不建议自研过程式语言——维护成本极高且用户学习曲线陡峭。推荐方案：嵌入已有语言运行时（JavaScript V8/Python/Lua），Snowflake 的多语言存储过程是成功案例
+- 如果必须支持 SQL 过程式语言，优先兼容 PL/pgSQL 或 MySQL 的 BEGIN...END 语法——用户基数大，迁移门槛低
+- PROCEDURE vs FUNCTION 的区别必须明确：PROCEDURE 可以有事务控制（COMMIT/ROLLBACK）和多结果集，FUNCTION 是表达式的一部分且有确定性要求。PostgreSQL 11 之前混淆两者是设计负债
+- 安全上下文（DEFINER vs INVOKER）决定存储过程以谁的权限运行。两者都要支持，默认推荐 INVOKER（更安全）
+- 返回结果集的方式需要统一设计：直接 SELECT（MySQL 风格）最简单，RETURNS TABLE（PostgreSQL 风格）类型更安全，REFCURSOR（Oracle 风格）最灵活但最复杂
+- 常见错误：忽略存储过程的执行计划缓存问题。过程体内的 SQL 应该有独立的计划缓存——每次调用都重新编译会导致严重的性能问题

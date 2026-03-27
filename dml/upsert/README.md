@@ -115,3 +115,15 @@
 | **MERGE 支持** | 不支持 SQL 标准 MERGE | 不支持 MERGE | 完整支持 MERGE（推荐方式） | Oracle/SQL Server 完整支持，PG 15+ 支持，MySQL 不支持 |
 | **并发安全** | 单写模型天然无并发冲突 | 并发 INSERT 后由后台合并保证最终一致 | 同一表并发 MERGE 有限制 | 行级锁保证并发安全，但可能死锁 |
 | **REPLACE INTO** | 支持（DELETE + INSERT） | 不支持 | 不支持 | MySQL 支持（DELETE + INSERT，会重置自增） |
+
+## 引擎开发者视角
+
+**核心设计决策**：UPSERT 的语法选择直接影响并发安全性。MERGE（SQL 标准）vs ON CONFLICT（PostgreSQL）vs ON DUPLICATE KEY（MySQL）各有利弊。
+
+**实现建议**：
+- ON CONFLICT 语义更清晰（显式指定冲突目标列或约束名），推荐新引擎优先实现。PostgreSQL 9.5 的 ON CONFLICT DO UPDATE/DO NOTHING 设计优雅且并发安全
+- MERGE 是 SQL 标准但实现复杂（需要支持 WHEN MATCHED/NOT MATCHED/NOT MATCHED BY SOURCE 多个分支），SQL Server 的 MERGE 实现有已知的并发 bug——新引擎实现 MERGE 时要特别注意锁策略
+- UPSERT 的原子性是核心难点：CHECK-THEN-INSERT 的朴素实现在并发下会失败（TOCTOU 竞态）。正确的实现需要在索引层面加排他锁或使用 INSERT-ON-CONFLICT 的原子操作
+- REPLACE INTO（MySQL/SQLite）的 DELETE+INSERT 语义有严重副作用：重置自增 ID、触发 DELETE 触发器、破坏外键引用。新引擎不推荐实现此语法
+- 分析型引擎如果使用 MergeTree 类架构，可以在引擎级实现去重（ReplacingMergeTree）而非 SQL 级——这是更自然的列式引擎方案
+- 常见错误：UPSERT 的死锁风险。并发 UPSERT 操作如果以不同顺序访问同一组行会导致死锁，引擎应提供 gap lock 或按主键排序的写入策略来缓解

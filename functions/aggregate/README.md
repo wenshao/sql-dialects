@@ -114,3 +114,15 @@ COUNT(DISTINCT) 在大基数列上性能差，大数据场景考虑使用 HyperL
 | **近似聚合** | 不支持 | 丰富：uniq/uniqExact/uniqHLL12/uniqCombined | APPROX_COUNT_DISTINCT 等 | PG/MySQL 不内置，Oracle 有 APPROX_COUNT_DISTINCT |
 | **FILTER 子句** | 不支持（用 CASE WHEN 替代） | 支持 -If 后缀聚合函数（countIf/sumIf 等） | 不支持（用 CASE WHEN 或 COUNTIF） | PG 9.4+ 支持 FILTER (WHERE ...) |
 | **列式优势** | 行存储，聚合需全行读取 | 列式存储使聚合极其高效（只读目标列） | 列式存储 + 按扫描列计费，SELECT 特定列可降低成本 | 行存储，聚合需读取完整行 |
+
+## 引擎开发者视角
+
+**核心设计决策**：聚合函数的实现直接影响分析查询的性能。需要决定：支持哪些聚合函数、是否支持用户自定义聚合（UDAF）、是否提供近似聚合函数。
+
+**实现建议**：
+- 最低实现：COUNT/SUM/AVG/MIN/MAX + GROUP BY。聚合算子的内存管理是关键——GROUP BY 高基数列时的哈希表可能超出内存，必须有溢出到磁盘的机制（hash-based aggregation with spilling）
+- STRING_AGG/LISTAGG（字符串聚合）是高频需求，实现优先级应高于一般认知。MySQL 的 GROUP_CONCAT 有默认 1024 字节限制是设计缺陷——新引擎应默认不限制或设足够大的上限
+- FILTER 子句（PostgreSQL 9.4+ 的 `SUM(x) FILTER (WHERE cond)`）对优化器很友好——可以生成更高效的执行计划。比 CASE WHEN 的等价改写优化空间更大
+- 近似聚合函数（APPROX_COUNT_DISTINCT/HyperLogLog）对大数据引擎几乎是必选——精确的 COUNT DISTINCT 在十亿行级别不实际。ClickHouse 的 uniq/uniqHLL12/uniqCombined 系列函数是优秀参考
+- 用户自定义聚合函数（UDAF）应使用 init/accumulate/merge/finalize 四步接口——merge 步骤对分布式引擎的并行聚合至关重要
+- 常见错误：AVG 的整数除法问题（SUM/COUNT 都是整数时 AVG 可能丢失精度）。聚合函数内部应使用高精度中间类型进行计算

@@ -115,3 +115,16 @@ OLTP 场景下索引是性能优化的第一手段，但不要过度建索引（
 | **CREATE INDEX** | 标准 CREATE INDEX 语法 | 用 ALTER TABLE ADD INDEX 添加跳数索引 | 不支持 CREATE INDEX | 标准 CREATE INDEX 语法 |
 | **全文索引** | 通过 FTS5 虚拟表实现（非传统索引） | tokenbf_v1/ngrambf_v1 实现简单全文查找 | 无原生全文索引 | MySQL FULLTEXT / PG GIN+tsvector / Oracle Text |
 | **存储开销** | 索引存储在同一数据库文件中 | 跳数索引开销极小（只存聚合信息） | 无索引存储开销（按存储和查询计费） | 索引占用独立存储空间，影响写入性能 |
+
+## 引擎开发者视角
+
+**核心设计决策**：索引子系统是 OLTP 引擎的心脏。需要决定：支持哪些索引类型、如何与查询优化器集成、是否支持在线索引创建。
+
+**实现建议**：
+- B-Tree 索引是最高优先级——覆盖等值查找、范围扫描、排序三大场景。B+ Tree（叶子节点链表）是标准实现，支持高效的范围遍历
+- CREATE INDEX CONCURRENTLY（不阻塞写入的索引创建）对生产环境至关重要。实现方式：先构建索引快照再增量追加期间的变更。PostgreSQL 的两阶段方式（build + validate）是参考
+- 部分索引（CREATE INDEX ... WHERE condition）实现成本低但价值大——减少索引大小、提高查询效率。SQLite 和 PostgreSQL 都支持，MySQL 不支持是遗憾
+- 覆盖索引（INCLUDE 子句）让索引包含额外列避免回表查询，PostgreSQL 11+ 的实现可做参考
+- 列式引擎的索引哲学完全不同：ClickHouse 的跳数索引（minmax/bloom_filter）只存聚合信息、开销极小——这是列式引擎索引的正确方向，不要照搬 B-Tree
+- 不可见索引（MySQL 8.0 INVISIBLE INDEX）是优秀的运维特性——让 DBA 可以安全地测试删除索引的影响而不实际删除
+- 常见错误：索引选择性估算不准导致优化器做出错误决策。索引的基数统计（cardinality statistics）需要定期更新

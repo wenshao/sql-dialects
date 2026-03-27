@@ -114,3 +114,15 @@
 | **COALESCE** | 完整支持 | 完整支持 | 完整支持 | 所有方言均支持（SQL 标准） |
 | **NULLIF** | 完整支持 | 完整支持 | 完整支持 | 所有方言均支持 |
 | **NULL 行为** | 动态类型下 NULL 处理较宽松 | 严格的 Nullable 类型系统，非 Nullable 列不存 NULL | 严格类型，NULL 处理符合 SQL 标准 | Oracle 空字符串=NULL 是独特陷阱 |
+
+## 引擎开发者视角
+
+**核心设计决策**：条件函数是表达式求值引擎的基础组件。CASE WHEN 是 SQL 标准的条件分支，实现方式影响所有条件逻辑的性能。
+
+**实现建议**：
+- CASE WHEN 是必须实现的——它是 SQL 标准中唯一的条件分支表达式，其他条件函数（IF/IIF/DECODE）都可以用 CASE WHEN 表达。在优化器中将 IF/IIF 内部归一化为 CASE WHEN 可以简化优化规则
+- COALESCE 的实现应该是短路求值——找到第一个非 NULL 值后不继续计算后续表达式。这对有副作用或计算成本高的表达式很重要
+- NULLIF 是避免除零错误的标准模式（`x / NULLIF(y, 0)`），实现简单但用户价值大。内部可转换为 `CASE WHEN a = b THEN NULL ELSE a END`
+- IF() 函数虽然不是 SQL 标准但在 MySQL 生态中广泛使用。如果目标兼容 MySQL，建议支持。ClickHouse 的 multiIf() 是更通用的变体，减少了嵌套 IF 的可读性问题
+- NULL 的三值逻辑是条件函数实现中的核心复杂性：AND/OR/NOT 与 NULL 的交互必须严格遵循 SQL 标准（NULL AND FALSE = FALSE，NULL OR TRUE = TRUE 等）
+- 常见错误：CASE WHEN 的类型推导——各分支返回不同类型时结果类型如何确定。SQL 标准定义了类型提升规则，但 MySQL 的隐式转换规则与标准不同，需要明确设计决策
