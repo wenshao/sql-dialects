@@ -1,0 +1,59 @@
+# 公用表表达式 (CTE) — 方言对比
+
+## 语法支持对比
+
+### 传统 RDBMS
+
+| 特性 | MySQL | PostgreSQL | SQLite | Oracle | SQL Server | MariaDB | Firebird | Db2 | SAP HANA |
+|---|---|---|---|---|---|---|---|---|---|
+| 基本 CTE | ✅ 8.0+ | ✅ 8.4+ | ✅ 3.8.3+ | ✅ 9i+ | ✅ 2005+ | ✅ 10.2+ | ✅ 2.1+ | ✅ | ✅ |
+| 递归 CTE | ✅ 8.0+ | ✅ 8.4+ | ✅ 3.8.3+ | ✅ 11g+ | ✅ 2005+ | ✅ 10.2.2+ | ✅ 2.1+ | ✅ | ✅ |
+| 多个 CTE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| CTE + DML | ✅ 8.0.19+ | ✅ 9.1+ | ✅ | ❌ | ✅ | ✅ 10.2.1+ | ✅ 3.0+ | ✅ | ✅ |
+| MATERIALIZED | ❌ | ✅ 12+ | ✅ 3.34+ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| RECURSIVE 关键字 | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ |
+
+### 大数据 / 分析引擎
+
+| 特性 | BigQuery | Snowflake | MaxCompute | Hive | ClickHouse | StarRocks | Trino | Hologres | Doris | DuckDB | Spark | Flink |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 基本 CTE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 递归 CTE | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
+| CTE + DML | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ 3.0+ | ✅ |
+| MATERIALIZED | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+### 云数据仓库
+
+| 特性 | Redshift | Synapse | Databricks | Greenplum | Impala | Vertica | Teradata |
+|---|---|---|---|---|---|---|---|
+| 基本 CTE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 递归 CTE | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| CTE + DML | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ |
+| MATERIALIZED | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+### 分布式 / NewSQL
+
+| 特性 | TiDB | OceanBase | CockroachDB | Spanner | YugabyteDB | PolarDB | openGauss | TDSQL | DamengDB | KingbaseES |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 基本 CTE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 递归 CTE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| CTE + DML | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| MATERIALIZED | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ |
+
+### 特殊用途
+
+| 特性 | TimescaleDB | TDengine | ksqlDB | Materialize | H2 | Derby |
+|---|---|---|---|---|---|---|
+| 基本 CTE | ✅ | ❌ | ❌ | ✅ | ✅ | ⚠️ 10.14+ |
+| 递归 CTE | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+| CTE + DML | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
+| MATERIALIZED | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+## 关键差异
+
+- **Oracle/SQL Server/Synapse** 递归 CTE 不需要 RECURSIVE 关键字
+- **Hive/MaxCompute/Impala/Spark/Flink/Hologres** 不支持递归 CTE
+- **TDengine/ksqlDB** 完全不支持 CTE
+- **Derby** 仅在 10.14+ 支持基本 CTE，不支持递归
+- **PostgreSQL/SQLite/TimescaleDB/openGauss/KingbaseES** 支持 MATERIALIZED/NOT MATERIALIZED 提示控制物化行为
+- **ClickHouse** 支持标量 CTE（WITH 定义标量表达式）

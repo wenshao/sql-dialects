@@ -1,0 +1,111 @@
+-- TiDB: 数据去重策略（Deduplication）
+--
+-- 参考资料:
+--   [1] TiDB Documentation - Window Functions
+--       https://docs.pingcap.com/tidb/stable/window-functions
+
+-- ============================================================
+-- 示例数据上下文
+-- ============================================================
+-- 假设表结构:
+--   users(user_id INT, email VARCHAR(255), username VARCHAR(64), created_at TIMESTAMP)
+
+-- ============================================================
+-- 1. 查找重复数据
+-- ============================================================
+
+SELECT email, COUNT(*) AS cnt
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+
+SELECT u.*
+FROM users u
+JOIN (
+    SELECT email FROM users GROUP BY email HAVING COUNT(*) > 1
+) dup ON u.email = dup.email
+ORDER BY u.email, u.created_at;
+
+-- ============================================================
+-- 2. 保留每组一行（ROW_NUMBER 方式）
+-- ============================================================
+
+SELECT *
+FROM (
+    SELECT user_id, email, username, created_at,
+           ROW_NUMBER() OVER (
+               PARTITION BY email
+               ORDER BY created_at DESC
+           ) AS rn
+    FROM users
+) ranked
+WHERE rn = 1;
+
+
+
+-- ============================================================
+-- 3. 删除重复数据
+-- ============================================================
+
+-- DELETE JOIN 方式
+DELETE u1
+FROM users u1
+JOIN users u2
+  ON u1.email = u2.email
+  AND u1.user_id < u2.user_id;
+
+
+-- 标准 DELETE 方式
+DELETE FROM users
+WHERE user_id NOT IN (
+    SELECT keep_id FROM (
+        SELECT MAX(user_id) AS keep_id
+        FROM users
+        GROUP BY email
+    ) keepers
+);
+
+-- CTAS 方式（创建去重后的新表）
+CREATE TABLE users_clean AS
+SELECT *
+FROM (
+    SELECT user_id, email, username, created_at,
+           ROW_NUMBER() OVER (
+               PARTITION BY email
+               ORDER BY created_at DESC
+           ) AS rn
+    FROM users
+) ranked
+WHERE rn = 1;
+
+-- ============================================================
+-- 4. MERGE（防止重复插入）
+-- ============================================================
+
+MERGE INTO users target
+USING new_users source
+ON target.email = source.email
+WHEN MATCHED THEN
+    UPDATE SET target.username = source.username, target.created_at = source.created_at
+WHEN NOT MATCHED THEN
+    INSERT (email, username, created_at) VALUES (source.email, source.username, source.created_at);
+
+-- ============================================================
+-- 5. DISTINCT vs GROUP BY
+-- ============================================================
+
+SELECT DISTINCT email FROM users;
+SELECT email FROM users GROUP BY email;
+
+SELECT email, COUNT(*) AS cnt, MAX(created_at) AS latest
+FROM users
+GROUP BY email;
+
+
+-- ============================================================
+-- 性能考量
+-- ============================================================
+
+-- TiDB 兼容 MySQL 语法
+-- DELETE JOIN 可用
+CREATE INDEX idx_users_email ON users (email);

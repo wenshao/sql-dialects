@@ -1,0 +1,16 @@
+-- 达梦 (Dameng): 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] 达梦数据库 SQL 参考手册
+--       https://eco.dameng.com/document/dm/zh-cn/sql-dev/
+
+-- 一、与 Oracle 兼容性: 高度兼容Oracle SQL和PL/SQL
+--   数据类型: NUMBER→NUMBER, VARCHAR2→VARCHAR2/VARCHAR, CLOB→CLOB,
+--     DATE→DATE(含时间), TIMESTAMP→TIMESTAMP, BLOB→BLOB
+-- 二、函数: NVL, DECODE, TO_CHAR, TO_DATE, SYSDATE, ROWNUM 等Oracle函数均支持
+-- 三、陷阱: 国产数据库, 需要适配特定认证要求, 部分Oracle高级特性不支持,
+--   PL/SQL兼容但不是100%, 数据迁移工具DTS可用,
+--   字符集选择影响存储(推荐UTF-8)
+-- 四、自增: IDENTITY(1,1) 或 SEQUENCE
+-- 五、日期: SYSDATE; CURRENT_DATE; SYSDATE+1; TO_CHAR(SYSDATE,'YYYY-MM-DD')
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, INSTR, ||, LISTAGG

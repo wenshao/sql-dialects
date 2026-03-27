@@ -1,0 +1,31 @@
+-- Hive: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Apache Hive Language Manual
+--       https://cwiki.apache.org/confluence/display/Hive/LanguageManual
+--   [2] Hive Data Types
+--       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types
+
+-- ============================================================
+-- 一、从其他数据库迁移到 Hive
+-- ============================================================
+-- 数据类型: INT→INT, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--           VARCHAR→STRING(推荐), TEXT→STRING, DECIMAL→DECIMAL(p,s),
+--           BOOLEAN→BOOLEAN, DATE→DATE, TIMESTAMP→TIMESTAMP,
+--           BLOB→BINARY, JSON→STRING(用函数处理),
+--           ARRAY→ARRAY<T>, MAP→MAP<K,V>, STRUCT→STRUCT<...>
+-- 函数: IFNULL/NVL/ISNULL→COALESCE或nvl, NOW()→current_timestamp,
+--        CONCAT→concat, GROUP_CONCAT→collect_list+concat_ws,
+--        DATEDIFF→datediff, DATE_ADD→date_add
+-- 陷阱: 无主键/唯一约束/外键, 无自增列, 无索引(3.0废弃),
+--        ACID表才支持UPDATE/DELETE/MERGE, 分区设计很重要,
+--        SerDe决定数据解析方式, 文件格式选择影响性能(推荐ORC/Parquet)
+
+-- 二、自增: 无自增，使用 ROW_NUMBER() OVER () 或应用层生成
+-- 三、日期: SELECT current_timestamp; SELECT current_date;
+--           SELECT date_add('2024-01-01', 1);
+--           SELECT datediff('2024-12-31', '2024-01-01');
+--           SELECT from_unixtime(unix_timestamp(), 'yyyy-MM-dd HH:mm:ss');
+-- 四、字符串: length, upper, lower, trim, substr(s,start,len),
+--            regexp_replace, instr(s,sub), concat/concat_ws,
+--            collect_list→concat_ws(',', collect_list(name))

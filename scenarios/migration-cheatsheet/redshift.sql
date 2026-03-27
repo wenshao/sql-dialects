@@ -1,0 +1,23 @@
+-- Redshift: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Amazon Redshift SQL Reference
+--       https://docs.aws.amazon.com/redshift/latest/dg/
+--   [2] Amazon Redshift Migration Guide
+--       https://docs.aws.amazon.com/SchemaConversionTool/
+
+-- 一、数据类型（到 Redshift）
+--   INT→INTEGER, BIGINT→BIGINT, FLOAT→REAL, DOUBLE→DOUBLE PRECISION,
+--   VARCHAR→VARCHAR(max 65535), TEXT→VARCHAR(MAX), DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BOOLEAN, DATE→DATE, TIMESTAMP→TIMESTAMP/TIMESTAMPTZ,
+--   BLOB→不支持(用S3), JSON→SUPER(推荐)或VARCHAR, AUTO_INCREMENT→IDENTITY
+-- 二、函数: IFNULL/NVL→NVL/COALESCE, NOW()→GETDATE()/SYSDATE,
+--   CONCAT→||或CONCAT, GROUP_CONCAT→LISTAGG, DATEDIFF→DATEDIFF,
+--   DATE_ADD→DATEADD
+-- 三、陷阱: 无主键强制(信息性), 列式存储(选择合适的DISTKEY/SORTKEY很重要),
+--   无LATERAL JOIN, 有限的UPDATE/DELETE性能, 无窗口帧ROWS BETWEEN(部分支持),
+--   VARCHAR最大65535字节
+-- 四、自增: IDENTITY(seed, step)
+-- 五、日期: GETDATE(); CURRENT_DATE; DATEADD('day',1,d); DATEDIFF('day',a,b);
+--   TO_CHAR(ts,'YYYY-MM-DD HH24:MI:SS')
+-- 六、字符串: LEN, UPPER, LOWER, TRIM, SUBSTRING, REPLACE, CHARINDEX, ||, LISTAGG

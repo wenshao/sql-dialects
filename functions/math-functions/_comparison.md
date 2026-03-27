@@ -1,0 +1,96 @@
+# 数学函数 (Math Functions) — 方言对比
+
+## 语法支持对比
+
+### 传统 RDBMS
+
+| 特性 | MySQL | PostgreSQL | SQLite | Oracle | SQL Server | MariaDB | Firebird | Db2 | SAP HANA |
+|---|---|---|---|---|---|---|---|---|---|
+| ABS | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| CEIL / CEILING | ✅ 两者 | ✅ 两者 | ❌ | ✅ CEIL | ✅ CEILING | ✅ 两者 | ✅ CEILING | ✅ 两者 | ✅ 两者 |
+| FLOOR | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ROUND | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| TRUNC / TRUNCATE | ✅ TRUNCATE | ✅ TRUNC | ❌ | ✅ TRUNC | ❌ | ✅ TRUNCATE | ✅ TRUNC | ✅ 两者 | ❌ |
+| MOD | ✅ | ✅ | ✅ % | ✅ | ✅ % | ✅ | ✅ | ✅ | ✅ |
+| POWER / POW | ✅ 两者 | ✅ POWER | ❌ | ✅ POWER | ✅ POWER | ✅ 两者 | ✅ POWER | ✅ POWER | ✅ POWER |
+| SQRT | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| EXP | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
+| LN | ✅ | ✅ | ❌ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| LOG（自然对数） | ✅ LOG() | ✅ LN() | ❌ | ✅ LN() | ✅ LOG() | ✅ LOG() | ✅ LN() | ✅ LN() | ✅ LN() |
+| LOG10 | ✅ LOG10() | ✅ LOG(10,x) | ❌ | ✅ LOG(10,x) | ✅ LOG10() | ✅ LOG10() | ✅ LOG10() | ✅ LOG10() | ✅ LOG10() |
+| LOG2 | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| LOG(base, x) | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| SIGN | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| PI() | ✅ | ✅ | ❌ | ⚠️ ACOS(-1) | ✅ | ✅ | ✅ | ❌ | ❌ |
+| SIN / COS / TAN | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ASIN / ACOS / ATAN | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ATAN2 | ✅ | ✅ | ❌ | ❌ | ✅ ATN2 | ✅ | ✅ | ✅ | ✅ |
+| DEGREES / RADIANS | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| RAND / RANDOM | ✅ RAND() | ✅ random() | ✅ random() | ✅ DBMS_RANDOM | ✅ RAND() | ✅ RAND() | ❌ | ✅ RAND() | ✅ RAND() |
+| GREATEST / LEAST | ✅ | ✅ | ✅ MAX/MIN | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| DIV（整数除法） | ✅ | ✅ / | ✅ / | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| CBRT（立方根） | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| WIDTH_BUCKET | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
+
+### 大数据 / 分析引擎
+
+| 特性 | BigQuery | Snowflake | MaxCompute | Hive | ClickHouse | StarRocks | Trino | Hologres | Doris | DuckDB | Spark | Flink |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ABS | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| CEIL / CEILING | ✅ | ✅ | ✅ | ✅ | ✅ 两者 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| FLOOR | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ROUND | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| TRUNC / TRUNCATE | ✅ TRUNC | ✅ 两者 | ✅ TRUNC | ❌ | ✅ TRUNC | ✅ TRUNCATE | ✅ TRUNCATE | ✅ | ✅ TRUNCATE | ✅ | ❌ | ✅ TRUNCATE |
+| MOD | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| POWER / POW | ✅ 两者 | ✅ 两者 | ✅ | ✅ | ✅ 两者 | ✅ 两者 | ✅ POWER | ✅ | ✅ 两者 | ✅ 两者 | ✅ 两者 | ✅ POWER |
+| SQRT | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| LN / LOG | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| RAND / RANDOM | ✅ RAND() | ✅ RANDOM() | ✅ RAND() | ✅ RAND() | ✅ rand() | ✅ RAND() | ✅ RAND() | ✅ | ✅ RANDOM() | ✅ random() | ✅ RAND() | ✅ RAND() |
+| GREATEST / LEAST | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| SAFE_DIVIDE | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+
+### 云数据仓库
+
+| 特性 | Redshift | Synapse | Databricks | Greenplum | Impala | Vertica | Teradata |
+|---|---|---|---|---|---|---|---|
+| 基本函数 (ABS/CEIL/FLOOR/ROUND) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| TRUNC / TRUNCATE | ✅ TRUNC | ❌ | ✅ | ✅ | ✅ TRUNCATE | ✅ TRUNC | ❌ |
+| MOD | ✅ | ✅ % | ✅ | ✅ | ✅ | ✅ | ✅ |
+| POWER / SQRT | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 三角函数 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| RAND / RANDOM | ✅ RANDOM() | ✅ RAND() | ✅ RAND() | ✅ RANDOM() | ✅ RAND() | ✅ RANDOM() | ✅ RANDOM() |
+| GREATEST / LEAST | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ |
+
+### 分布式 / NewSQL
+
+| 特性 | TiDB | OceanBase | CockroachDB | Spanner | YugabyteDB | PolarDB | openGauss | TDSQL | DamengDB | KingbaseES |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 基本函数 (ABS/CEIL/FLOOR/ROUND) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| MOD | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| POWER / SQRT | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 三角函数 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| RAND | ✅ | ✅ | ✅ random() | ❌ | ✅ random() | ✅ | ✅ random() | ✅ | ✅ | ✅ random() |
+
+### 特殊用途
+
+| 特性 | TimescaleDB | TDengine | ksqlDB | Materialize | H2 | Derby |
+|---|---|---|---|---|---|---|
+| 基本函数 (ABS/CEIL/FLOOR/ROUND) | ✅ | ✅ ABS/CEIL/FLOOR/ROUND | ✅ ABS/CEIL/FLOOR/ROUND | ✅ | ✅ | ✅ |
+| MOD | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ |
+| POWER / SQRT | ✅ | ✅ SQRT/POW | ✅ SQRT | ✅ | ✅ | ✅ |
+| 三角函数 | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ |
+| RAND / RANDOM | ✅ random() | ❌ | ❌ | ✅ random() | ✅ RAND() | ❌ |
+| GREATEST / LEAST | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ |
+
+## 关键差异
+
+- **SQLite 3.35.0 之前** 数学函数极少（仅 ABS、ROUND、random），3.35.0+ 扩展了完整数学函数库
+- **MySQL** 的 LOG() 返回自然对数（与数学惯例不同），LOG10()/LOG2() 是独立函数
+- **PostgreSQL** 的 LOG(base, x) 支持任意底数，LN() 返回自然对数
+- **Oracle** 没有 PI() 函数，需用 ACOS(-1) 代替
+- **SQL Server** 的 ATN2 对应其他数据库的 ATAN2
+- **SQL Server 2022 之前** 不支持 GREATEST/LEAST（需用 CASE WHEN 或 IIF 模拟），2022+ 已支持
+- **BigQuery** 独有 SAFE_DIVIDE（除以零返回 NULL 而非报错）
+- **MySQL/MariaDB** 独有 LOG2() 函数
+- **PostgreSQL** 独有 CBRT()（立方根）和 WIDTH_BUCKET()
+- **SQLite** 的 random() 返回 64 位整数，而非 0-1 浮点数

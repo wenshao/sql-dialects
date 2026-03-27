@@ -1,0 +1,20 @@
+-- MaxCompute (ODPS): 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] MaxCompute SQL Reference
+--       https://help.aliyun.com/document_detail/27860.html
+
+-- 一、数据类型: 类似Hive
+--   INT→INT, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--   VARCHAR→STRING, DECIMAL→DECIMAL(p,s), BOOLEAN→BOOLEAN,
+--   DATE→DATE(MaxCompute 2.0), TIMESTAMP→TIMESTAMP(MaxCompute 2.0),
+--   BLOB→BINARY, ARRAY→ARRAY<T>, MAP→MAP<K,V>, STRUCT→STRUCT<...>
+-- 二、函数: 类似Hive + MaxCompute特有函数
+--   IFNULL→NVL/COALESCE, NOW()→GETDATE(), CONCAT→concat
+-- 三、陷阱: 阿里云大数据计算平台, 无UPDATE/DELETE(2.0有限支持),
+--   分区设计很重要, 计费按扫描数据量, 不支持索引/主键,
+--   项目(project)→schema→table结构
+-- 四、自增: 无（使用ROW_NUMBER或应用层生成）
+-- 五、日期: GETDATE(); CURRENT_TIMESTAMP; DATEADD(d,1,'day');
+--   DATEDIFF(a,b,'dd'); TO_CHAR(ts,'yyyy-mm-dd hh:mi:ss')
+-- 六、字符串: LENGTH, TOUPPER, TOLOWER, TRIM, SUBSTR, REGEXP_REPLACE, INSTR, CONCAT

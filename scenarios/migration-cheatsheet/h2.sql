@@ -1,0 +1,19 @@
+-- H2: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] H2 Documentation
+--       https://h2database.com/html/main.html
+
+-- 一、兼容模式: H2 支持多种兼容模式
+--   MODE=MySQL, MODE=PostgreSQL, MODE=Oracle, MODE=MSSQLServer
+--   通过 SET MODE 切换, 影响SQL方言解析
+-- 二、数据类型: 标准SQL类型 + Java类型映射
+--   INT→INT, BIGINT→BIGINT, FLOAT→REAL, DOUBLE→DOUBLE,
+--   VARCHAR→VARCHAR(n), TEXT→CLOB, DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BOOLEAN, DATE→DATE, TIMESTAMP→TIMESTAMP, BLOB→BLOB,
+--   JSON→JSON(H2 2.x), AUTO_INCREMENT→AUTO_INCREMENT或IDENTITY
+-- 三、陷阱: 嵌入式数据库(适合测试/原型), 内存模式vs文件模式,
+--   兼容模式不是100%兼容, 大型生产环境建议迁移到其他数据库
+-- 四、自增: AUTO_INCREMENT 或 GENERATED ALWAYS AS IDENTITY
+-- 五、日期: CURRENT_TIMESTAMP(); CURRENT_DATE(); DATEADD('DAY',1,d)
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, LOCATE, ||, CONCAT

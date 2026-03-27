@@ -1,0 +1,18 @@
+-- TDengine: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] TDengine Documentation
+--       https://docs.tdengine.com/
+
+-- 一、专用时序数据库: 不适用于通用OLTP/OLAP迁移
+--   数据类型: TIMESTAMP(必须), INT, BIGINT, FLOAT, DOUBLE,
+--     BINARY(定长字节串), NCHAR(Unicode字符串), BOOL, TINYINT, SMALLINT,
+--     JSON(仅TAG), 无VARCHAR/TEXT/DATE/DECIMAL
+-- 二、数据模型: 超级表(STABLE)→子表(TABLE), TAG标签
+--   每个采集设备一个子表, 必须有时间戳列作为第一列
+-- 三、陷阱: 时序数据库(不是通用数据库), 不支持JOIN(3.0有限支持),
+--   不支持事务/回滚, 不支持UPDATE(同时间戳覆盖), 不支持DELETE(部分),
+--   SQL语法是子集, 适合IoT/监控/日志场景
+-- 四、自增: 无（时间戳是唯一标识）
+-- 五、日期: NOW(); NOW()+1h; TIMEDIFF(a,b); TO_ISO8601(ts)
+-- 六、字符串: LENGTH, UPPER, LOWER, LTRIM/RTRIM, SUBSTR, CONCAT

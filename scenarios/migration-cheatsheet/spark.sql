@@ -1,0 +1,31 @@
+-- Spark SQL: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Spark SQL Reference
+--       https://spark.apache.org/docs/latest/sql-ref.html
+--   [2] Spark SQL Migration Guide
+--       https://spark.apache.org/docs/latest/sql-migration-guide.html
+
+-- ============================================================
+-- 一、从其他数据库迁移到 Spark SQL
+-- ============================================================
+-- 数据类型: INT→INT, BIGINT→BIGINT/LONG, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--           VARCHAR→STRING, DECIMAL→DECIMAL(p,s), BOOLEAN→BOOLEAN,
+--           DATE→DATE, TIMESTAMP→TIMESTAMP, BLOB→BINARY,
+--           JSON→STRING(用from_json), ARRAY→ARRAY<T>, MAP→MAP<K,V>,
+--           STRUCT→STRUCT<...>
+-- 函数: IFNULL/NVL→nvl/coalesce, NOW()→current_timestamp(),
+--        CONCAT→concat, GROUP_CONCAT→collect_list+concat_ws,
+--        DATEDIFF→datediff, DATE_ADD→date_add
+-- 陷阱: 无主键/约束(Delta Lake/Iceberg可定义), 大小写不敏感,
+--        UDF性能影响大(尽量用内置函数), 分区裁剪很重要,
+--        Hive兼容语法和ANSI语法共存, 数据源格式选择影响性能
+
+-- 二、自增: 无自增，用 monotonically_increasing_id() 或 row_number()
+-- 三、日期: SELECT current_timestamp(); SELECT current_date();
+--           SELECT date_add(current_date(), 1);
+--           SELECT datediff('2024-12-31', '2024-01-01');
+--           SELECT date_format(current_timestamp(), 'yyyy-MM-dd HH:mm:ss');
+-- 四、字符串: length, upper, lower, trim, substring(s,start,len),
+--            regexp_replace, locate(sub,s), concat/concat_ws,
+--            concat_ws(',', collect_list(name))

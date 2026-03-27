@@ -1,0 +1,17 @@
+-- Derby: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Apache Derby Documentation
+--       https://db.apache.org/derby/docs/10.16/ref/
+
+-- 一、数据类型: 标准SQL子集
+--   INT→INTEGER, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--   VARCHAR→VARCHAR(n)(max 32672), TEXT→CLOB, DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BOOLEAN(10.7+), DATE→DATE, TIMESTAMP→TIMESTAMP,
+--   BLOB→BLOB, AUTO_INCREMENT→GENERATED ALWAYS AS IDENTITY
+-- 二、陷阱: Java嵌入式数据库, 功能有限(无JSON/窗口函数/CTE),
+--   VARCHAR最大32672字节, 不支持MERGE/UPSERT, 不支持FULL OUTER JOIN,
+--   Derby 10.14+支持OFFSET/FETCH, 10.12+支持递归CTE
+-- 三、自增: GENERATED ALWAYS AS IDENTITY
+-- 四、日期: CURRENT_TIMESTAMP; CURRENT_DATE; 日期算术有限
+-- 五、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE(仅10.14+), LOCATE, ||

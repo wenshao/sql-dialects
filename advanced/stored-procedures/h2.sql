@@ -1,0 +1,73 @@
+-- H2: 存储过程
+
+-- H2 通过 Java 方法实现存储过程和函数
+
+-- ============================================================
+-- CREATE ALIAS（创建函数/存储过程）
+-- ============================================================
+
+-- 内联 Java 代码
+CREATE ALIAS HELLO AS $$
+String hello(String name) {
+    return "Hello, " + name + "!";
+}
+$$;
+
+SELECT HELLO('Alice');
+
+-- 带返回值的函数
+CREATE ALIAS CALCULATE_TAX AS $$
+double calculateTax(double amount, double rate) {
+    return amount * rate;
+}
+$$;
+
+SELECT CALCULATE_TAX(100.0, 0.1);
+
+-- ============================================================
+-- 引用外部 Java 类
+-- ============================================================
+
+-- CREATE ALIAS my_func FOR "com.example.MyClass.myMethod";
+
+-- 示例：使用 Java UUID
+CREATE ALIAS GENERATE_ID AS $$
+String generateId() {
+    return java.util.UUID.randomUUID().toString();
+}
+$$;
+
+-- ============================================================
+-- 返回结果集
+-- ============================================================
+
+CREATE ALIAS GET_USERS AS $$
+import java.sql.*;
+ResultSet getUsers(Connection conn, int minAge) throws SQLException {
+    return conn.createStatement().executeQuery(
+        "SELECT * FROM users WHERE age >= " + minAge
+    );
+}
+$$;
+
+CALL GET_USERS(18);
+
+-- ============================================================
+-- 聚合函数
+-- ============================================================
+
+-- 创建自定义聚合函数
+-- CREATE AGGREGATE my_agg FOR "com.example.MyAggregateFunction";
+
+-- ============================================================
+-- 删除
+-- ============================================================
+
+DROP ALIAS IF EXISTS HELLO;
+DROP ALIAS IF EXISTS CALCULATE_TAX;
+
+-- 注意：H2 使用 CREATE ALIAS 创建函数
+-- 注意：函数用 Java 语言编写
+-- 注意：支持内联 Java 代码和引用外部类
+-- 注意：支持返回结果集的过程
+-- 注意：不支持 PL/SQL 或 PL/pgSQL

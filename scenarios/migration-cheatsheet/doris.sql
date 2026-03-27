@@ -1,0 +1,18 @@
+-- Doris: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Apache Doris Documentation
+--       https://doris.apache.org/docs/
+
+-- 一、与 MySQL 兼容性: 兼容MySQL协议和大部分语法
+--   数据类型: INT, BIGINT, FLOAT, DOUBLE, DECIMAL, VARCHAR, STRING,
+--     BOOLEAN, DATE, DATETIME, JSON(1.2+), BITMAP, HLL, ARRAY(2.0+)
+-- 二、数据模型: Duplicate/Aggregate/Unique/Primary Key
+--   选择合适的模型很关键(影响写入和查询性能)
+-- 三、陷阱: MPP架构, DISTRIBUTED BY HASH 必须指定, BUCKETS数量影响性能,
+--   不支持事务, AUTO_INCREMENT不支持(2.1+实验性支持),
+--   MySQL工具可直接连接(mysqlclient), 无外键/约束
+-- 四、自增: 无（使用UUID或应用层生成）
+-- 五、日期: NOW(); CURDATE(); DATE_ADD(d, INTERVAL 1 DAY);
+--   DATEDIFF(a,b); DATE_FORMAT(ts,'%Y-%m-%d %H:%i:%s')
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTRING, REPLACE, LOCATE, CONCAT, GROUP_CONCAT

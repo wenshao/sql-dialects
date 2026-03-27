@@ -1,0 +1,17 @@
+-- Synapse: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Azure Synapse Analytics Documentation
+--       https://learn.microsoft.com/en-us/azure/synapse-analytics/
+
+-- 一、与 SQL Server 兼容性: 大部分T-SQL语法兼容
+--   差异: MPP架构, 分布式表(HASH/ROUND_ROBIN/REPLICATE),
+--   不支持部分T-SQL(如游标/临时存储过程/全文搜索)
+-- 二、数据类型: 与SQL Server基本相同
+--   差异: 无TIMESTAMP(rowversion), 无HIERARCHYID, GEOMETRY/GEOGRAPHY有限支持
+-- 三、陷阱: DISTRIBUTION选择很关键(HASH vs ROUND_ROBIN vs REPLICATE),
+--   CTAS模式替代INSERT/UPDATE(推荐), 不支持MERGE(部分池),
+--   Serverless SQL Pool vs Dedicated SQL Pool功能不同,
+--   统计信息需要手动创建/更新
+-- 四、自增: IDENTITY(1,1)
+-- 五、日期/字符串: 与 SQL Server 基本相同

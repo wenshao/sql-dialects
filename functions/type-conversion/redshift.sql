@@ -1,0 +1,23 @@
+-- Amazon Redshift: Type Conversion
+--
+-- 参考资料:
+--   [1] Redshift Documentation - CAST / CONVERT
+--       https://docs.aws.amazon.com/redshift/latest/dg/r_CAST_function.html
+
+SELECT CAST(42 AS VARCHAR); SELECT CAST('42' AS INTEGER); SELECT CAST('2024-01-15' AS DATE);
+SELECT 42::VARCHAR; SELECT '42'::INTEGER; SELECT '2024-01-15'::DATE;
+
+SELECT TO_CHAR(123456.789, '999,999.99'); SELECT TO_CHAR(GETDATE(), 'YYYY-MM-DD');
+SELECT TO_NUMBER('123.45', '999.99'); SELECT TO_DATE('2024-01-15', 'YYYY-MM-DD');
+SELECT TO_TIMESTAMP('2024-01-15 10:30:00', 'YYYY-MM-DD HH24:MI:SS');
+
+-- CONVERT (Redshift 特有)
+SELECT CONVERT(INTEGER, '42');                   -- Redshift CONVERT 语法
+
+-- 日期 / Unix 时间戳
+SELECT EXTRACT(EPOCH FROM TIMESTAMP '2024-01-15 00:00:00');
+SELECT TIMESTAMP 'epoch' + 1705276800 * INTERVAL '1 second';
+
+-- 注意：Redshift 支持 CAST, ::, CONVERT
+-- 注意：支持 TO_CHAR, TO_NUMBER, TO_DATE, TO_TIMESTAMP
+-- 限制：无 TRY_CAST

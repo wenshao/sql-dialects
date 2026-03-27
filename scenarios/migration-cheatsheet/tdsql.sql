@@ -1,0 +1,16 @@
+-- TDSQL: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] TDSQL Documentation
+--       https://cloud.tencent.com/document/product/557
+
+-- 一、与 MySQL 兼容性: 高度兼容MySQL 5.7/8.0
+--   TDSQL-C(云原生): 共享存储, 兼容MySQL
+--   TDSQL-H(分析型): HTAP混合负载
+--   TDSQL(分布式): 分布式MySQL, 需要指定分片键(shardkey)
+-- 二、数据类型: 与MySQL相同
+-- 三、陷阱: 分布式版本需要shardkey(分片键), 分布式事务性能影响,
+--   跨分片JOIN有限制, 全局唯一索引需要包含shardkey,
+--   DDL操作在分布式模式下可能阻塞, sequence全局唯一
+-- 四、自增: AUTO_INCREMENT（分布式模式下全局唯一但不连续）
+-- 五、日期/字符串: 与 MySQL 相同

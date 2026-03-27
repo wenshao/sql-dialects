@@ -1,0 +1,63 @@
+-- H2: Views
+--
+-- 参考资料:
+--   [1] H2 Documentation - CREATE VIEW
+--       https://h2database.com/html/commands.html#create_view
+--   [2] H2 Documentation - SQL Commands
+--       https://h2database.com/html/commands.html
+
+-- ============================================
+-- 基本视图
+-- ============================================
+CREATE VIEW active_users AS
+SELECT id, username, email, created_at
+FROM users
+WHERE age >= 18;
+
+-- CREATE OR REPLACE VIEW
+CREATE OR REPLACE VIEW active_users AS
+SELECT id, username, email, created_at
+FROM users
+WHERE age >= 18;
+
+-- IF NOT EXISTS
+CREATE VIEW IF NOT EXISTS active_users AS
+SELECT id, username, email, created_at
+FROM users
+WHERE age >= 18;
+
+-- FORCE（即使基表不存在也创建视图）
+CREATE FORCE VIEW future_view AS
+SELECT * FROM not_yet_created_table;
+
+-- ============================================
+-- 可更新视图 + WITH CHECK OPTION
+-- H2 支持简单单表视图的 DML 操作
+-- ============================================
+CREATE VIEW adult_users AS
+SELECT id, username, email, age
+FROM users
+WHERE age >= 18
+WITH CHECK OPTION;
+
+-- ============================================
+-- 物化视图
+-- H2 不支持物化视图
+-- ============================================
+-- 替代方案：使用 CREATE TABLE AS SELECT
+CREATE TABLE mv_order_summary AS
+SELECT user_id, COUNT(*) AS order_count, SUM(amount) AS total_amount
+FROM orders
+GROUP BY user_id;
+
+-- ============================================
+-- 删除视图
+-- ============================================
+DROP VIEW active_users;
+DROP VIEW IF EXISTS active_users;
+
+-- 限制：
+-- 不支持物化视图
+-- H2 是嵌入式/内存数据库，功能较为精简
+-- FORCE 视图可能在查询时失败（如果基表仍不存在）
+-- 支持 WITH CHECK OPTION

@@ -1,0 +1,74 @@
+-- SQLite: Dynamic SQL
+--
+-- 参考资料:
+--   [1] SQLite Documentation - SQL Prepared Statements
+--       https://www.sqlite.org/c3ref/prepare.html
+--   [2] SQLite Documentation - sqlite3_exec()
+--       https://www.sqlite.org/c3ref/exec.html
+
+-- ============================================================
+-- SQLite 没有内置的服务端动态 SQL 语法
+-- ============================================================
+-- SQLite 是嵌入式数据库，没有存储过程或 PL/SQL 等过程语言
+-- 动态 SQL 需要在应用层实现
+
+-- ============================================================
+-- 应用层替代方案: Python
+-- ============================================================
+-- import sqlite3
+-- conn = sqlite3.connect('mydb.db')
+-- cursor = conn.cursor()
+--
+-- # 参数化查询（防止 SQL 注入）
+-- cursor.execute('SELECT * FROM users WHERE age > ? AND status = ?', (18, 'active'))
+--
+-- # 动态表名（需要应用层验证）
+-- table_name = 'users'
+-- if table_name in allowed_tables:
+--     cursor.execute(f'SELECT * FROM [{table_name}] WHERE id = ?', (user_id,))
+--
+-- # 动态 DDL
+-- cursor.execute(f'CREATE TABLE IF NOT EXISTS archive_{year} AS SELECT * FROM orders WHERE year = ?', (year,))
+
+-- ============================================================
+-- 应用层替代方案: Node.js (better-sqlite3)
+-- ============================================================
+-- const db = require('better-sqlite3')('mydb.db');
+--
+-- // 参数化查询
+-- const stmt = db.prepare('SELECT * FROM users WHERE age > ? AND status = ?');
+-- const rows = stmt.all(18, 'active');
+--
+-- // 命名参数
+-- const stmt = db.prepare('SELECT * FROM users WHERE id = @id');
+-- const user = stmt.get({ id: 42 });
+
+-- ============================================================
+-- 应用层替代方案: C API
+-- ============================================================
+-- // sqlite3_prepare_v2() + sqlite3_bind_*() + sqlite3_step()
+-- sqlite3_stmt *stmt;
+-- sqlite3_prepare_v2(db, "SELECT * FROM users WHERE id = ?", -1, &stmt, NULL);
+-- sqlite3_bind_int(stmt, 1, 42);
+-- while (sqlite3_step(stmt) == SQLITE_ROW) { ... }
+-- sqlite3_finalize(stmt);
+
+-- ============================================================
+-- SQLite 预编译语句 (SQL 层面可用的有限功能)
+-- ============================================================
+-- SQLite 支持在单个连接中编译和缓存语句
+-- 但不支持 PREPARE / EXECUTE 语法
+
+-- 参数化查询的 SQL 语法（通过 API 使用）:
+-- SELECT * FROM users WHERE id = ?1;          -- 位置参数
+-- SELECT * FROM users WHERE id = :id;          -- 命名参数
+-- SELECT * FROM users WHERE id = @id;          -- 命名参数 (@ 前缀)
+-- SELECT * FROM users WHERE id = $id;          -- 命名参数 ($ 前缀)
+
+-- 注意：SQLite 不支持服务端存储过程或动态 SQL 语法
+-- 注意：所有动态 SQL 必须在应用层实现
+-- 注意：始终使用参数化查询（? 或命名参数）防止 SQL 注入
+-- 注意：表名和列名不能参数化，必须在应用层验证
+-- 限制：无 EXECUTE IMMEDIATE
+-- 限制：无 PREPARE / EXECUTE SQL 语法
+-- 限制：无存储过程

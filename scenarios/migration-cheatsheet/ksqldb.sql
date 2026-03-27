@@ -1,0 +1,18 @@
+-- ksqlDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] ksqlDB Documentation
+--       https://docs.ksqldb.io/en/latest/
+
+-- 一、数据类型: Kafka流处理
+--   INT→INT, BIGINT→BIGINT, DOUBLE→DOUBLE,
+--   VARCHAR→VARCHAR/STRING, DECIMAL→DECIMAL(p,s), BOOLEAN→BOOLEAN,
+--   DATE→DATE, TIMESTAMP→TIMESTAMP, BYTES→BYTES,
+--   ARRAY→ARRAY<T>, MAP→MAP<K,V>, STRUCT→STRUCT<...>
+-- 二、函数: 流处理特有函数(EXPLODE, TIMESTAMPTOSTRING等)
+-- 三、陷阱: 基于Kafka的流处理引擎, 区分STREAM和TABLE,
+--   持续查询(EMIT CHANGES), 无传统JOIN(只有Stream-Table/Stream-Stream Join),
+--   数据格式由序列化决定(JSON/AVRO/PROTOBUF)
+-- 四、自增: 无（由Kafka消息key/value决定）
+-- 五、日期: 使用UNIX时间戳, TIMESTAMPTOSTRING(ts,'yyyy-MM-dd HH:mm:ss')
+-- 六、字符串: LEN, UCASE, LCASE, TRIM, SUBSTRING, REPLACE, INSTR, CONCAT

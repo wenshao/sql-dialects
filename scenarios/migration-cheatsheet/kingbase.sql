@@ -1,0 +1,16 @@
+-- 人大金仓 (KingbaseES): 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] KingbaseES Documentation
+--       https://help.kingbase.com.cn/
+
+-- 一、多模式兼容: PostgreSQL模式(默认), Oracle模式, MySQL模式
+--   PostgreSQL模式: 高度兼容PostgreSQL语法
+--   Oracle模式: 兼容Oracle SQL/PL语法
+-- 二、数据类型: 取决于兼容模式
+--   PG模式: 与PostgreSQL相同
+--   Oracle模式: 支持NUMBER, VARCHAR2, DATE(含时间)等
+-- 三、陷阱: 国产数据库, 兼容模式在初始化时选择, 部分高级特性受限,
+--   KWR(类似AWR)性能报告, KCES安全增强
+-- 四、自增: SERIAL(PG模式) 或 SEQUENCE
+-- 五、日期/字符串: 取决于兼容模式（PostgreSQL或Oracle语法）

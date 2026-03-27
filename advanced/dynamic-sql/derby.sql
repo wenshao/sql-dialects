@@ -1,0 +1,41 @@
+-- Apache Derby: Dynamic SQL
+--
+-- 参考资料:
+--   [1] Apache Derby Reference Manual
+--       https://db.apache.org/derby/docs/10.16/ref/
+
+-- ============================================================
+-- Derby 没有服务端动态 SQL
+-- ============================================================
+-- Derby 不支持存储过程中的动态 SQL (无 EXECUTE IMMEDIATE)
+-- 需要通过 JDBC 在应用层实现
+
+-- ============================================================
+-- JDBC 替代方案 (Java)
+-- ============================================================
+-- PreparedStatement stmt = conn.prepareStatement(
+--     "SELECT * FROM users WHERE age > ? AND status = ?"
+-- );
+-- stmt.setInt(1, 18);
+-- stmt.setString(2, "active");
+-- ResultSet rs = stmt.executeQuery();
+--
+-- // 动态表名
+-- String table = "users";
+-- Statement stmt = conn.createStatement();
+-- ResultSet rs = stmt.executeQuery("SELECT * FROM " + table);
+
+-- ============================================================
+-- Derby 存储过程 (Java 实现)
+-- ============================================================
+-- Derby 的存储过程用 Java 编写，可以在 Java 代码中使用动态 SQL
+-- CREATE PROCEDURE dynamic_query(IN sql_text VARCHAR(4000))
+-- LANGUAGE JAVA
+-- PARAMETER STYLE JAVA
+-- EXTERNAL NAME 'com.example.Procedures.dynamicQuery';
+
+-- 注意：Derby 不支持 PL/SQL 或 T-SQL 风格的过程语言
+-- 注意：所有动态 SQL 需通过 JDBC API 在应用层实现
+-- 注意：Derby 的存储过程使用 Java，可在 Java 中实现动态 SQL
+-- 限制：无 PREPARE / EXECUTE SQL 语法
+-- 限制：无 EXECUTE IMMEDIATE

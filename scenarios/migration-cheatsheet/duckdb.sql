@@ -1,0 +1,29 @@
+-- DuckDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] DuckDB Documentation
+--       https://duckdb.org/docs/
+--   [2] DuckDB SQL Reference
+--       https://duckdb.org/docs/sql/introduction
+
+-- ============================================================
+-- 一、从其他数据库迁移到 DuckDB
+-- ============================================================
+-- 数据类型: INT→INTEGER, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--           VARCHAR→VARCHAR, TEXT→VARCHAR, DECIMAL→DECIMAL(p,s),
+--           BOOLEAN→BOOLEAN, DATE→DATE, TIMESTAMP→TIMESTAMP,
+--           BLOB→BLOB, JSON→JSON, ARRAY→T[](原生数组),
+--           STRUCT→STRUCT, MAP→MAP
+-- 函数: IFNULL→IFNULL/COALESCE, NOW()→NOW()/CURRENT_TIMESTAMP,
+--        CONCAT→CONCAT或||, GROUP_CONCAT→STRING_AGG或LIST_AGG,
+--        DATEDIFF→DATE_DIFF, DATE_ADD→DATE_ADD或+INTERVAL
+-- 陷阱: 嵌入式数据库(无客户端-服务器模式), 面向 OLAP,
+--        可直接读取 CSV/Parquet/JSON 文件, 支持 PostgreSQL 语法,
+--        LIST 类型(PostgreSQL ARRAY 的超集), STRUCT 原生支持
+
+-- 二、自增: CREATE TABLE t (id INTEGER PRIMARY KEY);  -- ROWID 自动分配
+-- 三、日期: SELECT NOW(); SELECT CURRENT_DATE;
+--           SELECT CURRENT_DATE + INTERVAL 1 DAY;
+--           SELECT DATE_DIFF('day', DATE '2024-01-01', DATE '2024-12-31');
+-- 四、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTRING(s,start,len),
+--            REPLACE, POSITION(sub IN s), ||, STRING_AGG, STRING_SPLIT

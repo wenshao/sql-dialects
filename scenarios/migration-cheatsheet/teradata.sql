@@ -1,0 +1,20 @@
+-- Teradata: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Teradata SQL Reference
+--       https://docs.teradata.com/r/Teradata-VantageTM-SQL-Functions-Expressions-and-Predicates
+
+-- 一、数据类型（到 Teradata）
+--   INT→INTEGER, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE PRECISION,
+--   VARCHAR→VARCHAR(n), TEXT→CLOB, DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BYTEINT, DATE→DATE, TIMESTAMP→TIMESTAMP, BLOB→BLOB,
+--   JSON→JSON(15.0+), AUTO_INCREMENT→GENERATED ALWAYS AS IDENTITY
+-- 二、函数: IFNULL/NVL→COALESCE或NVL, NOW()→CURRENT_TIMESTAMP,
+--   CONCAT→||或CONCAT, TOP→TOP或SAMPLE, LIMIT→TOP n 或 QUALIFY ROW_NUMBER
+-- 三、陷阱: Teradata使用MPP架构(选择合适的PI-主索引很重要),
+--   日期格式独特(DATE类型内部为INTEGER), 无AUTO_COMMIT(默认),
+--   QUALIFY子句是Teradata特色(窗口函数过滤)
+-- 四、自增: GENERATED ALWAYS AS IDENTITY
+-- 五、日期: CURRENT_TIMESTAMP; CURRENT_DATE; d + INTERVAL '1' DAY;
+--   CAST(ts AS FORMAT 'YYYY-MM-DD')
+-- 六、字符串: CHARACTER_LENGTH, UPPER, LOWER, TRIM, SUBSTR, OREPLACE, INDEX, ||

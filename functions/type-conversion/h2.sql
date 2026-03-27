@@ -1,0 +1,21 @@
+-- H2 Database: Type Conversion
+--
+-- 参考资料:
+--   [1] H2 Documentation - Functions
+--       https://h2database.com/html/functions.html
+
+SELECT CAST(42 AS VARCHAR); SELECT CAST('42' AS INT); SELECT CAST('3.14' AS DECIMAL(10,2));
+SELECT CAST('2024-01-15' AS DATE); SELECT CAST('2024-01-15 10:30:00' AS TIMESTAMP);
+
+-- CONVERT (H2 支持)
+SELECT CONVERT(42, VARCHAR); SELECT CONVERT('42', INT);
+
+-- 格式化
+SELECT FORMATDATETIME(CURRENT_TIMESTAMP, 'yyyy-MM-dd HH:mm:ss');
+SELECT PARSEDATETIME('2024-01-15', 'yyyy-MM-dd');
+SELECT TO_CHAR(42); SELECT TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD');
+
+-- 注意：H2 支持 CAST 和 CONVERT
+-- 注意：FORMATDATETIME/PARSEDATETIME 用于日期格式化
+-- 注意：部分兼容 TO_CHAR
+-- 限制：无 TRY_CAST, ::

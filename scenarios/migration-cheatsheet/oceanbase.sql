@@ -1,0 +1,17 @@
+-- OceanBase: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] OceanBase Documentation
+--       https://www.oceanbase.com/docs/common-oceanbase-database-cn
+
+-- 一、双模式兼容: MySQL模式 和 Oracle模式
+--   MySQL模式: 高度兼容MySQL 5.7/8.0语法
+--   Oracle模式: 兼容Oracle SQL/PL语法
+-- 二、数据类型: 取决于租户模式
+--   MySQL模式: 与MySQL相同
+--   Oracle模式: 与Oracle相同(NUMBER, VARCHAR2, DATE等)
+-- 三、陷阱: 分布式架构, 多租户(每个租户独立模式), 分区表是核心,
+--   PRIMARY KEY同时决定数据分布, 不同模式语法不可混用,
+--   ob_admin工具管理集群, OMS工具辅助迁移
+-- 四、自增: AUTO_INCREMENT(MySQL模式)或SEQUENCE(Oracle模式)
+-- 五、日期/字符串: 取决于租户模式（MySQL或Oracle语法）

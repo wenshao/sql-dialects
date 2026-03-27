@@ -1,0 +1,21 @@
+-- Derby: JSON 展平为关系行 (JSON Flatten)
+--
+-- 参考资料:
+--   [1] Apache Derby 不原生支持 JSON
+--       https://db.apache.org/derby/docs/10.16/ref/
+
+-- ============================================================
+-- 注意: Apache Derby 没有 JSON 数据类型和函数
+-- ============================================================
+-- 建议方案:
+-- 1. 在应用层（Java）解析 JSON
+-- 2. 使用 Derby 自定义函数（Java UDF）
+-- 3. 将 JSON 数据预处理为关系表后存入 Derby
+
+-- 示例: 创建 Java UDF 来解析 JSON
+-- CREATE FUNCTION json_value(json_str VARCHAR(10000), path VARCHAR(200))
+--     RETURNS VARCHAR(1000)
+--     LANGUAGE JAVA
+--     EXTERNAL NAME 'com.example.JsonUDF.extractValue'
+--     PARAMETER STYLE JAVA
+--     NO SQL;

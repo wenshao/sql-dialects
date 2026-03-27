@@ -1,0 +1,17 @@
+-- StarRocks: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] StarRocks Documentation
+--       https://docs.starrocks.io/
+
+-- 一、与 MySQL 兼容性: 兼容MySQL协议和语法
+--   数据类型: INT, BIGINT, FLOAT, DOUBLE, DECIMAL, VARCHAR, STRING,
+--     BOOLEAN, DATE, DATETIME, JSON(2.5+), BITMAP, HLL, ARRAY, MAP, STRUCT
+-- 二、表模型: Duplicate/Aggregate/Unique/Primary Key
+--   Primary Key模型支持实时UPDATE/DELETE
+-- 三、陷阱: 与Doris类似(StarRocks从Doris分叉), MPP架构,
+--   DISTRIBUTED BY HASH必须, 物化视图(异步)可加速查询,
+--   CBO优化器(比Doris更先进), 外表联邦查询
+-- 四、自增: 无（使用UUID或应用层生成）
+-- 五、日期: NOW(); CURDATE(); DATE_ADD; DATEDIFF; DATE_FORMAT
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTRING, REPLACE, LOCATE, CONCAT, GROUP_CONCAT

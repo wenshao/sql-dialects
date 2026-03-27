@@ -1,0 +1,56 @@
+-- H2: 事务
+
+-- 基本事务
+-- H2 默认自动提交
+SET AUTOCOMMIT FALSE;
+
+BEGIN;
+INSERT INTO users (username, email) VALUES ('alice', 'alice@example.com');
+INSERT INTO users (username, email) VALUES ('bob', 'bob@example.com');
+COMMIT;
+
+-- 回滚
+BEGIN;
+DELETE FROM users WHERE id = 1;
+ROLLBACK;
+
+-- 保存点
+BEGIN;
+INSERT INTO users (username, email) VALUES ('alice', 'alice@example.com');
+SAVEPOINT sp1;
+INSERT INTO users (username, email) VALUES ('bob', 'bob@example.com');
+ROLLBACK TO SAVEPOINT sp1;
+COMMIT;
+
+-- 自动提交
+SET AUTOCOMMIT TRUE;
+SET AUTOCOMMIT FALSE;
+
+-- 隔离级别
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;     -- 脏读
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;       -- 默认
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+SET TRANSACTION ISOLATION LEVEL SNAPSHOT;              -- H2 MVCC
+
+-- 查看隔离级别
+SELECT SETTING_VALUE FROM INFORMATION_SCHEMA.SETTINGS
+WHERE SETTING_NAME = 'DEFAULT_TRANSACTION_ISOLATION_LEVEL';
+
+-- 只读事务
+SET TRANSACTION READ ONLY;
+
+-- 锁
+SELECT * FROM users WHERE id = 1 FOR UPDATE;
+
+-- 锁超时
+SET LOCK_TIMEOUT 5000;                                 -- 5 秒
+
+-- 表锁（H2 特有语法）
+-- H2 默认使用行级锁（MVCC 模式）
+
+-- 注意：默认自动提交
+-- 注意：支持 MVCC 模式（SNAPSHOT 隔离）
+-- 注意：内存数据库的事务也完全支持
+-- 注意：支持 SAVEPOINT
+-- 注意：SET LOCK_TIMEOUT 设置锁等待超时

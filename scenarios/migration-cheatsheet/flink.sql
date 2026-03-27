@@ -1,0 +1,19 @@
+-- Flink SQL: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Flink SQL Reference
+--       https://nightlies.apache.org/flink/flink-docs-stable/docs/dev/table/sql/overview/
+
+-- 一、数据类型: 遵循SQL标准 + 流处理特性
+--   INT→INT, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--   VARCHAR→STRING/VARCHAR(n), DECIMAL→DECIMAL(p,s), BOOLEAN→BOOLEAN,
+--   DATE→DATE, TIMESTAMP→TIMESTAMP(p), BINARY→BYTES/VARBINARY,
+--   JSON→STRING(用JSON函数), ARRAY→ARRAY<T>, MAP→MAP<K,V>, ROW→ROW<...>
+-- 二、函数: SQL标准函数 + Flink特有函数(PROCTIME(), TUMBLE, HOP等)
+-- 三、陷阱: 流处理引擎(批流一体), 需要定义connector和format,
+--   无持久化存储(数据在外部系统), WATERMARK对时间语义很重要,
+--   状态管理影响性能, 支持的DML有限(取决于connector)
+-- 四、自增: 无（流数据由外部源提供ID）
+-- 五、日期: CURRENT_TIMESTAMP; CURRENT_DATE; TIMESTAMPADD(DAY,1,ts);
+--   TIMESTAMPDIFF(DAY,a,b); DATE_FORMAT(ts,'yyyy-MM-dd HH:mm:ss')
+-- 六、字符串: CHAR_LENGTH, UPPER, LOWER, TRIM, SUBSTRING, REPLACE, POSITION, ||

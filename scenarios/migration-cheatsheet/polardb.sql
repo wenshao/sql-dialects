@@ -1,0 +1,16 @@
+-- PolarDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] PolarDB Documentation
+--       https://help.aliyun.com/product/172538.html
+
+-- 一、多引擎: PolarDB MySQL版, PolarDB PostgreSQL版, PolarDB-X(分布式)
+--   PolarDB MySQL版: 高度兼容MySQL 5.6/5.7/8.0
+--   PolarDB PostgreSQL版: 高度兼容PostgreSQL 11/14
+--   PolarDB-X: 分布式MySQL兼容
+-- 二、数据类型: 取决于引擎版本
+-- 三、陷阱: 共享存储架构(一写多读), 读写分离自动处理,
+--   并行查询是PolarDB特色, 存储计算分离,
+--   PolarDB-X有分布式事务限制, Global Binlog支持CDC
+-- 四、自增: AUTO_INCREMENT(MySQL版) 或 SERIAL(PG版)
+-- 五、日期/字符串: 与对应引擎(MySQL/PostgreSQL)相同

@@ -1,0 +1,15 @@
+-- Hologres: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Hologres Documentation
+--       https://help.aliyun.com/document_detail/130408.html
+
+-- 一、与 PostgreSQL 兼容性: 兼容PostgreSQL 11协议和语法
+--   差异: 列存+行存混合引擎, 实时分析场景, 与MaxCompute互通
+-- 二、数据类型: 与PostgreSQL基本相同
+--   差异: 不支持部分PG类型(如自定义类型/域), JSONB支持, ARRAY支持
+-- 三、陷阱: OLAP实时数仓(不适合OLTP), 建表需要选择列存/行存/行列混存,
+--   Distribution Key(分布键)影响查询性能, Segment Key(分段键)用于数据裁剪,
+--   Clustering Key(聚簇键)优化排序, 与MaxCompute外表互通
+-- 四、自增: SERIAL（但建议使用应用层生成ID）
+-- 五、日期/字符串: 与 PostgreSQL 相同

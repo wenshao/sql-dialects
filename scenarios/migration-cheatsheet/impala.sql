@@ -1,0 +1,17 @@
+-- Impala: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Impala SQL Reference
+--       https://impala.apache.org/docs/build/html/topics/impala_langref.html
+
+-- 一、数据类型: 类似Hive但更严格
+--   INT→INT, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+--   VARCHAR→STRING/VARCHAR(n), DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BOOLEAN, DATE→DATE(Impala不支持), TIMESTAMP→TIMESTAMP
+-- 二、陷阱: 与Hive共享Metastore但SQL方言不同, 不支持UPDATE/DELETE(非Kudu表),
+--   不支持MERGE(非Kudu表), 不支持递归CTE, 不支持LATERAL VIEW(部分),
+--   Kudu表支持UPSERT/UPDATE/DELETE
+-- 三、自增: 无
+-- 四、日期: now(); current_timestamp(); date_add(d, 1);
+--   datediff(a,b); from_timestamp(ts,'yyyy-MM-dd HH:mm:ss')
+-- 五、字符串: length, upper, lower, trim, substr, regexp_replace, instr, concat

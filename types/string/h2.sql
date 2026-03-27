@@ -1,0 +1,90 @@
+-- H2: 字符串类型
+--
+-- 参考资料:
+--   [1] H2 SQL Reference - Commands
+--       https://h2database.com/html/commands.html
+--   [2] H2 - Data Types
+--       https://h2database.com/html/datatypes.html
+--   [3] H2 - Functions
+--       https://h2database.com/html/functions.html
+
+-- VARCHAR(n): 变长字符串，最大 n 个字符（推荐）
+-- CHAR(n): 定长字符串，自动补空格
+-- CLOB: 大文本对象
+-- VARCHAR_IGNORECASE: 大小写不敏感的 VARCHAR（H2 特有）
+
+CREATE TABLE users (
+    id       INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(64) NOT NULL,
+    email    VARCHAR(128),
+    code     CHAR(10),
+    bio      CLOB,
+    search   VARCHAR_IGNORECASE(100)        -- H2 特有
+);
+
+-- VARCHAR 默认最大长度：2^31-1
+-- CLOB 用于大文本
+-- VARCHAR_IGNORECASE 比较时忽略大小写
+
+-- ============================================================
+-- 兼容性别名
+-- ============================================================
+
+-- 以下类型都映射到 VARCHAR 或 CLOB:
+-- CHARACTER VARYING(n) → VARCHAR(n)
+-- NVARCHAR(n) → VARCHAR(n)
+-- TEXT → CLOB
+-- TINYTEXT → CLOB
+-- MEDIUMTEXT → CLOB
+-- LONGTEXT → CLOB
+-- NTEXT → CLOB
+-- NCLOB → CLOB
+
+-- 以下映射到 CHAR:
+-- CHARACTER(n) → CHAR(n)
+-- NCHAR(n) → CHAR(n)
+
+-- 类型转换
+SELECT CAST(123 AS VARCHAR);
+SELECT CAST('2024-01-15' AS DATE);
+SELECT CONVERT('123', INT);                   -- 兼容语法
+
+-- 字符串字面量
+SELECT 'hello world';
+SELECT 'it''s a test';                        -- 转义单引号
+
+-- ============================================================
+-- 二进制类型
+-- ============================================================
+
+-- BINARY(n): 定长二进制
+-- VARBINARY(n): 变长二进制
+-- BLOB: 大二进制对象
+
+CREATE TABLE files (
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    data BLOB
+);
+
+-- UUID 类型（H2 内置）
+CREATE TABLE events (
+    id   UUID DEFAULT RANDOM_UUID(),
+    name VARCHAR(100)
+);
+
+-- ============================================================
+-- VARCHAR_IGNORECASE
+-- ============================================================
+
+-- H2 特有：大小写不敏感比较
+CREATE TABLE search_index (
+    keyword VARCHAR_IGNORECASE(100)
+);
+INSERT INTO search_index VALUES ('Hello');
+SELECT * FROM search_index WHERE keyword = 'hello';  -- 匹配
+
+-- 注意：VARCHAR 是推荐的字符串类型
+-- 注意：VARCHAR_IGNORECASE 是 H2 特有类型
+-- 注意：TEXT 映射为 CLOB
+-- 注意：在兼容模式下类型映射可能不同
+-- 注意：支持 UUID 内置类型

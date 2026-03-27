@@ -1,0 +1,17 @@
+-- TimescaleDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] TimescaleDB Documentation
+--       https://docs.timescale.com/
+
+-- 一、与 PostgreSQL 兼容性: 100%兼容（TimescaleDB是PostgreSQL扩展）
+--   额外功能: Hypertable(自动分区), 连续聚合, 压缩, 数据保留策略
+-- 二、数据类型: 与PostgreSQL完全相同
+-- 三、陷阱: CREATE TABLE后需要SELECT create_hypertable()将表转为hypertable,
+--   时间列必须存在, 分区间隔选择影响性能, 压缩可大幅减少存储,
+--   连续聚合类似物化视图但自动刷新
+-- 四、自增/日期/字符串: 与 PostgreSQL 完全相同
+-- 五、TimescaleDB特有:
+--   SELECT create_hypertable('table', 'time_column');
+--   SELECT time_bucket('1 hour', ts) AS bucket, avg(value) FROM ...;
+--   ALTER TABLE t SET (timescaledb.compress);

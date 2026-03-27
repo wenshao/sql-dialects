@@ -1,0 +1,56 @@
+-- H2: 将分隔字符串拆分为多行 (String Split to Rows)
+--
+-- 参考资料:
+--   [1] H2 Documentation - Functions
+--       https://h2database.com/html/functions.html
+--   [2] H2 Documentation - UNNEST
+--       https://h2database.com/html/grammar.html#unnest
+
+-- ============================================================
+-- 示例数据
+-- ============================================================
+CREATE TABLE tags_csv (
+    id   INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    tags VARCHAR(500)
+);
+
+INSERT INTO tags_csv (name, tags) VALUES
+    ('Alice', 'python,java,sql'),
+    ('Bob',   'go,rust'),
+    ('Carol', 'sql,python,javascript,typescript');
+
+-- ============================================================
+-- 方法 1: UNNEST + REGEXP_SPLIT（推荐, H2 2.x）
+-- ============================================================
+-- H2 模式: PostgreSQL 兼容模式
+SELECT t.id, t.name, x.tag
+FROM   tags_csv t
+CROSS JOIN UNNEST(REGEXP_SPLIT(t.tags, ',')) AS x(tag);
+
+-- ============================================================
+-- 方法 2: 递归 CTE
+-- ============================================================
+WITH RECURSIVE split_cte AS (
+    SELECT id, name,
+           CASE WHEN LOCATE(',', tags) > 0
+                THEN LEFT(tags, LOCATE(',', tags) - 1)
+                ELSE tags END                    AS tag,
+           CASE WHEN LOCATE(',', tags) > 0
+                THEN SUBSTRING(tags, LOCATE(',', tags) + 1)
+                ELSE '' END                      AS remaining,
+           1                                     AS pos
+    FROM   tags_csv
+    UNION ALL
+    SELECT id, name,
+           CASE WHEN LOCATE(',', remaining) > 0
+                THEN LEFT(remaining, LOCATE(',', remaining) - 1)
+                ELSE remaining END,
+           CASE WHEN LOCATE(',', remaining) > 0
+                THEN SUBSTRING(remaining, LOCATE(',', remaining) + 1)
+                ELSE '' END,
+           pos + 1
+    FROM   split_cte
+    WHERE  remaining <> ''
+)
+SELECT id, name, tag, pos FROM split_cte ORDER BY id, pos;

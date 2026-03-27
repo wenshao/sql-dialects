@@ -1,0 +1,22 @@
+-- DB2: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] IBM DB2 SQL Reference
+--       https://www.ibm.com/docs/en/db2/11.5
+--   [2] IBM DB2 Migration Guide
+--       https://www.ibm.com/docs/en/db2/11.5?topic=migrating
+
+-- 一、数据类型映射（从常见数据库到 DB2）
+--   INT→INTEGER, BIGINT→BIGINT, FLOAT→REAL, DOUBLE→DOUBLE,
+--   VARCHAR→VARCHAR, TEXT→CLOB, DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BOOLEAN(11.1+)或SMALLINT, DATE→DATE, TIMESTAMP→TIMESTAMP,
+--   BLOB→BLOB, JSON→CLOB(用JSON函数), AUTO_INCREMENT→GENERATED ALWAYS AS IDENTITY
+-- 二、函数映射: IFNULL/NVL→COALESCE, NOW()→CURRENT TIMESTAMP,
+--   CONCAT→CONCAT或||, GROUP_CONCAT→LISTAGG(11.1+),
+--   DATEDIFF→TIMESTAMPDIFF, DATE_ADD→d+n DAYS
+-- 三、陷阱: DB2对标准SQL遵循度高, 表名schema.table必须指定,
+--   日期算术用DAYS/MONTHS/YEARS关键字, 字符串连接用||或CONCAT
+-- 四、自增: GENERATED ALWAYS AS IDENTITY 或 SEQUENCE
+-- 五、日期: CURRENT TIMESTAMP; CURRENT DATE; d + 1 DAY;
+--   TIMESTAMPDIFF(16, CHAR(t2-t1)); VARCHAR_FORMAT(ts,'YYYY-MM-DD')
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, LOCATE, ||, LISTAGG

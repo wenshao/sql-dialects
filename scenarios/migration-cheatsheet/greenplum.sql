@@ -1,0 +1,14 @@
+-- Greenplum: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Greenplum Documentation
+--       https://docs.vmware.com/en/VMware-Greenplum/
+
+-- 一、与 PostgreSQL 兼容性: 基于 PostgreSQL, 高度兼容
+--   差异: 部分PostgreSQL新特性滞后, 分布式架构引入DISTRIBUTED BY,
+--   不支持部分PG扩展, 并行查询优化器(ORCA/Postgres Planner)
+-- 二、陷阱: MPP架构(选择合适的DISTRIBUTED BY很关键),
+--   不支持全局唯一序列(SERIAL在每个segment独立), 不支持外键约束强制,
+--   大表UPDATE/DELETE性能较差(建议用CTAS重建)
+-- 三、自增: SERIAL/BIGSERIAL（但分布式环境下不保证全局唯一递增）
+-- 四、日期/字符串: 与 PostgreSQL 相同

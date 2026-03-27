@@ -1,0 +1,21 @@
+-- PolarDB: Math Functions
+--
+-- 参考资料:
+--   [1] PolarDB Documentation
+--       https://www.alibabacloud.com/help/en/polardb/
+
+-- PolarDB for PostgreSQL
+SELECT ABS(-42); SELECT CEIL(4.3); SELECT FLOOR(4.7);
+SELECT ROUND(3.14159, 2); SELECT TRUNC(3.14159, 2);
+SELECT MOD(17, 5); SELECT POWER(2, 10); SELECT SQRT(144);
+SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG(100); SELECT PI(); SELECT RANDOM();
+SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
+SELECT GREATEST(1, 5, 3); SELECT LEAST(1, 5, 3);
+
+-- PolarDB for MySQL
+-- SELECT ABS(-42); SELECT CEIL(4.3); SELECT FLOOR(4.7);
+-- SELECT ROUND(3.14159, 2); SELECT TRUNCATE(3.14159, 2);
+-- SELECT MOD(17, 5); SELECT POW(2, 10); SELECT SQRT(144);
+-- SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG(EXP(1)); SELECT PI(); SELECT RAND();
+
+-- 注意：PolarDB 有 PostgreSQL 和 MySQL 两个版本，数学函数跟随对应引擎

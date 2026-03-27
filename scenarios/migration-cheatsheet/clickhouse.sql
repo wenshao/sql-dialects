@@ -1,0 +1,28 @@
+-- ClickHouse: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] ClickHouse Documentation - Migration
+--       https://clickhouse.com/docs/en/getting-started/example-datasets
+--   [2] ClickHouse SQL Reference
+--       https://clickhouse.com/docs/en/sql-reference
+
+-- ============================================================
+-- 一、从其他数据库迁移到 ClickHouse
+-- ============================================================
+-- 数据类型: INT→Int32, BIGINT→Int64, FLOAT→Float32, DOUBLE→Float64,
+--           VARCHAR/TEXT→String, DECIMAL→Decimal(p,s), BOOLEAN→UInt8(0/1),
+--           DATE→Date/Date32, TIMESTAMP→DateTime/DateTime64,
+--           NULL→Nullable(T)（需显式声明）, JSON→String或JSON(实验性)
+-- 函数: COALESCE→COALESCE, NOW()→now(), CONCAT→concat,
+--        GROUP_CONCAT→groupArray+arrayStringConcat,
+--        DATEDIFF→dateDiff, DATE_ADD→date_add
+-- 陷阱: 无UPDATE/DELETE(用ALTER TABLE UPDATE/DELETE异步),
+--        默认列不可NULL, 必须指定表引擎, 无事务(原子INSERT除外),
+--        无JOIN索引(大表JOIN需预聚合), 字符串排序用collation
+
+-- 二、自增: ClickHouse 无自增列，使用 rowNumberInAllBlocks() 或应用层生成
+-- 三、日期: SELECT now(); SELECT today(); SELECT toDate('2024-01-01') + 1;
+--           SELECT dateDiff('day', '2024-01-01', '2024-12-31');
+--           SELECT formatDateTime(now(), '%Y-%m-%d %H:%M:%S');
+-- 四、字符串: length, upper, lower, trim, substring(s,start,len),
+--            replaceAll, position(s,sub), concat, arrayStringConcat(groupArray(name),', ')

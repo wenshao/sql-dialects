@@ -1,0 +1,69 @@
+-- H2: JSON 类型
+
+-- H2 2.0+ 支持 JSON 类型
+
+CREATE TABLE events (
+    id   IDENTITY,
+    data JSON
+);
+
+-- 插入 JSON
+INSERT INTO events (data) VALUES ('{"name": "alice", "age": 25}');
+INSERT INTO events (data) VALUES (JSON '{"name": "bob", "tags": ["vip"]}');
+
+-- 用 FORMAT JSON 插入
+INSERT INTO events (data) VALUES (JSON '{"items": [1, 2, 3]}');
+
+-- ============================================================
+-- JSON 访问
+-- ============================================================
+
+-- JSON 值提取（H2 语法）
+SELECT data FORMAT JSON FROM events;
+
+-- CAST 转换
+SELECT CAST(data AS VARCHAR) FROM events;
+
+-- ============================================================
+-- JSON 函数（2.0+）
+-- ============================================================
+
+-- JSON_OBJECT（构造 JSON 对象）
+SELECT JSON_OBJECT('name': 'alice', 'age': 25);
+
+-- JSON_ARRAY（构造 JSON 数组）
+SELECT JSON_ARRAY(1, 2, 3);
+
+-- JSON_OBJECTAGG（聚合为 JSON 对象）
+SELECT JSON_OBJECTAGG(username: age) FROM users;
+
+-- JSON_ARRAYAGG（聚合为 JSON 数组）
+SELECT JSON_ARRAYAGG(username) FROM users;
+
+-- ============================================================
+-- VARCHAR 存储 JSON（兼容方式）
+-- ============================================================
+
+-- 老版本或兼容模式下，用 VARCHAR/CLOB 存储 JSON
+CREATE TABLE config (
+    id    INT PRIMARY KEY,
+    data  VARCHAR(10000)                    -- JSON 作为字符串
+);
+
+INSERT INTO config VALUES (1, '{"key": "value", "count": 42}');
+
+-- 字符串方式查询
+SELECT * FROM config WHERE data LIKE '%"key": "value"%';
+
+-- ============================================================
+-- JSON 与 Java 集成
+-- ============================================================
+
+-- 通过 Java 存储过程处理复杂 JSON 逻辑
+-- 可以使用 Jackson / Gson 库解析 JSON
+
+-- 注意：JSON 类型在 H2 2.0+ 版本支持
+-- 注意：老版本使用 VARCHAR/CLOB 存储 JSON
+-- 注意：JSON 函数支持有限（不如 PostgreSQL 丰富）
+-- 注意：不支持 -> / ->> 操作符
+-- 注意：复杂 JSON 处理建议在应用层完成

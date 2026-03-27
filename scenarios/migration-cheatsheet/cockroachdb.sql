@@ -1,0 +1,22 @@
+-- CockroachDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] CockroachDB Documentation - Migration
+--       https://www.cockroachlabs.com/docs/stable/migration-overview
+--   [2] CockroachDB SQL Reference
+--       https://www.cockroachlabs.com/docs/stable/sql-statements
+
+-- 一、数据类型: 与 PostgreSQL 高度兼容
+--   INT→INT/INT8, FLOAT→FLOAT/FLOAT8, VARCHAR→VARCHAR/STRING,
+--   BOOLEAN→BOOL, TIMESTAMP→TIMESTAMP/TIMESTAMPTZ,
+--   JSON→JSONB, UUID→UUID, SERIAL→INT DEFAULT unique_rowid()
+-- 二、函数: 与 PostgreSQL 基本兼容
+--   差异: 部分PostgreSQL扩展函数不支持, 无LATERAL(部分版本),
+--   gen_random_uuid()可用
+-- 三、陷阱: 分布式事务(高延迟写入), SERIAL使用unique_rowid()而非序列,
+--   无全表扫描的排他锁, 部分PostgreSQL语法不支持(如LISTEN/NOTIFY),
+--   跨区域部署时延迟敏感
+-- 四、自增: INT DEFAULT unique_rowid() 或 UUID DEFAULT gen_random_uuid()
+-- 五、日期: NOW(); CURRENT_DATE; d + INTERVAL '1 day';
+--   DATE_PART('day', a-b); TO_CHAR(ts,'YYYY-MM-DD')
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, POSITION, ||, STRING_AGG

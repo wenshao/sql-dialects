@@ -1,0 +1,14 @@
+-- Materialize: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Materialize Documentation
+--       https://materialize.com/docs/
+
+-- 一、与 PostgreSQL 兼容性: 基于PostgreSQL协议，大部分语法兼容
+--   差异: 流式物化视图引擎, 支持CDC源, 增量计算
+-- 二、数据类型: 兼容PostgreSQL(TEXT, INT, JSONB, TIMESTAMPTZ等)
+-- 三、陷阱: 流式引擎(不是传统数据库), CREATE SOURCE定义数据输入,
+--   CREATE MATERIALIZED VIEW定义持续查询, 不支持DELETE/UPDATE,
+--   适合实时分析场景, 不适合OLTP
+-- 四、自增: 无（数据从外部源流入）
+-- 五、日期/字符串: 与 PostgreSQL 相同

@@ -1,0 +1,23 @@
+-- Trino: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Trino Documentation
+--       https://trino.io/docs/current/
+--   [2] Trino SQL Syntax
+--       https://trino.io/docs/current/sql.html
+
+-- 一、数据类型（到 Trino）
+--   INT→INTEGER, BIGINT→BIGINT, FLOAT→REAL, DOUBLE→DOUBLE,
+--   VARCHAR→VARCHAR, TEXT→VARCHAR(无长度限制), DECIMAL→DECIMAL(p,s),
+--   BOOLEAN→BOOLEAN, DATE→DATE, TIMESTAMP→TIMESTAMP,
+--   JSON→JSON, ARRAY→ARRAY(T), MAP→MAP(K,V), ROW→ROW(...)
+-- 二、函数: IFNULL/NVL→COALESCE, NOW()→current_timestamp或now(),
+--   CONCAT→concat或||, GROUP_CONCAT→array_join(array_agg(col),','),
+--   DATEDIFF→date_diff, DATE_ADD→date_add
+-- 三、陷阱: Trino是查询引擎(不存储数据), 功能取决于connector,
+--   部分connector不支持DML, 类型系统严格(需显式CAST),
+--   无AUTO_INCREMENT(数据在底层存储), 区分catalog.schema.table
+-- 四、自增: 取决于底层存储
+-- 五、日期: current_timestamp; current_date; date_add('day',1,d);
+--   date_diff('day',a,b); format_datetime(ts,'yyyy-MM-dd HH:mm:ss')
+-- 六、字符串: length, upper, lower, trim, substr, replace, strpos, ||, array_join

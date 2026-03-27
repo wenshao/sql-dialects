@@ -1,0 +1,24 @@
+-- TiDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] TiDB Documentation - MySQL Compatibility
+--       https://docs.pingcap.com/tidb/stable/mysql-compatibility
+--   [2] TiDB Migration Guide
+--       https://docs.pingcap.com/tidb/stable/migration-overview
+
+-- 一、与 MySQL 的兼容性: 高度兼容 MySQL 5.7/8.0 语法
+--   数据类型: 基本完全兼容MySQL
+--   差异: AUTO_INCREMENT 行为不同(TiDB使用分布式自增,可能不连续),
+--         部分MySQL特性不支持(如存储过程/触发器的部分功能)
+-- 二、函数: 与MySQL基本兼容
+--   差异: 部分MySQL特有函数可能不支持
+-- 三、陷阱: 分布式架构(大事务有限制), AUTO_INCREMENT不保证连续,
+--   TiKV存储引擎vs InnoDB行为差异, 乐观/悲观事务模式选择,
+--   热点问题(需要合理设计主键), 不支持外键约束,
+--   不支持FULLTEXT索引, 临时表语法差异
+-- 四、自增: AUTO_INCREMENT（分布式自增，可能不连续）
+--   推荐: AUTO_RANDOM 避免热点
+-- 五、日期: NOW(); CURDATE(); DATE_ADD(NOW(),INTERVAL 1 DAY);
+--   DATEDIFF(a,b); DATE_FORMAT(NOW(),'%Y-%m-%d %H:%i:%s')
+-- 六、字符串: CHAR_LENGTH, UPPER, LOWER, TRIM, SUBSTRING,
+--   REPLACE, LOCATE, CONCAT, GROUP_CONCAT

@@ -1,0 +1,29 @@
+-- H2 Database: 表分区策略
+--
+-- 参考资料:
+--   [1] H2 Documentation
+--       https://h2database.com/html/main.html
+
+-- H2 不支持表分区
+-- 替代方案：
+
+-- ============================================================
+-- 手动分表
+-- ============================================================
+
+CREATE TABLE orders_2024 (
+    id BIGINT AUTO_INCREMENT, user_id BIGINT, amount DECIMAL(10,2), order_date DATE
+);
+
+CREATE VIEW orders AS
+SELECT * FROM orders_2023 UNION ALL SELECT * FROM orders_2024;
+
+-- ============================================================
+-- 索引优化
+-- ============================================================
+
+CREATE INDEX idx_date ON orders_2024(order_date);
+
+-- 注意：H2 不支持表分区
+-- 注意：作为嵌入式/测试数据库，分区需求较少
+-- 注意：索引是主要的查询优化手段

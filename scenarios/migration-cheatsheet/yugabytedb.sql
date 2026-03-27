@@ -1,0 +1,15 @@
+-- YugabyteDB: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] YugabyteDB Documentation
+--       https://docs.yugabyte.com/
+
+-- 一、与 PostgreSQL 兼容性: YSQL兼容PostgreSQL（高度兼容）
+--   差异: 分布式架构, 部分PG扩展不支持, SERIAL使用全局序列
+-- 二、数据类型: 与PostgreSQL基本相同
+-- 三、陷阱: 分布式事务(延迟高于单节点PG), 选择合适的分片键,
+--   COLOCATION策略影响小表JOIN性能, 部分DDL操作在线不可用,
+--   Tablet splitting影响性能, 二级索引是全局的(分布式)
+-- 四、自增: SERIAL（分布式全局序列）
+--   推荐: UUID 避免热点
+-- 五、日期/字符串: 与 PostgreSQL 相同

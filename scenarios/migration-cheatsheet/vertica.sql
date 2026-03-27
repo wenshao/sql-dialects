@@ -1,0 +1,21 @@
+-- Vertica: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Vertica SQL Reference
+--       https://www.vertica.com/docs/latest/HTML/Content/Authoring/SQLReferenceManual/SQLReferenceManual.htm
+
+-- 一、数据类型（到 Vertica）
+--   INT→INTEGER/INT, BIGINT→BIGINT/INT8, FLOAT→FLOAT/FLOAT8,
+--   VARCHAR→VARCHAR(n)(默认80), TEXT→LONG VARCHAR(max 32MB),
+--   DECIMAL→NUMERIC(p,s), BOOLEAN→BOOLEAN, DATE→DATE,
+--   TIMESTAMP→TIMESTAMP/TIMESTAMPTZ, BLOB→LONG VARBINARY,
+--   JSON→VARCHAR(用JSON函数), AUTO_INCREMENT→AUTO_INCREMENT或IDENTITY
+-- 二、函数: IFNULL/NVL→NVL/COALESCE, NOW()→NOW()/CURRENT_TIMESTAMP,
+--   CONCAT→||或CONCAT, GROUP_CONCAT→不支持(用子查询)
+-- 三、陷阱: 列式存储MPP(选择合适的投影Projection很重要),
+--   分段segmentation和排序sort order影响性能, 无MERGE(11.x+支持),
+--   DELETE标记行而非物理删除(需PURGE)
+-- 四、自增: CREATE TABLE t (id AUTO_INCREMENT PRIMARY KEY);
+-- 五、日期: NOW(); CURRENT_DATE; d + INTERVAL '1 day'; DATEDIFF('day',a,b);
+--   TO_CHAR(ts,'YYYY-MM-DD HH24:MI:SS')
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, POSITION, ||

@@ -1,0 +1,23 @@
+-- 达梦 (DM): Type Conversion
+--
+-- 参考资料:
+--   [1] 达梦数据库 SQL 参考手册
+--       https://eco.dameng.com/document/dm/zh-cn/sql-dev/
+
+-- CAST (SQL 标准)
+SELECT CAST(42 AS VARCHAR2(10)) FROM DUAL;
+SELECT CAST('42' AS NUMBER) FROM DUAL;
+SELECT CAST('2024-01-15' AS DATE) FROM DUAL;
+
+-- TO_CHAR / TO_NUMBER / TO_DATE (Oracle 兼容)
+SELECT TO_CHAR(123456.789, '999,999.99') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL;
+SELECT TO_NUMBER('123,456.78', '999,999.99') FROM DUAL;
+SELECT TO_DATE('2024-01-15', 'YYYY-MM-DD') FROM DUAL;
+SELECT TO_TIMESTAMP('2024-01-15 10:30:00', 'YYYY-MM-DD HH24:MI:SS') FROM DUAL;
+
+-- 隐式转换 (Oracle 兼容)
+SELECT '42' + 0 FROM DUAL;
+
+-- 注意：达梦兼容 Oracle 类型转换函数
+-- 限制：无 TRY_CAST, ::, CONVERT (SQL Server 风格)

@@ -1,0 +1,20 @@
+-- Spanner: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] Cloud Spanner SQL Reference
+--       https://cloud.google.com/spanner/docs/reference/standard-sql/
+
+-- 一、数据类型（到 Spanner）
+--   INT→INT64, FLOAT→FLOAT64, VARCHAR→STRING(n), TEXT→STRING(MAX),
+--   BOOLEAN→BOOL, DATE→DATE, TIMESTAMP→TIMESTAMP, BLOB→BYTES(MAX),
+--   JSON→JSON, ARRAY→ARRAY<T>(原生支持), STRUCT→STRUCT<...>
+-- 二、函数: 与BigQuery标准SQL类似
+--   IFNULL→IFNULL/COALESCE, CONCAT→CONCAT, GENERATE_UUID可用
+-- 三、陷阱: 全球分布式数据库, 主键设计很关键(避免热点),
+--   不建议使用自增主键(推荐UUID或bit-reversed序列),
+--   DDL和DML必须在不同事务中, interleaved tables是Spanner特色,
+--   无AUTO_INCREMENT, SEQUENCE只在GoogleSQL方言支持
+-- 四、自增: 无传统自增，推荐 GENERATE_UUID() 或 bit_reverse(SEQUENCE)
+-- 五、日期: CURRENT_TIMESTAMP(); CURRENT_DATE(); DATE_ADD(d, INTERVAL 1 DAY);
+--   DATE_DIFF(a,b,DAY); FORMAT_TIMESTAMP('%Y-%m-%d',ts)
+-- 六、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE, STRPOS, CONCAT, STRING_AGG

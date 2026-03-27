@@ -1,0 +1,15 @@
+-- openGauss: 迁移速查表 (Migration Cheatsheet)
+--
+-- 参考资料:
+--   [1] openGauss Documentation
+--       https://docs.opengauss.org/
+
+-- 一、与 PostgreSQL 兼容性: 基于PostgreSQL 9.2, 扩展了部分功能
+--   差异: 存储引擎不同(MOT内存表), 安全增强, AI特性,
+--   部分PostgreSQL新版本特性不支持(基于较老版本)
+-- 二、数据类型: 与PostgreSQL基本相同, 额外支持部分Oracle类型
+-- 三、陷阱: 华为开源数据库, 兼容PostgreSQL但不是100%,
+--   MOT(内存优化表)适合OLTP高并发, 分布式版本openGauss需要分片键,
+--   gs_tools系列工具管理集群
+-- 四、自增: SERIAL 或 GENERATED ALWAYS AS IDENTITY
+-- 五、日期/字符串: 与 PostgreSQL 基本相同
