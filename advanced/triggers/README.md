@@ -103,3 +103,13 @@
 - PostgreSQL 10+：支持在分区表上创建触发器（自动应用到所有分区）
 - MySQL 5.7+：允许同一事件的多个触发器（FOLLOWS/PRECEDES 控制顺序）
 - 触发器的总体趋势是被应用层事件、CDC（Change Data Capture）等机制替代
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **触发器支持** | 支持 BEFORE/AFTER/INSTEAD OF 触发器 | 不支持传统触发器（物化视图实现类似的增量处理） | 不支持触发器 | MySQL BEFORE/AFTER / PG 全部 / Oracle 全部 |
+| **触发器类型** | FOR EACH ROW（行级） | 无 | 无 | MySQL 行级 / PG 行级+语句级 / SQL Server 语句级 |
+| **替代方案** | 触发器是唯一的数据库端自动化 | 物化视图（INSERT 触发增量更新目标表） | Cloud Functions / Pub/Sub 事件驱动 | CDC（Change Data Capture）/ 事件驱动架构 |
+| **NEW/OLD 引用** | NEW/OLD 关键字 | 无 | 无 | MySQL NEW/OLD / PG NEW/OLD / SQL Server INSERTED/DELETED |
+| **权限需求** | 无权限限制（文件可写即可创建触发器） | 无触发器 | 无触发器 | 需要 TRIGGER 权限 |

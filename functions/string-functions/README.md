@@ -104,3 +104,13 @@
 - MySQL 8.0+：引入 REGEXP_REPLACE()、REGEXP_SUBSTR() 等正则函数（5.7 只有 REGEXP/RLIKE 匹配）
 - PostgreSQL：正则支持一直很完善，包括命名捕获组等高级特性
 - SQL Server 2017+：引入 STRING_AGG()、CONCAT_WS()、TRIM() 等现代字符串函数
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **字符串拼接** | `||` 运算符（与 PG/Oracle 相同） | concat() 函数或 `||` | CONCAT() 函数或 `||` | MySQL CONCAT() / PG `||` / SQL Server `+` |
+| **字符串类型** | 动态类型，TEXT 是主要字符串存储 | String/FixedString 列式存储，处理高效 | STRING 类型 | VARCHAR/TEXT/CLOB 等 |
+| **正则表达式** | 不内置（需加载 regexp 扩展） | 丰富的正则函数（match/extract/replaceRegexpAll） | REGEXP_CONTAINS/REGEXP_EXTRACT/REGEXP_REPLACE | PG 内置强大正则 / MySQL 8.0+ 支持 |
+| **LIKE 性能** | 无全文索引，LIKE '%x%' 全表扫描 | 列式存储下 LIKE 可利用跳数索引优化 | LIKE 按扫描量计费 | 可利用索引优化前缀 LIKE |
+| **动态类型影响** | 任何类型可存入 TEXT 列，字符串函数容错性高 | 严格类型，非 String 需先转换 | 严格类型 | 严格类型 |

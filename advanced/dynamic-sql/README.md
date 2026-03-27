@@ -103,3 +103,12 @@
 - BigQuery：引入 EXECUTE IMMEDIATE 支持脚本中的动态 SQL
 - Snowflake：存储过程中支持 JavaScript 拼接和执行 SQL
 - PostgreSQL：PL/pgSQL 的 EXECUTE 一直是动态 SQL 的标准方式，支持 USING 参数绑定
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **动态 SQL** | 不支持（无存储过程，应用层拼接 SQL） | 不支持数据库端动态 SQL | 支持 EXECUTE IMMEDIATE（Scripting 中） | MySQL PREPARE/EXECUTE / PG EXECUTE / Oracle EXECUTE IMMEDIATE |
+| **参数绑定** | 应用层 API 支持参数化查询（防注入） | 应用层参数化 | EXECUTE IMMEDIATE 支持 USING 参数绑定 | 各方言均支持参数绑定 |
+| **安全风险** | 应用层拼接 SQL 需防注入 | 应用层拼接 SQL 需防注入 | EXECUTE IMMEDIATE 需防注入 | 存储过程内动态 SQL 需防注入 |
+| **适用场景** | 应用层动态生成查询是唯一方式 | 应用层动态生成查询 | 报表/ETL 脚本中的动态表名/列名 | 动态报表、通用查询接口、DDL 脚本 |

@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **递归 CTE** | 3.8.3+ 支持递归 CTE（层级查询标准方案） | 有限递归 CTE 支持 | 支持递归 CTE | PG/MySQL 8.0+/SQL Server 支持 |
+| **CONNECT BY** | 不支持 | 不支持 | 不支持 | Oracle 独有的 CONNECT BY LEVEL/PRIOR 语法 |
+| **递归深度** | 可配置（SQLITE_MAX_VARIABLE_NUMBER） | 有限制 | 有递归深度限制 | PG 默认无限 / MySQL 默认 1000 / SQL Server 默认 100 |
+| **替代方案** | 递归 CTE 是唯一方案 | 物化路径（path 列）预计算层级 | 递归 CTE 或预计算嵌套集合 | 递归 CTE / CONNECT BY / 嵌套集合模型 |

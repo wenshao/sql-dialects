@@ -104,3 +104,13 @@
 - PostgreSQL 10+：推荐 `GENERATED { ALWAYS | BY DEFAULT } AS IDENTITY` 替代 SERIAL
 - Oracle 12c+：引入 IDENTITY 列，简化了之前 SEQUENCE + TRIGGER 的模式
 - MariaDB 10.3+：引入 CREATE SEQUENCE 语法（MySQL 至今不支持）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **自增机制** | ROWID 自动生成；INTEGER PRIMARY KEY 自动成为 ROWID 别名 | 无自增机制，分布式架构不适用单调递增 ID | 无自增列，推荐 GENERATE_UUID() 或 ROW_NUMBER() | AUTO_INCREMENT / SERIAL / IDENTITY / SEQUENCE |
+| **SEQUENCE 对象** | 不支持独立 SEQUENCE 对象 | 不支持 | 不支持 | PG/Oracle/SQL Server/Db2 支持 |
+| **ID 策略** | ROWID 或 AUTOINCREMENT（严格递增但更慢） | 通常用 UUID、雪花 ID 或业务键 | UUID 或应用层生成的分布式 ID | 自增 ID / SEQUENCE / UUID |
+| **分布式考量** | 单文件数据库，无分布式 ID 问题 | 多节点写入，单调递增 ID 会成为热点 | Serverless 架构，无需关心 ID 生成的并发问题 | 分布式 NewSQL（TiDB/CockroachDB）ID 可能非连续 |
+| **并发安全** | 单写模型天然避免 ID 冲突 | INSERT 批量写入，ID 由应用层保证 | 并发 INSERT 由平台管理 | 行锁 / 序列缓存保证并发安全 |

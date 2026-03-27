@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **窗口函数方案** | 3.25.0+ 支持 ROW_NUMBER/RANK/DENSE_RANK | 支持 ROW_NUMBER 等基本窗口函数 | 完整支持 + QUALIFY 可直接过滤 Top-N 无需子查询 | PG 8.4+/MySQL 8.0+/Oracle 8i+ 支持 |
+| **无窗口函数替代** | 旧版本需自连接或 LIMIT 分组模拟 | 通常有窗口函数可用 | 通常有窗口函数可用 | MySQL 5.7 需变量模拟 ROW_NUMBER |
+| **LIMIT 语法** | LIMIT/OFFSET（简单 Top-N 直接可用） | LIMIT/OFFSET | LIMIT/OFFSET | 各方言语法不同（TOP/FETCH FIRST/ROWNUM） |
+| **性能** | 单文件，小数据高效 | 列式存储分布式 Top-N 高效 | Serverless 按扫描量计费 | 索引辅助排序可加速 |

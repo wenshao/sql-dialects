@@ -103,3 +103,14 @@
 - MySQL 8.0：引入 ROLE 机制，权限管理能力显著提升
 - PostgreSQL 15+：对 PUBLIC schema 的默认权限收紧（安全增强）
 - SQL Server 2016+：引入行级安全（Row-Level Security）策略
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **权限系统** | 无 GRANT/REVOKE，完全依赖操作系统文件权限 | 有完整的 GRANT/REVOKE/CREATE USER/ROLE 系统 | 使用 Google Cloud IAM 管理权限（非 SQL GRANT） | 完整的 SQL GRANT/REVOKE 权限体系 |
+| **用户认证** | 无认证机制，文件可读即可查 | 支持密码认证、LDAP、Kerberos 等 | Google 账号 / 服务账号 / OAuth | 各方言有独立的认证体系 |
+| **角色管理** | 不支持 | 支持 CREATE ROLE 和角色继承 | IAM 角色（Viewer/Editor/Owner + 自定义） | PG ROLE 统一模型 / MySQL 8.0+ ROLE / Oracle USER+ROLE |
+| **行级安全** | 不支持（应用层实现） | 支持行级策略（Row Policy） | 通过 IAM 条件和行级访问策略实现 | PG Row-Level Security / Oracle VPD / SQL Server 2016+ |
+| **列级权限** | 不支持 | 支持列级 GRANT | 支持列级 IAM 绑定 | PG/MySQL 支持列级权限 |
+| **安全模型** | 文件系统安全是唯一防线 | 数据库级安全 | 云平台级安全（IAM + VPC + 加密） | 数据库级安全 |

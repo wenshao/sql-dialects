@@ -104,3 +104,14 @@ OLTP 数据库应充分利用约束保证数据完整性，外键约束对数据
 - MySQL 8.0.16：CHECK 约束从"仅解析"变为真正强制执行
 - TiDB 6.6：首次支持外键约束
 - PostgreSQL 15+：支持 NULLS NOT DISTINCT 使 UNIQUE 约束完全排除 NULL 重复
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **主键约束** | 支持且强制执行，INTEGER PRIMARY KEY 特殊处理为 ROWID | 定义 PRIMARY KEY 影响排序键（ORDER BY），但不强制唯一性 | 支持声明但不强制执行（NOT ENFORCED） | 完整支持且强制执行 |
+| **外键约束** | 支持但默认关闭（PRAGMA foreign_keys=ON 启用） | 不支持外键 | 支持声明但不强制执行（信息性约束） | 完整支持且强制执行，影响写入性能 |
+| **CHECK 约束** | 完整支持 | 不支持 CHECK 约束 | 不支持 | MySQL 8.0.16+ 才真正执行，PG/Oracle 一直支持 |
+| **UNIQUE 约束** | 支持且强制执行 | 不强制执行唯一性（MergeTree 最终合并可能去重） | 不强制执行 | 完整支持且强制执行 |
+| **约束命名** | 支持但通常省略 | 无约束命名概念 | 约束名可选 | PG/Oracle 严格管理约束名 |
+| **事务保证** | 单写场景下约束检查在事务内即时生效 | 无传统事务，约束不在写入时检查 | DML 有配额限制，约束仅用于查询优化器提示 | 约束在事务中即时检查（可 DEFERRABLE 延迟到提交） |

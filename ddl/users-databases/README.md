@@ -101,3 +101,13 @@
 - MySQL 8.0：引入角色（ROLE）机制，之前只能直接给用户授权
 - PostgreSQL 16+：支持 `GRANT ... ON ALL TABLES IN SCHEMA` 的改进
 - BigQuery：使用 IAM 角色代替传统 SQL 权限，与 Google Cloud 深度集成
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **权限系统** | 无 GRANT/REVOKE，完全依赖文件系统权限控制访问 | 有完整的 GRANT/REVOKE 和用户/角色系统 | 使用 Google Cloud IAM，不用 SQL GRANT | 完整的 GRANT/REVOKE 权限体系 |
+| **用户管理** | 无用户概念，无 CREATE USER | 支持 CREATE USER、角色管理 | 通过 IAM 管理用户和服务账号 | CREATE USER / CREATE ROLE |
+| **数据库层次** | 单文件即一个数据库，无 schema 概念 | database → table 两层结构 | project → dataset → table 三层结构 | PG: database→schema→table，MySQL: database=schema |
+| **多租户隔离** | 每个租户一个数据库文件实现隔离 | 通过 database 或行级权限隔离 | 通过 dataset 权限 + IAM 策略隔离 | schema 隔离（PG）或 database 隔离（MySQL） |
+| **跨库查询** | 通过 ATTACH DATABASE 可跨文件查询 | 支持跨 database 查询 | 支持跨 dataset/跨 project 查询 | 各方言支持程度不同（PG 需 dblink/FDW） |

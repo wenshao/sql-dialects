@@ -103,3 +103,13 @@
 - PostgreSQL 11+：引入 CREATE PROCEDURE（支持事务控制 COMMIT/ROLLBACK）
 - BigQuery 2019+：引入 Scripting 和存储过程支持
 - Snowflake：支持 JavaScript/SQL/Python/Scala 编写存储过程，多语言支持是独特优势
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **存储过程** | 不支持存储过程（无过程式语言） | 不支持存储过程 | 支持 Scripting 和 CREATE PROCEDURE | MySQL/PG/Oracle/SQL Server 各有独立过程式语言 |
+| **替代方案** | 应用层（Python/Java 等）实现逻辑 | 用物化视图 + 定时任务实现 ETL 逻辑 | EXECUTE IMMEDIATE + Scripting 实现动态逻辑 | 存储过程 + 触发器 |
+| **UDF 支持** | 可通过 C API 注册自定义函数 | 支持 UDF（C++/SQL） | 支持 UDF（SQL/JavaScript） | 各方言支持 UDF |
+| **事务控制** | 应用层管理事务 | 无事务控制 | Scripting 中无显式事务控制 | PG 11+ PROCEDURE 支持事务控制 |
+| **调试能力** | 无数据库端调试 | 无存储过程调试 | 有限的错误信息 | 各方言有不同的调试工具 |

@@ -104,3 +104,13 @@
 - Oracle 12c+：引入 `OFFSET n ROWS FETCH FIRST m ROWS ONLY`，告别 ROWNUM 三层嵌套
 - SQL Server 2012+：引入 `OFFSET ... FETCH NEXT ...` 语法
 - MySQL 8.0：引入窗口函数，可用 ROW_NUMBER() 实现更灵活的分页逻辑
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **分页语法** | LIMIT/OFFSET（与 MySQL/PG 相同） | LIMIT/OFFSET | LIMIT/OFFSET | MySQL/PG LIMIT / Oracle FETCH FIRST / SQL Server TOP+OFFSET |
+| **OFFSET 性能** | 大 OFFSET 性能差（需跳过行），但单文件操作开销有限 | 大 OFFSET 分布式扫描成本高 | 大 OFFSET 按扫描量计费，成本高 | 大 OFFSET 普遍性能差 |
+| **键集分页** | 支持 WHERE id > last_id 键集分页 | 支持且推荐，避免大 OFFSET | 支持但更推荐利用分区裁剪 | 均支持且推荐 |
+| **FETCH FIRST** | 不支持 SQL 标准 FETCH FIRST 语法 | 不支持 | 不支持 | PG/Oracle 12c+/SQL Server 2012+ 支持 |
+| **计费影响** | 无计费概念 | 无直接计费影响 | OFFSET 不减少扫描量，分页仍按全量扫描计费 | 无计费概念 |

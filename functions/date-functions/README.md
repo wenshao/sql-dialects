@@ -104,3 +104,13 @@
 - MySQL 8.0：引入更多窗口函数与日期结合的能力，但仍无 DATE_TRUNC
 - PostgreSQL 14+：增强 EXTRACT 和 date_bin() 函数（按任意间隔截断时间）
 - BigQuery：日期函数设计最一致（DATE_ADD/DATE_SUB/DATE_DIFF/DATE_TRUNC 命名统一）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **日期存储** | 无原生日期类型，日期存为 TEXT/REAL/INTEGER | 有 Date/Date32/DateTime/DateTime64 原生类型 | DATE/DATETIME/TIMESTAMP 原生类型 | 各方言有原生日期时间类型 |
+| **日期函数** | 有限函数集：date()/time()/datetime()/strftime() | 极其丰富：toDate/toDateTime/addDays/dateDiff 等 | 统一命名：DATE_ADD/DATE_SUB/DATE_DIFF/DATE_TRUNC | MySQL DATE_ADD / PG interval 运算 / Oracle ADD_MONTHS |
+| **DATE_TRUNC** | 无原生 DATE_TRUNC（用 strftime 模拟） | toStartOfMonth/toStartOfDay 等专用函数 | DATE_TRUNC（设计最一致） | PG 有 DATE_TRUNC，MySQL 无原生支持 |
+| **时区处理** | 无时区概念（存储什么就是什么） | DateTime 可指定时区（'Asia/Shanghai'） | TIMESTAMP 自动 UTC 处理 | PG TIMESTAMPTZ 最佳 / MySQL TIMESTAMP 自动转 UTC |
+| **动态类型影响** | 日期存为字符串时，比较和排序可能不符预期 | 严格类型确保日期计算正确 | 严格类型 | 严格类型 |

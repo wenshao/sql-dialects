@@ -105,3 +105,13 @@
 - Snowflake/Databricks：也支持 TRY_CAST 语法
 - PostgreSQL：无 TRY_CAST，但可以通过自定义函数实现类似功能
 - MySQL 8.0：CAST 支持的目标类型更丰富（如 CAST(... AS FLOAT)）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **类型系统** | 动态类型：声明类型仅为亲和性，任何值可存入任何列 | 严格类型：有丰富类型（UInt8~256、Decimal、DateTime64 等） | 严格类型：INT64/FLOAT64/STRING/BYTES 等 | 严格类型系统 |
+| **CAST 语法** | 支持 CAST(x AS type)，但实际只是亲和性转换 | 支持 CAST 和特有的 toInt32/toString 等转换函数 | CAST / SAFE_CAST（转换失败返回 NULL） | 标准 CAST / PG `::` / MySQL CONVERT |
+| **隐式转换** | 极度宽松（核心是动态类型，比较时按亲和性规则） | 较严格，但有自动类型提升规则 | 严格，不自动隐式转换 | MySQL 极宽松 / PG 极严格 / Oracle 居中 |
+| **TRY_CAST** | 不需要（动态类型天然不会因类型不匹配报错） | 不支持 TRY_CAST，转换失败报错 | SAFE_CAST（等价于 TRY_CAST） | SQL Server TRY_CAST / PG 无（需自定义函数） |
+| **迁移风险** | 从 SQLite 迁出时，动态类型数据可能包含混合类型值 | 类型精度高，迁入时需仔细映射 | BigQuery 类型有限，某些精度可能损失 | 各方言间类型映射是迁移核心挑战 |

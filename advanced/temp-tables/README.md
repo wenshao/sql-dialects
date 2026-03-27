@@ -103,3 +103,13 @@
 - PostgreSQL 15+：改进临时表的性能和系统目录清理
 - MySQL 8.0：临时表使用 TempTable 存储引擎替代 MEMORY 引擎，性能和大数据量支持改进
 - BigQuery：支持临时表但有 24 小时过期限制
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **临时表语法** | CREATE TEMP TABLE（存储在临时文件中） | CREATE TEMPORARY TABLE（会话级） | 支持临时表（24 小时过期限制） | MySQL/PG CREATE TEMPORARY TABLE / SQL Server #table |
+| **生命周期** | 连接关闭时自动删除 | 会话结束时自动删除 | 24 小时自动过期 | MySQL/PG 会话结束删除 / Oracle GTT 结构持久数据隔离 |
+| **可见性** | 仅当前连接可见 | 仅当前会话可见 | 仅当前会话可见 | 各方言均为会话隔离 |
+| **存储位置** | 临时数据库文件（或内存） | 本地磁盘 | Serverless 托管存储 | 各方言有专用临时表空间 |
+| **CTE 替代** | CTE（3.8.3+）可替代简单临时表场景 | CTE 可替代简单场景 | CTE 可替代简单场景 | CTE 是单查询范围内的替代 |

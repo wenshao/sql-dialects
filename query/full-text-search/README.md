@@ -103,3 +103,12 @@
 - MySQL 5.6+：InnoDB 引擎支持 FULLTEXT INDEX（之前仅 MyISAM 支持）
 - MySQL 5.7+：内置 ngram 和 MeCab 分词器支持 CJK 语言
 - PostgreSQL 12+：引入 websearch_to_tsquery() 支持类似 Google 的搜索语法
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **全文搜索方案** | FTS5 虚拟表（编译时扩展），非传统索引方式 | tokenbf_v1/ngrambf_v1 跳数索引实现简单全文查找 | 无原生全文索引，依赖 LIKE/REGEXP 或外部搜索服务 | MySQL FULLTEXT / PG tsvector+GIN / Oracle Text |
+| **中文支持** | FTS5 可自定义分词器但需额外开发 | 支持 ngram 分词 | 无内置分词 | MySQL 5.7+ 内置 ngram / PG 需安装中文分词扩展 |
+| **相关性排序** | FTS5 的 rank 函数 | 无内置相关性排序 | 无内置相关性排序 | MySQL MATCH / PG ts_rank / Oracle SCORE |
+| **架构定位** | 轻量级嵌入式搜索 | OLAP 引擎，全文搜索非核心功能 | 分析型服务，全文搜索非核心功能 | RDBMS 内置全文搜索，中等复杂度可用 |

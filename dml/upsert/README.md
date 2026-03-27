@@ -105,3 +105,13 @@
 - PostgreSQL 15+：引入 SQL 标准 MERGE 语法
 - SQLite 3.24.0+：引入 ON CONFLICT（UPSERT）语法
 - MySQL 8.0：ON DUPLICATE KEY UPDATE 支持 VALUES() 的别名替代（推荐用 AS 新行别名）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **UPSERT 机制** | ON CONFLICT DO UPDATE/NOTHING（3.24.0+），REPLACE INTO | 无原生 UPSERT；ReplacingMergeTree 引擎实现最终去重 | MERGE 语法（SQL 标准） | MySQL ON DUPLICATE KEY / PG ON CONFLICT / Oracle MERGE |
+| **去重时机** | INSERT 时即时检查冲突并处理 | ReplacingMergeTree 在后台合并时去重（最终一致，非即时） | MERGE 即时执行但消耗 DML 配额 | 即时在 INSERT 时处理 |
+| **MERGE 支持** | 不支持 SQL 标准 MERGE | 不支持 MERGE | 完整支持 MERGE（推荐方式） | Oracle/SQL Server 完整支持，PG 15+ 支持，MySQL 不支持 |
+| **并发安全** | 单写模型天然无并发冲突 | 并发 INSERT 后由后台合并保证最终一致 | 同一表并发 MERGE 有限制 | 行级锁保证并发安全，但可能死锁 |
+| **REPLACE INTO** | 支持（DELETE + INSERT） | 不支持 | 不支持 | MySQL 支持（DELETE + INSERT，会重置自增） |

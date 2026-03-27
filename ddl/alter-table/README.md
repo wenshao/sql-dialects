@@ -105,3 +105,14 @@
 - PostgreSQL 11+：ADD COLUMN WITH DEFAULT 不再需要重写全表
 - SQLite 3.35.0：首次支持 DROP COLUMN
 - SQLite 3.25.0：首次支持 RENAME COLUMN
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **DROP COLUMN** | 3.35.0 之前完全不支持，只能重建表；3.35.0+ 才可用 | 支持但为异步操作（mutation），不立即释放空间 | 支持 DROP COLUMN，Serverless 后台处理 | 完整支持，部分方言可能短暂锁表 |
+| **MODIFY COLUMN** | 不支持修改列类型或默认值，必须重建表 | 支持 MODIFY COLUMN 改类型，但为异步 mutation | 支持修改列类型（有限制），不停服 | 各方言语法不同但均支持（可能需重写表） |
+| **RENAME COLUMN** | 3.25.0+ 才支持 | 支持 RENAME COLUMN | 支持 RENAME COLUMN | MySQL 8.0+/PG/Oracle 支持原生语法 |
+| **在线 DDL** | 无此概念，文件级操作天然轻量 | ALTER 操作多为异步 mutation，不阻塞查询 | 完全在线，Serverless 架构无锁表概念 | MySQL ALGORITHM=INSTANT/PG 即时 ADD COLUMN |
+| **ADD COLUMN** | 支持但只能追加到末尾，不能指定位置 | 支持，可用 AFTER 指定位置 | 支持 | 均支持，MySQL 可用 AFTER/FIRST 指定位置 |
+| **权限需求** | 无权限系统，文件访问权即操作权 | 需要 ALTER TABLE 权限 | 需要 IAM bigquery.tables.update 权限 | 需要 ALTER 权限（GRANT/REVOKE 控制） |

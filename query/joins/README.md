@@ -105,3 +105,13 @@
 - PostgreSQL 9.3+：引入 LATERAL JOIN
 - Hive 0.13+：支持隐式 JOIN 语法的 CROSS JOIN
 - ClickHouse：引入多种 JOIN 算法（hash/partial_merge/parallel_hash）可通过设置调优
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **JOIN 类型** | INNER/LEFT/CROSS JOIN 完整支持，3.39.0+ 支持 RIGHT/FULL OUTER JOIN | 支持所有 JOIN 类型，有独特的 JOIN 算法选择（hash/partial_merge 等） | 完整支持所有 JOIN 类型 | 均支持（MySQL 不支持 FULL OUTER JOIN） |
+| **LATERAL JOIN** | 不支持 | 不支持传统 LATERAL，但有 arrayJoin 等替代 | 支持 | PG 9.3+/MySQL 8.0.14+ 支持 |
+| **JOIN 性能** | 嵌套循环为主，适合小数据集 | JOIN 可能触发数据 shuffle，提供 JOIN 算法提示优化 | Serverless 自动优化，大表 JOIN 按扫描量计费 | 优化器选择 nested loop/hash/merge join |
+| **JOIN 哲学** | 传统关系型 JOIN | 列式存储偏好宽表，JOIN 代价较高，推荐预 JOIN 写入 | 按扫描数据量计费，JOIN 大表成本高 | JOIN 是核心操作，优化器高度成熟 |
+| **存储模型影响** | 行存储，JOIN 操作自然 | 列存储 + 分布式，JOIN 需要网络传输和内存 | 列存储 + Serverless，按扫描量计费影响 JOIN 策略 | 行存储，JOIN 依赖索引高效执行 |

@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **序列生成** | 递归 CTE 生成日期序列（3.8.3+） | numbers() 函数 + toDate() 生成日期序列 | GENERATE_DATE_ARRAY + UNNEST 生成（最简洁） | PG generate_series 最优雅 / MySQL 递归 CTE / Oracle CONNECT BY |
+| **日期类型** | 无原生 DATE，日期存为 TEXT | Date/DateTime 原生类型 | DATE 原生类型 | 各方言有原生日期类型 |
+| **LEFT JOIN 填充** | 标准 LEFT JOIN 方案 | 标准 LEFT JOIN | 标准 LEFT JOIN | 标准方案 |
+| **COALESCE 填 0** | COALESCE(val, 0) 填充缺失值 | COALESCE 或 ifNull() | COALESCE 或 IFNULL() | 各方言均支持 COALESCE |

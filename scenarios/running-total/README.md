@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **窗口函数方案** | 3.25.0+ 支持 SUM() OVER (ORDER BY ...) | 支持 SUM() OVER 累计窗口 | 完整支持 | PG 8.4+/MySQL 8.0+/Oracle 8i+ |
+| **无窗口替代** | 旧版本需自连接或子查询模拟 | 通常有窗口函数 | 通常有窗口函数 | MySQL 5.7 需变量累加 |
+| **窗口帧控制** | 支持 ROWS/RANGE BETWEEN | 支持基本窗口帧 | 支持完整窗口帧 | PG 11+ 支持 GROUPS 帧 |
+| **性能** | 小数据量足够 | 列式存储大数据聚合高效 | Serverless 弹性处理 | 索引有序可加速 |

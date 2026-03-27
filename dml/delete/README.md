@@ -104,3 +104,14 @@
 - ClickHouse：DELETE 从异步 mutation 演进到 20.8+ 的轻量级删除（ALTER TABLE DELETE）
 - Hive 0.14+：ACID 事务表支持 DELETE
 - MySQL 8.0：DELETE 的 WITH CTE 语法支持（更清晰的子查询写法）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **DELETE 可用性** | 标准 DELETE 语法 | DELETE 是异步 mutation（ALTER TABLE DELETE），非即时 | 标准 DELETE 语法但有 DML 配额限制 | 标准即时 DELETE |
+| **DELETE 哲学** | 即时行级删除 | INSERT-only 哲学：删除通过标记 + 后台合并实现最终一致 | Serverless 执行，DELETE 内部重写受影响的数据文件 | MVCC 即时行级删除 |
+| **TRUNCATE** | DELETE FROM table（无 TRUNCATE 关键字），用 sqlite3_reset 或重建 | 支持 TRUNCATE TABLE（立即清空） | 不支持 TRUNCATE（用 DELETE 全表或重建表） | TRUNCATE 高速清空，不可回滚（PG 可回滚） |
+| **DELETE RETURNING** | 3.35.0+ 支持 RETURNING | 不支持 | 不支持 | PG 支持 |
+| **软删除替代** | 应用层实现 | TTL 自动过期删除是更好的替代方案 | 表/分区过期策略替代手动删除 | 应用层实现或 Oracle VPD |
+| **性能代价** | 轻量操作 | 重量级：重写 data part，推荐用 TTL 或分区 DROP 替代 | 消耗 DML 配额，大批量删除建议按分区操作 | 行级操作，大批量建议分批 |

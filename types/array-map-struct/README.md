@@ -102,3 +102,13 @@
 - Hive 0.7+：引入复合类型（ARRAY、MAP、STRUCT）
 - BigQuery：原生支持 ARRAY 和 STRUCT，是云数仓中嵌套数据能力最强的
 - ClickHouse：ARRAY 和 MAP 支持完善，近年引入 Tuple/Named Tuple 类型
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **ARRAY 支持** | 不支持原生 ARRAY（可用 JSON 数组模拟） | 完整支持 Array(T) 类型，丰富的数组函数 | 完整支持 ARRAY 类型 | PG 原生支持 / MySQL 不支持 / Oracle 需 VARRAY |
+| **MAP 类型** | 不支持（可用 JSON 对象模拟） | 支持 Map(K,V) 类型 | 不原生支持（用 STRUCT 的 ARRAY 模拟） | PG 用 hstore 或 JSONB / MySQL 不支持 |
+| **STRUCT/ROW** | 不支持 | 支持 Tuple/Named Tuple | 完整支持 STRUCT（嵌套数据的核心类型） | PG 支持 ROW/复合类型 / MySQL 不支持 |
+| **展开操作** | 不支持 | arrayJoin() 展开数组为多行 | UNNEST() 展开数组/结构体 | PG unnest() / Hive explode() |
+| **动态类型影响** | 用 JSON 模拟复合类型，灵活但无类型检查 | 严格类型的复合类型，高性能列式操作 | 严格类型 | PG 严格 / MySQL 不支持原生复合类型 |

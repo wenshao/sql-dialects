@@ -86,3 +86,11 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **拆分函数** | 无内置拆分函数（递归 CTE + substr 模拟） | splitByChar/splitByString 返回 Array + arrayJoin 展开 | SPLIT() 返回 ARRAY + UNNEST() 展开 | PG STRING_TO_TABLE()/unnest / MySQL JSON_TABLE 模拟 / Oracle REGEXP_SUBSTR |
+| **ARRAY 支持** | 无原生 ARRAY 类型 | 原生 Array 类型，拆分天然高效 | 原生 ARRAY + UNNEST | PG 原生 ARRAY / MySQL 无原生 ARRAY |
+| **性能** | 递归 CTE 拆分效率低 | 列式 Array 操作高效 | Serverless 弹性处理 | 取决于方法和数据量 |

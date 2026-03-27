@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **SCD Type 1** | 标准 UPDATE 覆盖旧值 | ALTER TABLE UPDATE（异步 mutation），代价高 | UPDATE 语法（受 DML 配额限制） | 标准 UPDATE |
+| **SCD Type 2** | INSERT 新行 + UPDATE 旧行关闭 | INSERT 新行 + UPDATE 关闭旧行（mutation 代价高） | MERGE 语法实现 SCD2（最简洁） | MERGE / INSERT + UPDATE |
+| **时间旅行** | 不支持（需手动管理版本） | 不支持时间旅行查询 | 支持 FOR SYSTEM_TIME（7 天时间旅行查询） | Oracle Flashback / PG 无原生支持 |
+| **适用场景** | 小型数仓的维度管理 | 大数据量维度表，但 UPDATE 代价高 | 云数仓 SCD 管理的首选方案 | 传统数仓标准方案 |

@@ -104,3 +104,14 @@
 - Oracle 12c+：支持多行 VALUES 语法，告别 INSERT ALL 的繁琐写法
 - MariaDB 10.5+：INSERT ... RETURNING 支持
 - MySQL 8.0：VALUES 语句可以作为独立的行构造器使用
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **INSERT 哲学** | 标准 INSERT，单写模型，适合小批量 | INSERT 是核心操作（INSERT-only 哲学），批量写入性能极强 | 流式插入（Streaming INSERT）和批量 Load Job 两种模式 | 标准逐行/批量 INSERT |
+| **批量写入** | 多值 VALUES 支持，事务内批量插入 | 推荐大批量插入（每批至少数千行），小批量频繁 INSERT 效率低 | Streaming INSERT 有行级配额限制，大批量推荐 Load Job（免费） | MySQL LOAD DATA / PG COPY / Oracle SQL*Loader |
+| **并发写入** | 文件级锁，同一时刻只允许一个写入者 | 多节点并发写入，列式存储后台合并 | DML 配额限制（每表每天 1500 次 DML），需合理规划 | 行级锁支持高并发写入 |
+| **INSERT RETURNING** | 不支持 | 不支持 | 不支持 | PG 支持，MySQL 不支持（用 LAST_INSERT_ID） |
+| **INSERT OVERWRITE** | 不支持 | 不支持（用 DROP + INSERT 或 ALTER TABLE DELETE） | 支持 INSERT OVERWRITE（覆盖表/分区） | 不支持（Hive/Spark 支持） |
+| **事务保证** | 每条 INSERT 在事务中原子执行 | 无传统事务，INSERT 批次要么全成功要么全失败 | DML 操作有快照隔离但无跨语句事务 | 完整 ACID 事务保证 |

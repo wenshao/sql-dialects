@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **LAG/LEAD 方案** | 3.25.0+ 支持 LAG/LEAD 窗口函数 | 支持 LAG/LEAD | 完整支持 LAG/LEAD | PG/Oracle/MySQL 8.0+ 支持 |
+| **序列生成** | 递归 CTE 生成连续序列 | numbers() 函数生成数字序列 | GENERATE_ARRAY + UNNEST | PG generate_series / MySQL 递归 CTE |
+| **LEFT JOIN 检测** | 标准 LEFT JOIN 方案 | 支持但 JOIN 可能触发 shuffle | 支持，按扫描量计费 | 标准方案 |
+| **性能** | 小数据集足够 | 列式存储大范围扫描高效 | 大范围扫描成本需关注 | 索引辅助提升效率 |

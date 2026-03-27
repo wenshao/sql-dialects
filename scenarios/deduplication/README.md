@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **去重策略** | ROW_NUMBER + DELETE 或 CREATE TABLE AS SELECT 重建 | ReplacingMergeTree 引擎后台自动合并去重（最终一致） | MERGE 或 CREATE TABLE AS SELECT 重建 | ROW_NUMBER + DELETE / MERGE / CTE + DELETE |
+| **去重时机** | 即时（DML 操作立即生效） | 最终一致：后台合并时去重，查询时可能看到重复 | DML 操作即时但受配额限制 | 即时 |
+| **DISTINCT 性能** | 适合小数据集 | 列式存储 DISTINCT 高效，有 APPROX 近似去重 | 大数据集 DISTINCT 按扫描量计费 | 取决于索引和数据量 |
+| **INSERT 防重** | UNIQUE 约束 + ON CONFLICT | PRIMARY KEY/ReplacingMergeTree（不强制即时唯一） | 约束不强制，需应用层防重 | UNIQUE 约束强制去重 |

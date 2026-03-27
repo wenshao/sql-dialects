@@ -36,3 +36,14 @@ Oracle 12c 之前用 ROWNUM，SQL Server 用 OFFSET FETCH 或 TOP，分析型引
 - MySQL 8.0 之前没有窗口函数，需要用变量模拟 ROW_NUMBER()
 - `FULL OUTER JOIN` 在 MySQL/MariaDB 中不支持，需要用 UNION 模拟
 - 递归 CTE 无终止条件会导致无限循环，各方言默认递归深度不同
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **查询能力** | 功能完整的 SQL 引擎，受限于单文件单线程 | OLAP 优化的列式引擎，聚合/扫描极快 | Serverless 分布式查询，按扫描量计费 | 功能全面的优化器 |
+| **窗口函数** | 3.25.0+（2018 年才支持） | 支持但覆盖略有限 | 完整支持 + QUALIFY | MySQL 8.0+ / PG 8.4+ / Oracle 8i+ |
+| **CTE** | 3.8.3+ | 非递归 CTE，递归有限 | 完整支持 | MySQL 8.0+ / PG / Oracle |
+| **全文搜索** | FTS5 虚拟表 | 跳数索引实现简单匹配 | 无原生全文搜索 | MySQL FULLTEXT / PG tsvector |
+| **分页** | LIMIT/OFFSET | LIMIT/OFFSET | LIMIT/OFFSET | 各方言语法不同 |
+| **PIVOT** | 不支持（CASE WHEN 模拟） | 不支持（条件聚合模拟） | 原生支持 PIVOT/UNPIVOT | Oracle/SQL Server 原生支持 |

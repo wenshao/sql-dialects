@@ -175,3 +175,19 @@ SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;
 最大的坑通常在三个地方：**NULL 处理**（Oracle 中空字符串等于 NULL，其他方言不是）、
 **隐式类型转换**（MySQL 极为宽松，PostgreSQL 极为严格）、
 **事务行为**（分析型引擎大多不支持完整 ACID 事务）。
+
+## 横向对比 -- 三大特殊方言速查
+
+下表总结 SQLite、ClickHouse、BigQuery 与传统 RDBMS 的核心架构差异。跨方言迁移时，这些差异比语法差异影响更大。
+
+| 维度 | SQLite | ClickHouse | BigQuery |
+|---|---|---|---|
+| **架构** | 文件级嵌入式，单写多读 | 分布式列式存储，多节点集群 | Serverless 云数仓，按需扩展 |
+| **类型系统** | 动态类型（声明类型仅为亲和性） | 严格类型（丰富的数值和日期类型） | 严格类型（INT64/STRING 等有限类型集） |
+| **事务模型** | 完整 ACID（文件级锁保证） | 无传统事务，最终一致 | 无跨语句事务，每条 DML 原子执行 |
+| **DML 特点** | 标准 CRUD | INSERT-only 哲学，UPDATE/DELETE 是异步 mutation | 标准语法但有 DML 配额限制 |
+| **索引策略** | B-Tree 索引 | 排序键 + 跳数索引 | 无索引（分区 + 聚簇替代） |
+| **约束执行** | 支持（外键需手动启用） | 不强制执行 | 信息性约束（NOT ENFORCED） |
+| **权限系统** | 无 GRANT/REVOKE（依赖文件权限） | 完整 GRANT/REVOKE | IAM 权限管理 |
+| **DDL 限制** | 3.35.0 前无 DROP COLUMN | ALTER 为异步 mutation | 在线 DDL，无锁表 |
+| **计费模型** | 免费 | 开源/按资源计费 | 按扫描数据量计费 |

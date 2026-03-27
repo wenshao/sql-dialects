@@ -104,3 +104,13 @@
 - PostgreSQL 14+：改进 NUMERIC 的计算性能
 - MySQL 8.0：严格模式默认开启，整数溢出和截断会报错而非静默处理
 - ClickHouse：独有的 Decimal32/Decimal64/Decimal128/Decimal256 类型，精度选择灵活
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **类型系统** | 动态类型，INTEGER/REAL 是存储类（非严格类型），64 位有符号整数和 IEEE 浮点 | 严格类型，丰富的数值类型（Int8~256/UInt8~256/Float32/64/Decimal32~256） | 有限类型：INT64/FLOAT64/NUMERIC/BIGNUMERIC | 丰富的整数和浮点类型 |
+| **DECIMAL 精度** | 无原生 DECIMAL 类型（浮点存储，金融计算需注意） | Decimal32(S)/Decimal64(S)/Decimal128(S)/Decimal256(S) 灵活选择 | NUMERIC 29位整数+9位小数 / BIGNUMERIC 更大 | MySQL 65位 / PG 1000位 / Oracle 38位 |
+| **整数溢出** | 64 位整数范围，溢出时静默处理 | 默认溢出回绕（不报错），可配置 | 溢出报错 | PG 报错 / MySQL 默认截断（STRICT 模式报错） |
+| **除法行为** | 5/2=2（整数除法） | 5/2=2（整数除法） | 5/2=2.5（浮点除法） | PG 5/2=2 / MySQL 5/2=2.5 |
+| **列式优势** | 行存储 | 列式存储压缩比高，聚合运算极快 | 列式存储，只扫描需要的列 | 行存储 |

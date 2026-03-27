@@ -103,3 +103,13 @@
 - MySQL 5.5+：默认字符集从 latin1 改为 utf8（但推荐显式使用 utf8mb4）
 - MySQL 8.0：默认字符集改为 utf8mb4，默认排序规则改为 utf8mb4_0900_ai_ci
 - Oracle 12c+：VARCHAR2 最大长度可扩展到 32767 字节（MAX_STRING_SIZE=EXTENDED）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **类型系统** | 动态类型，TEXT 存储任意长度字符串，声明 VARCHAR(n) 不限制实际长度 | String（变长）和 FixedString(N)（定长），列式存储高效压缩 | STRING 类型（无长度限制） | VARCHAR(n)/TEXT/CLOB 各方言上限不同 |
+| **字符集** | 默认 UTF-8，无字符集配置概念 | UTF-8 编码 | UTF-8 编码 | MySQL 需显式 utf8mb4 / PG 数据库级 / Oracle NLS |
+| **空字符串** | `''` 与 NULL 不同（标准行为） | `''` 与 NULL 不同 | `''` 与 NULL 不同 | Oracle 中 `''` = NULL（独特陷阱） |
+| **长度限制** | 无实际限制（受磁盘空间限制） | 无硬性限制，列式压缩高效 | 无硬性限制 | MySQL 65535 字节 / PG 1GB / Oracle 4000/32767 |
+| **CHAR 补空格** | CHAR(n) 不补空格（动态类型无此语义） | FixedString(N) 补零字节（非空格） | 无 CHAR 类型 | CHAR(n) 补空格且比较时忽略尾部空格 |

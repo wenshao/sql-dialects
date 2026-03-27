@@ -104,3 +104,12 @@
 - SQL Server 2005+：支持 PIVOT/UNPIVOT
 - BigQuery/Snowflake：近年引入 PIVOT/UNPIVOT 语法支持
 - PostgreSQL：通过 tablefunc 扩展的 crosstab() 函数提供有限的 PIVOT 能力
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **原生 PIVOT** | 不支持，用 CASE WHEN + GROUP BY 模拟 | 不支持原生 PIVOT，用条件聚合模拟 | 支持 PIVOT/UNPIVOT 语法 | Oracle 11g+/SQL Server 2005+ 支持原生 PIVOT |
+| **UNPIVOT** | 不支持，用 UNION ALL 模拟 | 不支持原生 UNPIVOT，用 arrayJoin 等替代 | 支持 UNPIVOT 语法 | Oracle/SQL Server 支持原生 UNPIVOT |
+| **条件聚合** | 支持 SUM(CASE WHEN...) 通用方案 | 支持且高效（列式存储利于条件聚合） | 支持 | 所有方言通用方案 |
+| **动态列** | 不支持（无存储过程做动态 SQL） | 可用客户端生成动态查询 | 可用 EXECUTE IMMEDIATE 动态生成 | 需要存储过程中动态 SQL |

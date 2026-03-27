@@ -104,3 +104,14 @@
 - PostgreSQL 9.3+：引入物化视图，9.4+ 支持 CONCURRENTLY 刷新不阻塞查询
 - MySQL 8.0：视图功能与 5.7 基本一致，仍无原生物化视图
 - ClickHouse：物化视图是触发式的，INSERT 时自动增量更新到目标表
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **普通视图** | 支持 CREATE VIEW | 支持 CREATE VIEW | 支持 CREATE VIEW | 均支持 |
+| **物化视图** | 不支持 | 支持且独特：INSERT 触发式增量更新到目标表 | 支持自动增量刷新的物化视图 | PG/Oracle 支持，MySQL 不原生支持 |
+| **可更新视图** | 简单视图支持 INSERT/UPDATE/DELETE | 视图只读 | 视图只读 | MySQL/PG/Oracle 简单视图可更新 |
+| **WITH CHECK OPTION** | 不支持 | 不支持 | 不支持 | MySQL/PG/Oracle/SQL Server 支持 |
+| **视图性能** | 视图展开为子查询执行，无额外优化 | 物化视图用于预聚合加速，普通视图无特殊优化 | 物化视图可显著降低查询成本和延迟 | PG 物化视图可手动 REFRESH |
+| **权限控制** | 无权限系统，视图不提供安全隔离 | 可通过 GRANT 控制视图访问 | 通过 IAM 控制视图的 dataset 级访问 | 视图是实现列级/行级安全的常用手段 |

@@ -84,3 +84,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **移动平均** | 3.25.0+ 支持 AVG() OVER (ROWS BETWEEN) | 支持窗口聚合 | 完整支持 + QUALIFY 过滤 | PG 8.4+/MySQL 8.0+/Oracle 8i+ |
+| **同环比计算** | LAG/LEAD 窗口函数（3.25.0+） | 支持 LAG/LEAD | 完整支持 | 各方言窗口函数支持 |
+| **占比计算** | SUM() OVER() 实现总计后除以 | SUM() OVER() 或 ratio 系列函数 | SUM() OVER() + QUALIFY | 标准窗口聚合方案 |
+| **性能** | 单线程，大数据量下窗口函数较慢 | 列式存储聚合高效，分布式窗口可能需 shuffle | Serverless 弹性，按扫描量计费 | 优化器利用索引辅助 |

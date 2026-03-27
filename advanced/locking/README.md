@@ -102,3 +102,14 @@
 - MySQL 8.0+：支持 SKIP LOCKED 和 NOWAIT（之前只能等待锁超时）
 - PostgreSQL 9.5+：引入 SKIP LOCKED，使得用 SELECT FOR UPDATE 实现任务队列成为实际可用方案
 - MySQL 8.0：改进死锁检测和诊断信息（SHOW ENGINE INNODB STATUS 的死锁日志更详细）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **锁粒度** | 文件级锁：SHARED（读）/ RESERVED / EXCLUSIVE（写） | 无行级锁概念，数据写入通过 mutation 队列串行化 | 无锁概念，Serverless 平台管理并发 | 行级锁（InnoDB/PG/Oracle），SQL Server 有锁升级 |
+| **FOR UPDATE** | 不支持行级 SELECT FOR UPDATE | 不支持 | 不支持 | PG/MySQL/Oracle 支持 |
+| **SKIP LOCKED** | 不支持 | 不支持 | 不支持 | PG 9.5+ / MySQL 8.0+ / Oracle 支持 |
+| **死锁** | 单写模型无传统死锁，但可能出现 SQLITE_BUSY | 无死锁问题（无行级锁） | 无死锁问题 | 所有 RDBMS 都有死锁检测和自动回滚 |
+| **并发模型** | WAL 模式：允许并发读+单写；非 WAL 模式：读写互斥 | 多节点并发 INSERT，后台合并，最终一致 | Serverless 无限并发读，DML 有配额限制 | MVCC 高并发读写 |
+| **Advisory Lock** | 不支持 | 不支持 | 不支持 | PG 支持 Advisory Lock（轻量级应用锁） |

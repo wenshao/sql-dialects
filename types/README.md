@@ -33,3 +33,12 @@ SQLite 3.38.0+ 才内置 JSON 函数，而 ClickHouse/Hive 更偏好将 JSON 展
 - MySQL 的 FLOAT/DOUBLE 存在精度丢失问题，金融场景必须用 DECIMAL
 - Oracle 中空字符串 `''` 等于 NULL，这与所有其他数据库不同
 - 大数据引擎通常不支持 CHAR（定长字符串），只有 STRING/VARCHAR
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **类型系统** | 动态类型：5 种存储类（NULL/INTEGER/REAL/TEXT/BLOB），声明类型仅为亲和性 | 严格类型：丰富的类型系统（Int8~256/Decimal/DateTime64/Array/Map 等） | 严格类型：有限但清晰的类型集（INT64/STRING/STRUCT 等） | 严格类型系统 |
+| **迁移风险** | 动态类型数据迁出时可能包含混合类型值 | 类型精度高，迁入需仔细映射 | 类型有限，某些精度迁移需注意 | 各方言间类型映射是迁移核心挑战 |
+| **JSON/复合** | JSON 函数（3.38.0+），无原生复合类型 | Array/Map/Tuple 原生支持，JSON 实验性 | STRUCT/ARRAY 原生支持 | PG 最丰富 / MySQL 有限 |
+| **NULL 语义** | 标准 NULL 处理 | 可选 Nullable(T) 包装 | 标准 NULL 处理 | Oracle 空字符串=NULL 是独特陷阱 |

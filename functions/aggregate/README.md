@@ -104,3 +104,13 @@ COUNT(DISTINCT) 在大基数列上性能差，大数据场景考虑使用 HyperL
 - PostgreSQL 9.4+：引入聚合函数的 FILTER 子句
 - SQL Server 2017+：引入 STRING_AGG()（替代 FOR XML PATH 拼接字符串的复杂写法）
 - MySQL 8.0：GROUP_CONCAT 仍是主要的字符串聚合方式，无 STRING_AGG
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **基本聚合** | 支持 COUNT/SUM/AVG/MIN/MAX/GROUP_CONCAT | 支持全部标准聚合 + 大量扩展函数 | 完整支持 + APPROX 近似函数 | 完整支持 |
+| **字符串聚合** | GROUP_CONCAT（与 MySQL 类似） | groupArray + arrayStringConcat 组合 | STRING_AGG | MySQL GROUP_CONCAT / PG STRING_AGG / Oracle LISTAGG |
+| **近似聚合** | 不支持 | 丰富：uniq/uniqExact/uniqHLL12/uniqCombined | APPROX_COUNT_DISTINCT 等 | PG/MySQL 不内置，Oracle 有 APPROX_COUNT_DISTINCT |
+| **FILTER 子句** | 不支持（用 CASE WHEN 替代） | 支持 -If 后缀聚合函数（countIf/sumIf 等） | 不支持（用 CASE WHEN 或 COUNTIF） | PG 9.4+ 支持 FILTER (WHERE ...) |
+| **列式优势** | 行存储，聚合需全行读取 | 列式存储使聚合极其高效（只读目标列） | 列式存储 + 按扫描列计费，SELECT 特定列可降低成本 | 行存储，聚合需读取完整行 |

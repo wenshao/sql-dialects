@@ -86,3 +86,12 @@
 | 方言 | 链接 |
 |---|---|
 | SQL Standard | [sql-standard.sql](sql-standard.sql) |
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **JSON 展开** | json_each()/json_tree() 虚拟表（3.38.0+） | JSONExtract 系列函数提取字段，推荐 ETL 时展开为列 | JSON_VALUE/JSON_QUERY + UNNEST 展开 JSON 数组 | PG jsonb_to_recordset / MySQL JSON_TABLE / Oracle JSON_TABLE |
+| **嵌套数据** | json_tree() 可递归遍历 | 推荐预展开为 STRUCT/Array 列（列式存储更高效） | STRUCT/ARRAY 原生支持嵌套数据 | PG JSONB 最灵活 / MySQL 8.0 JSON_TABLE |
+| **索引支持** | 无 JSON 索引 | 列式存储天然高效查询展开后的列 | 无索引（分区+聚簇替代） | PG JSONB GIN 索引 / MySQL 虚拟列索引 |
+| **性能** | TEXT 存储 JSON，查询性能一般 | 展开为独立列后查询极快 | STRUCT 比 JSON 字符串查询更高效 | PG JSONB 查询性能良好 |

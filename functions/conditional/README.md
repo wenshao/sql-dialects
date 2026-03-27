@@ -104,3 +104,13 @@
 - SQL Server 2012+：引入 IIF() 函数（从 Access 移植），但建议使用 CASE WHEN
 - 条件函数在各方言中变化较小，属于最稳定的语法领域
 - ClickHouse：独有的 multiIf() 函数提供多条件判断，比嵌套 if() 更清晰
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **CASE WHEN** | 完整支持（SQL 标准） | 完整支持 | 完整支持 | 所有方言均支持 |
+| **IF 函数** | 不支持 IF() 函数（用 CASE WHEN 替代） | 支持 if(cond, then, else)，还有独特的 multiIf() | 支持 IF(cond, then, else) | MySQL 有 IF()，PG 无，SQL Server 有 IIF() |
+| **COALESCE** | 完整支持 | 完整支持 | 完整支持 | 所有方言均支持（SQL 标准） |
+| **NULLIF** | 完整支持 | 完整支持 | 完整支持 | 所有方言均支持 |
+| **NULL 行为** | 动态类型下 NULL 处理较宽松 | 严格的 Nullable 类型系统，非 Nullable 列不存 NULL | 严格类型，NULL 处理符合 SQL 标准 | Oracle 空字符串=NULL 是独特陷阱 |

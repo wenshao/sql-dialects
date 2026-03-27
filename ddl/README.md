@@ -35,3 +35,13 @@ DDL 在各方言中差异最大的领域是：自增策略（AUTO_INCREMENT vs S
 - 分布式数据库的约束通常不强制执行（TiDB 6.6 之前不支持外键）
 - 各方言的 `DROP COLUMN` 行为差异大：SQLite 3.35.0 之前完全不支持
 - ClickHouse/Hive 没有传统意义上的 `ALTER COLUMN` 修改列类型
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **DDL 能力** | 受限：3.35.0 前无 DROP COLUMN，不支持 MODIFY COLUMN | 支持多数 DDL 但 ALTER 为异步 mutation | Serverless DDL 在线执行，无锁表 | 完整 DDL 支持 |
+| **约束体系** | 支持但外键默认关闭 | 无传统约束（无 FK/CHECK/UNIQUE 强制执行） | 约束为信息性（NOT ENFORCED） | 完整约束体系 |
+| **索引** | B-Tree 索引 + 部分索引 | 跳数索引（非传统索引） | 无索引（分区+聚簇替代） | 丰富索引类型 |
+| **权限管理** | 无 GRANT/REVOKE | 完整权限系统 | IAM 权限管理 | SQL GRANT/REVOKE |
+| **在线 DDL** | 单文件操作天然轻量 | ALTER 异步不阻塞查询 | Serverless 在线执行 | MySQL 部分支持 / PG 多数即时 |

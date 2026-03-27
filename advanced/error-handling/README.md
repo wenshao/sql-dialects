@@ -103,3 +103,12 @@
 - MySQL 5.5+：引入 SIGNAL/RESIGNAL 语法（替代之前非标准的错误处理）
 - PostgreSQL：PL/pgSQL 的 EXCEPTION 处理一直很强大，支持获取异常详情（SQLSTATE, SQLERRM, PG_EXCEPTION_DETAIL 等）
 - SQL Server 2012+：引入 THROW 语句替代 RAISERROR（语法更简洁）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **错误处理** | 无数据库端错误处理，应用层通过返回码判断（SQLITE_OK/SQLITE_ERROR 等） | 无存储过程级错误处理，查询失败返回错误 | Scripting 中支持 BEGIN...EXCEPTION WHEN ERROR THEN... | MySQL DECLARE HANDLER / PG EXCEPTION WHEN / Oracle EXCEPTION |
+| **错误代码** | SQLITE_xxx 返回码体系 | HTTP 错误码 + 内部错误消息 | 标准 GoogleSQL 错误消息 | PG SQLSTATE / MySQL 错误号 / Oracle ORA-xxxxx |
+| **重试机制** | 应用层处理 SQLITE_BUSY 重试 | 应用层重试失败查询 | 应用层重试，Scripting 中可 CATCH 后重试 | 存储过程内可 RETRY 逻辑 |
+| **事务回滚** | 错误时应用层决定是否 ROLLBACK | 无事务回滚概念 | 无跨语句事务 | PG EXCEPTION 自动回滚到 SAVEPOINT |

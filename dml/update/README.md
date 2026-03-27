@@ -103,3 +103,14 @@
 - Hive 0.14+：支持 ACID 事务表的 UPDATE 操作
 - ClickHouse 20.8+：支持轻量级 UPDATE（ALTER TABLE UPDATE），但仍是异步操作
 - DuckDB：支持 UPDATE FROM 语法，与 PostgreSQL 类似
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **UPDATE 可用性** | 标准 UPDATE 语法，完整支持 | UPDATE 是异步 mutation（ALTER TABLE UPDATE），非即时生效 | 标准 UPDATE 语法但有 DML 配额限制（每表每天 1500 次） | 标准即时 UPDATE |
+| **UPDATE 哲学** | 即时行级修改 | INSERT-only 哲学：数据追加后通过后台合并实现"更新"效果 | Serverless 执行，UPDATE 内部重写受影响的文件 | MVCC 即时行级修改 |
+| **多表关联 UPDATE** | 不支持 FROM 子句（需子查询） | 不支持关联 UPDATE | 支持 UPDATE ... FROM 语法 | MySQL 用 JOIN，PG 用 FROM，Oracle 用子查询 |
+| **UPDATE RETURNING** | 3.35.0+ 支持 RETURNING | 不支持 | 不支持 | PG 支持，MySQL/Oracle 不支持 |
+| **性能影响** | 轻量操作 | 重量级操作：重写整个 data part，不适合频繁小批量更新 | 每次 UPDATE 消耗 DML 配额且扫描受影响分区 | 行级操作，性能高 |
+| **并发限制** | 单写模型，UPDATE 时阻塞其他写入 | mutation 队列串行执行 | 同一表的并发 DML 有限制 | 行级锁支持并发 UPDATE |

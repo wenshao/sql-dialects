@@ -104,3 +104,13 @@
 - MySQL 5.6+：DATETIME/TIMESTAMP 支持指定小数秒精度（最多 6 位微秒）
 - MySQL 8.0.28+：TIMESTAMP 的 2038 年上限问题在内部有缓解方案（但建议迁移到 DATETIME）
 - PostgreSQL 12+：增强 JSON 路径中的日期时间处理能力
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **日期类型** | 无原生日期类型：以 TEXT('YYYY-MM-DD')/REAL(Julian)/INTEGER(Unix) 存储 | Date(日级)/Date32/DateTime(秒级)/DateTime64(亚秒) | DATE/DATETIME/TIMESTAMP/TIME | 各方言有原生日期时间类型 |
+| **时区支持** | 无时区概念，应用层自行管理 | DateTime 可绑定时区（如 DateTime('Asia/Shanghai')） | TIMESTAMP 自动 UTC 管理 | PG TIMESTAMPTZ / MySQL TIMESTAMP 自动 UTC |
+| **精度范围** | 取决于存储格式（TEXT 可存任意精度字符串） | DateTime64 可指定精度（毫秒/微秒/纳秒） | DATETIME 微秒级，TIMESTAMP 微秒级 | MySQL DATETIME(6)微秒 / PG 微秒级 |
+| **日期范围** | 无限制（TEXT 存储任意字符串） | Date: 1970-2149，DateTime64: 1900-2299 | 0001-01-01 到 9999-12-31 | MySQL TIMESTAMP 有 2038 问题 |
+| **INTERVAL 类型** | 不支持原生 INTERVAL，用字符串参数模拟 | 支持 INTERVAL（在函数中使用） | 支持 INTERVAL | PG/Oracle 原生 INTERVAL / MySQL 仅函数中可用 |

@@ -104,3 +104,14 @@ OLTP 场景下索引是性能优化的第一手段，但不要过度建索引（
 - PostgreSQL 11+：CREATE INDEX CONCURRENTLY 支持覆盖索引（INCLUDE）
 - MySQL 8.0：支持降序索引、不可见索引（INVISIBLE INDEX）、函数索引
 - PostgreSQL 13+：B-Tree 索引去重（deduplication）减少索引体积
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **索引类型** | B-Tree 索引，支持部分索引（WHERE 条件） | 跳数索引（minmax/set/bloom_filter/ngrambf），非传统 B-Tree | 无用户创建的索引，靠分区 + 聚簇（Clustering）自动优化 | B-Tree/Hash/GiST/GIN/全文索引等丰富类型 |
+| **索引哲学** | 传统 OLTP 索引思路，适合点查和范围查 | 列式存储 + 排序键天然加速扫描，跳数索引辅助过滤 | Serverless 自动管理，无需手动索引，CLUSTER BY 影响数据布局 | 索引是性能优化的第一手段 |
+| **部分索引** | 支持 CREATE INDEX ... WHERE | 不支持传统部分索引 | 无索引概念 | PG 支持，MySQL 不支持 |
+| **CREATE INDEX** | 标准 CREATE INDEX 语法 | 用 ALTER TABLE ADD INDEX 添加跳数索引 | 不支持 CREATE INDEX | 标准 CREATE INDEX 语法 |
+| **全文索引** | 通过 FTS5 虚拟表实现（非传统索引） | tokenbf_v1/ngrambf_v1 实现简单全文查找 | 无原生全文索引 | MySQL FULLTEXT / PG GIN+tsvector / Oracle Text |
+| **存储开销** | 索引存储在同一数据库文件中 | 跳数索引开销极小（只存聚合信息） | 无索引存储开销（按存储和查询计费） | 索引占用独立存储空间，影响写入性能 |

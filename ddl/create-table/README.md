@@ -105,3 +105,14 @@
 - MySQL 8.0：支持 `CHECK` 约束（之前只解析不执行）、支持降序索引
 - Oracle 12c：引入 IDENTITY 列，不再强制依赖 SEQUENCE
 - SQL Server 2016+：支持 `DROP IF EXISTS` 语法简化 DDL 脚本
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **类型系统** | 动态类型，声明类型仅为亲和性提示，任意列可存任意类型 | 严格类型，有丰富的数值类型（UInt8~256、Decimal32~256） | 严格类型，INT64/FLOAT64/STRING 等有限类型集 | 严格类型，丰富的类型选择 |
+| **存储引擎** | 单一文件存储，无引擎选择 | 必须指定引擎（MergeTree/Log/Memory 等），引擎决定数据组织方式 | 无需指定，Serverless 自动管理存储 | 可选引擎（MySQL InnoDB/MyISAM），多数有默认引擎 |
+| **自增主键** | ROWID 自动生成，INTEGER PRIMARY KEY 即为 ROWID 别名 | 无传统自增，分布式环境不适用单调递增 ID | 无自增列，通常用 GENERATE_UUID() 或应用层生成 | AUTO_INCREMENT / SERIAL / IDENTITY / SEQUENCE |
+| **约束执行** | 支持但外键默认关闭（需 PRAGMA foreign_keys=ON） | 不支持外键，PRIMARY KEY 影响排序但不强制唯一 | 约束为信息性（NOT ENFORCED），不实际执行 | 完整约束执行（PK/FK/UNIQUE/CHECK） |
+| **分区/分桶** | 不支持 | 通过 PARTITION BY 表达式分区，ORDER BY 定义排序键 | PARTITION BY（仅支持日期/整数等）+ CLUSTER BY 代替索引 | 支持 RANGE/LIST/HASH 分区 |
+| **并发架构** | 文件级锁，单写多读（WAL 模式下允许并发读） | 多节点分布式写入，列式存储优化批量写入 | Serverless 无限扩展，按查询量计费 | 客户端-服务器架构，行级锁支持高并发读写 |

@@ -105,3 +105,14 @@ OLTP 系统必须理解所选数据库的隔离级别行为（尤其是幻读、
 - PostgreSQL 12+：改进 SERIALIZABLE 隔离级别的性能
 - ClickHouse：从无事务逐步演进到支持轻量级事务（实验性）
 - Hive 0.14+/3.0+：引入 ACID 事务支持（基于 delta files 实现）
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **事务支持** | 支持完整 ACID 事务（单写模型下） | 无传统事务：轻量级事务为实验性功能 | 无跨语句事务，每条 DML 是独立原子操作（快照隔离） | 完整 ACID 事务 |
+| **隔离级别** | 序列化隔离（单写天然保证）或 WAL 模式下读写并发 | 无隔离级别概念，数据最终一致 | 快照隔离（每条查询看到一致的快照） | RC/RR/SERIALIZABLE 等多级可选 |
+| **SAVEPOINT** | 支持 SAVEPOINT（嵌套事务模拟） | 不支持 | 不支持 | 所有主流 RDBMS 支持 |
+| **并发控制** | 文件级锁，单写多读（WAL 模式改善并发） | 无行级锁，INSERT 并发由存储引擎管理（MergeTree 合并） | 无锁概念，Serverless 管理并发，DML 有配额限制 | MVCC + 行级锁 |
+| **一致性模型** | 即时一致（写入立即可见） | 最终一致：MergeTree 后台合并后数据才"收敛" | 即时一致（每条 DML 原子完成） | 即时一致（事务提交后可见） |
+| **权限保护** | 无权限系统防止误操作 | GRANT/REVOKE 控制操作权限 | IAM 策略控制访问 | GRANT/REVOKE 完整权限体系 |

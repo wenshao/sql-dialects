@@ -103,3 +103,13 @@ UNION ALL 是性能最好的集合操作，优先使用。INTERSECT 可以用 IN
 - MySQL 8.0.31+：首次支持 INTERSECT 和 EXCEPT（之前只支持 UNION/UNION ALL）
 - MariaDB 10.3+：支持 INTERSECT 和 EXCEPT
 - PostgreSQL：一直完整支持所有集合操作，包括 INTERSECT ALL 和 EXCEPT ALL
+
+## 横向对比
+
+| 特性维度 | SQLite | ClickHouse | BigQuery | 传统 RDBMS (MySQL/PG/Oracle) |
+|---|---|---|---|---|
+| **UNION/UNION ALL** | 完整支持 | 完整支持 | 完整支持 | 均支持 |
+| **INTERSECT/EXCEPT** | 完整支持 | 支持 INTERSECT，EXCEPT 用 NOT IN 替代 | 完整支持 INTERSECT/EXCEPT | PG 完整支持，MySQL 8.0.31+ 才支持 |
+| **EXCEPT vs MINUS** | 使用 EXCEPT | 使用 EXCEPT | 使用 EXCEPT | Oracle 用 MINUS（语义相同） |
+| **类型匹配** | 动态类型，列匹配宽松（不严格检查类型） | 严格类型匹配 | 严格类型匹配 | PG 严格 / MySQL 宽松隐式转换 |
+| **性能考量** | 单文件操作，小数据集高效 | 分布式执行，UNION ALL 常用于合并分片结果 | 按扫描量计费，UNION ALL 扫描两倍数据 | 优化器选择合并策略 |
