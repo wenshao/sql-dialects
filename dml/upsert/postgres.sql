@@ -221,57 +221,106 @@ WHEN NOT MATCHED THEN
 --    大多数场景都需要知道操作后的 id 或其他生成值，记得加上
 
 -- ============================================================
--- 横向对比: PostgreSQL vs 其他方言
+-- 横向对比: PostgreSQL vs 其他方言的 UPSERT/MERGE
 -- ============================================================
 
--- UPSERT 语法对比:
+-- 1. UPSERT 语法对比:
 --   PostgreSQL: INSERT ... ON CONFLICT (col) DO UPDATE SET ...（9.5+）
 --               MERGE INTO ... USING ... WHEN MATCHED/NOT MATCHED ...（15+）
 --   MySQL:      INSERT ... ON DUPLICATE KEY UPDATE ...（最早支持 UPSERT 的数据库之一）
---               REPLACE INTO ...（删除旧行再插入新行，会改变 AUTO_INCREMENT、触发 DELETE 触发器！）
---   Oracle:     MERGE INTO ... USING ... WHEN MATCHED/NOT MATCHED ...（9i+，最早支持 MERGE）
+--               REPLACE INTO ...（删除旧行再插入新行，有严重副作用，见下文）
+--   Oracle:     MERGE INTO ... USING ... WHEN MATCHED/NOT MATCHED ...（9i+）
+--               Oracle 是最早支持 MERGE 的数据库（9i，约 2001 年）
+--               Oracle MERGE 实现成熟稳定，多年来几乎没有并发相关 Bug
 --   SQL Server: MERGE INTO ... USING ... WHEN MATCHED/NOT MATCHED ...（2008+）
---               注意: SQL Server 的 MERGE 有已知 bug（KB3188549），建议加 HOLDLOCK 提示
 --   SQLite:     INSERT OR REPLACE（整行替换）/ INSERT ... ON CONFLICT DO UPDATE（3.24+）
 --   DB2:        MERGE INTO ... USING ...
 
--- RETURNING / OUTPUT 对比:
+-- 2. Oracle MERGE 的先发优势与成熟度:
+--   Oracle 9i (2001年) 就引入了 MERGE，是 SQL:2003 标准的主要推动者
+--   Oracle MERGE 支持:
+--     - WHEN MATCHED THEN UPDATE / DELETE
+--     - WHEN NOT MATCHED THEN INSERT
+--     - WHERE 子句过滤
+--     - 10g+: DELETE WHERE 子句（在 UPDATE 后删除不满足条件的行）
+--   Oracle MERGE 在处理 '' 值时的注意事项:
+--     Oracle 的 '' = NULL 意味着 MERGE 的 ON 条件中 '' 匹配永远为 UNKNOWN
+--     MERGE INTO t USING s ON (t.col = s.col) -- 如果 s.col 是空字符串，永远不匹配
+--     需要用 NVL 或 IS NULL 处理: ON (NVL(t.col, 'X') = NVL(s.col, 'X'))
+--   Oracle NUMBER 在 MERGE 中的类型转换:
+--     NUMBER 是 Oracle 唯一的数值类型，MERGE 中不存在 INT/BIGINT 与 DECIMAL 的类型不匹配问题
+--     迁移到 PostgreSQL 时需要确保 INTEGER vs NUMERIC 的对应关系正确
+
+-- 3. SQL Server MERGE 的 Bug 和为什么专家建议避免使用:
+--   SQL Server 的 MERGE 有大量已知 Bug（微软 Connect/Feedback 上几十个未修复的报告）:
+--     - 并发 MERGE 可能导致死锁或主键违反（即使加了 HOLDLOCK）
+--     - 在某些场景下产生错误的查询计划
+--     - OUTPUT 子句与 MERGE 组合时可能返回错误结果
+--     - 触发器触发顺序可能不正确
+--     - 统计信息在 MERGE 后可能不更新
+--   Aaron Bertrand、Paul White 等 SQL Server MVP 公开建议:
+--     "Don't use MERGE" -- 使用 IF EXISTS ... UPDATE ELSE INSERT 替代
+--   SQL Server MERGE 如果非要使用，必须:
+--     - SET XACT_ABORT ON（防止部分提交）
+--     - 加 WITH (HOLDLOCK) 提示（防止并发问题）
+--     - 加 WITH (UPDLOCK, SERIALIZABLE) 提示（最安全但性能差）
+
+-- 4. RETURNING / OUTPUT 对比:
 --   PostgreSQL: INSERT ... RETURNING id, col（最自然的语法，所有 DML 都支持）
 --   MySQL:      不支持 RETURNING！只能用 LAST_INSERT_ID()（只返回最后一个自增 ID）
---   Oracle:     INSERT ... RETURNING col INTO variable（只在 PL/SQL 中可用，不能在纯 SQL 中）
+--   Oracle:     INSERT ... RETURNING col INTO variable（只在 PL/SQL 中可用，纯 SQL 不支持）
 --   SQL Server: OUTPUT inserted.id（语法独特但功能强大，INSERT/UPDATE/DELETE 都支持）
+--               OUTPUT 可以同时引用 inserted 和 deleted 伪表（MERGE 中非常有用）
 --   SQLite:     RETURNING 子句（3.35+）
 
--- ON CONFLICT vs MERGE 对比:
+-- 5. ON CONFLICT vs MERGE 核心对比:
 --   ON CONFLICT（PostgreSQL 特有）:
 --     - 真正原子性，无竞态条件（内部使用 speculative insertion）
 --     - 必须有唯一约束/索引
 --     - 支持部分唯一索引匹配（其他数据库无此能力）
 --     - 支持 DO NOTHING（静默跳过冲突）
 --   MERGE（SQL 标准）:
---     - 所有主流数据库都支持（跨平台可移植）
+--     - Oracle 实现最早最稳定（9i+），PostgreSQL 最新（15+）
 --     - 不要求唯一约束
 --     - 支持多条件分支（WHEN MATCHED AND ... THEN）
 --     - 支持匹配时 DELETE
 --     - 并发安全性不如 ON CONFLICT（可能有竞态）
 
--- 并发安全性对比:
+-- 6. 并发安全性对比:
 --   PostgreSQL ON CONFLICT: 最安全，两个事务同时 UPSERT 同一行不会报错
 --   MySQL ON DUPLICATE KEY: 安全（利用唯一索引锁）
---   Oracle MERGE:           不安全，并发 MERGE 可能 unique violation，需要手动加锁
---   SQL Server MERGE:       不安全！有已知并发 bug，必须加 WITH (HOLDLOCK) 提示
+--   Oracle MERGE:           不完全安全，并发 MERGE 可能 unique violation，需要手动加锁
+--                           但 Oracle 实现比 SQL Server 稳定得多
+--   SQL Server MERGE:       最不安全！有已知并发 Bug，必须加 WITH (HOLDLOCK) 提示
+--                           即使加了提示仍可能有问题，专家建议完全避免 MERGE
 --   SQLite ON CONFLICT:     安全（单写者模型，天然串行化）
 
--- 批量 UPSERT 性能对比:
+-- 7. 批量 UPSERT 性能对比:
 --   PostgreSQL: INSERT ... VALUES (...),(...),... ON CONFLICT DO UPDATE（一条语句搞定）
 --   MySQL:      INSERT ... VALUES (...),(...),... ON DUPLICATE KEY UPDATE（同样一条语句）
 --   Oracle:     MERGE + 多行子查询（或用 INSERT ALL，但不支持 ON CONFLICT）
---   SQL Server: MERGE + VALUES 表值构造器或临时表（步骤较多）
+--               Oracle 的自治事务（PRAGMA AUTONOMOUS_TRANSACTION）可用于在批量操作中
+--               独立记录审计日志，即使主事务回滚，审计记录仍保留（Oracle 独有能力）
+--   SQL Server: MERGE + VALUES 表值构造器或临时表（步骤较多，且有上述 Bug 风险）
 
--- REPLACE 的危险性（MySQL 特有）:
+-- 8. Oracle Flashback 与 UPSERT 的关系:
+--   Oracle 独有: 如果 UPSERT 操作出错，可以用 Flashback Query 查看操作前的数据
+--     SELECT * FROM users AS OF TIMESTAMP (SYSTIMESTAMP - INTERVAL '5' MINUTE);
+--   这在其他数据库中无法直接实现（PostgreSQL/MySQL/SQL Server 都没有内置 Flashback）
+--   SQL Server 2016+ 的 Temporal Tables 可以查询历史数据，但需要预先配置
+
+-- 9. REPLACE 的危险性（MySQL 特有）:
 --   MySQL REPLACE INTO: 先 DELETE 再 INSERT，看起来简单但有严重副作用:
 --     1. AUTO_INCREMENT 值会变（新行获得新 ID）
 --     2. 触发 DELETE + INSERT 触发器（不是 UPDATE 触发器）
 --     3. 级联删除的外键会删除子表数据！
 --     4. 其他数据库没有 REPLACE INTO，不可移植
 --   PostgreSQL 没有 REPLACE，ON CONFLICT DO UPDATE 是更安全的替代
+
+-- 10. WITH (NOLOCK) 与 UPSERT 的交互（SQL Server 特有问题）:
+--   SQL Server 中常见的反模式:
+--     MERGE INTO t WITH (NOLOCK) ...
+--   这是极其危险的: NOLOCK 允许读到脏数据，MERGE 的匹配条件基于脏数据可能导致:
+--     - 本应 UPDATE 的行被 INSERT（数据重复）
+--     - 本应 INSERT 的行被 UPDATE（数据丢失）
+--   正确做法: 开启 RCSI（READ_COMMITTED_SNAPSHOT），不要在 MERGE 中使用 NOLOCK

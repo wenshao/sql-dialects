@@ -268,39 +268,75 @@ ROLLBACK;  -- test_table 不会被创建
 -- 17:    UUIDv7 支持（uuidv7()），MERGE 支持 RETURNING，JSON_TABLE，分区性能改进
 
 -- ============================================================
--- 横向对比: PostgreSQL vs 其他方言
+-- 横向对比: PostgreSQL vs 其他方言的 CREATE TABLE
 -- ============================================================
 
--- 自增策略对比:
---   PostgreSQL: SERIAL（语法糖，不推荐）→ IDENTITY（10+，SQL 标准，推荐）
+-- 1. 自增策略对比:
+--   PostgreSQL: SERIAL（语法糖，不推荐）-> IDENTITY（10+，SQL 标准，推荐）
 --   MySQL:      AUTO_INCREMENT（简单直接，5.7- 重启可能回退，8.0 持久化）
---   Oracle:     SEQUENCE + 触发器（传统）→ IDENTITY（12c+）
---   SQL Server: IDENTITY（从一开始就有）→ SEQUENCE（2012+，更灵活）
+--   Oracle:     SEQUENCE + 触发器（传统）-> IDENTITY（12c+）
+--               Oracle 的 SEQUENCE 是最早的实现（8i+），其他数据库的 SEQUENCE 基本参考 Oracle
+--   SQL Server: IDENTITY（从一开始就有）-> SEQUENCE（2012+）
+--               IDENTITY vs SEQUENCE 的权衡:
+--                 IDENTITY 绑定到表列，不能跨表共享，不能在非 INSERT 场景使用
+--                 SEQUENCE 独立对象，可跨表共享，可手动获取下一个值
+--                 大多数 SQL Server 项目仍使用 IDENTITY（简单够用）
 --   SQLite:     INTEGER PRIMARY KEY 自动成为 rowid；AUTOINCREMENT 只防止 id 复用
---   TiDB:       AUTO_INCREMENT（单机语义）→ AUTO_RANDOM（分布式推荐）
+--   TiDB:       AUTO_INCREMENT（单机语义）-> AUTO_RANDOM（分布式推荐）
 
--- TEXT vs VARCHAR 对比:
+-- 2. 数值类型对比:
+--   PostgreSQL: INTEGER(4B) / BIGINT(8B) / SMALLINT(2B) / NUMERIC(p,s)
+--               类型选择细粒度，NUMERIC 用于精确计算
+--   Oracle:     NUMBER 是唯一的数值类型（Oracle 独有行为）
+--               NUMBER(10,0) = 整数，NUMBER(10,2) = 定点数，NUMBER 无参数 = 任意精度
+--               没有 INT/BIGINT 等独立类型（INT 只是 NUMBER(38) 的别名）
+--               迁移到 PostgreSQL: NUMBER(10,0) -> BIGINT, NUMBER(10,2) -> NUMERIC(10,2)
+--   SQL Server: INT(4B) / BIGINT(8B) / DECIMAL(p,s) / MONEY
+--               MONEY 类型只有 4 位小数精度，不推荐用于需要灵活精度的场景
+--   MySQL:      INT(4B) / BIGINT(8B) / DECIMAL(p,s)，与 PostgreSQL 最接近
+
+-- 3. '' = NULL（Oracle 独有行为，建表时必须考虑）:
+--   Oracle:     空字符串 '' 等于 NULL！这是 Oracle 最大的坑
+--               VARCHAR2 列即使有 NOT NULL 约束，INSERT '' 也会失败
+--               WHERE column = '' 永远不返回行（因为 '' 是 NULL，NULL = NULL 为 UNKNOWN）
+--               迁移到 PostgreSQL 时: 所有 '' 检查需要改为 IS NULL 或保持 '' 语义
+--   PostgreSQL: '' 是空字符串，与 NULL 完全不同
+--   SQL Server: '' 是空字符串，与 NULL 完全不同
+--   MySQL:      '' 是空字符串，与 NULL 完全不同
+
+-- 4. TEXT vs VARCHAR 对比:
 --   PostgreSQL: TEXT 和 VARCHAR 性能完全一样，官方文档明确说"没有差异"，推荐 TEXT
 --   MySQL:      TEXT 存储在行外（overflow page），不能做索引前缀以外的完整索引，
 --               VARCHAR 存储在行内，性能更好；VARCHAR(255) 是常见选择
 --   Oracle:     VARCHAR2(n) 最大 4000 字节（标准模式），CLOB 用于大文本
 --   SQL Server: VARCHAR(MAX) 替代 TEXT（TEXT 已废弃），NVARCHAR 用于 Unicode
 
--- DDL 事务性对比:
+-- 5. DDL 事务性对比:
 --   PostgreSQL: DDL 完全事务性！BEGIN; CREATE TABLE ...; ROLLBACK; 可以回滚建表
 --   MySQL:      DDL 隐式提交（CREATE TABLE 会自动 COMMIT 当前事务，无法回滚）
---   Oracle:     DDL 隐式提交（同 MySQL）
+--   Oracle:     DDL 隐式提交（同 MySQL），这是 Oracle 迁移到 PostgreSQL 时的重大行为差异
 --   SQL Server: DDL 事务性（同 PostgreSQL，可以回滚）
 --   SQLite:     DDL 事务性（同 PostgreSQL）
 
--- 类型严格度对比:
+-- 6. 聚集索引概念（SQL Server 独有）:
+--   SQL Server: 每张表有且仅有一个聚集索引（Clustered Index）
+--               聚集索引 = 表的物理存储顺序（数据按聚集索引键排列在磁盘上）
+--               默认主键就是聚集索引，选择不当会严重影响性能
+--               非聚集索引的叶节点存储聚集索引键（不是行指针 RID）
+--   PostgreSQL: 没有聚集索引概念（CLUSTER 命令只做一次性物理重排，不自动维护）
+--               所有索引指向堆表中的 ctid（物理位置指针）
+--   Oracle:     IOT（Index-Organized Table）类似聚集索引，但需要显式 ORGANIZATION INDEX
+--               默认是堆表（Heap-Organized Table）
+--   MySQL:      InnoDB 主键就是聚集索引（和 SQL Server 类似），存储引擎决定
+
+-- 7. 类型严格度对比:
 --   PostgreSQL: 最严格，需要显式 CAST（'123'::INT），不允许隐式跨类型比较
 --   MySQL:      宽松，大量隐式转换（'123' + 0 = 123，WHERE int_col = '123' 自动转换）
 --   Oracle:     中等，TO_NUMBER/TO_CHAR 显式转换为主
 --   SQL Server: 中等，有隐式转换规则但比 MySQL 严格
 --   SQLite:     极度宽松（动态类型，任何列可以存任何值，除非 STRICT 模式）
 
--- 时间类型对比:
+-- 8. 时间类型对比:
 --   PostgreSQL: TIMESTAMPTZ（推荐，存 UTC 显示按 session 时区）vs TIMESTAMP（不带时区）
 --               两者都是 8 字节，性能无差异
 --   MySQL:      TIMESTAMP（4 字节，有 2038 年问题！）vs DATETIME（5 字节，无时区）
@@ -308,20 +344,20 @@ ROLLBACK;  -- test_table 不会被创建
 --   Oracle:     TIMESTAMP WITH TIME ZONE（13 字节）vs TIMESTAMP（11 字节）
 --   SQL Server: DATETIMEOFFSET（时区）vs DATETIME2（无时区，推荐替代 DATETIME）
 
--- 分区对比:
+-- 9. 分区对比:
 --   PostgreSQL: 声明式分区（10+），支持 RANGE/LIST/HASH，DEFAULT 分区（11+）
 --   MySQL:      PARTITION BY RANGE/LIST/HASH/KEY，分区键必须在主键中（最大限制）
---   Oracle:     分区功能最强大但需要 Enterprise Edition（贵）
+--   Oracle:     分区功能最强大（Composite, Interval, Reference 分区等），但需要 Enterprise Edition
 --   SQL Server: 需要创建 PARTITION FUNCTION + PARTITION SCHEME（步骤最多）
 
--- CHECK 约束对比:
+-- 10. CHECK 约束对比:
 --   PostgreSQL: 从第一个版本就完美支持 CHECK，最成熟
 --   MySQL:      5.7 及之前解析 CHECK 但不执行！8.0.16+ 才真正生效（著名的坑）
 --   Oracle:     完整支持 CHECK
 --   SQL Server: 完整支持 CHECK
 
--- 生成列对比:
+-- 11. 生成列对比:
 --   PostgreSQL: 12+ 支持 STORED 生成列（不支持 VIRTUAL，计划中但截至 17 未实现）
 --   MySQL:      5.7+ 支持 STORED 和 VIRTUAL 两种（VIRTUAL 不占磁盘，查询时计算）
---   Oracle:     11g+ 支持 VIRTUAL 列
+--   Oracle:     11g+ 支持 VIRTUAL 列（Oracle 最早引入虚拟列）
 --   SQL Server: 计算列（PERSISTED = STORED，不加 PERSISTED = VIRTUAL）

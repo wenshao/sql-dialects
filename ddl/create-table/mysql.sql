@@ -309,65 +309,92 @@ CREATE TABLE IF NOT EXISTS audit_log (
 --   先解决核心存储和事务 → 再补充分析能力（窗口函数、CTE）→ 最后完善标准合规性
 
 -- ============================================================
--- 横向对比: MySQL vs 其他方言
+-- 横向对比: MySQL vs 其他方言的 CREATE TABLE
 -- ============================================================
 
--- 自增策略对比:
+-- 1. 自增策略对比:
 --   MySQL:      AUTO_INCREMENT（简单，但重启可能回退 5.7-，分布式不适用）
---   PostgreSQL: SERIAL（语法糖）→ IDENTITY（10+，SQL 标准，推荐）
---   Oracle:     SEQUENCE（传统）→ IDENTITY（12c+）
---   SQL Server: IDENTITY（传统）→ SEQUENCE（2012+）
+--   PostgreSQL: SERIAL（语法糖）-> IDENTITY（10+，SQL 标准，推荐）
+--   Oracle:     SEQUENCE（传统，8i+，最早的实现）-> IDENTITY（12c+）
+--   SQL Server: IDENTITY（传统）-> SEQUENCE（2012+）
+--               IDENTITY vs SEQUENCE 权衡:
+--                 IDENTITY 绑定到列，简单但不能跨表共享、不能在非 INSERT 中使用
+--                 SEQUENCE 独立对象，灵活但需要额外管理
+--                 SET IDENTITY_INSERT ON 才能手动指定值（默认禁止）
 --   SQLite:     INTEGER PRIMARY KEY（自动成为 rowid，AUTOINCREMENT 只防止复用）
---   TiDB:       AUTO_INCREMENT（单机语义）→ AUTO_RANDOM（分布式推荐）
+--   TiDB:       AUTO_INCREMENT（单机语义）-> AUTO_RANDOM（分布式推荐）
 
--- DDL 事务性对比:
+-- 2. 数值类型对比:
+--   MySQL:      INT(4B) / BIGINT(8B) / DECIMAL(p,s)，类型选择细粒度
+--   Oracle:     NUMBER 是唯一的数值类型（Oracle 独有行为）
+--               NUMBER(10,0) = 整数，NUMBER(10,2) = 定点数，NUMBER 无参数 = 任意精度
+--               没有真正的 INT/BIGINT（INT 只是 NUMBER(38) 的别名）
+--               迁移到 MySQL: NUMBER(10,0) -> BIGINT, NUMBER(10,2) -> DECIMAL(10,2)
+--   SQL Server: INT(4B) / BIGINT(8B) / DECIMAL(p,s) / MONEY
+--               MONEY 类型只有 4 位小数精度，不推荐用于需要灵活精度的场景
+--   PostgreSQL: INTEGER(4B) / BIGINT(8B) / NUMERIC(p,s)，类似 MySQL
+
+-- 3. '' = NULL（Oracle 独有行为）:
+--   Oracle:     空字符串 '' 等于 NULL！这是 Oracle 最大最著名的坑
+--               VARCHAR2 列即使有 NOT NULL 约束，INSERT '' 也会失败（因为 '' 就是 NULL）
+--               WHERE column = '' 永远不返回行（NULL = NULL 为 UNKNOWN）
+--               从 MySQL 迁移到 Oracle 时: 所有空字符串相关逻辑都需要重写
+--               从 Oracle 迁移到 MySQL 时: NULL 和 '' 的处理逻辑需要区分
+--   MySQL:      '' 是空字符串，与 NULL 完全不同
+--   PostgreSQL: '' 是空字符串，与 NULL 完全不同
+--   SQL Server: '' 是空字符串，与 NULL 完全不同
+
+-- 4. DDL 事务性对比:
 --   MySQL:      DDL 隐式提交事务（不能回滚 CREATE TABLE），8.0+ 原子 DDL 保证单个 DDL 原子性
 --   PostgreSQL: DDL 是事务性的！可以 BEGIN; CREATE TABLE ...; ROLLBACK;
---   Oracle:     DDL 隐式提交（同 MySQL）
---   SQL Server: DDL 是事务性的（同 PostgreSQL）
+--   Oracle:     DDL 隐式提交（同 MySQL），DDL 前后各有一个隐式 COMMIT
+--   SQL Server: DDL 是事务性的（同 PostgreSQL），可以在事务中回滚
 --   SQLite:     DDL 是事务性的（同 PostgreSQL）
 
--- 在线 DDL 对比:
+-- 5. 聚集索引概念（SQL Server / InnoDB 共有）:
+--   SQL Server: 每表有且仅有一个聚集索引（Clustered Index）= 表的物理排列顺序
+--               默认主键就是聚集索引，选择不当严重影响性能
+--               非聚集索引的叶节点存储聚集索引键（不是行地址）
+--   MySQL:      InnoDB 主键也是聚集索引（二级索引叶节点存主键值），与 SQL Server 类似
+--   PostgreSQL: 没有聚集索引概念，所有索引指向堆表的物理位置（ctid）
+--   Oracle:     默认堆表，IOT（Index-Organized Table）需显式创建
+
+-- 6. 在线 DDL 对比:
 --   MySQL:      5.6+ Online DDL，8.0.12+ ALGORITHM=INSTANT（部分操作不锁表）
 --   PostgreSQL: ADD COLUMN + 非 NULL 默认值在 11+ 是即时的
---   Oracle:     ONLINE 关键字，Edition-Based Redefinition
---   SQL Server: ONLINE = ON（Enterprise 版）
+--   Oracle:     ONLINE 关键字，Edition-Based Redefinition（最强大的在线变更能力）
+--   SQL Server: ONLINE = ON（仅 Enterprise 版，Standard 版不支持）
 
--- NULL 和空字符串对比:
---   MySQL:      '' ≠ NULL（空字符串和 NULL 是不同的值）
---   PostgreSQL: '' ≠ NULL（同 MySQL）
---   Oracle:     '' = NULL！（Oracle 最大的坑，迁移时必须处理）
---   SQL Server: '' ≠ NULL（同 MySQL）
---   SQLite:     '' ≠ NULL（同 MySQL）
-
--- 类型严格度对比:
+-- 7. 类型严格度对比:
 --   MySQL:      宽松（会隐式转换，如 '123' + 0 = 123）
 --   PostgreSQL: 严格（需要显式 CAST，如 '123'::INTEGER）
 --   Oracle:     中等（TO_NUMBER/TO_CHAR 显式转换为主）
 --   SQL Server: 中等（CONVERT/CAST，有些隐式转换）
 --   SQLite:     极度宽松（动态类型，任何列可以存任何类型，除非 STRICT 模式）
 
--- 字符集对比:
---   MySQL:      utf8 ≠ UTF-8！utf8 只支持 3 字节，必须用 utf8mb4
+-- 8. 字符集对比:
+--   MySQL:      utf8 != UTF-8！utf8 只支持 3 字节，必须用 utf8mb4
 --   PostgreSQL: UTF-8 就是真正的 UTF-8，建库时指定
 --   Oracle:     AL32UTF8 = 真正的 UTF-8
 --   SQL Server: NVARCHAR 用 UTF-16；2019+ VARCHAR 可用 UTF-8 排序规则
 --   SQLite:     默认 UTF-8，内置 UTF-16 支持
 
--- TEXT vs VARCHAR 对比:
---   MySQL:      TEXT 存储在行外（overflow page），不能完整索引，VARCHAR 性能更好
---   PostgreSQL: TEXT 和 VARCHAR 性能完全一样，官方推荐 TEXT
---   Oracle:     VARCHAR2(n) 最大 4000 字节，CLOB 用于大文本
---   SQL Server: VARCHAR(MAX) 替代 TEXT（TEXT 已废弃）
-
--- CHECK 约束对比:
+-- 9. CHECK 约束对比:
 --   MySQL:      5.7 及之前解析 CHECK 但不执行！8.0.16+ 才真正生效
 --   PostgreSQL: 从第一个版本就完美支持 CHECK
 --   Oracle:     完整支持 CHECK
 --   SQL Server: 完整支持 CHECK
 
--- 分区表对比:
+-- 10. 分区表对比:
 --   MySQL:      分区键必须包含在主键和所有唯一索引中（最大限制）
---   PostgreSQL: 声明式分区（10+），主键也必须包含分区键，但支持 DEFAULT 分区（11+）
---   Oracle:     分区功能最强大，不要求分区键在主键中（Enterprise Edition）
---   SQL Server: 需要 PARTITION FUNCTION + PARTITION SCHEME（步骤最多）
+--   PostgreSQL: 声明式分区（10+），主键也必须包含分区键，支持 DEFAULT 分区（11+）
+--   Oracle:     分区功能最强大（Composite/Interval/Reference 分区等），不要求分区键在主键中
+--               但需要 Enterprise Edition（费用高昂）
+--   SQL Server: 需要创建 PARTITION FUNCTION + PARTITION SCHEME（步骤最多）
+
+-- 11. MERGE 语句与 UPSERT 对比:
+--   MySQL:      没有 MERGE，使用 INSERT ... ON DUPLICATE KEY UPDATE 或 REPLACE INTO
+--   Oracle:     MERGE 从 9i 开始就有，是最早支持的数据库，实现最成熟稳定
+--   PostgreSQL: INSERT ... ON CONFLICT (9.5+) 是原生 UPSERT，MERGE 在 15 才加入
+--   SQL Server: MERGE 有大量已知 Bug，多位 MVP 公开建议避免使用
+--               替代: IF EXISTS UPDATE ELSE INSERT 或单独的 INSERT/UPDATE
