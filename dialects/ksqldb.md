@@ -2,7 +2,7 @@
 
 **分类**: 流处理 SQL（Kafka）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3586 行
+**总行数**: 4208 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [ksqldb.sql](../ddl/create-table/ksqldb.sql) |
+| 改表 | [ksqldb.sql](../ddl/alter-table/ksqldb.sql) |
+| 索引 | [ksqldb.sql](../ddl/indexes/ksqldb.sql) |
+| 约束 | [ksqldb.sql](../ddl/constraints/ksqldb.sql) |
+| 视图 | [ksqldb.sql](../ddl/views/ksqldb.sql) |
+| 序列与自增 | [ksqldb.sql](../ddl/sequences/ksqldb.sql) |
+| 数据库/Schema/用户 | [ksqldb.sql](../ddl/users-databases/ksqldb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [ksqldb.sql](../advanced/temp-tables/ksqldb.sql) |
 | 事务 | [ksqldb.sql](../advanced/transactions/ksqldb.sql) |
 | 触发器 | [ksqldb.sql](../advanced/triggers/ksqldb.sql) |
-| 改表 | [ksqldb.sql](../ddl/alter-table/ksqldb.sql) |
-| 约束 | [ksqldb.sql](../ddl/constraints/ksqldb.sql) |
-| 建表 | [ksqldb.sql](../ddl/create-table/ksqldb.sql) |
-| 索引 | [ksqldb.sql](../ddl/indexes/ksqldb.sql) |
-| 序列与自增 | [ksqldb.sql](../ddl/sequences/ksqldb.sql) |
-| 数据库/Schema/用户 | [ksqldb.sql](../ddl/users-databases/ksqldb.sql) |
-| 视图 | [ksqldb.sql](../ddl/views/ksqldb.sql) |
 
 ### DML — 数据操作
 

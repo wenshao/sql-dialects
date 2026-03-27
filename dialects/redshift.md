@@ -2,7 +2,7 @@
 
 **分类**: AWS 云数仓（基于 PostgreSQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4812 行
+**总行数**: 4862 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [redshift.sql](../ddl/create-table/redshift.sql) |
+| 改表 | [redshift.sql](../ddl/alter-table/redshift.sql) |
+| 索引 | [redshift.sql](../ddl/indexes/redshift.sql) |
+| 约束 | [redshift.sql](../ddl/constraints/redshift.sql) |
+| 视图 | [redshift.sql](../ddl/views/redshift.sql) |
+| 序列与自增 | [redshift.sql](../ddl/sequences/redshift.sql) |
+| 数据库/Schema/用户 | [redshift.sql](../ddl/users-databases/redshift.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [redshift.sql](../advanced/temp-tables/redshift.sql) |
 | 事务 | [redshift.sql](../advanced/transactions/redshift.sql) |
 | 触发器 | [redshift.sql](../advanced/triggers/redshift.sql) |
-| 改表 | [redshift.sql](../ddl/alter-table/redshift.sql) |
-| 约束 | [redshift.sql](../ddl/constraints/redshift.sql) |
-| 建表 | [redshift.sql](../ddl/create-table/redshift.sql) |
-| 索引 | [redshift.sql](../ddl/indexes/redshift.sql) |
-| 序列与自增 | [redshift.sql](../ddl/sequences/redshift.sql) |
-| 数据库/Schema/用户 | [redshift.sql](../ddl/users-databases/redshift.sql) |
-| 视图 | [redshift.sql](../ddl/views/redshift.sql) |
 
 ### DML — 数据操作
 

@@ -2,7 +2,7 @@
 
 **分类**: 云原生数仓
 **文件数**: 51 个 SQL 文件
-**总行数**: 5178 行
+**总行数**: 5306 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [snowflake.sql](../ddl/create-table/snowflake.sql) |
+| 改表 | [snowflake.sql](../ddl/alter-table/snowflake.sql) |
+| 索引 | [snowflake.sql](../ddl/indexes/snowflake.sql) |
+| 约束 | [snowflake.sql](../ddl/constraints/snowflake.sql) |
+| 视图 | [snowflake.sql](../ddl/views/snowflake.sql) |
+| 序列与自增 | [snowflake.sql](../ddl/sequences/snowflake.sql) |
+| 数据库/Schema/用户 | [snowflake.sql](../ddl/users-databases/snowflake.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [snowflake.sql](../advanced/temp-tables/snowflake.sql) |
 | 事务 | [snowflake.sql](../advanced/transactions/snowflake.sql) |
 | 触发器 | [snowflake.sql](../advanced/triggers/snowflake.sql) |
-| 改表 | [snowflake.sql](../ddl/alter-table/snowflake.sql) |
-| 约束 | [snowflake.sql](../ddl/constraints/snowflake.sql) |
-| 建表 | [snowflake.sql](../ddl/create-table/snowflake.sql) |
-| 索引 | [snowflake.sql](../ddl/indexes/snowflake.sql) |
-| 序列与自增 | [snowflake.sql](../ddl/sequences/snowflake.sql) |
-| 数据库/Schema/用户 | [snowflake.sql](../ddl/users-databases/snowflake.sql) |
-| 视图 | [snowflake.sql](../ddl/views/snowflake.sql) |
 
 ### DML — 数据操作
 

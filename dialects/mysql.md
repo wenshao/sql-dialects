@@ -2,7 +2,7 @@
 
 **分类**: 传统关系型数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 4831 行
+**总行数**: 8956 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [mysql.sql](../ddl/create-table/mysql.sql) |
+| 改表 | [mysql.sql](../ddl/alter-table/mysql.sql) |
+| 索引 | [mysql.sql](../ddl/indexes/mysql.sql) |
+| 约束 | [mysql.sql](../ddl/constraints/mysql.sql) |
+| 视图 | [mysql.sql](../ddl/views/mysql.sql) |
+| 序列与自增 | [mysql.sql](../ddl/sequences/mysql.sql) |
+| 数据库/Schema/用户 | [mysql.sql](../ddl/users-databases/mysql.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [mysql.sql](../advanced/temp-tables/mysql.sql) |
 | 事务 | [mysql.sql](../advanced/transactions/mysql.sql) |
 | 触发器 | [mysql.sql](../advanced/triggers/mysql.sql) |
-| 改表 | [mysql.sql](../ddl/alter-table/mysql.sql) |
-| 约束 | [mysql.sql](../ddl/constraints/mysql.sql) |
-| 建表 | [mysql.sql](../ddl/create-table/mysql.sql) |
-| 索引 | [mysql.sql](../ddl/indexes/mysql.sql) |
-| 序列与自增 | [mysql.sql](../ddl/sequences/mysql.sql) |
-| 数据库/Schema/用户 | [mysql.sql](../ddl/users-databases/mysql.sql) |
-| 视图 | [mysql.sql](../ddl/views/mysql.sql) |
 
 ### DML — 数据操作
 

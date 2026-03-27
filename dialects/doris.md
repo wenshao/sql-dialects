@@ -2,7 +2,7 @@
 
 **分类**: MPP 分析数据库（Apache）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3979 行
+**总行数**: 4391 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [doris.sql](../ddl/create-table/doris.sql) |
+| 改表 | [doris.sql](../ddl/alter-table/doris.sql) |
+| 索引 | [doris.sql](../ddl/indexes/doris.sql) |
+| 约束 | [doris.sql](../ddl/constraints/doris.sql) |
+| 视图 | [doris.sql](../ddl/views/doris.sql) |
+| 序列与自增 | [doris.sql](../ddl/sequences/doris.sql) |
+| 数据库/Schema/用户 | [doris.sql](../ddl/users-databases/doris.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [doris.sql](../advanced/temp-tables/doris.sql) |
 | 事务 | [doris.sql](../advanced/transactions/doris.sql) |
 | 触发器 | [doris.sql](../advanced/triggers/doris.sql) |
-| 改表 | [doris.sql](../ddl/alter-table/doris.sql) |
-| 约束 | [doris.sql](../ddl/constraints/doris.sql) |
-| 建表 | [doris.sql](../ddl/create-table/doris.sql) |
-| 索引 | [doris.sql](../ddl/indexes/doris.sql) |
-| 序列与自增 | [doris.sql](../ddl/sequences/doris.sql) |
-| 数据库/Schema/用户 | [doris.sql](../ddl/users-databases/doris.sql) |
-| 视图 | [doris.sql](../ddl/views/doris.sql) |
 
 ### DML — 数据操作
 

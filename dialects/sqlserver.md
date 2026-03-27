@@ -2,7 +2,7 @@
 
 **分类**: 传统关系型数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 5134 行
+**总行数**: 7792 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [sqlserver.sql](../ddl/create-table/sqlserver.sql) |
+| 改表 | [sqlserver.sql](../ddl/alter-table/sqlserver.sql) |
+| 索引 | [sqlserver.sql](../ddl/indexes/sqlserver.sql) |
+| 约束 | [sqlserver.sql](../ddl/constraints/sqlserver.sql) |
+| 视图 | [sqlserver.sql](../ddl/views/sqlserver.sql) |
+| 序列与自增 | [sqlserver.sql](../ddl/sequences/sqlserver.sql) |
+| 数据库/Schema/用户 | [sqlserver.sql](../ddl/users-databases/sqlserver.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [sqlserver.sql](../advanced/temp-tables/sqlserver.sql) |
 | 事务 | [sqlserver.sql](../advanced/transactions/sqlserver.sql) |
 | 触发器 | [sqlserver.sql](../advanced/triggers/sqlserver.sql) |
-| 改表 | [sqlserver.sql](../ddl/alter-table/sqlserver.sql) |
-| 约束 | [sqlserver.sql](../ddl/constraints/sqlserver.sql) |
-| 建表 | [sqlserver.sql](../ddl/create-table/sqlserver.sql) |
-| 索引 | [sqlserver.sql](../ddl/indexes/sqlserver.sql) |
-| 序列与自增 | [sqlserver.sql](../ddl/sequences/sqlserver.sql) |
-| 数据库/Schema/用户 | [sqlserver.sql](../ddl/users-databases/sqlserver.sql) |
-| 视图 | [sqlserver.sql](../ddl/views/sqlserver.sql) |
 
 ### DML — 数据操作
 

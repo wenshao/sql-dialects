@@ -2,7 +2,7 @@
 
 **分类**: 时序数据库（涛思数据）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3639 行
+**总行数**: 4093 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [tdengine.sql](../ddl/create-table/tdengine.sql) |
+| 改表 | [tdengine.sql](../ddl/alter-table/tdengine.sql) |
+| 索引 | [tdengine.sql](../ddl/indexes/tdengine.sql) |
+| 约束 | [tdengine.sql](../ddl/constraints/tdengine.sql) |
+| 视图 | [tdengine.sql](../ddl/views/tdengine.sql) |
+| 序列与自增 | [tdengine.sql](../ddl/sequences/tdengine.sql) |
+| 数据库/Schema/用户 | [tdengine.sql](../ddl/users-databases/tdengine.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [tdengine.sql](../advanced/temp-tables/tdengine.sql) |
 | 事务 | [tdengine.sql](../advanced/transactions/tdengine.sql) |
 | 触发器 | [tdengine.sql](../advanced/triggers/tdengine.sql) |
-| 改表 | [tdengine.sql](../ddl/alter-table/tdengine.sql) |
-| 约束 | [tdengine.sql](../ddl/constraints/tdengine.sql) |
-| 建表 | [tdengine.sql](../ddl/create-table/tdengine.sql) |
-| 索引 | [tdengine.sql](../ddl/indexes/tdengine.sql) |
-| 序列与自增 | [tdengine.sql](../ddl/sequences/tdengine.sql) |
-| 数据库/Schema/用户 | [tdengine.sql](../ddl/users-databases/tdengine.sql) |
-| 视图 | [tdengine.sql](../ddl/views/tdengine.sql) |
 
 ### DML — 数据操作
 

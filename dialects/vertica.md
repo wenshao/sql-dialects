@@ -2,7 +2,7 @@
 
 **分类**: 列式分析数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 4468 行
+**总行数**: 4692 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [vertica.sql](../ddl/create-table/vertica.sql) |
+| 改表 | [vertica.sql](../ddl/alter-table/vertica.sql) |
+| 索引 | [vertica.sql](../ddl/indexes/vertica.sql) |
+| 约束 | [vertica.sql](../ddl/constraints/vertica.sql) |
+| 视图 | [vertica.sql](../ddl/views/vertica.sql) |
+| 序列与自增 | [vertica.sql](../ddl/sequences/vertica.sql) |
+| 数据库/Schema/用户 | [vertica.sql](../ddl/users-databases/vertica.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [vertica.sql](../advanced/temp-tables/vertica.sql) |
 | 事务 | [vertica.sql](../advanced/transactions/vertica.sql) |
 | 触发器 | [vertica.sql](../advanced/triggers/vertica.sql) |
-| 改表 | [vertica.sql](../ddl/alter-table/vertica.sql) |
-| 约束 | [vertica.sql](../ddl/constraints/vertica.sql) |
-| 建表 | [vertica.sql](../ddl/create-table/vertica.sql) |
-| 索引 | [vertica.sql](../ddl/indexes/vertica.sql) |
-| 序列与自增 | [vertica.sql](../ddl/sequences/vertica.sql) |
-| 数据库/Schema/用户 | [vertica.sql](../ddl/users-databases/vertica.sql) |
-| 视图 | [vertica.sql](../ddl/views/vertica.sql) |
 
 ### DML — 数据操作
 

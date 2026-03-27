@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [sql-standard.sql](../ddl/create-table/sql-standard.sql) |
+| 改表 | [sql-standard.sql](../ddl/alter-table/sql-standard.sql) |
+| 索引 | [sql-standard.sql](../ddl/indexes/sql-standard.sql) |
+| 约束 | [sql-standard.sql](../ddl/constraints/sql-standard.sql) |
+| 视图 | [sql-standard.sql](../ddl/views/sql-standard.sql) |
+| 序列与自增 | [sql-standard.sql](../ddl/sequences/sql-standard.sql) |
+| 数据库/Schema/用户 | [sql-standard.sql](../ddl/users-databases/sql-standard.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [sql-standard.sql](../advanced/temp-tables/sql-standard.sql) |
 | 事务 | [sql-standard.sql](../advanced/transactions/sql-standard.sql) |
 | 触发器 | [sql-standard.sql](../advanced/triggers/sql-standard.sql) |
-| 改表 | [sql-standard.sql](../ddl/alter-table/sql-standard.sql) |
-| 约束 | [sql-standard.sql](../ddl/constraints/sql-standard.sql) |
-| 建表 | [sql-standard.sql](../ddl/create-table/sql-standard.sql) |
-| 索引 | [sql-standard.sql](../ddl/indexes/sql-standard.sql) |
-| 序列与自增 | [sql-standard.sql](../ddl/sequences/sql-standard.sql) |
-| 数据库/Schema/用户 | [sql-standard.sql](../ddl/users-databases/sql-standard.sql) |
-| 视图 | [sql-standard.sql](../ddl/views/sql-standard.sql) |
 
 ### DML — 数据操作
 

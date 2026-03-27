@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [mariadb.sql](../ddl/create-table/mariadb.sql) |
+| 改表 | [mariadb.sql](../ddl/alter-table/mariadb.sql) |
+| 索引 | [mariadb.sql](../ddl/indexes/mariadb.sql) |
+| 约束 | [mariadb.sql](../ddl/constraints/mariadb.sql) |
+| 视图 | [mariadb.sql](../ddl/views/mariadb.sql) |
+| 序列与自增 | [mariadb.sql](../ddl/sequences/mariadb.sql) |
+| 数据库/Schema/用户 | [mariadb.sql](../ddl/users-databases/mariadb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [mariadb.sql](../advanced/temp-tables/mariadb.sql) |
 | 事务 | [mariadb.sql](../advanced/transactions/mariadb.sql) |
 | 触发器 | [mariadb.sql](../advanced/triggers/mariadb.sql) |
-| 改表 | [mariadb.sql](../ddl/alter-table/mariadb.sql) |
-| 约束 | [mariadb.sql](../ddl/constraints/mariadb.sql) |
-| 建表 | [mariadb.sql](../ddl/create-table/mariadb.sql) |
-| 索引 | [mariadb.sql](../ddl/indexes/mariadb.sql) |
-| 序列与自增 | [mariadb.sql](../ddl/sequences/mariadb.sql) |
-| 数据库/Schema/用户 | [mariadb.sql](../ddl/users-databases/mariadb.sql) |
-| 视图 | [mariadb.sql](../ddl/views/mariadb.sql) |
 
 ### DML — 数据操作
 

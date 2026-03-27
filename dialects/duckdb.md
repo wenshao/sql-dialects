@@ -2,7 +2,7 @@
 
 **分类**: 嵌入式 OLAP
 **文件数**: 51 个 SQL 文件
-**总行数**: 4685 行
+**总行数**: 4880 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [duckdb.sql](../ddl/create-table/duckdb.sql) |
+| 改表 | [duckdb.sql](../ddl/alter-table/duckdb.sql) |
+| 索引 | [duckdb.sql](../ddl/indexes/duckdb.sql) |
+| 约束 | [duckdb.sql](../ddl/constraints/duckdb.sql) |
+| 视图 | [duckdb.sql](../ddl/views/duckdb.sql) |
+| 序列与自增 | [duckdb.sql](../ddl/sequences/duckdb.sql) |
+| 数据库/Schema/用户 | [duckdb.sql](../ddl/users-databases/duckdb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [duckdb.sql](../advanced/temp-tables/duckdb.sql) |
 | 事务 | [duckdb.sql](../advanced/transactions/duckdb.sql) |
 | 触发器 | [duckdb.sql](../advanced/triggers/duckdb.sql) |
-| 改表 | [duckdb.sql](../ddl/alter-table/duckdb.sql) |
-| 约束 | [duckdb.sql](../ddl/constraints/duckdb.sql) |
-| 建表 | [duckdb.sql](../ddl/create-table/duckdb.sql) |
-| 索引 | [duckdb.sql](../ddl/indexes/duckdb.sql) |
-| 序列与自增 | [duckdb.sql](../ddl/sequences/duckdb.sql) |
-| 数据库/Schema/用户 | [duckdb.sql](../ddl/users-databases/duckdb.sql) |
-| 视图 | [duckdb.sql](../ddl/views/duckdb.sql) |
 
 ### DML — 数据操作
 

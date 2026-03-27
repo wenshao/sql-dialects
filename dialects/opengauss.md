@@ -2,7 +2,7 @@
 
 **分类**: 开源数据库（华为，基于 PostgreSQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3745 行
+**总行数**: 4877 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [opengauss.sql](../ddl/create-table/opengauss.sql) |
+| 改表 | [opengauss.sql](../ddl/alter-table/opengauss.sql) |
+| 索引 | [opengauss.sql](../ddl/indexes/opengauss.sql) |
+| 约束 | [opengauss.sql](../ddl/constraints/opengauss.sql) |
+| 视图 | [opengauss.sql](../ddl/views/opengauss.sql) |
+| 序列与自增 | [opengauss.sql](../ddl/sequences/opengauss.sql) |
+| 数据库/Schema/用户 | [opengauss.sql](../ddl/users-databases/opengauss.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [opengauss.sql](../advanced/temp-tables/opengauss.sql) |
 | 事务 | [opengauss.sql](../advanced/transactions/opengauss.sql) |
 | 触发器 | [opengauss.sql](../advanced/triggers/opengauss.sql) |
-| 改表 | [opengauss.sql](../ddl/alter-table/opengauss.sql) |
-| 约束 | [opengauss.sql](../ddl/constraints/opengauss.sql) |
-| 建表 | [opengauss.sql](../ddl/create-table/opengauss.sql) |
-| 索引 | [opengauss.sql](../ddl/indexes/opengauss.sql) |
-| 序列与自增 | [opengauss.sql](../ddl/sequences/opengauss.sql) |
-| 数据库/Schema/用户 | [opengauss.sql](../ddl/users-databases/opengauss.sql) |
-| 视图 | [opengauss.sql](../ddl/views/opengauss.sql) |
 
 ### DML — 数据操作
 

@@ -2,7 +2,7 @@
 
 **分类**: 内存数据库（SAP）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4292 行
+**总行数**: 4410 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [saphana.sql](../ddl/create-table/saphana.sql) |
+| 改表 | [saphana.sql](../ddl/alter-table/saphana.sql) |
+| 索引 | [saphana.sql](../ddl/indexes/saphana.sql) |
+| 约束 | [saphana.sql](../ddl/constraints/saphana.sql) |
+| 视图 | [saphana.sql](../ddl/views/saphana.sql) |
+| 序列与自增 | [saphana.sql](../ddl/sequences/saphana.sql) |
+| 数据库/Schema/用户 | [saphana.sql](../ddl/users-databases/saphana.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [saphana.sql](../advanced/temp-tables/saphana.sql) |
 | 事务 | [saphana.sql](../advanced/transactions/saphana.sql) |
 | 触发器 | [saphana.sql](../advanced/triggers/saphana.sql) |
-| 改表 | [saphana.sql](../ddl/alter-table/saphana.sql) |
-| 约束 | [saphana.sql](../ddl/constraints/saphana.sql) |
-| 建表 | [saphana.sql](../ddl/create-table/saphana.sql) |
-| 索引 | [saphana.sql](../ddl/indexes/saphana.sql) |
-| 序列与自增 | [saphana.sql](../ddl/sequences/saphana.sql) |
-| 数据库/Schema/用户 | [saphana.sql](../ddl/users-databases/saphana.sql) |
-| 视图 | [saphana.sql](../ddl/views/saphana.sql) |
 
 ### DML — 数据操作
 

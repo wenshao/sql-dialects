@@ -2,7 +2,7 @@
 
 **分类**: 分布式查询引擎
 **文件数**: 51 个 SQL 文件
-**总行数**: 4115 行
+**总行数**: 4552 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [trino.sql](../ddl/create-table/trino.sql) |
+| 改表 | [trino.sql](../ddl/alter-table/trino.sql) |
+| 索引 | [trino.sql](../ddl/indexes/trino.sql) |
+| 约束 | [trino.sql](../ddl/constraints/trino.sql) |
+| 视图 | [trino.sql](../ddl/views/trino.sql) |
+| 序列与自增 | [trino.sql](../ddl/sequences/trino.sql) |
+| 数据库/Schema/用户 | [trino.sql](../ddl/users-databases/trino.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [trino.sql](../advanced/temp-tables/trino.sql) |
 | 事务 | [trino.sql](../advanced/transactions/trino.sql) |
 | 触发器 | [trino.sql](../advanced/triggers/trino.sql) |
-| 改表 | [trino.sql](../ddl/alter-table/trino.sql) |
-| 约束 | [trino.sql](../ddl/constraints/trino.sql) |
-| 建表 | [trino.sql](../ddl/create-table/trino.sql) |
-| 索引 | [trino.sql](../ddl/indexes/trino.sql) |
-| 序列与自增 | [trino.sql](../ddl/sequences/trino.sql) |
-| 数据库/Schema/用户 | [trino.sql](../ddl/users-databases/trino.sql) |
-| 视图 | [trino.sql](../ddl/views/trino.sql) |
 
 ### DML — 数据操作
 

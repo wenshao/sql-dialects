@@ -2,7 +2,7 @@
 
 **分类**: 国产数据库（兼容 Oracle）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3750 行
+**总行数**: 4829 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [dameng.sql](../ddl/create-table/dameng.sql) |
+| 改表 | [dameng.sql](../ddl/alter-table/dameng.sql) |
+| 索引 | [dameng.sql](../ddl/indexes/dameng.sql) |
+| 约束 | [dameng.sql](../ddl/constraints/dameng.sql) |
+| 视图 | [dameng.sql](../ddl/views/dameng.sql) |
+| 序列与自增 | [dameng.sql](../ddl/sequences/dameng.sql) |
+| 数据库/Schema/用户 | [dameng.sql](../ddl/users-databases/dameng.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [dameng.sql](../advanced/temp-tables/dameng.sql) |
 | 事务 | [dameng.sql](../advanced/transactions/dameng.sql) |
 | 触发器 | [dameng.sql](../advanced/triggers/dameng.sql) |
-| 改表 | [dameng.sql](../ddl/alter-table/dameng.sql) |
-| 约束 | [dameng.sql](../ddl/constraints/dameng.sql) |
-| 建表 | [dameng.sql](../ddl/create-table/dameng.sql) |
-| 索引 | [dameng.sql](../ddl/indexes/dameng.sql) |
-| 序列与自增 | [dameng.sql](../ddl/sequences/dameng.sql) |
-| 数据库/Schema/用户 | [dameng.sql](../ddl/users-databases/dameng.sql) |
-| 视图 | [dameng.sql](../ddl/views/dameng.sql) |
 
 ### DML — 数据操作
 

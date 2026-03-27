@@ -1,9 +1,12 @@
 -- KingbaseES（人大金仓）: 数据库、模式与用户管理
 --
 -- 参考资料:
---   [1] KingbaseES 文档 - CREATE DATABASE
---       https://help.kingbase.com.cn/v8/index.html
---   [2] KingbaseES 文档 - 用户与权限管理
+--   [1] KingbaseES V8R6 文档 - SQL 参考
+--       https://help.kingbase.com.cn/v8/development/sql-reference/
+--   [2] KingbaseES V8R6 文档 - 数据库管理
+--       https://help.kingbase.com.cn/v8/administrator/
+--   [3] KingbaseES V8R6 文档 - 安全管理
+--       https://help.kingbase.com.cn/v8/administrator/security-management/
 
 -- ============================================================
 -- KingbaseES 兼容 PostgreSQL（也支持 Oracle 兼容模式）

@@ -57,7 +57,7 @@ SELECT '' || 'hello';                         -- 'hello' (NULL || x = x in conca
 | `TIMESTAMP` | `TIMESTAMP WITH TIME ZONE` | |
 | `DATE` | `DATE` | Oracle DATE 包含时间！ |
 | `TIME` | `INTERVAL DAY TO SECOND` | Oracle 无 TIME 类型 |
-| `BOOLEAN` / `TINYINT(1)` | `NUMBER(1)` + CHECK | Oracle 23c 前无 BOOLEAN(SQL层) |
+| `BOOLEAN` / `TINYINT(1)` | `BOOLEAN`(23ai+) / `NUMBER(1)` + CHECK | Oracle 23ai 引入原生 BOOLEAN；之前无 SQL 层 BOOLEAN |
 | `ENUM(...)` | `VARCHAR2 + CHECK` | Oracle 无 ENUM |
 | `JSON` | `JSON`(21c+) / `CLOB + IS JSON` | |
 | `BIT(N)` | `RAW(N)` | |
@@ -104,7 +104,7 @@ COMMENT ON COLUMN users.id IS '用户ID';
 | MySQL | Oracle | 说明 |
 |-------|--------|------|
 | `INSERT INTO t VALUES (...)` | 相同 | |
-| 多行 VALUES | `INSERT ALL INTO t VALUES (...) INTO t VALUES (...) SELECT 1 FROM DUAL` | Oracle 23c 前不支持多行 VALUES |
+| 多行 VALUES | `INSERT ALL INTO t VALUES (...) INTO t VALUES (...) SELECT 1 FROM DUAL` | Oracle 23ai+ 支持标准多行 VALUES；之前需 INSERT ALL |
 | `INSERT IGNORE` | PL/SQL 异常处理 | 无直接等价 |
 | `REPLACE INTO` | MERGE | |
 | `ON DUPLICATE KEY UPDATE` | MERGE | |
@@ -213,7 +213,7 @@ SELECT NOW();
 -- Oracle: 必须 FROM DUAL
 SELECT 1 + 1 FROM DUAL;
 SELECT SYSDATE FROM DUAL;
--- 23c+: Oracle 也支持省略 FROM DUAL 了
+-- 23ai+: Oracle 也支持省略 FROM DUAL 了
 ```
 
 ### 4. 标识符大小写
@@ -227,3 +227,14 @@ CREATE TABLE my_table (...);   -- 存储为 MY_TABLE
 SELECT * FROM my_table;        -- Oracle 自动转为 MY_TABLE
 SELECT * FROM "my_table";      -- 双引号保留原始大小写（不推荐）
 ```
+
+## Oracle 23ai 新特性（降低迁移难度）
+
+Oracle 23ai（原定名 23c，2024 年正式发布）引入了多项降低 MySQL 迁移难度的改进：
+
+| 特性 | 说明 | 迁移影响 |
+|------|------|---------|
+| 原生 BOOLEAN 类型 | SQL 层支持 `BOOLEAN`（之前仅 PL/SQL） | TINYINT(1) 可直接映射 BOOLEAN，无需 NUMBER(1)+CHECK |
+| 多行 VALUES | 支持 `INSERT INTO t VALUES (...), (...), (...)` | 不再需要 INSERT ALL ... SELECT FROM DUAL |
+| FROM DUAL 放宽 | SELECT 常量不再强制 FROM DUAL | 减少纯量查询的改写工作量 |
+| DDL IF [NOT] EXISTS | 支持 `CREATE TABLE IF NOT EXISTS`、`DROP TABLE IF EXISTS` 等 | 与 MySQL DDL 语法更一致，迁移脚本改动更少 |

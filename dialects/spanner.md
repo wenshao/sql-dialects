@@ -2,7 +2,7 @@
 
 **分类**: 全球分布式数据库（Google）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4308 行
+**总行数**: 5017 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [spanner.sql](../ddl/create-table/spanner.sql) |
+| 改表 | [spanner.sql](../ddl/alter-table/spanner.sql) |
+| 索引 | [spanner.sql](../ddl/indexes/spanner.sql) |
+| 约束 | [spanner.sql](../ddl/constraints/spanner.sql) |
+| 视图 | [spanner.sql](../ddl/views/spanner.sql) |
+| 序列与自增 | [spanner.sql](../ddl/sequences/spanner.sql) |
+| 数据库/Schema/用户 | [spanner.sql](../ddl/users-databases/spanner.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [spanner.sql](../advanced/temp-tables/spanner.sql) |
 | 事务 | [spanner.sql](../advanced/transactions/spanner.sql) |
 | 触发器 | [spanner.sql](../advanced/triggers/spanner.sql) |
-| 改表 | [spanner.sql](../ddl/alter-table/spanner.sql) |
-| 约束 | [spanner.sql](../ddl/constraints/spanner.sql) |
-| 建表 | [spanner.sql](../ddl/create-table/spanner.sql) |
-| 索引 | [spanner.sql](../ddl/indexes/spanner.sql) |
-| 序列与自增 | [spanner.sql](../ddl/sequences/spanner.sql) |
-| 数据库/Schema/用户 | [spanner.sql](../ddl/users-databases/spanner.sql) |
-| 视图 | [spanner.sql](../ddl/views/spanner.sql) |
 
 ### DML — 数据操作
 

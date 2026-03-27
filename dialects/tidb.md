@@ -2,7 +2,7 @@
 
 **分类**: 分布式数据库（兼容 MySQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 4232 行
+**总行数**: 4374 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [tidb.sql](../ddl/create-table/tidb.sql) |
+| 改表 | [tidb.sql](../ddl/alter-table/tidb.sql) |
+| 索引 | [tidb.sql](../ddl/indexes/tidb.sql) |
+| 约束 | [tidb.sql](../ddl/constraints/tidb.sql) |
+| 视图 | [tidb.sql](../ddl/views/tidb.sql) |
+| 序列与自增 | [tidb.sql](../ddl/sequences/tidb.sql) |
+| 数据库/Schema/用户 | [tidb.sql](../ddl/users-databases/tidb.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [tidb.sql](../advanced/temp-tables/tidb.sql) |
 | 事务 | [tidb.sql](../advanced/transactions/tidb.sql) |
 | 触发器 | [tidb.sql](../advanced/triggers/tidb.sql) |
-| 改表 | [tidb.sql](../ddl/alter-table/tidb.sql) |
-| 约束 | [tidb.sql](../ddl/constraints/tidb.sql) |
-| 建表 | [tidb.sql](../ddl/create-table/tidb.sql) |
-| 索引 | [tidb.sql](../ddl/indexes/tidb.sql) |
-| 序列与自增 | [tidb.sql](../ddl/sequences/tidb.sql) |
-| 数据库/Schema/用户 | [tidb.sql](../ddl/users-databases/tidb.sql) |
-| 视图 | [tidb.sql](../ddl/views/tidb.sql) |
 
 ### DML — 数据操作
 

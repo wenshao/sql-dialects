@@ -2,7 +2,7 @@
 
 **分类**: MPP 分析数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 3980 行
+**总行数**: 4301 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [starrocks.sql](../ddl/create-table/starrocks.sql) |
+| 改表 | [starrocks.sql](../ddl/alter-table/starrocks.sql) |
+| 索引 | [starrocks.sql](../ddl/indexes/starrocks.sql) |
+| 约束 | [starrocks.sql](../ddl/constraints/starrocks.sql) |
+| 视图 | [starrocks.sql](../ddl/views/starrocks.sql) |
+| 序列与自增 | [starrocks.sql](../ddl/sequences/starrocks.sql) |
+| 数据库/Schema/用户 | [starrocks.sql](../ddl/users-databases/starrocks.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [starrocks.sql](../advanced/temp-tables/starrocks.sql) |
 | 事务 | [starrocks.sql](../advanced/transactions/starrocks.sql) |
 | 触发器 | [starrocks.sql](../advanced/triggers/starrocks.sql) |
-| 改表 | [starrocks.sql](../ddl/alter-table/starrocks.sql) |
-| 约束 | [starrocks.sql](../ddl/constraints/starrocks.sql) |
-| 建表 | [starrocks.sql](../ddl/create-table/starrocks.sql) |
-| 索引 | [starrocks.sql](../ddl/indexes/starrocks.sql) |
-| 序列与自增 | [starrocks.sql](../ddl/sequences/starrocks.sql) |
-| 数据库/Schema/用户 | [starrocks.sql](../ddl/users-databases/starrocks.sql) |
-| 视图 | [starrocks.sql](../ddl/views/starrocks.sql) |
 
 ### DML — 数据操作
 

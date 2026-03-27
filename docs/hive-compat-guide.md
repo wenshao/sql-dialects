@@ -14,6 +14,8 @@ Hive 不是传统数据库——它是"SQL on Hadoop"的先驱，很多设计源
 4. **外部表 vs 内部表**: 外部表 DROP 时不删数据（数据不属于 Hive 管理）
 5. **SerDe 架构**: 数据的序列化/反序列化由独立的 SerDe 类处理
 
+> **Hive 版本现状**: Hive 4.x 是当前主推版本。Hive 3.0 引入了物化视图支持（Materialized View，支持自动重写优化），Hive 4.x 进一步改善了 ACID 表性能（底层优化了 delta 文件合并策略，大幅提升了 INSERT/UPDATE/DELETE 吞吐量）。迁移评估时建议以 4.x 特性为基准。
+
 ## 兼容性分级
 
 ### P0: 必须兼容
@@ -45,6 +47,7 @@ Hive 不是传统数据库——它是"SQL on Hadoop"的先驱，很多设计源
 |------|------|
 | UPDATE/DELETE (0.14+ ACID) | 需要 ORC + 事务表，大多数 Hive 用户不用 |
 | MERGE (2.2+) | 同上，需要 ACID 支持 |
+| 物化视图 (3.0+) | 支持 CREATE MATERIALIZED VIEW 及自动查询重写，显著提升分析性能 |
 | MSCK REPAIR TABLE | 修复分区元数据，可用替代命令 |
 | TRANSFORM/MAP/REDUCE | 调用外部脚本，已被 UDF 替代 |
 | Bucketing (CLUSTERED BY INTO N BUCKETS) | 分桶优化，使用率较低 |
@@ -153,6 +156,7 @@ STORED AS TEXTFILE;
 - UPDATE/DELETE 实际是写入 delta 文件，后台 compact 合并
 - 性能远不如原生 RDBMS 的行级更新
 - Hive 3.0+ 默认所有内部表为 ACID 表
+- Hive 4.x 大幅改善 ACID 性能：优化了 Compaction 调度、减少小文件数量、提升并发写入吞吐量
 - **对引擎开发者**: 如果你的引擎需要 UPDATE/DELETE，考虑 Delta Lake/Iceberg 的方案而非 Hive ACID
 
 ### 9. 类型转换的宽松性

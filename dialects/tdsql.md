@@ -2,7 +2,7 @@
 
 **分类**: 分布式数据库（腾讯云，兼容 MySQL）
 **文件数**: 51 个 SQL 文件
-**总行数**: 3250 行
+**总行数**: 6083 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [tdsql.sql](../ddl/create-table/tdsql.sql) |
+| 改表 | [tdsql.sql](../ddl/alter-table/tdsql.sql) |
+| 索引 | [tdsql.sql](../ddl/indexes/tdsql.sql) |
+| 约束 | [tdsql.sql](../ddl/constraints/tdsql.sql) |
+| 视图 | [tdsql.sql](../ddl/views/tdsql.sql) |
+| 序列与自增 | [tdsql.sql](../ddl/sequences/tdsql.sql) |
+| 数据库/Schema/用户 | [tdsql.sql](../ddl/users-databases/tdsql.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [tdsql.sql](../advanced/temp-tables/tdsql.sql) |
 | 事务 | [tdsql.sql](../advanced/transactions/tdsql.sql) |
 | 触发器 | [tdsql.sql](../advanced/triggers/tdsql.sql) |
-| 改表 | [tdsql.sql](../ddl/alter-table/tdsql.sql) |
-| 约束 | [tdsql.sql](../ddl/constraints/tdsql.sql) |
-| 建表 | [tdsql.sql](../ddl/create-table/tdsql.sql) |
-| 索引 | [tdsql.sql](../ddl/indexes/tdsql.sql) |
-| 序列与自增 | [tdsql.sql](../ddl/sequences/tdsql.sql) |
-| 数据库/Schema/用户 | [tdsql.sql](../ddl/users-databases/tdsql.sql) |
-| 视图 | [tdsql.sql](../ddl/views/tdsql.sql) |
 
 ### DML — 数据操作
 

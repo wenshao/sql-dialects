@@ -2,7 +2,7 @@
 
 **分类**: 列式分析数据库
 **文件数**: 51 个 SQL 文件
-**总行数**: 5214 行
+**总行数**: 6690 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [clickhouse.sql](../ddl/create-table/clickhouse.sql) |
+| 改表 | [clickhouse.sql](../ddl/alter-table/clickhouse.sql) |
+| 索引 | [clickhouse.sql](../ddl/indexes/clickhouse.sql) |
+| 约束 | [clickhouse.sql](../ddl/constraints/clickhouse.sql) |
+| 视图 | [clickhouse.sql](../ddl/views/clickhouse.sql) |
+| 序列与自增 | [clickhouse.sql](../ddl/sequences/clickhouse.sql) |
+| 数据库/Schema/用户 | [clickhouse.sql](../ddl/users-databases/clickhouse.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [clickhouse.sql](../advanced/temp-tables/clickhouse.sql) |
 | 事务 | [clickhouse.sql](../advanced/transactions/clickhouse.sql) |
 | 触发器 | [clickhouse.sql](../advanced/triggers/clickhouse.sql) |
-| 改表 | [clickhouse.sql](../ddl/alter-table/clickhouse.sql) |
-| 约束 | [clickhouse.sql](../ddl/constraints/clickhouse.sql) |
-| 建表 | [clickhouse.sql](../ddl/create-table/clickhouse.sql) |
-| 索引 | [clickhouse.sql](../ddl/indexes/clickhouse.sql) |
-| 序列与自增 | [clickhouse.sql](../ddl/sequences/clickhouse.sql) |
-| 数据库/Schema/用户 | [clickhouse.sql](../ddl/users-databases/clickhouse.sql) |
-| 视图 | [clickhouse.sql](../ddl/views/clickhouse.sql) |
 
 ### DML — 数据操作
 

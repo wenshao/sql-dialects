@@ -2,7 +2,7 @@
 
 **分类**: 阿里云实时数仓
 **文件数**: 51 个 SQL 文件
-**总行数**: 3772 行
+**总行数**: 4482 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [hologres.sql](../ddl/create-table/hologres.sql) |
+| 改表 | [hologres.sql](../ddl/alter-table/hologres.sql) |
+| 索引 | [hologres.sql](../ddl/indexes/hologres.sql) |
+| 约束 | [hologres.sql](../ddl/constraints/hologres.sql) |
+| 视图 | [hologres.sql](../ddl/views/hologres.sql) |
+| 序列与自增 | [hologres.sql](../ddl/sequences/hologres.sql) |
+| 数据库/Schema/用户 | [hologres.sql](../ddl/users-databases/hologres.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [hologres.sql](../advanced/temp-tables/hologres.sql) |
 | 事务 | [hologres.sql](../advanced/transactions/hologres.sql) |
 | 触发器 | [hologres.sql](../advanced/triggers/hologres.sql) |
-| 改表 | [hologres.sql](../ddl/alter-table/hologres.sql) |
-| 约束 | [hologres.sql](../ddl/constraints/hologres.sql) |
-| 建表 | [hologres.sql](../ddl/create-table/hologres.sql) |
-| 索引 | [hologres.sql](../ddl/indexes/hologres.sql) |
-| 序列与自增 | [hologres.sql](../ddl/sequences/hologres.sql) |
-| 数据库/Schema/用户 | [hologres.sql](../ddl/users-databases/hologres.sql) |
-| 视图 | [hologres.sql](../ddl/views/hologres.sql) |
 
 ### DML — 数据操作
 

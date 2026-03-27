@@ -2,7 +2,7 @@
 
 **分类**: Google 云数仓
 **文件数**: 51 个 SQL 文件
-**总行数**: 4873 行
+**总行数**: 6290 行
 
 ## 全部模块
 
@@ -10,6 +10,13 @@
 
 | 模块 | 链接 |
 |---|---|
+| 建表 | [bigquery.sql](../ddl/create-table/bigquery.sql) |
+| 改表 | [bigquery.sql](../ddl/alter-table/bigquery.sql) |
+| 索引 | [bigquery.sql](../ddl/indexes/bigquery.sql) |
+| 约束 | [bigquery.sql](../ddl/constraints/bigquery.sql) |
+| 视图 | [bigquery.sql](../ddl/views/bigquery.sql) |
+| 序列与自增 | [bigquery.sql](../ddl/sequences/bigquery.sql) |
+| 数据库/Schema/用户 | [bigquery.sql](../ddl/users-databases/bigquery.sql) |
 
 ### Advanced — 高级特性
 
@@ -25,13 +32,6 @@
 | 临时表 | [bigquery.sql](../advanced/temp-tables/bigquery.sql) |
 | 事务 | [bigquery.sql](../advanced/transactions/bigquery.sql) |
 | 触发器 | [bigquery.sql](../advanced/triggers/bigquery.sql) |
-| 改表 | [bigquery.sql](../ddl/alter-table/bigquery.sql) |
-| 约束 | [bigquery.sql](../ddl/constraints/bigquery.sql) |
-| 建表 | [bigquery.sql](../ddl/create-table/bigquery.sql) |
-| 索引 | [bigquery.sql](../ddl/indexes/bigquery.sql) |
-| 序列与自增 | [bigquery.sql](../ddl/sequences/bigquery.sql) |
-| 数据库/Schema/用户 | [bigquery.sql](../ddl/users-databases/bigquery.sql) |
-| 视图 | [bigquery.sql](../ddl/views/bigquery.sql) |
 
 ### DML — 数据操作
 
