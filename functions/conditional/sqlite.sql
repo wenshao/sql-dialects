@@ -6,51 +6,81 @@
 --   [2] SQLite Documentation - Core Functions
 --       https://www.sqlite.org/lang_corefunc.html
 
--- CASE WHEN
-SELECT username,
-    CASE
-        WHEN age < 18 THEN 'minor'
-        WHEN age < 65 THEN 'adult'
-        ELSE 'senior'
-    END AS category
-FROM users;
+-- ============================================================
+-- 1. CASE 表达式（标准 SQL）
+-- ============================================================
 
 -- 简单 CASE
-SELECT username,
-    CASE status
-        WHEN 0 THEN 'inactive'
-        WHEN 1 THEN 'active'
-        ELSE 'unknown'
-    END AS status_name
+SELECT username, CASE status
+    WHEN 0 THEN 'inactive'
+    WHEN 1 THEN 'active'
+    WHEN 2 THEN 'suspended'
+    ELSE 'unknown'
+END AS status_text
 FROM users;
 
--- COALESCE
-SELECT COALESCE(phone, email, 'unknown') FROM users;
+-- 搜索 CASE
+SELECT username, CASE
+    WHEN age < 18 THEN 'minor'
+    WHEN age < 65 THEN 'adult'
+    ELSE 'senior'
+END AS age_group
+FROM users;
 
--- NULLIF
-SELECT NULLIF(age, 0) FROM users;
+-- ============================================================
+-- 2. NULL 处理函数
+-- ============================================================
 
--- IIF（3.32.0+，类似 IF）
-SELECT username, IIF(age >= 18, 'adult', 'minor') AS category FROM users;
+-- COALESCE（返回第一个非 NULL 值）
+SELECT COALESCE(nickname, username, 'anonymous') FROM users;
 
--- IFNULL（两参数 NULL 替换，等同于两参数的 COALESCE）
-SELECT IFNULL(phone, 'N/A') FROM users;
+-- IFNULL（COALESCE 的两参数简化版，SQLite/MySQL 特有）
+SELECT IFNULL(email, 'no email') FROM users;
 
--- MAX / MIN 也可以用于两个值比较（非聚合用法）
-SELECT MAX(0, age) FROM users;                           -- 保证非负
-SELECT MIN(100, age) FROM users;                         -- 最大 100
+-- NULLIF（两值相等时返回 NULL）
+SELECT NULLIF(denominator, 0) FROM data;  -- 避免除零: x / NULLIF(d, 0)
 
--- 类型转换
-SELECT CAST('123' AS INTEGER);
-SELECT CAST('2024-01-15' AS TEXT);
--- 注意：SQLite 的 CAST 受限于 5 种存储类型
+-- IIF（三元条件，3.32.0+）
+SELECT IIF(age >= 18, 'adult', 'minor') FROM users;
+-- 等价于: CASE WHEN age >= 18 THEN 'adult' ELSE 'minor' END
 
--- typeof（返回存储类型）
-SELECT typeof(123);                                      -- 'integer'
-SELECT typeof(1.5);                                      -- 'real'
-SELECT typeof('hello');                                  -- 'text'
-SELECT typeof(NULL);                                     -- 'null'
-SELECT typeof(X'0102');                                  -- 'blob'
+-- ============================================================
+-- 3. typeof（SQLite 独有的类型检查函数）
+-- ============================================================
 
--- 注意：没有 GREATEST / LEAST 函数
--- 注意：没有 IF() 函数（用 IIF 或 CASE 代替）
+-- 由于 SQLite 是动态类型，typeof 用于运行时类型检查:
+SELECT typeof(42);          -- 'integer'
+SELECT typeof(3.14);        -- 'real'
+SELECT typeof('hello');     -- 'text'
+SELECT typeof(NULL);        -- 'null'
+SELECT typeof(x'AB');       -- 'blob'
+
+-- 结合 CASE 按实际类型处理:
+SELECT CASE typeof(value)
+    WHEN 'integer' THEN 'Number: ' || CAST(value AS TEXT)
+    WHEN 'text' THEN 'String: ' || value
+    WHEN 'null' THEN 'NULL'
+    ELSE 'Other: ' || typeof(value)
+END FROM data;
+
+-- ============================================================
+-- 4. 对比与引擎开发者启示
+-- ============================================================
+-- SQLite 条件函数的特点:
+--   (1) CASE / COALESCE / NULLIF / IFNULL → 标准 SQL
+--   (2) IIF → 3.32.0+ 三元条件（简洁）
+--   (3) typeof → 动态类型系统的必需品
+--
+-- 缺少:
+--   GREATEST / LEAST → 需要嵌套 CASE 或 MAX()/MIN()
+--   DECODE → Oracle 特有，用 CASE 替代
+--
+-- 对比:
+--   MySQL:      IF(cond, a, b) 函数
+--   PostgreSQL: 无 IIF，用 CASE
+--   ClickHouse: if(cond, a, b) + multiIf()
+--   BigQuery:   IF(cond, a, b) + IFF
+--
+-- 对引擎开发者的启示:
+--   IIF/IF 三元函数是 CASE 的有用简化，实现成本低但用户体验好。
+--   typeof 对动态类型引擎是必需的（让用户知道实际存储的是什么类型）。

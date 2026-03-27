@@ -1,47 +1,97 @@
 -- BigQuery: 字符串类型
 --
 -- 参考资料:
---   [1] BigQuery SQL Reference - Data Types (String)
+--   [1] BigQuery SQL Reference - STRING Type
 --       https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#string_type
---   [2] BigQuery SQL Reference - String Functions
---       https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions
+--   [2] BigQuery SQL Reference - BYTES Type
+--       https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#bytes_type
 
--- STRING: 变长 UTF-8 字符串，无长度限制（最大约 10MB）
--- BYTES: 变长二进制数据
+-- ============================================================
+-- 1. STRING: 唯一的字符串类型
+-- ============================================================
 
-CREATE TABLE examples (
-    name       STRING,                    -- 唯一字符串类型
-    content    STRING,                    -- 无需区分 TEXT/VARCHAR
-    data       BYTES                      -- 二进制数据
+-- BigQuery 只有 STRING 类型，没有 VARCHAR/CHAR/TEXT/CLOB 区分:
+CREATE TABLE users (
+    id       INT64 NOT NULL,
+    username STRING NOT NULL,
+    bio      STRING,            -- 无长度限制
+    country  STRING             -- 也用于短字符串
 );
 
--- 注意：BigQuery 没有 CHAR(n) / VARCHAR(n)
--- 所有字符串都用 STRING，无需指定长度
--- STRING 内部采用 UTF-8 编码
+-- 特点:
+--   (a) 保证 UTF-8 编码（插入无效 UTF-8 会报错）
+--   (b) 无长度限制（但受行大小限制: 最大 100 MB/行）
+--   (c) 无 VARCHAR(n) 的截断行为
+--   (d) 列式压缩自动优化（重复值字典编码，短值紧凑存储）
 
--- 类型转换
-SELECT CAST('hello' AS STRING);
-SELECT CAST(123 AS STRING);
-SELECT SAFE_CAST('abc' AS INT64);         -- 转换失败返回 NULL（安全转换）
+-- 为什么只有一种字符串类型?
+-- 与 INT64 相同的设计理念: 简化用户体验。
+-- Capacitor 列式格式会自动选择最优编码。
+-- 不需要用户决定 VARCHAR vs TEXT vs CLOB。
 
--- 字符串字面量
-SELECT 'hello world';                     -- 单引号
-SELECT "hello world";                     -- 双引号也可以
-SELECT '''multi
-line string''';                           -- 三引号多行字符串
-SELECT r'\n is not a newline';            -- 原始字符串（Raw String）
-SELECT b'binary data';                    -- BYTES 字面量
+-- ============================================================
+-- 2. BYTES: 二进制数据类型
+-- ============================================================
 
--- 模板字符串（仅在脚本中可用）
--- 不支持直接的字符串模板语法，需用 CONCAT 或 FORMAT
+-- BYTES 是原始字节序列，不做 UTF-8 验证:
+CREATE TABLE files (
+    id   INT64,
+    name STRING,
+    hash BYTES     -- 二进制哈希值
+);
+-- 插入: INSERT INTO files VALUES (1, 'test', B'\xDE\xAD\xBE\xEF');
+-- 或: INSERT INTO files VALUES (1, 'test', FROM_BASE64('3q2+7w=='));
 
--- FORMAT 函数（类似 printf）
-SELECT FORMAT('%s has %d items', 'cart', 5);  -- 'cart has 5 items'
-SELECT FORMAT('%010d', 42);                    -- '0000000042'
+-- STRING vs BYTES:
+--   STRING: UTF-8 文本，字符级操作（LENGTH 返回字符数）
+--   BYTES: 原始字节，字节级操作（BYTE_LENGTH 返回字节数）
 
--- COLLATION（排序规则，2023+）
-SELECT COLLATE('hello', 'und:ci') = COLLATE('HELLO', 'und:ci');  -- TRUE
+-- ============================================================
+-- 3. 排序规则（Collation）
+-- ============================================================
 
--- 注意：没有 ENUM 类型，通常用 STRING + CHECK 约束或视图层面校验
--- 注意：没有 BLOB/CLOB 类型，BYTES 最大约 10MB
--- 注意：BigQuery 是列存储，STRING 列会自动压缩
+-- BigQuery 默认区分大小写，可以通过 COLLATE 修改:
+SELECT * FROM users WHERE COLLATE(username, 'und:ci') = 'alice';
+-- 'und:ci' = Unicode Default, Case Insensitive
+
+-- 建表时指定默认排序规则:
+CREATE TABLE users (
+    username STRING COLLATE 'und:ci'  -- 大小写不敏感
+);
+
+-- 对比:
+--   MySQL: 排序规则绑定到字符集（utf8mb4_unicode_ci）
+--   PostgreSQL: 排序规则绑定到列或数据库（ICU 12+）
+--   SQLite: COLLATE NOCASE（仅 ASCII）
+--   ClickHouse: 无内置排序规则（用 lower() 手动处理）
+
+-- ============================================================
+-- 4. 字符串作为半结构化数据容器
+-- ============================================================
+
+-- BigQuery 中 STRING 经常用于存储:
+--   JSON: STRING 列 + JSON_EXTRACT 函数（或用 JSON 类型）
+--   CSV: STRING 列 + SPLIT 函数
+--   URL: STRING 列 + NET.HOST / REGEXP_EXTRACT
+--   UUID: STRING 列 + GENERATE_UUID()（BigQuery 无专用 UUID 类型）
+
+-- SEARCH INDEX 可以在 STRING 列上创建全文搜索索引:
+-- CREATE SEARCH INDEX idx ON docs (content);
+-- SELECT * FROM docs WHERE SEARCH(content, 'keyword');
+
+-- ============================================================
+-- 5. 对比与引擎开发者启示
+-- ============================================================
+-- BigQuery 字符串设计:
+--   (1) 只有 STRING → 最简化
+--   (2) 保证 UTF-8 → 比 ClickHouse（字节序列）更安全
+--   (3) 自动压缩 → 不需要用户选择类型
+--   (4) STRING 作为万能容器 → UUID/JSON/URL 都用 STRING
+--
+-- 对引擎开发者的启示:
+--   现代云数仓趋向于单一字符串类型（STRING），因为:
+--   - 列压缩消除了 VARCHAR(n) 的存储优势
+--   - 用户不需要为字符串长度做决策
+--   - 简化了类型系统和迁移复杂度
+--   但应该保证 UTF-8 编码（BigQuery）还是允许任意字节（ClickHouse），
+--   取决于目标场景: 分析（保证 UTF-8）vs 日志处理（允许任意字节）。

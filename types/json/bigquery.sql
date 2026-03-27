@@ -3,70 +3,112 @@
 -- 参考资料:
 --   [1] BigQuery SQL Reference - JSON Data Type
 --       https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types#json_type
---   [2] BigQuery SQL Reference - JSON Functions
+--   [2] BigQuery - JSON Functions
 --       https://cloud.google.com/bigquery/docs/reference/standard-sql/json_functions
 
--- JSON: 原生 JSON 类型（2022+）
--- 之前需要用 STRING 存储 JSON 并用 JSON 函数解析
+-- ============================================================
+-- 1. JSON 类型（原生类型，非 STRING）
+-- ============================================================
 
+-- BigQuery 有专用的 JSON 类型（不是 STRING 别名）:
 CREATE TABLE events (
-    id   INT64,
-    data JSON                              -- 原生 JSON 类型
+    id       INT64 NOT NULL,
+    payload  JSON,              -- 专用 JSON 类型
+    metadata STRING             -- 也可以用 STRING 存 JSON
 );
 
--- 插入 JSON
-INSERT INTO events (id, data) VALUES (1, JSON '{"name": "alice", "age": 25, "tags": ["vip"]}');
-INSERT INTO events (id, data) VALUES (2, JSON_OBJECT('name', 'bob', 'age', 30));
+-- 插入
+INSERT INTO events VALUES (1, JSON '{"name": "alice", "age": 25}', NULL);
+INSERT INTO events VALUES (2, JSON '{"name": "bob", "tags": ["vip"]}', NULL);
 
--- 读取 JSON 字段
-SELECT data.name FROM events;              -- 点号访问（返回 JSON）
-SELECT data.tags[0] FROM events;           -- 数组下标访问
-SELECT JSON_VALUE(data, '$.name') FROM events;          -- 返回 STRING 标量值
-SELECT JSON_QUERY(data, '$.tags') FROM events;          -- 返回 JSON 数组/对象
+-- JSON 类型 vs STRING:
+--   JSON 类型: 内部二进制存储，验证有效性，原生函数更高效
+--   STRING: 文本存储，不验证，需要 JSON_EXTRACT 解析
 
--- STRING_VALUE vs JSON_QUERY:
--- JSON_VALUE: 提取标量值，返回 STRING
--- JSON_QUERY: 提取数组/对象，返回 JSON
+-- ============================================================
+-- 2. JSON 读取
+-- ============================================================
 
--- 查询条件
-SELECT * FROM events WHERE JSON_VALUE(data, '$.name') = 'alice';
-SELECT * FROM events WHERE BOOL(data.age > 20);
+-- 字段访问（点号语法，BigQuery 独有的简洁语法）
+SELECT payload.name FROM events;          -- 直接点号访问!
+SELECT payload.age FROM events;
+SELECT payload.tags[0] FROM events;       -- 数组索引
 
--- 类型转换
-SELECT BOOL(JSON 'true');                  -- BOOL
-SELECT INT64(JSON '123');                  -- INT64
-SELECT FLOAT64(JSON '3.14');               -- FLOAT64
-SELECT STRING(JSON '"hello"');             -- STRING
-SELECT JSON_VALUE(data, '$.age' RETURNING INT64) FROM events;  -- 直接转换
+-- JSON_VALUE（返回标量值为 STRING）
+SELECT JSON_VALUE(payload, '$.name') FROM events;
 
--- JSON 构造
+-- JSON_QUERY（返回 JSON 子树）
+SELECT JSON_QUERY(payload, '$.tags') FROM events;    -- ["vip"]
+
+-- LAX vs STRICT 模式:
+SELECT JSON_VALUE(payload, 'lax $.missing_field');    -- NULL（宽松）
+SELECT JSON_VALUE(payload, 'strict $.missing_field'); -- 报错（严格）
+
+-- 设计分析:
+--   BigQuery 的点号访问语法（payload.name）是最简洁的 JSON 访问方式。
+--   对比: PostgreSQL 需要 payload->>'name'
+--         MySQL 需要 JSON_EXTRACT(payload, '$.name')
+--         SQLite 需要 json_extract(payload, '$.name') 或 payload->>'$.name'
+
+-- ============================================================
+-- 3. JSON 与 STRUCT 的关系（BigQuery 独特设计）
+-- ============================================================
+
+-- BigQuery 中 JSON 和 STRUCT 都可以表示嵌套数据:
+-- STRUCT: 编译时 schema 固定（强类型）
+-- JSON:   运行时 schema 灵活（弱类型）
+--
+-- 推荐选择:
+--   已知 schema → STRUCT（查询性能更好，列式存储）
+--   未知/变化 schema → JSON（灵活但查询较慢）
+--
+-- STRUCT 示例:
+-- CREATE TABLE users (
+--     id INT64,
+--     address STRUCT<street STRING, city STRING, zip STRING>
+-- );
+-- SELECT address.city FROM users;  -- 点号访问，与 JSON 语法相同
+
+-- ============================================================
+-- 4. JSON 数组操作
+-- ============================================================
+
+-- 展开 JSON 数组
+SELECT id, tag
+FROM events, UNNEST(JSON_QUERY_ARRAY(payload, '$.tags')) AS tag;
+
+-- JSON 数组长度
+SELECT JSON_QUERY(payload, '$.tags'),
+       ARRAY_LENGTH(JSON_QUERY_ARRAY(payload, '$.tags'))
+FROM events;
+
+-- ============================================================
+-- 5. JSON 构建与转换
+-- ============================================================
+
+-- 构建 JSON
 SELECT JSON_OBJECT('name', 'alice', 'age', 25);
-SELECT JSON_ARRAY(1, 2, 3);
-SELECT TO_JSON(STRUCT('alice' AS name, 25 AS age));    -- STRUCT 转 JSON
+SELECT JSON_ARRAY(1, 2, 'three', NULL);
+SELECT TO_JSON(STRUCT('alice' AS name, 25 AS age));
 
--- JSON 修改（LAX 模式）
-SELECT JSON_SET('{"a": 1}', '$.b', 2);                -- 添加/修改
-SELECT JSON_STRIP_NULLS(JSON '{"a": 1, "b": null}');  -- 移除 NULL
-SELECT JSON_REMOVE(JSON '{"a": 1, "b": 2}', '$.b');   -- 删除键
+-- JSON → STRING
+SELECT STRING(payload) FROM events;
 
--- JSON 展开
-SELECT * FROM UNNEST(JSON_QUERY_ARRAY(data, '$.tags')) AS tag FROM events;
-SELECT * FROM UNNEST(JSON_KEYS(data)) AS key_name FROM events;
+-- STRING → JSON
+SELECT PARSE_JSON('{"name": "alice"}');
+SELECT SAFE.PARSE_JSON('invalid json');  -- NULL（安全模式）
 
--- STRUCT 和 ARRAY（BigQuery 原生复合类型）
--- BigQuery 推荐使用 STRUCT/ARRAY 而非 JSON 存储结构化数据
-CREATE TABLE users (
-    name    STRING,
-    address STRUCT<street STRING, city STRING, zip STRING>,
-    tags    ARRAY<STRING>
-);
-SELECT address.city FROM users;
-SELECT tag FROM users, UNNEST(tags) AS tag;
-
--- JSON Path
-SELECT JSON_VALUE(data, '$.name') FROM events;
-SELECT JSON_QUERY(data, '$.tags[0]') FROM events;
-
--- 注意：JSON 类型是 2022 年引入的，之前用 STRING + JSON 函数
--- 注意：BigQuery 推荐原生 STRUCT/ARRAY 优于 JSON（性能更好）
--- 注意：JSON 列不支持排序和分组
+-- ============================================================
+-- 6. 对比与引擎开发者启示
+-- ============================================================
+-- BigQuery JSON 的设计:
+--   (1) 专用 JSON 类型 → 内部二进制存储 + 验证
+--   (2) 点号访问语法 → 最简洁的 JSON 查询
+--   (3) JSON vs STRUCT → 动态 vs 静态 schema 的选择
+--   (4) SAFE.PARSE_JSON → 安全解析（错误返回 NULL）
+--
+-- 对引擎开发者的启示:
+--   提供 STRUCT（静态 schema）和 JSON（动态 schema）两种嵌套类型
+--   是云数仓的最佳实践。用户根据 schema 确定性选择。
+--   点号访问语法（payload.field）比 -> 操作符或函数更直观，
+--   应该作为 JSON 访问的首选语法。

@@ -6,69 +6,109 @@
 --   [2] ClickHouse - Decimal
 --       https://clickhouse.com/docs/en/sql-reference/data-types/decimal
 
--- 有符号整数
--- Int8:   1 字节，-128 ~ 127
--- Int16:  2 字节，-32768 ~ 32767
--- Int32:  4 字节，-2^31 ~ 2^31-1
--- Int64:  8 字节，-2^63 ~ 2^63-1
--- Int128: 16 字节（21.6+）
--- Int256: 32 字节（21.6+）
+-- ============================================================
+-- 1. 整数类型: 有符号 + 无符号（最精细的整数类型系统）
+-- ============================================================
 
--- 无符号整数
--- UInt8:   1 字节，0 ~ 255
--- UInt16:  2 字节，0 ~ 65535
--- UInt32:  4 字节，0 ~ 2^32-1
--- UInt64:  8 字节，0 ~ 2^64-1
--- UInt128: 16 字节（21.6+）
--- UInt256: 32 字节（21.6+）
+-- ClickHouse 的整数类型比任何其他数据库都精细:
+-- 有符号: Int8(-128~127), Int16, Int32, Int64, Int128, Int256
+-- 无符号: UInt8(0~255), UInt16, UInt32, UInt64, UInt128, UInt256
 
-CREATE TABLE examples (
-    tiny_val   Int8,
-    int_val    Int32,
-    big_val    Int64,
-    pos_val    UInt32,                     -- 无符号
-    huge_val   Int128                      -- 超大整数（21.6+）
-) ENGINE = MergeTree() ORDER BY int_val;
+CREATE TABLE metrics (
+    id          UInt64,
+    status      UInt8,       -- 0~255，用于枚举值
+    count       UInt32,      -- 0~4B
+    timestamp   Int64,       -- Unix 时间戳
+    big_number  Int128       -- 超大整数（如加密哈希）
+) ENGINE = MergeTree() ORDER BY id;
 
--- 浮点数
--- Float32: 4 字节，单精度
--- Float64: 8 字节，双精度
+-- 为什么如此精细?
+-- (a) 列式存储: 每列独立存储，类型宽度直接影响存储大小和压缩率
+--     UInt8 列: 1 亿行 = 100 MB
+--     UInt64 列: 1 亿行 = 800 MB（8 倍差异!）
+-- (b) SIMD 优化: 窄类型可以在单条 SIMD 指令中处理更多值
+--     UInt8: 256-bit SIMD 一次处理 32 个值
+--     UInt64: 256-bit SIMD 一次处理 4 个值
+-- (c) 默认 NOT NULL: 没有 NULL 标记的开销（Nullable 需要额外 1 byte/行）
+
+-- 对比:
+--   MySQL:      TINYINT(1B) / SMALLINT(2B) / INT(4B) / BIGINT(8B) + UNSIGNED
+--   PostgreSQL: SMALLINT(2B) / INTEGER(4B) / BIGINT(8B)，无 UNSIGNED
+--   BigQuery:   只有 INT64（8B），无更小的整数类型
+--   SQLite:     只有 INTEGER（1-8B 自适应）
+
+-- ============================================================
+-- 2. 浮点类型
+-- ============================================================
+
+-- Float32 (4 字节, ~7 位有效数字)
+-- Float64 (8 字节, ~15 位有效数字)
 CREATE TABLE measurements (
-    value      Float64
-) ENGINE = MergeTree() ORDER BY value;
+    sensor_id UInt32,
+    value     Float64,
+    approx    Float32       -- 精度要求低时节省空间
+) ENGINE = MergeTree() ORDER BY sensor_id;
 
--- 定点数
--- Decimal(P, S) / Decimal32(S) / Decimal64(S) / Decimal128(S) / Decimal256(S)
--- Decimal32: P 1~9
--- Decimal64: P 10~18
--- Decimal128: P 19~38
--- Decimal256: P 39~76（21.6+）
-CREATE TABLE prices (
-    price      Decimal(10, 2),            -- 自动选择 Decimal32
-    precise    Decimal128(18)             -- 高精度
+-- 特殊值: inf, -inf, nan 都支持
+-- SELECT 1.0 / 0;  → inf
+-- SELECT 0.0 / 0;  → nan
+
+-- ============================================================
+-- 3. Decimal 类型（精确小数）
+-- ============================================================
+
+-- Decimal(P, S): P=有效位数, S=小数位数
+-- Decimal32(S): P=1~9, 4 字节
+-- Decimal64(S): P=1~18, 8 字节
+-- Decimal128(S): P=1~38, 16 字节
+-- Decimal256(S): P=1~76, 32 字节
+
+CREATE TABLE financials (
+    price    Decimal(10, 2),     -- 10 位有效数字，2 位小数
+    quantity Decimal64(4),       -- 18 位有效数字，4 位小数
+    total    Decimal128(6)       -- 38 位有效数字，6 位小数
 ) ENGINE = MergeTree() ORDER BY price;
 
--- 布尔（21.12+）
--- Bool: UInt8 的别名，0 = false, 1 = true
-CREATE TABLE t (
-    active Bool DEFAULT true
-) ENGINE = MergeTree() ORDER BY active;
+-- 设计分析:
+--   ClickHouse 的 Decimal 分为 4 种底层存储宽度（32/64/128/256 位）。
+--   这是列存的优化: 选择最小的宽度减少存储和提高压缩率。
+--   对比 MySQL: DECIMAL(P,S) 使用变长存储（4 字节一组 9 位数字）
 
--- Nullable 包装器
--- ClickHouse 列默认不允许 NULL，需显式声明
-CREATE TABLE t (
-    val    Int32,                          -- 不允许 NULL
-    opt    Nullable(Int32)                 -- 允许 NULL
-) ENGINE = MergeTree() ORDER BY val;
+-- ============================================================
+-- 4. 布尔: Bool 类型（21.12+）
+-- ============================================================
 
--- 类型转换
-SELECT toInt32('123');
-SELECT toFloat64('3.14');
-SELECT toInt32OrNull('abc');              -- 安全转换，失败返回 NULL
-SELECT toInt32OrZero('abc');              -- 安全转换，失败返回 0
-SELECT CAST('123' AS Int64);
+-- ClickHouse 21.12+ 添加了 Bool 类型（别名 UInt8）
+CREATE TABLE flags (
+    id UInt64,
+    is_active Bool DEFAULT true
+) ENGINE = MergeTree() ORDER BY id;
+-- 存储为 UInt8: true=1, false=0
 
--- 注意：UInt* 是 ClickHouse 特有的无符号类型
--- 注意：Int128/Int256 支持超大整数运算
--- 注意：Nullable 会影响查询性能，非必要不使用
--- 注意：没有自增类型
+-- ============================================================
+-- 5. 枚举类型（Enum8 / Enum16）
+-- ============================================================
+
+-- ClickHouse 独有的枚举类型:
+CREATE TABLE events (
+    id     UInt64,
+    level  Enum8('debug' = 0, 'info' = 1, 'warn' = 2, 'error' = 3)
+) ENGINE = MergeTree() ORDER BY id;
+-- 存储为 Int8/Int16，但显示和输入为字符串
+-- 比 String 更节省空间（1 字节 vs 平均 5 字节）
+-- 比 CHECK 约束更安全（只接受定义的值）
+
+-- ============================================================
+-- 6. 对比与引擎开发者启示
+-- ============================================================
+-- ClickHouse 数值类型的核心设计:
+--   (1) 最精细的整数类型 → 列存空间优化
+--   (2) 无符号类型 → 存储效率（状态码、计数器）
+--   (3) 4 种 Decimal 宽度 → 精确小数 + 存储效率
+--   (4) Enum 类型 → 比 String 更高效的枚举存储
+--   (5) 默认 NOT NULL → 无 NULL 标记开销
+--
+-- 对引擎开发者的启示:
+--   列存引擎的类型系统应该"窄"（小类型 → 高压缩率 → 高查询性能）。
+--   提供 UInt8/UInt16 等窄类型是列存引擎的标配。
+--   Enum 类型对日志/事件数据极有价值（高重复率 → 高压缩率）。
