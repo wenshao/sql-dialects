@@ -124,8 +124,10 @@ CREATE TABLE products (
     quantity   INTEGER      NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     -- STORED 生成列: 物理存储，写入时计算，可以建索引
     total_value NUMERIC(12,2) GENERATED ALWAYS AS (price * quantity) STORED
-    -- 注意: PostgreSQL 目前只支持 STORED，不支持 VIRTUAL（MySQL 两者都支持）
-    -- VIRTUAL 支持在计划中，但截至 17 仍未实现
+    -- PostgreSQL 18 之前只支持 STORED，不支持 VIRTUAL
+    -- PostgreSQL 18 (2025-09): 终于支持 VIRTUAL 生成列！
+    --   VIRTUAL 列不占磁盘空间，查询时实时计算
+    --   至此 PostgreSQL 与 MySQL 一样同时支持 STORED 和 VIRTUAL 两种生成列
     -- STORED 会占用磁盘空间，但查询时不需要计算
 );
 
@@ -266,6 +268,11 @@ ROLLBACK;  -- test_table 不会被创建
 -- 15:    MERGE 语句（SQL 标准），public schema 权限变更（安全加强），pg_stat_io
 -- 16:    逻辑复制改进，pg_stat_io 增强，任意子查询并行
 -- 17:    UUIDv7 支持（uuidv7()），MERGE 支持 RETURNING，JSON_TABLE，分区性能改进
+-- 18 (2025-09): uuidv7() 函数、VIRTUAL 生成列（终于支持！之前只有 STORED）、
+--        时态约束（temporal PRIMARY KEY / UNIQUE / FOREIGN KEY）、
+--        异步 I/O（显著提升大表扫描性能）、skip scan（索引跳跃扫描）、
+--        RETURNING 中的 OLD/NEW（INSERT/UPDATE/DELETE 可引用变更前后的行）
+-- 19:    计划 2026-09 发布
 
 -- ============================================================
 -- 横向对比: PostgreSQL vs 其他方言的 CREATE TABLE
@@ -357,7 +364,7 @@ ROLLBACK;  -- test_table 不会被创建
 --   SQL Server: 完整支持 CHECK
 
 -- 11. 生成列对比:
---   PostgreSQL: 12+ 支持 STORED 生成列（不支持 VIRTUAL，计划中但截至 17 未实现）
+--   PostgreSQL: 12+ 支持 STORED 生成列；18+ 支持 VIRTUAL 生成列（里程碑式更新!）
 --   MySQL:      5.7+ 支持 STORED 和 VIRTUAL 两种（VIRTUAL 不占磁盘，查询时计算）
 --   Oracle:     11g+ 支持 VIRTUAL 列（Oracle 最早引入虚拟列）
 --   SQL Server: 计算列（PERSISTED = STORED，不加 PERSISTED = VIRTUAL）

@@ -302,11 +302,21 @@ CREATE TABLE IF NOT EXISTS audit_log (
 --             AUTO_INCREMENT 持久化, utf8mb4 默认, CHECK 约束(8.0.16+),
 --             表达式默认值(8.0.13+), 函数索引, 角色(ROLE)
 -- MySQL 8.0.31: INTERSECT / EXCEPT
--- MySQL 8.4:  LTS 版本（长期支持）
+-- MySQL 8.4:  LTS 版本（长期支持），新发布模型的第一个 LTS
+-- MySQL 9.0 (2024-07): 向量数据类型 (VECTOR)、JavaScript 存储过程（Enterprise）、
+--             EXPLAIN ANALYZE JSON 输出
+-- MySQL 9.1 (2024-10): 触发器解析优化
+-- MySQL 9.2-9.5: Innovation 版本持续发布（快速迭代，非 LTS）
+--
+-- 新发布模型（8.4 起）:
+--   Innovation Release: 约每 3 个月一个，包含最新特性但支持周期短
+--   LTS Release: 长期支持版本（8.4 是首个 LTS），生产环境推荐
+--   9.x 系列均为 Innovation Release，快速引入实验性功能
 --
 -- 对引擎开发者的参考:
 --   MySQL 的演进轨迹展示了一个成熟 OLTP 引擎的功能补全路径:
 --   先解决核心存储和事务 → 再补充分析能力（窗口函数、CTE）→ 最后完善标准合规性
+--   9.x 的 VECTOR 类型标志着 MySQL 开始进入 AI/向量搜索领域
 
 -- ============================================================
 -- 横向对比: MySQL vs 其他方言的 CREATE TABLE
