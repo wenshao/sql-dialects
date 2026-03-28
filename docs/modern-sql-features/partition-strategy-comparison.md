@@ -1,5 +1,12 @@
 # 分区策略：各 SQL 方言实现全对比
 
+> 参考资料:
+> - [MySQL 8.0 - Partitioning](https://dev.mysql.com/doc/refman/8.0/en/partitioning.html)
+> - [PostgreSQL - Table Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html)
+> - [Oracle - Partitioning Concepts](https://docs.oracle.com/en/database/oracle/oracle-database/19/vldbg/partition-concepts.html)
+> - [BigQuery - Partitioned Tables](https://cloud.google.com/bigquery/docs/partitioned-tables)
+> - [ClickHouse - Custom Partitioning Key](https://clickhouse.com/docs/engines/table-engines/mergetree-family/custom-partitioning-key)
+
 分区 (Partitioning) 是将一张逻辑表拆分为多个物理片段的技术。正确的分区策略可以将 TB 级表的查询从全表扫描变为只扫描单个分区，性能提升 10~100 倍。但不同引擎对分区的支持差异巨大——从完全手动到完全自动，从仅支持 RANGE 到支持任意表达式。
 
 ## 分区类型支持矩阵
