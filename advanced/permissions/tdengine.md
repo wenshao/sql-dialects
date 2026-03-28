@@ -1,0 +1,95 @@
+# TDengine: 权限管理
+
+TDengine 的权限管理基于用户和数据库级别
+============================================================
+用户管理
+============================================================
+创建用户
+
+```sql
+CREATE USER alice PASS 'password123';
+```
+
+## 修改密码
+
+```sql
+ALTER USER alice PASS 'new_password';
+```
+
+## 删除用户
+
+```sql
+DROP USER alice;
+```
+
+## 查看用户
+
+```sql
+SHOW USERS;
+```
+
+## 权限级别
+
+
+TDengine 有两种用户级别：
+super: 超级用户（root），拥有所有权限
+normal: 普通用户，需要授权
+授权数据库读写权限
+
+```sql
+GRANT ALL ON power TO alice;
+```
+
+## 授权只读权限
+
+```sql
+GRANT READ ON power TO alice;
+```
+
+## 授权写权限
+
+```sql
+GRANT WRITE ON power TO alice;
+```
+
+## 撤销权限
+
+```sql
+REVOKE ALL ON power FROM alice;
+REVOKE WRITE ON power FROM alice;
+```
+
+## 权限粒度
+
+
+TDengine 权限粒度仅到数据库级别
+不支持表级权限
+不支持列级权限
+不支持行级安全
+不同数据库可以授予不同权限
+
+```sql
+GRANT READ ON db_production TO alice;
+GRANT ALL ON db_development TO alice;
+```
+
+## 超级用户
+
+
+root 是默认超级用户
+可以创建其他超级用户（企业版）
+ALTER USER alice PRIVILEGE super;
+
+## 不支持的权限功能
+
+
+不支持角色（ROLE）
+不支持表级权限
+不支持列级权限
+不支持行级安全（RLS）
+不支持 GRANT OPTION
+不支持默认权限
+注意：权限粒度仅到数据库级别
+注意：只有 READ, WRITE, ALL 三种权限
+注意：不支持角色和细粒度权限
+注意：root 用户默认密码为 taosdata

@@ -1,0 +1,112 @@
+# SAP HANA: Date/Time Types
+
+> 参考资料:
+> - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
+> - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
+> - DATE: date only, 'YYYY-MM-DD'
+> - TIME: time of day, 'HH:MI:SS'
+> - SECONDDATE: date + time, second precision (compact, 8 bytes)
+> - TIMESTAMP: date + time, up to 7 fractional digits (100ns precision)
+
+```sql
+CREATE COLUMN TABLE events (
+    id            BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY,
+    event_date    DATE,
+    event_time    TIME,
+    second_ts     SECONDDATE,          -- SAP HANA-specific, second precision
+    created_at    TIMESTAMP,           -- default 7 fractional digits
+    PRIMARY KEY (id)
+);
+```
+
+## SECONDDATE (SAP HANA-specific: compact datetime without fractional seconds)
+
+More storage-efficient than TIMESTAMP for second-level precision
+
+```sql
+CREATE TABLE logs (
+    log_time SECONDDATE DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Current date/time
+
+```sql
+SELECT CURRENT_DATE FROM DUMMY;           -- DATE
+SELECT CURRENT_TIME FROM DUMMY;           -- TIME
+SELECT CURRENT_TIMESTAMP FROM DUMMY;      -- TIMESTAMP
+SELECT CURRENT_UTCDATE FROM DUMMY;        -- UTC DATE
+SELECT CURRENT_UTCTIME FROM DUMMY;        -- UTC TIME
+SELECT CURRENT_UTCTIMESTAMP FROM DUMMY;   -- UTC TIMESTAMP
+SELECT NOW() FROM DUMMY;                  -- same as CURRENT_TIMESTAMP
+```
+
+## Date arithmetic
+
+```sql
+SELECT ADD_DAYS(CURRENT_DATE, 7) FROM DUMMY;
+SELECT ADD_MONTHS(CURRENT_DATE, 3) FROM DUMMY;
+SELECT ADD_YEARS(CURRENT_DATE, 1) FROM DUMMY;
+SELECT ADD_SECONDS(CURRENT_TIMESTAMP, 3600) FROM DUMMY;
+```
+
+## Date difference
+
+```sql
+SELECT DAYS_BETWEEN('2024-01-01', '2024-12-31') FROM DUMMY;    -- 365
+SELECT SECONDS_BETWEEN(CURRENT_TIMESTAMP, ADD_SECONDS(CURRENT_TIMESTAMP, 3600)) FROM DUMMY;
+SELECT MONTHS_BETWEEN('2024-01-01', '2024-06-01') FROM DUMMY;
+SELECT YEARS_BETWEEN('2020-01-01', '2024-01-01') FROM DUMMY;
+```
+
+## Extract
+
+```sql
+SELECT EXTRACT(YEAR FROM CURRENT_DATE) FROM DUMMY;
+SELECT EXTRACT(MONTH FROM CURRENT_DATE) FROM DUMMY;
+SELECT EXTRACT(DAY FROM CURRENT_DATE) FROM DUMMY;
+SELECT EXTRACT(HOUR FROM CURRENT_TIMESTAMP) FROM DUMMY;
+SELECT YEAR(CURRENT_DATE) FROM DUMMY;
+SELECT MONTH(CURRENT_DATE) FROM DUMMY;
+SELECT DAYOFWEEK(CURRENT_DATE) FROM DUMMY;   -- 0=Monday
+SELECT WEEK(CURRENT_DATE) FROM DUMMY;
+SELECT WEEKDAY(CURRENT_DATE) FROM DUMMY;
+```
+
+## Formatting
+
+```sql
+SELECT TO_VARCHAR(CURRENT_TIMESTAMP, 'YYYY-MM-DD HH24:MI:SS') FROM DUMMY;
+SELECT TO_NVARCHAR(CURRENT_DATE, 'YYYY/MM/DD') FROM DUMMY;
+```
+
+## Parsing
+
+```sql
+SELECT TO_DATE('2024-01-15', 'YYYY-MM-DD') FROM DUMMY;
+SELECT TO_TIMESTAMP('2024-01-15 10:30:00', 'YYYY-MM-DD HH24:MI:SS') FROM DUMMY;
+```
+
+## Truncation
+
+```sql
+SELECT TO_DATE(CURRENT_TIMESTAMP) FROM DUMMY;                            -- truncate to date
+SELECT ADD_DAYS(CURRENT_DATE, -DAYOFMONTH(CURRENT_DATE) + 1) FROM DUMMY; -- first of month
+```
+
+## Last day of month
+
+```sql
+SELECT LAST_DAY(CURRENT_DATE) FROM DUMMY;
+```
+
+## ISOWEEK_NUMBER
+
+```sql
+SELECT ISOWEEK_NUMBER(CURRENT_DATE) FROM DUMMY;
+```
+
+Note: SECONDDATE is unique to SAP HANA (compact second-precision datetime)
+Note: DUMMY is SAP HANA's single-row system table (like DUAL)
+Note: extensive date functions: ADD_DAYS, ADD_MONTHS, DAYS_BETWEEN, etc.
+Note: no INTERVAL type; use ADD_* functions for arithmetic

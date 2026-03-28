@@ -1,0 +1,61 @@
+# Greenplum: 迁移速查表 (Migration Cheatsheet)
+
+> 参考资料:
+> - [Greenplum Documentation](https://docs.vmware.com/en/VMware-Greenplum/)
+
+
+一、与 PostgreSQL 兼容性: 基于 PostgreSQL, 高度兼容
+差异: 部分PostgreSQL新特性滞后, 分布式架构引入DISTRIBUTED BY,
+不支持部分PG扩展, 并行查询优化器(ORCA/Postgres Planner)
+二、陷阱: MPP架构(选择合适的DISTRIBUTED BY很关键),
+不支持全局唯一序列(SERIAL在每个segment独立), 不支持外键约束强制,
+大表UPDATE/DELETE性能较差(建议用CTAS重建)
+三、自增: SERIAL/BIGSERIAL（但分布式环境下不保证全局唯一递增）
+推荐: UUID 或应用层生成全局唯一 ID
+四、日期/字符串: 与 PostgreSQL 相同
+NOW(); CURRENT_TIMESTAMP; CURRENT_DATE;
+d + INTERVAL '1 day'; DATE_PART('day', a - b);
+TO_CHAR(ts, 'YYYY-MM-DD HH24:MI:SS'); TO_DATE('2024-01-15', 'YYYY-MM-DD');
+五、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTRING, REPLACE, POSITION, ||, STRING_AGG
+
+## 六、数据类型映射（从 PostgreSQL/MySQL/Oracle 到 Greenplum）
+
+PostgreSQL → Greenplum: 基本相同
+JSONB → JSONB (GP 6+), TEXT → TEXT, SERIAL → SERIAL
+MySQL → Greenplum:
+INT/INTEGER → INTEGER, BIGINT → BIGINT,
+VARCHAR(n) → VARCHAR(n), TEXT → TEXT, MEDIUMTEXT → TEXT,
+DATETIME → TIMESTAMP, AUTO_INCREMENT → SERIAL,
+TINYINT(1) → BOOLEAN, ENUM → VARCHAR + CHECK
+Oracle → Greenplum:
+NUMBER(p,s) → NUMERIC(p,s), VARCHAR2(n) → VARCHAR(n),
+CLOB → TEXT, DATE → TIMESTAMP, SYSDATE → NOW()
+
+七、函数等价映射
+MySQL → Greenplum:
+IFNULL → COALESCE, NOW() → NOW(),
+DATE_FORMAT(d,'%Y-%m-%d') → TO_CHAR(d,'YYYY-MM-DD'),
+CONCAT(a,b) → a || b, GROUP_CONCAT → STRING_AGG,
+LIMIT n → LIMIT n, AUTO_INCREMENT → SERIAL
+Oracle → Greenplum:
+NVL → COALESCE, SYSDATE → NOW(), ROWNUM → ROW_NUMBER(),
+DECODE → CASE WHEN, || → ||, FROM DUAL → (省略)
+
+八、常见陷阱补充
+DISTRIBUTED BY 列选择不当会导致数据倾斜
+外键约束不强制执行（仅用于优化器提示）
+SERIAL 在每个 Segment 独立生成，不保证全局递增
+大表 UPDATE/DELETE 性能差，建议 CTAS 重建
+VACUUM/ANALYZE 需要定期执行
+分区表使用 Greenplum 分区语法而非 PostgreSQL 声明式分区
+
+九、分页语法
+MySQL: SELECT * FROM t LIMIT 10 OFFSET 20;
+Greenplum: SELECT * FROM t LIMIT 10 OFFSET 20;    -- 相同
+Oracle: 使用 FETCH FIRST/ROW_NUMBER
+Greenplum: SELECT * FROM t ORDER BY id OFFSET 20 FETCH FIRST 10 ROWS ONLY;
+
+十、NULL 处理
+COALESCE(a, b, c)                                  -- 返回第一个非 NULL
+NULLIF(a, b)                                       -- a=b 时返回 NULL
+IS DISTINCT FROM / IS NOT DISTINCT FROM             -- NULL 安全比较

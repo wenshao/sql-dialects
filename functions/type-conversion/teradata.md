@@ -1,0 +1,101 @@
+# Teradata: Type Conversion
+
+> 参考资料:
+> - [Teradata SQL Reference - CAST](https://docs.teradata.com/r/Teradata-VantageTM-SQL-Functions-Expressions-and-Predicates/)
+
+
+```sql
+SELECT CAST(42 AS VARCHAR(10)); SELECT CAST('42' AS INTEGER);
+SELECT CAST('3.14' AS DECIMAL(10,2)); SELECT CAST('2024-01-15' AS DATE);
+```
+
+
+Teradata 格式化
+```sql
+SELECT CAST(CURRENT_DATE AS FORMAT 'YYYY-MM-DD');
+SELECT CAST(CURRENT_TIMESTAMP AS FORMAT 'YYYY-MM-DDBHH:MI:SS');
+```
+
+
+TO_CHAR / TO_DATE / TO_NUMBER (Oracle 兼容模式)
+```sql
+SELECT TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD');
+SELECT TO_DATE('2024-01-15', 'YYYY-MM-DD');
+SELECT TO_NUMBER('123.45');
+```
+
+
+TRY_CAST                                      -- 16.20+
+```sql
+SELECT TRY_CAST('abc' AS INTEGER);               -- NULL
+SELECT TRY_CAST('42' AS INTEGER);                -- 42
+```
+
+
+更多数值转换
+```sql
+SELECT CAST(3.14 AS INTEGER);                        -- 3 (截断)
+SELECT CAST('100' AS BIGINT);                        -- 100
+SELECT CAST(3.14 AS DECIMAL(10,1));                  -- 3.1
+SELECT CAST(42 AS FLOAT);                            -- 42.0
+```
+
+
+Teradata FORMAT 修饰符详解
+```sql
+SELECT CAST(CURRENT_DATE AS FORMAT 'YYYY-MM-DD');
+SELECT CAST(CURRENT_DATE AS FORMAT 'MM/DD/YYYY');
+SELECT CAST(CURRENT_DATE AS FORMAT 'DD.MM.YYYY');
+SELECT CAST(CURRENT_DATE AS FORMAT 'YYYYMMDD');
+SELECT CAST(CURRENT_TIMESTAMP AS FORMAT 'YYYY-MM-DDBHH:MI:SS');
+SELECT CAST(1234567.89 AS FORMAT 'ZZZ,ZZZ,ZZ9.99');
+```
+
+
+TRY_CAST 示例 (16.20+)
+```sql
+SELECT TRY_CAST('hello' AS INTEGER);                 -- NULL
+SELECT TRY_CAST('2024-99-99' AS DATE);               -- NULL
+SELECT TRY_CAST('' AS INTEGER);                      -- NULL
+SELECT TRY_CAST('3.14' AS DECIMAL(10,2));            -- 3.14
+```
+
+
+Oracle 兼容模式
+```sql
+SELECT TO_CHAR(CURRENT_DATE, 'YYYY-MM-DD');
+SELECT TO_CHAR(CURRENT_DATE, 'Day, DD Month YYYY');
+SELECT TO_DATE('15/01/2024', 'DD/MM/YYYY');
+SELECT TO_NUMBER('1,234.56', '9,999.99');
+SELECT TO_TIMESTAMP('2024-01-15 10:30:00', 'YYYY-MM-DD HH24:MI:SS');
+```
+
+
+日期部分提取
+```sql
+SELECT EXTRACT(YEAR FROM CURRENT_DATE);
+SELECT EXTRACT(MONTH FROM CURRENT_DATE);
+SELECT EXTRACT(DAY FROM CURRENT_DATE);
+```
+
+
+区間转換
+```sql
+SELECT CURRENT_DATE + INTERVAL '1' DAY;
+SELECT CURRENT_DATE - INTERVAL '30' DAY;
+SELECT CURRENT_TIMESTAMP + INTERVAL '2' HOUR;
+```
+
+
+隐式転換
+```sql
+SELECT 1 + 1.5;                                     -- DECIMAL
+SELECT 'hello' || CAST(42 AS VARCHAR(10));           -- 需显式 CAST
+```
+
+
+注意：Teradata 支持 CAST, FORMAT 修饰符, TO_* 函数
+注意：Teradata 16.20+ 支持 TRY_CAST
+注意：FORMAT 修饰符是 Teradata 特有
+注意：DATE 类型内部存储为 INTEGER
+限制：无 ::, CONVERT (SQL Server 风格)

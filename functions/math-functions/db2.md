@@ -1,0 +1,40 @@
+# DB2: Math Functions
+
+> 参考资料:
+> - [IBM DB2 Documentation - Numeric Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-numeric)
+
+```sql
+SELECT ABS(-42); SELECT CEIL(4.3); SELECT CEILING(4.3); SELECT FLOOR(4.7);
+SELECT ROUND(3.14159, 2); SELECT TRUNCATE(3.14159, 2); SELECT TRUNC(3.14159, 2);
+SELECT MOD(17, 5);
+SELECT POWER(2, 10); SELECT SQRT(144);
+SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG10(1000);
+SELECT SIGN(-42);
+SELECT RAND();                            -- 0.0 到 1.0
+```
+
+## 三角函数
+
+```sql
+SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
+SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1); SELECT ATAN2(1, 1);
+SELECT DEGREES(ACOS(-1)); SELECT RADIANS(180);
+SELECT SINH(1); SELECT COSH(1); SELECT TANH(1);
+```
+
+## GREATEST / LEAST
+
+```sql
+SELECT GREATEST(1, 5, 3); SELECT LEAST(1, 5, 3);        -- 11.1+
+```
+
+## 位运算
+
+```sql
+SELECT BITAND(5, 3); SELECT BITOR(5, 3); SELECT BITXOR(5, 3);
+SELECT BITNOT(5);
+```
+
+注意：DB2 支持完整的数学函数集
+注意：GREATEST/LEAST 从 DB2 11.1 开始支持
+注意：位运算使用函数形式
