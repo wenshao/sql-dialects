@@ -31,6 +31,12 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+if not (REPO_ROOT / ".git").is_dir():
+    # Fallback: try current working directory
+    if (Path.cwd() / ".git").is_dir():
+        REPO_ROOT = Path.cwd()
+    else:
+        print(f"WARNING: Cannot find repository root (no .git in {REPO_ROOT} or {Path.cwd()})", file=sys.stderr)
 
 EXPECTED_DIALECTS = sorted([
     "bigquery", "clickhouse", "cockroachdb", "dameng", "databricks",
@@ -341,6 +347,7 @@ def cmd_convert(args):
     from convert import convert_sql_to_md, find_sql_files, update_dialect_page
 
     total_created = 0
+    total_skipped = 0
     total_updated = 0
 
     for dialect in dialects:
@@ -348,7 +355,14 @@ def cmd_convert(args):
         for sql_path in sql_files:
             md_path = sql_path.replace(".sql", ".md")
             if os.path.exists(md_path):
-                continue
+                # Protect manually-written .md files from overwrite
+                md_size = os.path.getsize(md_path)
+                if md_size > 2000 and not args.force:
+                    print(f"  SKIP (exists, {md_size}B, use --force): {md_path}")
+                    total_skipped += 1
+                    continue
+                elif not args.force:
+                    continue
 
             with open(sql_path, "r") as f:
                 sql_content = f.read()
@@ -364,7 +378,7 @@ def cmd_convert(args):
         if update_dialect_page(dialect):
             total_updated += 1
 
-    print(f"\nSummary: Created {total_created} .md files, updated {total_updated} dialect pages")
+    print(f"\nSummary: Created {total_created} .md files, skipped {total_skipped}, updated {total_updated} dialect pages")
     return 0
 
 
@@ -448,6 +462,7 @@ def main():
     # convert
     p_convert = subparsers.add_parser("convert", help="Convert .sql files to .md")
     p_convert.add_argument("--dialects", type=str, default=None, help="Comma-separated dialect list (default: all from convert.py)")
+    p_convert.add_argument("--force", action="store_true", help="Overwrite existing .md files (protects manual content by default)")
 
     # expand
     p_expand = subparsers.add_parser("expand", help="Expand dialect module tables")

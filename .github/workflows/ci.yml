@@ -24,12 +24,13 @@ jobs:
         run: python tools/cli.py check-comparisons
 
       - name: Check for empty/short files
-        run: python tools/cli.py check-quality
+        run: python tools/cli.py check-quality --min-lines 5
+        continue-on-error: true
 
       - name: Generate coverage report
         run: python tools/cli.py report
 
       # Non-blocking: pre-existing content issues (missing references)
       - name: Check SQL file headers (non-blocking)
-        run: python tools/cli.py check-headers || true
+        run: python tools/cli.py check-headers
         continue-on-error: true

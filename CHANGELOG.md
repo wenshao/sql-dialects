@@ -3,10 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+This project uses date-based version identifiers.
 
 ## [Unreleased]
 
-## [1.4.0] - 2026-03-28
+## [2026-03-28] - Infrastructure improvements
 
 ### Added
 - Missing `_comparison.md` for `ddl/users-databases/` module
@@ -18,7 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - GitHub Pull Request template
 - `CHANGELOG.md`
 
-## [1.3.0] - 2026-03-22
+## [2026-03-22] - Bulk SQL-to-MD conversion (batch 2)
 
 ### Added
 - Convert 408 SQL files to Markdown: TiDB, OceanBase, CockroachDB, Spanner, YugabyteDB, Trino, Flink, DuckDB (1,181 files changed)
@@ -28,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Audit round 2: cross-consistency, format, completeness fixes
 - Verify and enrich all people pages with source citations
 
-## [1.2.0] - 2026-03-15
+## [2026-03-15] - People, SQL standards, modern SQL features
 
 ### Added
 - Key people pages for database founders (22 dialect pages updated)
@@ -41,13 +42,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Deep rewrites of all 51 Snowflake and Hive SQL files
 - Enrichment of dialect module tables (batch updates)
 
-## [1.1.0] - 2026-03-01
+## [2026-03-01] - Bulk SQL-to-MD conversion (batch 1)
 
 ### Added
 - Convert 255 SQL files to Markdown for MySQL, PostgreSQL, Oracle, SQL Server, SQLite
 - Missing engine-level features added for multiple dialects
 
-## [1.0.0] - 2026-02-15
+## [2026-02-15] - Initial release
 
 ### Added
 - Initial release with 2,295 SQL files covering 45 dialects × 51 modules
