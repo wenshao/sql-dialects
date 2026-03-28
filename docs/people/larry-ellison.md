@@ -1,5 +1,12 @@
 # Larry Ellison - Oracle 创始人
 
+> 信息来源：
+> - [Wikipedia: Larry Ellison](https://en.wikipedia.org/wiki/Larry_Ellison)
+> - [Wikipedia: Oracle Database](https://en.wikipedia.org/wiki/Oracle_Database)
+> - [Wikipedia: Oracle Corporation](https://en.wikipedia.org/wiki/Oracle_Corporation)
+
+---
+
 Larry Ellison 是 Oracle Corporation 的联合创始人，
 也是将 SQL 从学术研究推向商业市场的关键人物。
 Oracle 是第一个成功商业化的 SQL 关系数据库。
@@ -127,3 +134,7 @@ Ellison 是科技行业最具争议性的人物之一。
 
 从读到 IBM 的学术论文到建立全球最大的数据库公司，
 Ellison 的故事是商业敏锐度与技术机遇结合的典型案例。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

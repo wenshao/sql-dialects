@@ -1,5 +1,14 @@
 # Spark SQL / Databricks 关键人物
 
+> 信息来源：
+> - [Wikipedia: Matei Zaharia](https://en.wikipedia.org/wiki/Matei_Zaharia)
+> - [GitHub: mateiz](https://github.com/mateiz)
+> - [GitHub: rxin](https://github.com/rxin)
+> - [Spark SQL: Relational Data Processing in Spark (SIGMOD 2015)](https://people.csail.mit.edu/matei/papers/2015/sigmod_spark_sql.pdf)
+> - [Databricks](https://www.databricks.com/)
+
+---
+
 ## Matei Zaharia — Apache Spark 创始人、Databricks CTO
 
 **背景与教育**：
@@ -79,3 +88,7 @@
 - [Spark SQL: Relational Data Processing in Spark (SIGMOD 2015)](https://people.csail.mit.edu/matei/papers/2015/sigmod_spark_sql.pdf)
 - [Deep Dive into Catalyst Optimizer (Databricks Blog)](https://www.databricks.com/blog/2015/04/13/deep-dive-into-spark-sqls-catalyst-optimizer.html)
 - [Matei Zaharia - Wikipedia](https://en.wikipedia.org/wiki/Matei_Zaharia)
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

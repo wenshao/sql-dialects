@@ -1,5 +1,12 @@
 # BigQuery/Dremel 关键人物
 
+> 信息来源：
+> - [Dremel: Interactive Analysis of Web-Scale Datasets (VLDB 2010)](https://dl.acm.org/doi/10.14778/1920841.1920886)
+> - [Spanner: Google's Globally-Distributed Database (OSDI 2012)](https://research.google/pubs/pub39966/)
+> - [Wikipedia: BigQuery](https://en.wikipedia.org/wiki/BigQuery)
+
+---
+
 BigQuery 是 Google Cloud 的全托管分析数据仓库，
 其底层技术源自 Google 内部的 Dremel 系统。
 2010 年发表的 Dremel 论文对整个分析引擎领域产生了深远影响。
@@ -81,3 +88,7 @@ Dremel 论文和 BigQuery 的出现标志着大数据分析从"跑批"走向"交
 Melnik、Gubarev 等人在 Google 的工作，
 与 Spanner 团队的全球一致性数据库研究一起，
 构成了 Google 在数据库和分析领域最重要的技术贡献。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

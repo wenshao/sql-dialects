@@ -131,6 +131,13 @@ PingCAP 还开发了多个相关的开源工具：
 
 > 来源：[TiDB GitHub](https://github.com/pingcap/tidb)、[Chaos Mesh CNCF](https://www.cncf.io/projects/chaos-mesh/)
 
+## 公开信息
+
+- **GitHub (刘奇)**: [github.com/qiuyesuifeng](https://github.com/qiuyesuifeng)
+- **GitHub (黄东旭)**: [github.com/c4pt0r](https://github.com/c4pt0r)
+- **TiDB GitHub**: [github.com/pingcap/tidb](https://github.com/pingcap/tidb)
+- **TiKV GitHub**: [github.com/tikv/tikv](https://github.com/tikv/tikv)
+
 ## 影响
 
 PingCAP 的三位创始人推动了中国在数据库基础软件领域的重要突破：

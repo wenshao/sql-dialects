@@ -1,5 +1,14 @@
 # SQL 语言的创始人
 
+> 信息来源：
+> - [Wikipedia: Edgar F. Codd](https://en.wikipedia.org/wiki/Edgar_F._Codd)
+> - [Wikipedia: SQL](https://en.wikipedia.org/wiki/SQL)
+> - [A Relational Model of Data for Large Shared Data Banks (1970)](https://dl.acm.org/doi/10.1145/362384.362685)
+> - [SEQUEL: A Structured English Query Language (1974)](https://dl.acm.org/doi/10.1145/800296.811515)
+> - [ACM Turing Award 1981: Edgar F. Codd](https://amturing.acm.org/award_winners/codd_1000892.cfm)
+
+---
+
 SQL 语言的诞生可以追溯到三位 IBM 研究员的工作。Edgar F. Codd 提出了关系模型的理论基础，
 Donald Chamberlin 和 Raymond Boyce 在此基础上设计了 SEQUEL 语言，即 SQL 的前身。
 
@@ -102,3 +111,7 @@ SQL:2011、SQL:2016、SQL:2023 等多个版本的演进。
 
 从三位 IBM 研究员的工作到今天，SQL 已经成为数据领域的通用语言，
 几乎每一个现代数据库系统都支持某种形式的 SQL。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

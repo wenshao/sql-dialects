@@ -14,7 +14,7 @@
 | [Sergei Golubchik 等](mariadb-community.md) | MariaDB | MariaDB Server 首席架构师，核心社区贡献者 |
 | [D. Richard Hipp](richard-hipp.md) | SQLite | SQLite 创始人，全球部署量最大的数据库 |
 | [Alexey Milovidov](alexey-milovidov.md) | ClickHouse | ClickHouse 创始人，CTO & Co-Founder |
-| [Mark Raasveldt & Hannes Muhleisen](duckdb-founders.md) | DuckDB | CWI 研究员，DuckDB Labs 创始人 |
+| [Mark Raasveldt & Hannes Mühleisen](duckdb-founders.md) | DuckDB | CWI 研究员，DuckDB Labs 创始人 |
 | [刘奇 / 黄东旭 / 崔秋](tidb-founders.md) | TiDB | PingCAP 联合创始人，TiDB/TiKV 开源项目 |
 | [Martin Traverso 等](trino-founders.md) | Trino / Presto | Facebook Presto 原始作者，Starburst 创始人 |
 | [Stephan Ewen 等](flink-creators.md) | Apache Flink | TU Berlin Stratosphere 项目，Apache Flink SQL |
@@ -41,7 +41,7 @@
 
 ### 分析型数据库
 - [Alexey Milovidov](alexey-milovidov.md) - ClickHouse
-- [Mark Raasveldt & Hannes Muhleisen](duckdb-founders.md) - DuckDB
+- [Mark Raasveldt & Hannes Mühleisen](duckdb-founders.md) - DuckDB
 - [Doris/StarRocks 创始人](doris-starrocks-founders.md) - 百度 Palo 到 Apache Doris 与 StarRocks
 
 ### 分布式数据库

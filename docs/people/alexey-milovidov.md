@@ -1,5 +1,13 @@
 # Alexey Milovidov - ClickHouse 创始人
 
+> 信息来源：
+> - [GitHub: alexey-milovidov](https://github.com/alexey-milovidov)
+> - [Wikipedia: ClickHouse](https://en.wikipedia.org/wiki/ClickHouse)
+> - [ClickHouse Inc.](https://clickhouse.com/)
+> - [Yandex Metrica](https://metrica.yandex.com/)
+
+---
+
 Alexey Milovidov 是 ClickHouse 的创始人和核心开发者，
 也是 ClickHouse Inc. 的联合创始人和 CTO。
 ClickHouse 是当前最快的开源列式分析数据库之一。
@@ -41,8 +49,9 @@ ClickHouse 的设计从一开始就聚焦于：
 
 ## ClickHouse Inc. (2021)
 
+2019 年，ClickHouse 团队从 Yandex 分拆独立运营。
 2021 年，Milovidov 与 Yury Izrailevsky 共同创立了 ClickHouse Inc.，
-将 ClickHouse 的开发从 Yandex 独立出来。
+正式将 ClickHouse 的开发完全从 Yandex 独立出来。
 公司获得了大量风险投资，估值达到数十亿美元。
 
 Milovidov 担任公司的 CTO 和联合创始人，
@@ -100,3 +109,7 @@ ClickHouse 在实时分析领域产生了重大影响：
 Milovidov 对 ClickHouse 的持续投入——从 Yandex 的内部工具
 到全球广泛使用的开源项目——是一个技术人员长期专注于
 一个系统并取得巨大成功的典范。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

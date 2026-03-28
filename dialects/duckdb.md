@@ -8,13 +8,14 @@
 
 ## 概述与定位
 
-DuckDB 是一款嵌入式列式分析数据库，常被称为"分析领域的 SQLite"。由 CWI（荷兰国家数学与计算机科学研究中心）的 Mark Raasveldt 和 Hannes Muhleisen 于 2018 年创建，DuckDB 以进程内嵌入方式运行——无需安装服务器、无需配置网络，直接作为库链接到 Python/R/Java/Node.js 应用中。它采用 PostgreSQL 兼容的 SQL 方言，并在此基础上引入了大量便利的语法糖，使交互式数据分析极为高效。
+DuckDB 是一款嵌入式列式分析数据库，常被称为"分析领域的 SQLite"。由 CWI（荷兰国家数学与计算机科学研究中心）的 Mark Raasveldt 和 Hannes Mühleisen 于 2018 年创建，DuckDB 以进程内嵌入方式运行——无需安装服务器、无需配置网络，直接作为库链接到 Python/R/Java/Node.js 应用中。它采用 PostgreSQL 兼容的 SQL 方言，并在此基础上引入了大量便利的语法糖，使交互式数据分析极为高效。
 
 ## 历史与演进
 
 - **2018 年**：DuckDB 项目在 CWI 启动，目标是创建一个嵌入式 OLAP 数据库（对标 SQLite 之于 OLTP）。
 - **2019 年**：DuckDB 0.1 发布，初步实现列式存储和向量化执行引擎。
-- **2020 年**：DuckDB Labs 公司成立，0.2 版本增加 Parquet 读写、Python API 集成。
+- **2019 年**：DuckDB Labs 公司成立（CWI spin-off）。
+- **2020 年**：0.2 版本增加 Parquet 读写、Python API 集成。
 - **2021 年**：引入扩展（Extension）系统，支持 httpfs（远程文件读取）、spatial（地理空间）等扩展。
 - **2022 年**：0.5+ 版本引入 PIVOT/UNPIVOT、GROUP BY ALL、COLUMNS(*) 等语法创新。
 - **2023 年**：0.9 版本引入新的存储格式（v2）、增强并行执行、Iceberg/Delta Lake 扩展。

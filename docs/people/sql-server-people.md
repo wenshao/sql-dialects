@@ -1,5 +1,13 @@
 # SQL Server 关键人物
 
+> 信息来源：
+> - [Wikipedia: Jim Gray (computer scientist)](https://en.wikipedia.org/wiki/Jim_Gray_(computer_scientist))
+> - [ACM Turing Award 1998: Jim Gray](https://amturing.acm.org/award_winners/gray_3649936.cfm)
+> - [Wikipedia: David DeWitt](https://en.wikipedia.org/wiki/David_DeWitt)
+> - [Access Path Selection in a Relational Database Management System (1979)](https://dl.acm.org/doi/10.1145/582095.582099)
+
+---
+
 SQL Server 的发展历程与多位数据库领域的先驱密切相关。
 本文介绍几位对 SQL Server 及关系型数据库理论产生深远影响的关键人物。
 
@@ -91,3 +99,7 @@ IBM 技术人员的最高荣誉。她还获得了多项行业和学术荣誉，
 
 他们的工作不仅影响了 SQL Server，
 更是整个关系型数据库行业的理论和工程基石。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

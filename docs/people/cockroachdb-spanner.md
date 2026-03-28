@@ -1,5 +1,14 @@
 # CockroachDB/Spanner 关键人物
 
+> 信息来源：
+> - [Wikipedia: CockroachDB](https://en.wikipedia.org/wiki/CockroachDB)
+> - [Cockroach Labs](https://www.cockroachlabs.com/)
+> - [Spanner: Google's Globally-Distributed Database (OSDI 2012)](https://research.google/pubs/pub39966/)
+> - [GitHub: Spencer Kimball](https://github.com/spencerkimball)
+> - [GitHub: Peter Mattis](https://github.com/petermattis)
+
+---
+
 CockroachDB 是一个开源的分布式 SQL 数据库，
 其设计深受 Google Spanner 论文的启发。
 两个项目的关键人物构成了分布式 SQL 数据库领域的重要脉络。
@@ -94,3 +103,13 @@ Spanner 的关键创新：
 体现了学术/工业研究成果向开源社区扩散的典型路径。
 CockroachDB 的三位创始人将 Google 内部的技术理念带出来，
 让更广泛的开发者和企业能够使用全球分布式 SQL 数据库技术。
+
+## 公开信息
+
+- **GitHub (Kimball)**: [github.com/spencerkimball](https://github.com/spencerkimball)
+- **GitHub (Mattis)**: [github.com/petermattis](https://github.com/petermattis)
+- **CockroachDB GitHub**: [github.com/cockroachdb/cockroach](https://github.com/cockroachdb/cockroach)
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*
