@@ -1,5 +1,11 @@
 # 事务隔离级别实际行为：各 SQL 方言全对比
 
+> 参考资料:
+> - [MySQL 8.0 - Transaction Isolation Levels](https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html)
+> - [PostgreSQL - Transaction Isolation](https://www.postgresql.org/docs/current/transaction-iso.html)
+> - [SQL Server - Transaction Isolation Levels](https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql)
+> - [A Critique of ANSI SQL Isolation Levels (Berenson et al., 1995)](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-95-51.pdf)
+
 SQL 标准定义了四个隔离级别，但几乎没有一个引擎完全按标准实现。有的引擎将 SERIALIZABLE 映射到 Snapshot Isolation，有的引擎的 REPEATABLE READ 实际上比标准更强或更弱。本文逐引擎梳理真实行为，重点标注那些"名字相同、语义不同"的陷阱。
 
 ## SQL 标准定义回顾
