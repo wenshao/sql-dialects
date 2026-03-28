@@ -1,0 +1,126 @@
+# Hive: 数学函数
+
+> 参考资料:
+> - [1] Apache Hive - Mathematical Functions
+>   https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-MathematicalFunctions
+
+
+## 1. 基本数学函数
+
+```sql
+SELECT ABS(-42);                              -- 绝对值: 42
+SELECT CEIL(4.3);                             -- 向上取整: 5
+SELECT FLOOR(4.7);                            -- 向下取整: 4
+SELECT ROUND(3.14159, 2);                     -- 四舍五入: 3.14
+SELECT BROUND(2.5);                           -- 银行家舍入: 2 (向偶数舍入)
+SELECT MOD(17, 5);                            -- 取模: 2
+SELECT 17 % 5;                                -- 取模运算符: 2
+SELECT SIGN(-42);                             -- 符号: -1
+
+```
+
+ BROUND (银行家舍入) 的设计意义:
+ ROUND(2.5) = 3 (传统四舍五入)
+ BROUND(2.5) = 2 (银行家舍入: 0.5 时向最近偶数舍入)
+ 银行家舍入减少了统计偏差，适合金融和统计计算
+ Hive 是少数内置 BROUND 的引擎（Spark SQL 也继承了）
+
+## 2. 幂与对数
+
+```sql
+SELECT POWER(2, 10);                          -- 2^10 = 1024
+SELECT POW(2, 10);                            -- 别名
+SELECT SQRT(144);                             -- 平方根: 12
+SELECT CBRT(27);                              -- 立方根: 3
+SELECT EXP(1);                                -- e^1 ≈ 2.718
+SELECT LN(EXP(1));                            -- 自然对数: 1
+SELECT LOG(EXP(1));                           -- 同 LN
+SELECT LOG2(1024);                            -- 以2为底: 10
+SELECT LOG10(1000);                           -- 以10为底: 3
+
+```
+
+## 3. 三角函数
+
+```sql
+SELECT SIN(0);  SELECT COS(0);  SELECT TAN(0);
+SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1);
+SELECT DEGREES(PI());                         -- 弧度转角度: 180
+SELECT RADIANS(180);                          -- 角度转弧度: π
+SELECT PI();                                  -- 3.14159...
+
+```
+
+## 4. 随机数
+
+```sql
+SELECT RAND();                                -- [0,1) 随机数
+SELECT RAND(42);                              -- 带种子的随机数（可重复）
+SELECT FLOOR(RAND() * 100);                   -- [0,99] 随机整数
+
+```
+
+ RAND(seed) 在 Hive 中的特殊行为:
+ 每个 Mapper/Reducer 使用不同的种子（seed + taskId）
+ 因此 RAND(42) 在不同 Task 中生成不同序列
+ 对比: 单机引擎中 RAND(42) 总是生成相同序列
+
+## 5. 比较与选择
+
+```sql
+SELECT GREATEST(1, 5, 3);                     -- 最大值: 5
+SELECT LEAST(1, 5, 3);                        -- 最小值: 1
+
+```
+
+ 注意: GREATEST/LEAST 包含 NULL 时返回 NULL
+ SELECT GREATEST(1, NULL, 3) → NULL（Hive 行为）
+ MySQL 的 GREATEST 会忽略 NULL
+
+## 6. 位运算
+
+```sql
+SELECT 5 & 3;                                 -- AND: 1
+SELECT 5 | 3;                                 -- OR: 7
+SELECT 5 ^ 3;                                 -- XOR: 6
+SELECT ~5;                                    -- NOT: -6
+SELECT SHIFTLEFT(1, 4);                       -- 左移: 16
+SELECT SHIFTRIGHT(16, 2);                     -- 右移: 4
+SELECT SHIFTRIGHTUNSIGNED(16, 2);             -- 无符号右移: 4
+
+```
+
+## 7. 其他数学函数
+
+```sql
+SELECT FACTORIAL(5);                          -- 阶乘: 120
+SELECT CONV(255, 10, 16);                     -- 进制转换: 'FF'
+SELECT WIDTH_BUCKET(42, 0, 100, 10);          -- 直方图桶号: 5
+SELECT POSITIVE(42);                          -- 正值: 42
+SELECT NEGATIVE(-42);                         -- 负值: 42
+
+```
+
+## 8. 跨引擎对比
+
+ 函数        Hive          MySQL        PostgreSQL    BigQuery
+ 银行家舍入  BROUND        无           无            无
+ 立方根      CBRT          无           CBRT          无
+ 阶乘        FACTORIAL     无           FACTORIAL     无
+ 进制转换    CONV          CONV         无            无
+ 位左移      SHIFTLEFT     <<           <<            <<
+ 直方图桶    WIDTH_BUCKET  无           WIDTH_BUCKET  无
+
+ Hive 的数学函数与 Spark SQL 基本一致（Spark 继承了 Hive 的函数库）
+
+## 9. 对引擎开发者的启示
+
+### 1. BROUND 应该被更多引擎支持: 银行家舍入在金融计算中很重要
+
+### 2. 分布式 RAND 的种子行为需要文档化:
+
+    分布式执行中每个分区的随机种子不同，这与单机语义不一致
+### 3. GREATEST/LEAST 对 NULL 的处理需要明确:
+
+不同引擎的行为不同（返回 NULL vs 忽略 NULL），需要在文档中说明
+

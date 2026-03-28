@@ -1,91 +1,45 @@
--- MariaDB: 临时表与临时存储
+-- MariaDB: 临时表
+-- 与 MySQL 基本一致, Aria 引擎用于内部临时表
 --
 -- 参考资料:
---   [1] MariaDB Documentation - CREATE TEMPORARY TABLE
---       https://mariadb.com/kb/en/create-table/#temporary-tables
---   [2] MariaDB Documentation - Internal Temporary Tables
---       https://mariadb.com/kb/en/internal-temporary-tables/
+--   [1] MariaDB Knowledge Base - CREATE TEMPORARY TABLE
+--       https://mariadb.com/kb/en/create-temporary-table/
 
 -- ============================================================
--- CREATE TEMPORARY TABLE
+-- 1. 基本临时表
 -- ============================================================
-
-CREATE TEMPORARY TABLE temp_users (
-    id BIGINT,
-    username VARCHAR(100),
-    email VARCHAR(200),
-    INDEX idx_username (username)
+CREATE TEMPORARY TABLE tmp_results (
+    id    BIGINT,
+    score DECIMAL(5,2)
 );
 
--- 从查询创建
-CREATE TEMPORARY TABLE temp_stats AS
-SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id;
-
--- 使用 LIKE
-CREATE TEMPORARY TABLE temp_users_copy LIKE users;
-
--- 使用 OR REPLACE（MariaDB 10.0.4+）
-CREATE OR REPLACE TEMPORARY TABLE temp_data (
-    id INT, value TEXT
-);
+CREATE TEMPORARY TABLE tmp_users AS
+SELECT id, username FROM users WHERE age > 25;
 
 -- ============================================================
--- 使用临时表
+-- 2. 会话隔离
 -- ============================================================
-
-INSERT INTO temp_users SELECT id, username, email FROM users WHERE status = 1;
-SELECT * FROM temp_users;
-
--- 显式删除
-DROP TEMPORARY TABLE IF EXISTS temp_users;
+-- 临时表只在当前会话可见, 会话结束自动销毁
+-- 不同会话可以创建同名临时表, 互不影响
+-- 临时表可以与永久表同名 (临时表优先)
 
 -- ============================================================
--- MEMORY 引擎（内存表）
+-- 3. 内部临时表引擎 (MariaDB 独有)
 -- ============================================================
-
-CREATE TEMPORARY TABLE temp_cache (
-    id INT PRIMARY KEY,
-    value VARCHAR(500)
-) ENGINE=MEMORY;
-
--- MEMORY 限制：
--- max_heap_table_size 控制大小
--- 不支持 BLOB/TEXT
--- 服务器重启后丢失
-
--- Aria 引擎（MariaDB 特有，支持崩溃恢复）
-CREATE TEMPORARY TABLE temp_aria (
-    id INT, data TEXT
-) ENGINE=Aria;
+-- MariaDB 使用 Aria 引擎处理内部临时表 (GROUP BY, ORDER BY 等)
+-- MySQL 使用 InnoDB 或 TempTable 引擎
+-- Aria 的优势:
+--   1. 崩溃安全 (比 MyISAM 更好)
+--   2. 更高效的临时表操作 (专门优化)
+--   3. 支持压缩 (减少磁盘临时表的空间)
+-- aria_used_for_temp_tables = ON (默认)
 
 -- ============================================================
--- CTE（10.2.1+）
+-- 4. 对引擎开发者的启示
 -- ============================================================
-
-WITH monthly AS (
-    SELECT user_id, MONTH(order_date) AS m, SUM(amount) AS total
-    FROM orders GROUP BY user_id, MONTH(order_date)
-)
-SELECT * FROM monthly WHERE total > 1000;
-
--- 递归 CTE
-WITH RECURSIVE nums AS (
-    SELECT 1 AS n
-    UNION ALL
-    SELECT n + 1 FROM nums WHERE n < 100
-)
-SELECT * FROM nums;
-
--- ============================================================
--- 序列表生成（MariaDB 10.0+）
--- ============================================================
-
--- seq 引擎快速生成序列（替代递归 CTE）
-SELECT * FROM seq_1_to_100;
-SELECT * FROM seq_1_to_1000_step_10;
-
--- 注意：MariaDB 的 CREATE OR REPLACE TEMPORARY TABLE 简化了重建临时表
--- 注意：Aria 引擎是 MariaDB 特有的临时表引擎，支持更大的数据量
--- 注意：CTE 从 10.2.1 版本开始支持
--- 注意：seq 引擎可以快速生成序列，无需临时表
--- 注意：临时表只对当前会话可见
+-- 内部临时表的引擎选择直接影响复杂查询性能:
+--   内存优先: 小结果集用内存临时表 (MEMORY/TempTable)
+--   磁盘 fallback: 超过阈值切换到磁盘临时表
+--   MariaDB Aria: 为临时表场景专门优化的引擎
+--   MySQL TempTable: 8.0 引入的专用内存临时表引擎
+-- 关键指标: 内存到磁盘的切换阈值 (tmp_table_size, max_heap_table_size)

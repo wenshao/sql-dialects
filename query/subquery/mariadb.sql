@@ -1,76 +1,49 @@
--- MariaDB: Subquery
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 子查询 (Subquery)
+-- 优化器在子查询去关联和物化策略上与 MySQL 有差异
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Subqueries
+--       https://mariadb.com/kb/en/subqueries/
 
--- Standard subqueries work the same as MySQL:
--- Scalar, WHERE IN, EXISTS, FROM (derived table)
-
--- Scalar subquery (same as MySQL)
-SELECT username, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count
+-- ============================================================
+-- 1. 基本子查询
+-- ============================================================
+-- 标量子查询
+SELECT username, (SELECT COUNT(*) FROM orders WHERE orders.user_id = users.id) AS order_count
 FROM users;
 
--- WHERE IN subquery (same as MySQL, but better optimized)
+-- IN 子查询
 SELECT * FROM users WHERE id IN (SELECT user_id FROM orders WHERE amount > 100);
--- MariaDB's optimizer is often better at converting IN subqueries to semi-joins
--- than MySQL 5.7 (MySQL 8.0 improved this significantly)
 
--- EXISTS (same as MySQL)
-SELECT * FROM users u
-WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
+-- EXISTS 子查询
+SELECT * FROM users u WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
 
--- FROM subquery (same as MySQL)
-SELECT t.city, t.cnt FROM (
-    SELECT city, COUNT(*) AS cnt FROM users GROUP BY city
-) t WHERE t.cnt > 10;
+-- 派生表 (FROM 子查询)
+SELECT ranked.* FROM (
+    SELECT username, age, ROW_NUMBER() OVER (ORDER BY age) AS rn FROM users
+) ranked WHERE ranked.rn <= 10;
 
--- LATERAL derived table (11.0+)
-SELECT u.username, t.total
-FROM users u,
-LATERAL (SELECT SUM(amount) AS total FROM orders WHERE user_id = u.id) t;
+-- ============================================================
+-- 2. MariaDB 子查询优化策略
+-- ============================================================
+-- MariaDB 10.0+ 引入了多项独立的子查询优化:
+--   1. Semi-Join: IN/EXISTS 子查询转为 semi-join (10.0+)
+--   2. Materialization: 子查询结果物化为临时表 (10.0+)
+--   3. FirstMatch: 找到第一个匹配即停止扫描
+--   4. LooseScan: 利用索引的松散扫描
+--   5. DuplicateWeedout: 去重策略
+--
+-- 关键差异 vs MySQL:
+--   MariaDB 10.0 的 semi-join 策略基于 MySQL 5.6 但独立发展
+--   MariaDB 对相关子查询的优化在某些场景下比 MySQL 更好
+--   MySQL 8.0 引入的 anti-join 优化 MariaDB 后续也独立实现
 
--- Semi-join optimizations (different strategies from MySQL)
--- MariaDB supports these semi-join strategies:
--- - FirstMatch
--- - Materialization (with/without scan)
--- - LooseScan
--- - DuplicateWeedout
--- Control via optimizer_switch:
-SET optimizer_switch = 'firstmatch=on,materialization=on,loosescan=on,duplicateweedout=on';
-
--- Subquery cache (MariaDB-specific)
--- MariaDB caches results of correlated subqueries to avoid re-execution
--- for repeated values of the correlation column
-SET optimizer_switch = 'subquery_cache=on';  -- enabled by default
--- This can significantly speed up correlated subqueries
-
--- Example that benefits from subquery cache:
-SELECT username, (SELECT MAX(amount) FROM orders WHERE user_id = users.id)
-FROM users;
--- If multiple users share the same id pattern, cache avoids re-executing
-
--- Condition pushdown into subqueries (10.4+)
--- MariaDB can push WHERE conditions from outer query into derived tables
-SELECT * FROM (
-    SELECT city, COUNT(*) AS cnt FROM users GROUP BY city
-) t WHERE t.city = 'Beijing';
--- MariaDB pushes city = 'Beijing' into the derived table
-
--- NOT IN / NOT EXISTS optimization
--- MariaDB handles NOT IN with NULLs better than early MySQL versions
-SELECT * FROM users WHERE id NOT IN (SELECT user_id FROM blacklist);
-
--- Comparison operators (same as MySQL)
-SELECT * FROM users WHERE age > (SELECT AVG(age) FROM users);
-SELECT * FROM users WHERE age >= ALL (SELECT age FROM users WHERE city = 'Beijing');
-
--- Differences from MySQL 8.0:
--- Subquery cache is MariaDB-specific (significant performance benefit)
--- Different semi-join strategy selection
--- Condition pushdown into derived tables (10.4+)
--- LATERAL available from 11.0+ (MySQL from 8.0.14+)
--- Generally better subquery optimization than MySQL 5.7, comparable to MySQL 8.0
+-- ============================================================
+-- 3. 对引擎开发者: 子查询去关联
+-- ============================================================
+-- 子查询去关联 (Decorrelation) 是优化器的核心能力:
+--   关联子查询: 每行外表数据执行一次子查询 → O(n*m)
+--   去关联后: 转为 JOIN → 可利用索引和 Hash Join → O(n+m)
+-- MariaDB 与 MySQL 在去关联策略选择上已有分歧:
+--   相同的查询可能一个选择 FirstMatch, 另一个选择 Materialization
+--   这影响内存使用和 I/O 模式

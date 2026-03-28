@@ -1,141 +1,125 @@
 -- DuckDB: ALTER TABLE
--- DuckDB is an in-process analytical database (OLAP).
 --
 -- 参考资料:
 --   [1] DuckDB Documentation - ALTER TABLE
 --       https://duckdb.org/docs/sql/statements/alter_table
---   [2] DuckDB Documentation - Data Types
---       https://duckdb.org/docs/sql/data_types/overview
---   [3] DuckDB Documentation - Nested Types
---       https://duckdb.org/docs/sql/data_types/overview#nested--composite-types
---   [4] DuckDB Documentation - Structs
---       https://duckdb.org/docs/sql/data_types/struct
---   [5] DuckDB v1.0 Release Notes
---       https://duckdb.org/2024/06/03/announcing-duckdb-100
 
 -- ============================================================
--- 1. 基本列操作
+-- 1. 基本语法
 -- ============================================================
-
 -- 添加列
 ALTER TABLE users ADD COLUMN phone VARCHAR;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR;
+ALTER TABLE users ADD COLUMN status VARCHAR DEFAULT 'active' NOT NULL;
 
--- 添加列带默认值和约束
-ALTER TABLE users ADD COLUMN status INTEGER NOT NULL DEFAULT 1;
-
--- 删除列（v0.8+）
-ALTER TABLE users DROP COLUMN phone;
-ALTER TABLE users DROP COLUMN IF EXISTS phone;
+-- 删除列
+ALTER TABLE users DROP COLUMN bio;
+ALTER TABLE users DROP COLUMN IF EXISTS bio;
 
 -- 重命名列
-ALTER TABLE users RENAME COLUMN phone TO mobile;
+ALTER TABLE users RENAME COLUMN username TO user_name;
 
--- 重命名表
-ALTER TABLE users RENAME TO members;
+-- 修改列类型
+ALTER TABLE users ALTER COLUMN age TYPE BIGINT;
+ALTER TABLE users ALTER COLUMN age SET DATA TYPE BIGINT;   -- SQL 标准写法
 
--- ============================================================
--- 2. 列类型修改
--- ============================================================
-
--- 修改列类型（v0.8+）
-ALTER TABLE users ALTER COLUMN age SET DATA TYPE BIGINT;
-ALTER TABLE users ALTER COLUMN age TYPE BIGINT;  -- 短语法
-
--- 设置 / 删除默认值
-ALTER TABLE users ALTER COLUMN status SET DEFAULT 0;
+-- 设置/删除默认值
+ALTER TABLE users ALTER COLUMN status SET DEFAULT 'active';
 ALTER TABLE users ALTER COLUMN status DROP DEFAULT;
 
--- 设置 / 删除 NOT NULL（v0.8+）
+-- 设置/删除 NOT NULL
 ALTER TABLE users ALTER COLUMN email SET NOT NULL;
 ALTER TABLE users ALTER COLUMN email DROP NOT NULL;
 
--- 类型转换限制:
---   安全转换: INT → BIGINT, VARCHAR → TEXT（宽化）
---   不安全转换: VARCHAR → INT（需确保数据全部可转换）
---   DuckDB 不支持 ALTER TABLE ... USING (表达式) 进行自定义转换
---   替代方案: ADD COLUMN + UPDATE + DROP COLUMN
+-- 重命名表
+ALTER TABLE users RENAME TO app_users;
 
 -- ============================================================
--- 3. 嵌套类型操作（DuckDB 特色）
+-- 2. 语法设计分析（对 SQL 引擎开发者）
 -- ============================================================
--- DuckDB 支持 STRUCT / MAP / LIST 三种嵌套类型，
--- 这些类型的 ALTER 操作是 DuckDB 的独有能力。
 
--- 3.1 STRUCT 类型的列操作
+-- 2.1 列式存储的 ALTER TABLE: 为什么大多数操作是即时的
+-- DuckDB 使用列式存储，ALTER TABLE 的实现与行式存储有本质区别:
+--
+-- 行式存储（MySQL InnoDB）:
+--   ADD COLUMN: 可能需要重写所有数据页（每行都需要新增字段空间）
+--   MySQL 8.0.12+ ALGORITHM=INSTANT 仅支持末尾添加列
+--
+-- 列式存储（DuckDB）:
+--   ADD COLUMN: 只需创建新的列段，已有列不受影响（即时完成）
+--   DROP COLUMN: 标记列为删除，惰性回收空间（即时完成）
+--   ALTER TYPE: 可能需要读取旧列数据并写入新格式（但只重写一列）
+--
+-- 设计 trade-off:
+--   列存的 ALTER TABLE 天然更快（列之间独立存储）
+--   但修改列类型仍需要扫描该列所有数据（不过只是一列，不是全表）
+--
+-- 对比 ALTER TABLE 性能:
+--   MySQL:      ADD COLUMN 可能需要全表重写（COPY 算法），8.0+ INSTANT 部分操作即时
+--   PostgreSQL: ADD COLUMN + DEFAULT 在 11+ 即时（之前需要重写全表）
+--   DuckDB:     大多数操作即时（列存优势）
+--   Databricks: Schema Evolution 只修改 Delta Log 元数据（不重写数据文件）
+
+-- 2.2 PostgreSQL 兼容的 ALTER 语法
+-- DuckDB 遵循 PostgreSQL 的 ALTER TABLE 语法:
+--   ALTER TABLE ... ALTER COLUMN ... TYPE ...（PostgreSQL 风格）
+--   而非:
+--   ALTER TABLE ... MODIFY COLUMN ...（MySQL 风格）
+--   ALTER TABLE ... ALTER COLUMN ... SET DATA TYPE ...（SQL 标准风格）
+-- DuckDB 同时支持 TYPE 和 SET DATA TYPE
+ALTER TABLE products ALTER COLUMN price TYPE DOUBLE;          -- PostgreSQL 风格
+ALTER TABLE products ALTER COLUMN price SET DATA TYPE DOUBLE; -- SQL 标准风格
+
+-- 2.3 IF NOT EXISTS / IF EXISTS: 幂等性设计
+ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR;
+ALTER TABLE users DROP COLUMN IF EXISTS bio;
+-- 设计价值: 让 DDL 迁移脚本可以安全重复执行
+-- 对比:
+--   MySQL:      不支持 ADD COLUMN IF NOT EXISTS（需要存储过程包装）
+--   PostgreSQL: 支持 ADD COLUMN IF NOT EXISTS（9.6+）
+--   Databricks: 支持
+--   Flink:      不支持
+
+-- ============================================================
+-- 3. 嵌套类型的 ALTER（DuckDB 特色）
+-- ============================================================
+-- DuckDB 支持 STRUCT/MAP/LIST 嵌套类型，但 ALTER 内部字段需要重建:
+
 -- 添加 STRUCT 列
-ALTER TABLE users ADD COLUMN address STRUCT(
-    street VARCHAR,
-    city   VARCHAR,
-    zip    VARCHAR
-);
+ALTER TABLE users ADD COLUMN address STRUCT(street VARCHAR, city VARCHAR, zip VARCHAR);
 
--- 查询 STRUCT 字段
-SELECT address.city FROM users;
-
--- 修改 STRUCT 内部字段类型（需要重建列）
--- DuckDB 不支持直接 ALTER STRUCT 内部字段
--- 替代方案: 提取 → 修改 → 重建
--- Step 1: 添加新 STRUCT 列
+-- 修改 STRUCT 内部字段（不支持直接 ALTER，需要重建）:
 ALTER TABLE users ADD COLUMN address_v2 STRUCT(
-    street VARCHAR,
-    city   VARCHAR,
-    zip    VARCHAR,
-    country VARCHAR DEFAULT 'CN'
+    street VARCHAR, city VARCHAR, zip VARCHAR, country VARCHAR
 );
--- Step 2: 迁移数据
 UPDATE users SET address_v2 = struct_pack(
-    street  := address.street,
-    city    := address.city,
-    zip     := address.zip,
-    country := 'CN'
+    street := address.street, city := address.city,
+    zip := address.zip, country := 'CN'
 );
--- Step 3: 替换旧列
 ALTER TABLE users DROP COLUMN address;
 ALTER TABLE users RENAME COLUMN address_v2 TO address;
 
--- 3.2 MAP 类型的列操作
--- 添加 MAP 列
+-- 添加 LIST / MAP 列
+ALTER TABLE users ADD COLUMN tags VARCHAR[];
 ALTER TABLE users ADD COLUMN meta MAP(VARCHAR, VARCHAR);
 
--- MAP 操作示例
-UPDATE users SET meta = map_from_entries([('key1', 'value1'), ('key2', 'value2')]);
-SELECT meta['key1'] FROM users;
+-- 修改 LIST 元素类型
+ALTER TABLE users ALTER COLUMN scores SET DATA TYPE BIGINT[];
 
--- 修改 MAP 的键/值类型需要重建列（同 STRUCT）
-
--- 3.3 LIST (ARRAY) 类型的列操作
--- 添加 LIST 列
-ALTER TABLE users ADD COLUMN tags VARCHAR[];
-ALTER TABLE users ADD COLUMN scores INTEGER[];
-
--- LIST 操作示例
-UPDATE users SET tags = ['duck', 'goose', 'swan'];
-SELECT tags[1] FROM users;  -- DuckDB LIST 是 1-indexed!
-SELECT list_aggregate(scores, 'sum') FROM users;
-SELECT unnest(tags) FROM users;  -- 展开为多行
-
--- 修改 LIST 的元素类型
-ALTER TABLE users ALTER COLUMN scores SET DATA TYPE BIGINT[];  -- VARCHAR[] → BIGINT[] 需兼容
-
--- 3.4 复杂嵌套组合
--- 多层嵌套: LIST of STRUCT
-ALTER TABLE orders ADD COLUMN items STRUCT(
-    product_id BIGINT,
-    name       VARCHAR,
-    tags       VARCHAR[]
-)[];
-
--- 查询嵌套数据
-SELECT items FROM orders;
-SELECT unnest(items) AS item FROM orders;  -- 展开 LIST
-SELECT item.name, unnest(item.tags) AS tag FROM orders, unnest(items) AS item;
+-- 设计分析:
+-- STRUCT 是固定 Schema 的嵌套类型，修改内部字段需要重写列数据。
+-- MAP 是动态键值对，不需要 ALTER 内部结构。
+-- 列式存储下嵌套类型的编码（类似 Parquet Dremel 编码）使部分更新困难。
+--
+-- 对比:
+--   Trino:      ROW 类型，ALTER 内部字段取决于 Connector
+--   Databricks: STRUCT 类型，支持 ADD COLUMN 到 STRUCT 内部
+--   Flink:      ROW 类型，ALTER 取决于 Catalog
 
 -- ============================================================
--- 4. 添加/删除列约束（v1.0+）
+-- 4. 约束管理
 -- ============================================================
-
--- 添加主键（DuckDB 对主键支持有限，主要用于约束）
+-- 添加主键
 ALTER TABLE users ADD PRIMARY KEY (id);
 
 -- 添加唯一约束
@@ -144,58 +128,57 @@ ALTER TABLE users ADD CONSTRAINT uk_email UNIQUE (email);
 -- 删除约束
 ALTER TABLE users DROP CONSTRAINT uk_email;
 
--- ============================================================
--- 5. DuckDB ALTER TABLE 的限制
--- ============================================================
--- 不支持 AFTER / FIRST 子句（列总是添加到末尾）
--- 不支持多操作合并（必须分开多个 ALTER TABLE 语句）
--- 不支持 ALTER TABLE ... SET SCHEMA
--- 不支持 ALTER TABLE ... ADD FOREIGN KEY
--- 不支持 USING 子句进行自定义类型转换
--- STRUCT/MAP 内部字段不能直接 ALTER（需要重建列）
--- 列顺序不可修改（分析型数据库不依赖列顺序）
+-- DuckDB 约束特点:
+--   PRIMARY KEY: 强制执行（使用 ART 索引检查唯一性）
+--   UNIQUE: 强制执行
+--   NOT NULL: 强制执行
+--   CHECK: 强制执行
+--   FOREIGN KEY: 有限支持
+--
+-- 对比:
+--   MySQL/PostgreSQL: 所有约束强制执行
+--   Databricks: CHECK/NOT NULL 强制执行，PK/FK/UNIQUE 信息性
+--   Flink: PRIMARY KEY NOT ENFORCED 只是语义提示
+--   Trino: 无约束语法
 
 -- ============================================================
--- 6. 设计分析（对 SQL 引擎开发者）
+-- 5. 不支持的操作与替代方案
 -- ============================================================
--- DuckDB 的 ALTER TABLE 设计哲学:
---   "分析型数据库的 Schema 变更应该是即时（instant）的"
+-- DuckDB 不支持:
+--   ALTER TABLE ... ADD INDEX（无传统 B-Tree 索引，用 Zone Maps 替代）
+--   ALTER TABLE ... AFTER/FIRST（列总是添加到末尾）
+--   ALTER TABLE ... USING expr（自定义类型转换表达式）
+--   ALTER TABLE ... SET SCHEMA（无 Schema 迁移）
+--   ALTER TABLE ... SET TABLESPACE（无表空间概念）
 --
--- 6.1 为什么 DuckDB 的 ALTER 几乎都是即时操作:
---   DuckDB 使用列式存储，每列独立存储文件
---   ADD COLUMN: 只修改元数据（catalog），不重写数据文件
---   DROP COLUMN: 标记删除，不立即回收空间（lazy 方式）
---   RENAME: 只修改元数据
---   CHANGE TYPE: 某些情况需要重写，但 DuckDB 尽量延迟
---   对比 PostgreSQL: ADD COLUMN + 非 NULL DEFAULT 在 11 之前需要重写全表
---   对比 MySQL:      ALGORITHM=INSTANT 在 8.0.12+ 支持部分操作
---
--- 6.2 嵌套类型的 ALTER 挑战:
---   STRUCT 是固定 schema 的嵌套类型（类似轻量级表），修改内部字段需要重写
---   MAP 是动态 schema 的键值对，不需要 ALTER 内部结构
---   LIST 是有序集合，元素类型固定，修改元素类型需要重写
---   列式存储下嵌套类型的编码（Parquet 方式）使部分更新非常困难
---
--- 6.3 跨方言对比:
---   DuckDB:   支持 STRUCT/MAP/LIST，ALTER 即时，无 AFTER/FIRST
---   SQLite:   不支持 ALTER 的灵活性（只支持 RENAME TABLE / ADD COLUMN）
---   ClickHouse: ALTER 也是即时（元数据操作），支持 NESTED 类型
---   BigQuery: 支持 STRUCT/ARRAY，ALTER 支持 ADD/DROP 列
---   Snowflake: 支持 VARIANT (半结构化)，ALTER 支持 ADD/DROP/RENAME 列
---   PostgreSQL: 支持 JSONB/JSON，ALTER 支持丰富但嵌套类型修改受限
---
--- 6.4 版本演进:
---   DuckDB 0.3: 基础 ALTER（ADD/DROP/RENAME 列）
---   DuckDB 0.8: 支持 SET DATA TYPE, SET/DROP NOT NULL, DROP COLUMN 改进
---   DuckDB 0.10: IF NOT EXISTS / IF EXISTS 支持
---   DuckDB 1.0: 稳定版，ADD CONSTRAINT / DROP CONSTRAINT 支持
---   DuckDB 1.1+: 持续改进嵌套类型和类型转换能力
+-- 无索引的设计理由:
+--   DuckDB 是 OLAP 引擎，使用以下替代方案:
+--   Zone Maps（min/max 统计信息，自动维护）
+--   ART Index（仅用于 PRIMARY KEY 约束检查）
+--   并行全表扫描（列存 + 向量化执行，分析查询比索引更快）
 
 -- ============================================================
--- 7. 最佳实践
+-- 6. 横向对比: ALTER TABLE 能力矩阵
 -- ============================================================
--- 1. 利用 IF NOT EXISTS / IF EXISTS 避免幂等性问题
--- 2. 修改 STRUCT 内部字段用 "添加新列 → 数据迁移 → 删除旧列" 模式
--- 3. 对于频繁变化的嵌套数据，考虑用 MAP (VARCHAR, VARCHAR) 代替 STRUCT
--- 4. ALTER 操作在 DuckDB 中几乎无性能代价，可以放心使用
--- 5. 数据管道中使用 ALTER + UPDATE 组合替代重建整表
+-- 操作                DuckDB   MySQL      PostgreSQL  Flink    Databricks
+-- ADD COLUMN          即时     可能重写    11+即时     部分     即时(元数据)
+-- DROP COLUMN         即时     INSTANT    即时        部分     即时(需CM)
+-- RENAME COLUMN       即时     即时       即时        部分     即时(需CM)
+-- ALTER TYPE          扫描列   可能重写    需USING     部分     只允许放宽
+-- ADD IF NOT EXISTS   支持     不支持     支持        不支持   支持
+-- ADD CONSTRAINT      支持     支持       支持        PK only  信息性
+-- ADD INDEX           不支持   支持       支持        不支持   不支持
+
+-- ============================================================
+-- 7. 对引擎开发者的启示
+-- ============================================================
+-- DuckDB 的 ALTER TABLE 设计体现了列式存储的天然优势:
+-- 列之间独立存储 → ADD/DROP COLUMN 只影响目标列 → 即时完成。
+--
+-- 与行式存储形成对比:
+-- 行式存储中一行的所有列物理相邻 → 修改任何列可能影响所有行。
+--
+-- 嵌套类型（STRUCT）的 ALTER 是列存引擎的设计难点:
+-- STRUCT 内部字段在列存中是"扁平化"存储的（类似 Parquet 的 Dremel 编码），
+-- 修改内部字段相当于修改底层编码结构，比修改普通列更复杂。
+-- Databricks 支持 ADD COLUMN 到 STRUCT 内部是因为 Delta Log 做了额外映射。

@@ -1,0 +1,70 @@
+# StarRocks: 日期函数
+
+> 参考资料:
+> - [1] StarRocks Documentation - Date Functions
+>   https://docs.starrocks.io/docs/sql-reference/sql-functions/
+
+
+## 1. 当前日期时间 (与 Doris 完全相同)
+
+```sql
+SELECT NOW(), CURRENT_TIMESTAMP(), CURDATE(), CURRENT_DATE();
+
+```
+
+## 2. 日期加减
+
+```sql
+SELECT DATE_ADD('2024-01-15', INTERVAL 1 DAY);
+SELECT DATE_SUB('2024-01-15', INTERVAL 1 YEAR);
+SELECT TIMESTAMPADD(HOUR, 2, NOW());
+SELECT YEARS_ADD('2024-01-15', 1);
+SELECT MONTHS_ADD('2024-01-15', 3);
+
+```
+
+## 3. 日期差
+
+```sql
+SELECT DATEDIFF('2024-12-31', '2024-01-01');
+SELECT TIMESTAMPDIFF(MONTH, '2024-01-01', '2024-06-15');
+
+```
+
+## 4. DATE_TRUNC
+
+```sql
+SELECT DATE_TRUNC('month', NOW());
+SELECT DATE_TRUNC('year', NOW());
+
+```
+
+## 5. 格式化
+
+```sql
+SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s');
+SELECT STR_TO_DATE('2024-01-15', '%Y-%m-%d');
+
+```
+
+## 6. 提取
+
+```sql
+SELECT YEAR('2024-01-15'), MONTH('2024-01-15'), DAY('2024-01-15');
+SELECT DAYOFWEEK('2024-01-15'), QUARTER('2024-06-15');
+
+```
+
+## 7. Unix 时间戳
+
+```sql
+SELECT UNIX_TIMESTAMP(), FROM_UNIXTIME(1705276800);
+
+```
+
+## 8. StarRocks vs Doris 日期函数差异
+
+完全相同(同源，MySQL 兼容)。
+两者都支持 Doris 特有的 YEARS_ADD/MONTHS_ADD 快捷函数。
+两者都支持 DATE_TRUNC(非 MySQL 标准，分析引擎常用)。
+

@@ -1,100 +1,45 @@
--- MariaDB: Date/Time Types
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 日期和时间类型
+-- 与 MySQL 一致, 系统版本表的时间列是独有扩展
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Date and Time Data Types
+--       https://mariadb.com/kb/en/date-and-time-data-types/
 
--- All MySQL date/time types are supported:
--- DATE, TIME, DATETIME, TIMESTAMP, YEAR
-
-CREATE TABLE events (
-    id         BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+-- ============================================================
+-- 1. 日期时间类型
+-- ============================================================
+-- DATE:      3 字节, 1000-01-01 ~ 9999-12-31
+-- TIME:      3 字节, -838:59:59 ~ 838:59:59
+-- DATETIME:  5 字节, 1000-01-01 ~ 9999-12-31 (不含时区)
+-- TIMESTAMP: 4 字节, 1970-01-01 ~ 2038-01-19 (存 UTC, 自动时区转换)
+-- YEAR:      1 字节, 1901~2155
+CREATE TABLE time_demo (
     event_date DATE,
-    event_time TIME(3),
-    created_at DATETIME(6),
-    updated_at TIMESTAMP(6)
+    event_time TIME(3),           -- 毫秒精度
+    created_at DATETIME(6),        -- 微秒精度
+    logged_at  TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6),
+    birth_year YEAR
 );
 
--- DATETIME vs TIMESTAMP (same as MySQL)
--- Range and behavior identical to MySQL
+-- ============================================================
+-- 2. DATETIME vs TIMESTAMP 选择
+-- ============================================================
+-- DATETIME: 存字面值, 不受时区影响, 适合业务时间
+-- TIMESTAMP: 存 UTC, 读取时按 session time_zone 转换, 适合系统时间
+-- 2038 问题: TIMESTAMP 最大 2038-01-19 03:14:07 UTC
+-- MariaDB 的立场与 MySQL 相同: 推荐 DATETIME 避免 2038 问题
 
--- Current time functions (same as MySQL)
-SELECT NOW();
-SELECT CURRENT_TIMESTAMP;
-SELECT CURDATE();
-SELECT CURTIME();
-SELECT UTC_TIMESTAMP();
+-- ============================================================
+-- 3. 系统版本表的时间列 (MariaDB 独有)
+-- ============================================================
+-- GENERATED ALWAYS AS ROW START/ROW END 是 MariaDB 独有的列属性
+-- 使用 TIMESTAMP(6) 精度记录行的生命周期
+-- 这些列通常声明为 INVISIBLE, 不影响 SELECT *
 
--- ON UPDATE CURRENT_TIMESTAMP (same as MySQL)
-CREATE TABLE t (
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- System-versioned tables: automatic row history timestamps (10.3.4+)
--- ROW START / ROW END columns for temporal tracking
-CREATE TABLE products (
-    id         BIGINT NOT NULL AUTO_INCREMENT,
-    name       VARCHAR(255),
-    price      DECIMAL(10,2),
-    row_start  TIMESTAMP(6) GENERATED ALWAYS AS ROW START INVISIBLE,
-    row_end    TIMESTAMP(6) GENERATED ALWAYS AS ROW END INVISIBLE,
-    PERIOD FOR SYSTEM_TIME (row_start, row_end),
-    PRIMARY KEY (id)
-) WITH SYSTEM VERSIONING;
-
--- Query at a specific point in time
-SELECT * FROM products FOR SYSTEM_TIME AS OF '2024-01-15 10:00:00';
-
--- Query history between two timestamps
-SELECT * FROM products FOR SYSTEM_TIME
-    BETWEEN '2024-01-01 00:00:00' AND '2024-06-01 00:00:00';
-
--- Application-time periods (10.5+)
--- PERIOD FOR user-defined temporal periods
-CREATE TABLE contracts (
-    id         BIGINT NOT NULL AUTO_INCREMENT,
-    client     VARCHAR(255),
-    amount     DECIMAL(10,2),
-    valid_from DATE NOT NULL,
-    valid_to   DATE NOT NULL,
-    PERIOD FOR valid_period (valid_from, valid_to),
-    PRIMARY KEY (id)
-);
-
--- Temporal DML with FOR PORTION OF (10.5+)
-UPDATE contracts FOR PORTION OF valid_period
-    FROM '2024-01-01' TO '2024-06-01'
-SET amount = 5000.00;
-
-DELETE FROM contracts FOR PORTION OF valid_period
-    FROM '2024-01-01' TO '2024-06-01'
-WHERE client = 'Acme';
-
--- Date arithmetic (same as MySQL)
-SELECT DATE_ADD(NOW(), INTERVAL 1 DAY);
-SELECT DATE_SUB(NOW(), INTERVAL 1 HOUR);
-SELECT DATEDIFF('2024-12-31', '2024-01-01');
-SELECT TIMESTAMPDIFF(HOUR, '2024-01-01', NOW());
-
--- Date formatting (same as MySQL)
-SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s');
-SELECT STR_TO_DATE('2024-01-15', '%Y-%m-%d');
-
--- Unix timestamp (same as MySQL)
-SELECT UNIX_TIMESTAMP();
-SELECT FROM_UNIXTIME(1705276800);
-
--- Microsecond precision (same as MySQL, supported since 5.3)
--- MariaDB supported microsecond precision before MySQL 5.6.4
-
--- Differences from MySQL 8.0:
--- System versioning with ROW START/ROW END (10.3.4+, MariaDB-specific)
--- PERIOD FOR application-time periods (10.5+, MariaDB-specific)
--- FOR PORTION OF temporal DML (10.5+, MariaDB-specific)
--- FOR SYSTEM_TIME temporal queries (10.3.4+, MariaDB-specific)
--- Microsecond precision supported earlier than MySQL (5.3+)
--- Same TIMESTAMP 2038 limitation as MySQL
--- No functional differences in core date/time types vs MySQL
+-- ============================================================
+-- 4. 对引擎开发者的启示
+-- ============================================================
+-- TIMESTAMP 的 2038 年问题是所有 32 位 Unix 时间戳系统的共同问题
+-- 解决方案: 内部使用 64 位存储 (如 PostgreSQL TIMESTAMPTZ: 8 字节, 微秒精度)
+-- MariaDB/MySQL 选择保持 4 字节 TIMESTAMP 是向后兼容的代价
+-- 系统版本表要求精确的时间比较: 6 位精度 (微秒) 是最低要求

@@ -1,132 +1,57 @@
--- MariaDB: 锁机制 (Locking)
+-- MariaDB: 锁
+-- InnoDB 锁机制与 MySQL 基本一致
 --
 -- 参考资料:
 --   [1] MariaDB Knowledge Base - InnoDB Lock Modes
 --       https://mariadb.com/kb/en/innodb-lock-modes/
---   [2] MariaDB Knowledge Base - LOCK TABLES
---       https://mariadb.com/kb/en/lock-tables/
---   [3] MariaDB Knowledge Base - GET_LOCK
---       https://mariadb.com/kb/en/get_lock/
---   [4] MariaDB Knowledge Base - metadata_lock_info Plugin
---       https://mariadb.com/kb/en/metadata-lock-info/
 
 -- ============================================================
--- 行级锁 (Row-Level Locks) — InnoDB/Aria 引擎
+-- 1. 行锁 (InnoDB)
 -- ============================================================
+-- 共享锁 (S): SELECT ... LOCK IN SHARE MODE (或 FOR SHARE)
+SELECT * FROM users WHERE id = 1 LOCK IN SHARE MODE;
+SELECT * FROM users WHERE id = 1 FOR SHARE;    -- 10.3+ 语法
 
--- SELECT FOR UPDATE: 排他行锁
-SELECT * FROM orders WHERE id = 100 FOR UPDATE;
+-- 排他锁 (X): SELECT ... FOR UPDATE
+SELECT * FROM users WHERE id = 1 FOR UPDATE;
 
--- LOCK IN SHARE MODE（MariaDB 传统语法）
-SELECT * FROM orders WHERE id = 100 LOCK IN SHARE MODE;
-
--- FOR SHARE（MariaDB 10.6+ 兼容 MySQL 8.0 语法）-- 注意：需确认版本支持
-
--- ============================================================
--- NOWAIT / SKIP LOCKED（MariaDB 10.3+）
--- ============================================================
-
-SELECT * FROM orders WHERE status = 'pending'
-FOR UPDATE NOWAIT;
-
-SELECT * FROM tasks WHERE status = 'pending'
-ORDER BY created_at
-LIMIT 5
-FOR UPDATE SKIP LOCKED;
+-- NOWAIT 和 SKIP LOCKED (10.3+)
+SELECT * FROM orders WHERE status = 'pending' FOR UPDATE NOWAIT;
+SELECT * FROM orders WHERE status = 'pending' FOR UPDATE SKIP LOCKED;
+-- NOWAIT: 不等待锁, 立即报错
+-- SKIP LOCKED: 跳过已锁定的行 (用于队列处理)
 
 -- ============================================================
--- Gap Locks / Next-Key Locks (InnoDB)
+-- 2. 表锁
 -- ============================================================
-
--- 与 MySQL InnoDB 相同的 gap lock 机制
--- REPEATABLE READ 下使用 next-key locking 防止幻读
-SELECT * FROM orders WHERE price BETWEEN 10 AND 20 FOR UPDATE;
-
--- 降级到 READ COMMITTED 可以禁用 gap lock
-SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
-
--- ============================================================
--- 表级锁
--- ============================================================
-
-LOCK TABLES orders READ;
-LOCK TABLES orders WRITE;
-LOCK TABLES orders READ, users WRITE;
-UNLOCK TABLES;
-
--- FLUSH TABLES WITH READ LOCK（全局读锁，用于备份）
-FLUSH TABLES WITH READ LOCK;
--- ... 备份 ...
+LOCK TABLES users READ, orders WRITE;
+-- ... 操作 ...
 UNLOCK TABLES;
 
 -- ============================================================
--- 乐观锁
+-- 3. 死锁处理
 -- ============================================================
-
-ALTER TABLE orders ADD COLUMN version INT NOT NULL DEFAULT 1;
-
-UPDATE orders
-SET status = 'shipped', version = version + 1
-WHERE id = 100 AND version = 5;
+-- InnoDB 自动检测死锁并回滚代价最小的事务
+-- SHOW ENGINE INNODB STATUS 查看最近的死锁信息
+-- innodb_deadlock_detect = ON (默认)
+-- 关闭死锁检测 + 使用 innodb_lock_wait_timeout 适用于高并发场景
 
 -- ============================================================
--- 悲观锁
+-- 4. 间隙锁 (Gap Lock) 和 Next-Key Lock
 -- ============================================================
-
-START TRANSACTION;
-    SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
-    UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-    UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-COMMIT;
-
--- ============================================================
--- 应用级锁 (Named Locks)
--- ============================================================
-
-SELECT GET_LOCK('my_lock', 10);
-SELECT RELEASE_LOCK('my_lock');
-SELECT IS_FREE_LOCK('my_lock');
-SELECT IS_USED_LOCK('my_lock');
-
--- MariaDB 10.0.2+: 支持同时持有多个命名锁
-SELECT GET_LOCK('lock_a', 10);
-SELECT GET_LOCK('lock_b', 10);
-SELECT RELEASE_LOCK('lock_a');
-SELECT RELEASE_LOCK('lock_b');
-SELECT RELEASE_ALL_LOCKS();
+-- REPEATABLE READ 下, InnoDB 使用 Next-Key Lock 防止幻读:
+--   Record Lock: 锁定索引记录
+--   Gap Lock: 锁定索引记录之间的间隙
+--   Next-Key Lock = Record Lock + Gap Lock
+-- 这与 MySQL InnoDB 的行为完全一致
 
 -- ============================================================
--- 死锁检测与预防
+-- 5. 对引擎开发者: 锁实现差异
 -- ============================================================
-
-SHOW ENGINE INNODB STATUS;
-
-SET GLOBAL innodb_lock_wait_timeout = 50;
-SET SESSION innodb_lock_wait_timeout = 10;
-
--- 预防死锁
-START TRANSACTION;
-    SELECT * FROM accounts WHERE id IN (1, 2) ORDER BY id FOR UPDATE;
-COMMIT;
-
--- ============================================================
--- 锁监控
--- ============================================================
-
--- information_schema（MariaDB）
-SELECT * FROM information_schema.INNODB_LOCKS;
-SELECT * FROM information_schema.INNODB_LOCK_WAITS;
-SELECT * FROM information_schema.INNODB_TRX;
-
--- metadata_lock_info 插件（MariaDB 10.0.7+）
-INSTALL SONAME 'metadata_lock_info';
-SELECT * FROM information_schema.METADATA_LOCK_INFO;
-
--- ============================================================
--- 事务隔离级别
--- ============================================================
-
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;  -- 默认
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+-- MariaDB 的 InnoDB 锁管理器与 MySQL 已有微小差异:
+--   1. 锁等待超时: 两者默认都是 50 秒 (innodb_lock_wait_timeout)
+--   2. 死锁日志: 输出格式可能不同
+--   3. 锁调度: 事务优先级和权重计算可能不同
+-- SKIP LOCKED 的实现:
+--   扫描索引时, 遇到已锁定的行就跳过 (不等待, 不报错)
+--   用于实现简单的消息队列: 多个消费者并发取任务

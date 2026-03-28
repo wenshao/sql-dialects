@@ -1,0 +1,142 @@
+# BigQuery: 日期函数
+
+> 参考资料:
+> - [1] BigQuery SQL Reference - Date Functions
+>   https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions
+> - [2] BigQuery SQL Reference - Timestamp Functions
+>   https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions
+> - [3] BigQuery SQL Reference - Datetime Functions
+>   https://cloud.google.com/bigquery/docs/reference/standard-sql/datetime_functions
+
+
+当前日期时间
+
+```sql
+SELECT CURRENT_DATE();                                   -- DATE
+SELECT CURRENT_TIME();                                   -- TIME
+SELECT CURRENT_DATETIME();                              -- DATETIME（无时区）
+SELECT CURRENT_TIMESTAMP();                             -- TIMESTAMP（UTC）
+
+```
+
+构造
+
+```sql
+SELECT DATE(2024, 1, 15);                                -- DATE
+SELECT TIME(10, 30, 0);                                  -- TIME
+SELECT DATETIME(2024, 1, 15, 10, 30, 0);                 -- DATETIME
+SELECT TIMESTAMP('2024-01-15 10:30:00', 'Asia/Shanghai'); -- TIMESTAMP
+
+```
+
+日期加减（按类型分组）
+
+```sql
+SELECT DATE_ADD(DATE '2024-01-15', INTERVAL 7 DAY);
+SELECT DATE_SUB(DATE '2024-01-15', INTERVAL 1 MONTH);
+SELECT DATETIME_ADD(DATETIME '2024-01-15 10:00:00', INTERVAL 2 HOUR);
+SELECT DATETIME_SUB(DATETIME '2024-01-15 10:00:00', INTERVAL 30 MINUTE);
+SELECT TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR);
+SELECT TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 3 DAY);
+
+```
+
+日期差（按类型分组）
+
+```sql
+SELECT DATE_DIFF(DATE '2024-12-31', DATE '2024-01-01', DAY);       -- 365
+SELECT DATE_DIFF(DATE '2024-12-31', DATE '2024-01-01', MONTH);     -- 11
+SELECT DATE_DIFF(DATE '2024-12-31', DATE '2024-01-01', YEAR);      -- 0
+SELECT DATETIME_DIFF(dt1, dt2, HOUR);
+SELECT TIMESTAMP_DIFF(ts1, ts2, SECOND);
+
+```
+
+提取
+
+```sql
+SELECT EXTRACT(YEAR FROM DATE '2024-01-15');              -- 2024
+SELECT EXTRACT(MONTH FROM DATE '2024-01-15');             -- 1
+SELECT EXTRACT(DAY FROM DATE '2024-01-15');               -- 15
+SELECT EXTRACT(HOUR FROM CURRENT_TIMESTAMP());
+SELECT EXTRACT(DAYOFWEEK FROM DATE '2024-01-15');         -- 1=周日
+SELECT EXTRACT(DAYOFYEAR FROM DATE '2024-01-15');         -- 15
+SELECT EXTRACT(ISOWEEK FROM DATE '2024-01-15');           -- ISO 周数
+SELECT EXTRACT(DATE FROM CURRENT_TIMESTAMP());            -- 提取 DATE 部分
+
+```
+
+截断（按类型分组）
+
+```sql
+SELECT DATE_TRUNC(DATE '2024-01-15', MONTH);              -- 2024-01-01
+SELECT DATE_TRUNC(DATE '2024-01-15', YEAR);               -- 2024-01-01
+SELECT DATETIME_TRUNC(CURRENT_DATETIME(), HOUR);
+SELECT TIMESTAMP_TRUNC(CURRENT_TIMESTAMP(), DAY);
+
+```
+
+格式化（按类型分组）
+
+```sql
+SELECT FORMAT_DATE('%Y-%m-%d', CURRENT_DATE());
+SELECT FORMAT_TIME('%H:%M:%S', CURRENT_TIME());
+SELECT FORMAT_DATETIME('%Y-%m-%d %H:%M:%S', CURRENT_DATETIME());
+SELECT FORMAT_TIMESTAMP('%Y-%m-%d %H:%M:%S %Z', CURRENT_TIMESTAMP());
+SELECT FORMAT_TIMESTAMP('%A, %B %d, %Y', CURRENT_TIMESTAMP());  -- 星期/月名
+
+```
+
+解析（按类型分组）
+
+```sql
+SELECT PARSE_DATE('%Y-%m-%d', '2024-01-15');
+SELECT PARSE_TIME('%H:%M:%S', '10:30:00');
+SELECT PARSE_DATETIME('%Y-%m-%d %H:%M:%S', '2024-01-15 10:30:00');
+SELECT PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%S %Z', '2024-01-15 10:00:00 UTC');
+
+```
+
+最后一天
+
+```sql
+SELECT LAST_DAY(DATE '2024-01-15');                       -- 2024-01-31
+SELECT LAST_DAY(DATE '2024-01-15', MONTH);                -- 2024-01-31
+SELECT LAST_DAY(DATE '2024-01-15', YEAR);                 -- 2024-12-31
+
+```
+
+Unix 时间戳
+
+```sql
+SELECT UNIX_SECONDS(CURRENT_TIMESTAMP());
+SELECT UNIX_MILLIS(CURRENT_TIMESTAMP());
+SELECT UNIX_MICROS(CURRENT_TIMESTAMP());
+SELECT TIMESTAMP_SECONDS(1705312800);
+SELECT TIMESTAMP_MILLIS(1705312800000);
+SELECT TIMESTAMP_MICROS(1705312800000000);
+
+```
+
+时区转换
+
+```sql
+SELECT DATETIME(CURRENT_TIMESTAMP(), 'Asia/Shanghai');
+SELECT TIMESTAMP(DATETIME '2024-01-15 10:00:00', 'Asia/Shanghai');
+
+```
+
+日期序列（使用 GENERATE_DATE_ARRAY）
+
+```sql
+SELECT * FROM UNNEST(GENERATE_DATE_ARRAY(DATE '2024-01-01', DATE '2024-01-31'));
+SELECT * FROM UNNEST(GENERATE_DATE_ARRAY(DATE '2024-01-01', DATE '2024-12-31', INTERVAL 1 MONTH));
+SELECT * FROM UNNEST(GENERATE_TIMESTAMP_ARRAY(
+    TIMESTAMP '2024-01-01', TIMESTAMP '2024-01-02', INTERVAL 1 HOUR));
+
+```
+
+注意：函数按类型分组（DATE_*, DATETIME_*, TIMESTAMP_*）
+注意：格式符使用 strftime 风格（%Y, %m, %d 等）
+注意：EXTRACT 的 DAYOFWEEK 1=周日（与 ISO 不同）
+

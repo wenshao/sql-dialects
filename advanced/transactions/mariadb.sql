@@ -1,107 +1,63 @@
--- MariaDB: Transactions
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 事务
+-- 与 MySQL InnoDB 事务行为一致, Aria 引擎差异
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Transactions
+--       https://mariadb.com/kb/en/transactions/
 
--- Basic transaction (same as MySQL)
-START TRANSACTION;  -- or BEGIN
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+-- ============================================================
+-- 1. 基本事务
+-- ============================================================
+START TRANSACTION;
+INSERT INTO accounts (user_id, balance) VALUES (1, 1000.00);
+UPDATE accounts SET balance = balance - 100 WHERE user_id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE user_id = 2;
 COMMIT;
 
--- Rollback (same as MySQL)
+-- 回滚
 START TRANSACTION;
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+DELETE FROM users WHERE age < 18;
 ROLLBACK;
 
--- Savepoint (same as MySQL)
+-- ============================================================
+-- 2. 保存点
+-- ============================================================
 START TRANSACTION;
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+INSERT INTO orders (user_id, amount) VALUES (1, 100.00);
 SAVEPOINT sp1;
-UPDATE accounts SET balance = balance + 100 WHERE id = 2;
-ROLLBACK TO SAVEPOINT sp1;
-COMMIT;
+INSERT INTO orders (user_id, amount) VALUES (1, 200.00);
+ROLLBACK TO SAVEPOINT sp1;   -- 只回滚第二条 INSERT
+COMMIT;                       -- 第一条 INSERT 生效
 
--- Auto-commit (same as MySQL)
-SELECT @@autocommit;
-SET autocommit = 0;
+-- ============================================================
+-- 3. 隔离级别
+-- ============================================================
+SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;
+-- READ UNCOMMITTED: 脏读 (不推荐)
+-- READ COMMITTED: 不可重复读
+-- REPEATABLE READ: 默认, InnoDB MVCC 实现
+-- SERIALIZABLE: 所有 SELECT 隐式加共享锁
+-- MariaDB 与 MySQL 的隔离级别实现基本一致 (都基于 InnoDB MVCC)
 
--- Isolation levels (same as MySQL)
-SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
-SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
-SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;  -- default (InnoDB)
-SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+-- ============================================================
+-- 4. DDL 事务性
+-- ============================================================
+-- MariaDB (同 MySQL): DDL 隐式提交当前事务
+-- 不能 START TRANSACTION; CREATE TABLE ...; ROLLBACK;
+-- 对比 PostgreSQL: DDL 是事务性的, 可以回滚 CREATE TABLE
 
--- Check isolation level
-SELECT @@transaction_isolation;  -- 10.5.2+
-SELECT @@tx_isolation;           -- older versions
-
--- Read-only transaction (same as MySQL)
-START TRANSACTION READ ONLY;
-
--- Locking reads (same as MySQL)
-SELECT * FROM accounts WHERE id = 1 FOR UPDATE;
-SELECT * FROM accounts WHERE id = 1 FOR SHARE;      -- 10.3.0+ (same as MySQL 8.0)
-SELECT * FROM accounts WHERE id = 1 LOCK IN SHARE MODE;
-
--- NOWAIT (10.3+) / SKIP LOCKED (10.6+)
-SELECT * FROM accounts WHERE id = 1 FOR UPDATE NOWAIT;       -- 10.3+
-SELECT * FROM accounts WHERE id = 1 FOR UPDATE SKIP LOCKED;  -- 10.6+
-
--- WAIT N (MariaDB-specific, 10.3+)
--- Wait up to N seconds for a lock (not in MySQL)
-SELECT * FROM accounts WHERE id = 1 FOR UPDATE WAIT 5;
--- Returns error if lock not acquired within 5 seconds
-
--- START TRANSACTION WITH CONSISTENT SNAPSHOT (same as MySQL)
+-- ============================================================
+-- 5. START TRANSACTION WITH CONSISTENT SNAPSHOT
+-- ============================================================
 START TRANSACTION WITH CONSISTENT SNAPSHOT;
+-- 创建一致性快照 (MVCC 读取点), 用于备份等场景
+-- 对比 MySQL: 行为相同, 但 MariaDB 的 GTID 实现不同
 
--- System-versioned table transactions (10.3.4+):
--- DML on system-versioned tables automatically records history
-START TRANSACTION;
-UPDATE products SET price = 29.99 WHERE id = 1;
--- Old row version automatically preserved with row_start/row_end timestamps
-COMMIT;
--- After commit, both current and historical versions exist
-
--- XA Transactions (same as MySQL, for distributed two-phase commit)
-XA START 'txn_001';
-UPDATE accounts SET balance = balance - 100 WHERE id = 1;
-XA END 'txn_001';
-XA PREPARE 'txn_001';
-XA COMMIT 'txn_001';
-
--- Galera Cluster transactions (MariaDB Galera Cluster):
--- Virtually synchronous replication using certification-based replication
--- All nodes can accept writes; conflicts detected at commit time
-
--- Galera-specific: wsrep_sync_wait
--- Control what operations wait for cluster synchronization
-SET wsrep_sync_wait = 1;  -- wait for reads to be consistent
-SET wsrep_sync_wait = 7;  -- wait for reads, updates, and inserts
-
--- Galera-specific: wsrep_trx_fragment_size
--- Stream large transactions in fragments (10.4+)
-SET wsrep_trx_fragment_size = 10000;  -- fragment every 10000 bytes
--- Prevents large transactions from blocking the cluster
-
--- Galera limitations:
--- No table-level LOCK TABLES inside transactions
--- MyISAM not fully supported (InnoDB required)
--- Certification-based conflict detection may roll back transactions
-
--- DDL and transactions:
--- DDL causes implicit commit (same as MySQL)
-
--- Differences from MySQL 8.0:
--- FOR UPDATE WAIT N (MariaDB-specific, 10.3+)
--- NOWAIT from 10.3+, SKIP LOCKED from 10.6+ (MySQL both from 8.0)
--- Galera Cluster for multi-master synchronous replication
--- Galera streaming replication for large transactions (10.4+)
--- System-versioned table automatic history tracking in transactions
--- Same InnoDB transaction engine and isolation level behavior
--- Same XA transaction support
+-- ============================================================
+-- 6. 对引擎开发者: MVCC 实现差异
+-- ============================================================
+-- MariaDB 的 InnoDB 与 MySQL 的 InnoDB 的 MVCC 实现已有微小差异:
+--   1. Undo log 格式: 两者独立维护, 可能有布局差异
+--   2. Purge 线程: 清理旧版本的策略和线程模型不同
+--   3. Read View: 创建和回收时机的优化路径不同
+-- 这些差异在极端并发场景下可能导致不同的性能特征

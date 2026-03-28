@@ -1,86 +1,125 @@
--- CockroachDB: ALTER TABLE (v23.1+)
+-- CockroachDB: ALTER TABLE (v23.2+)
 --
 -- 参考资料:
---   [1] CockroachDB - SQL Statements
---       https://www.cockroachlabs.com/docs/stable/sql-statements
---   [2] CockroachDB - Functions and Operators
---       https://www.cockroachlabs.com/docs/stable/functions-and-operators
---   [3] CockroachDB - Data Types
---       https://www.cockroachlabs.com/docs/stable/data-types
+--   [1] CockroachDB ALTER TABLE
+--       https://www.cockroachlabs.com/docs/stable/alter-table
+--   [2] CockroachDB Online Schema Changes
+--       https://www.cockroachlabs.com/docs/stable/online-schema-changes
 
--- Add column (same as PostgreSQL)
+-- ============================================================
+-- 1. 基本语法（PostgreSQL 兼容）
+-- ============================================================
 ALTER TABLE users ADD COLUMN phone VARCHAR(20);
 ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
-
--- Add column with default and constraint
 ALTER TABLE users ADD COLUMN status INT NOT NULL DEFAULT 1;
-
--- Drop column
-ALTER TABLE users DROP COLUMN phone;
-ALTER TABLE users DROP COLUMN IF EXISTS phone;
-
--- Rename column
-ALTER TABLE users RENAME COLUMN username TO user_name;
-
--- Change column type (limited type changes, requires rewrite)
 ALTER TABLE users ALTER COLUMN age TYPE BIGINT;
-ALTER TABLE users ALTER COLUMN bio TYPE VARCHAR(500);
-
--- Set/drop default
-ALTER TABLE users ALTER COLUMN status SET DEFAULT 0;
-ALTER TABLE users ALTER COLUMN status DROP DEFAULT;
-
--- Set/drop NOT NULL
 ALTER TABLE users ALTER COLUMN email SET NOT NULL;
 ALTER TABLE users ALTER COLUMN phone DROP NOT NULL;
-
--- Rename table
+ALTER TABLE users ALTER COLUMN status SET DEFAULT 0;
+ALTER TABLE users ALTER COLUMN status DROP DEFAULT;
+ALTER TABLE users DROP COLUMN phone;
+ALTER TABLE users DROP COLUMN IF EXISTS phone;
+ALTER TABLE users RENAME COLUMN username TO user_name;
 ALTER TABLE users RENAME TO members;
 
--- Add constraint
-ALTER TABLE orders ADD CONSTRAINT fk_orders_user
-    FOREIGN KEY (user_id) REFERENCES users (id);
+-- ============================================================
+-- 2. 语法设计分析（对 SQL 引擎开发者）
+-- ============================================================
 
--- Add CHECK constraint
-ALTER TABLE users ADD CONSTRAINT chk_age CHECK (age >= 0 AND age <= 150);
+-- 2.1 异步 Schema 变更: CockroachDB 的核心 DDL 设计
+-- CockroachDB 的 schema 变更基于 Google F1 论文（与 TiDB 类似），
+-- 但实现上有重要差异:
+--
+-- 状态机: absent → delete-only → delete-and-write-only → backfill → public
+-- 协调: 不需要中心化协调器（不同于 TiDB 的 PD），而是通过 schema lease 机制
+-- 每个节点定期刷新 schema（默认 5 分钟），任何时刻最多两个相邻版本共存
+--
+-- 关键设计决策:
+--   DDL 是事务性的: BEGIN; ALTER TABLE ...; CREATE TABLE ...; COMMIT;
+--   这与 PostgreSQL 一致，但在分布式环境中实现难度更大。
+--   MySQL/Oracle DDL 隐式提交，无法在事务中 rollback DDL。
+--
+-- 对比:
+--   TiDB:       F1 协议 + PD 协调（中心化），DDL 隐式提交
+--   OceanBase:  RootService 协调 DDL，DDL 隐式提交
+--   Spanner:    DDL 不在用户事务中，是独立的 schema update 操作
+--   PostgreSQL: DDL 是事务性的（与 CockroachDB 一致）
 
--- Add UNIQUE constraint
-ALTER TABLE users ADD CONSTRAINT uq_email UNIQUE (email);
-
--- Drop constraint
-ALTER TABLE orders DROP CONSTRAINT fk_orders_user;
-ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_age;
-
--- Validate constraint (same as PostgreSQL)
-ALTER TABLE orders ADD CONSTRAINT fk_orders_user
-    FOREIGN KEY (user_id) REFERENCES users (id) NOT VALID;
-ALTER TABLE orders VALIDATE CONSTRAINT fk_orders_user;
-
--- Change primary key (CockroachDB-specific ALTER PRIMARY KEY)
+-- 2.2 ALTER PRIMARY KEY: CockroachDB 独有能力
 ALTER TABLE users ALTER PRIMARY KEY USING COLUMNS (id, region);
+-- 背后执行: 创建新主键索引 → 回填数据 → 原子切换 → 清理旧索引
+-- 对比: MySQL/PostgreSQL/TiDB/Spanner/OceanBase 都不支持直接修改主键
 
--- Add hash-sharded index via ALTER
-ALTER TABLE events ADD INDEX idx_ts (ts) USING HASH;
+-- ============================================================
+-- 3. CockroachDB 特有操作
+-- ============================================================
 
--- Set table locality (multi-region, v21.1+)
+-- 3.1 Locality 修改（多区域控制）
 ALTER TABLE users SET LOCALITY REGIONAL BY ROW;
 ALTER TABLE users SET LOCALITY GLOBAL;
 ALTER TABLE users SET LOCALITY REGIONAL BY TABLE IN 'us-east1';
 
--- Column families
+-- 3.2 行级 TTL（v22.1+）
+ALTER TABLE events SET (ttl_expiration_expression = 'created_at + INTERVAL ''90 days''');
+ALTER TABLE events SET (ttl_job_cron = '@daily');
+ALTER TABLE events RESET (ttl);
+
+-- 3.3 Column Family 修改
 ALTER TABLE wide_table ADD COLUMN extra BYTES CREATE FAMILY f_extra;
 ALTER TABLE wide_table ADD COLUMN more TEXT CREATE IF NOT EXISTS FAMILY f_extra;
 
--- Configure zone (replication/placement)
+-- 3.4 Zone 配置（副本和 GC）
 ALTER TABLE users CONFIGURE ZONE USING num_replicas = 5;
-ALTER TABLE users CONFIGURE ZONE USING
-    num_replicas = 5,
-    gc.ttlseconds = 86400;
+ALTER TABLE users CONFIGURE ZONE USING num_replicas = 5, gc.ttlseconds = 86400;
 
--- Schema changes
+-- 3.5 Hash-sharded index via ALTER
+ALTER TABLE events ADD INDEX idx_ts (ts) USING HASH;
+
+-- 3.6 Schema 修改
 ALTER TABLE users SET SCHEMA myschema;
 
--- Note: Schema changes are online and non-blocking
--- Note: Some ALTER operations run as background schema changes
--- Note: ALTER PRIMARY KEY creates a new hidden rowid column if needed
--- Note: No ALTER TABLE ... ADD COLUMN with GENERATED ALWAYS AS (must recreate)
+-- ============================================================
+-- 4. 约束管理
+-- ============================================================
+ALTER TABLE orders ADD CONSTRAINT fk_orders_user
+    FOREIGN KEY (user_id) REFERENCES users (id);
+ALTER TABLE users ADD CONSTRAINT chk_age CHECK (age >= 0 AND age <= 150);
+ALTER TABLE users ADD CONSTRAINT uq_email UNIQUE (email);
+
+-- NOT VALID: 添加约束但不验证现有数据（PostgreSQL 兼容）
+ALTER TABLE orders ADD CONSTRAINT fk_user
+    FOREIGN KEY (user_id) REFERENCES users (id) NOT VALID;
+ALTER TABLE orders VALIDATE CONSTRAINT fk_user;
+
+-- Partial unique constraint
+ALTER TABLE users ADD CONSTRAINT uq_active_email
+    UNIQUE (email) WHERE (status = 'active');
+
+ALTER TABLE orders DROP CONSTRAINT fk_orders_user;
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_age;
+
+-- ============================================================
+-- 5. 限制与注意事项
+-- ============================================================
+-- 不支持 ADD COLUMN ... AFTER/FIRST（PostgreSQL 语法不支持列顺序指定）
+-- 部分列类型转换支持（如 INT → BIGINT），不支持部分（如 STRING → INT with data）
+-- 同一表上的 DDL 串行执行
+-- SHOW JOBS 查看 schema 变更进度
+-- 大表 ADD INDEX 可能影响读写性能
+-- 不支持 ADD COLUMN 带 GENERATED ALWAYS AS（必须在 CREATE TABLE 中定义）
+
+-- ============================================================
+-- 6. 横向对比
+-- ============================================================
+-- 1. ALTER PRIMARY KEY:
+--    CockroachDB: 支持在线修改（独有优势）
+--    TiDB/MySQL/PostgreSQL/OceanBase/Spanner: 不支持直接修改
+--
+-- 2. DDL 事务性:
+--    CockroachDB + PostgreSQL: DDL 是事务性的（可以 ROLLBACK）
+--    MySQL + OceanBase + TiDB: DDL 隐式提交
+--    Spanner: DDL 不在事务中
+--
+-- 3. NOT VALID 约束:
+--    CockroachDB + PostgreSQL: 支持（先添加再异步验证，对大表友好）
+--    MySQL/TiDB/OceanBase: 不支持（添加约束时必须验证所有现有数据）

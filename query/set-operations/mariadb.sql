@@ -1,103 +1,61 @@
--- MariaDB: 集合操作
+-- MariaDB: 集合操作 (UNION / INTERSECT / EXCEPT)
+-- INTERSECT 和 EXCEPT 从 10.3+ 支持, 比 MySQL 8.0.31 更早
 --
 -- 参考资料:
---   [1] MariaDB Documentation - UNION
+--   [1] MariaDB Knowledge Base - UNION
 --       https://mariadb.com/kb/en/union/
---   [2] MariaDB Documentation - INTERSECT
+--   [2] MariaDB Knowledge Base - INTERSECT
 --       https://mariadb.com/kb/en/intersect/
---   [3] MariaDB Documentation - EXCEPT
---       https://mariadb.com/kb/en/except/
 
 -- ============================================================
--- UNION / UNION ALL（全版本支持）
+-- 1. UNION
 -- ============================================================
-SELECT id, name FROM employees
+SELECT username, email FROM users WHERE age >= 18
 UNION
-SELECT id, name FROM contractors;
+SELECT username, email FROM archived_users WHERE age >= 18;
 
-SELECT id, name FROM employees
+SELECT username FROM users
 UNION ALL
-SELECT id, name FROM contractors;
-
--- UNION DISTINCT 等价于 UNION
-SELECT id, name FROM employees
-UNION DISTINCT
-SELECT id, name FROM contractors;
+SELECT username FROM archived_users;
 
 -- ============================================================
--- INTERSECT / INTERSECT ALL（10.3+）
+-- 2. INTERSECT (10.3+)
 -- ============================================================
-SELECT id FROM employees
+SELECT username FROM users
 INTERSECT
-SELECT id FROM project_members;
+SELECT username FROM premium_users;
 
-SELECT id FROM employees
+-- INTERSECT ALL (10.5+): 保留重复
+SELECT username FROM users
 INTERSECT ALL
-SELECT id FROM project_members;
-
--- 10.3 之前的替代方案
-SELECT DISTINCT e.id FROM employees e
-INNER JOIN project_members p ON e.id = p.id;
+SELECT username FROM premium_users;
 
 -- ============================================================
--- EXCEPT / EXCEPT ALL（10.3+）
+-- 3. EXCEPT (10.3+)
 -- ============================================================
-SELECT id FROM employees
+SELECT username FROM users
 EXCEPT
-SELECT id FROM terminated_employees;
+SELECT username FROM blacklisted_users;
 
-SELECT id FROM employees
+-- EXCEPT ALL (10.5+)
+SELECT username FROM users
 EXCEPT ALL
-SELECT id FROM terminated_employees;
-
--- 10.3 之前的替代方案
-SELECT e.id FROM employees e
-LEFT JOIN terminated_employees t ON e.id = t.id
-WHERE t.id IS NULL;
+SELECT username FROM blacklisted_users;
 
 -- ============================================================
--- 嵌套与组合集合操作（10.4+）
+-- 4. 优先级和组合
 -- ============================================================
--- 10.4+ 支持括号控制优先级
-(SELECT id FROM employees
- UNION
- SELECT id FROM contractors)
-INTERSECT
-SELECT id FROM project_members;
+-- MariaDB 10.4+: INTERSECT 优先级高于 UNION/EXCEPT
+-- A UNION B INTERSECT C = A UNION (B INTERSECT C)
+-- 这符合 SQL 标准, 也与 PostgreSQL 一致
+-- MySQL 8.0.31: 也遵循相同优先级
 
 -- ============================================================
--- ORDER BY 与集合操作
+-- 5. 对引擎开发者的启示
 -- ============================================================
-SELECT name, salary FROM employees
-UNION ALL
-SELECT name, salary FROM contractors
-ORDER BY salary DESC;
-
--- 限制单个分支（需括号）
-(SELECT name FROM employees ORDER BY name LIMIT 5)
-UNION ALL
-(SELECT name FROM contractors ORDER BY name LIMIT 5);
-
--- ============================================================
--- LIMIT 与集合操作
--- ============================================================
-SELECT name FROM employees
-UNION ALL
-SELECT name FROM contractors
-ORDER BY name
-LIMIT 10;
-
--- LIMIT + OFFSET
-SELECT name FROM employees
-UNION ALL
-SELECT name FROM contractors
-ORDER BY name
-LIMIT 10 OFFSET 20;
-
--- ============================================================
--- 注意事项
--- ============================================================
--- MariaDB 10.3 引入 INTERSECT 和 EXCEPT
--- MariaDB 10.4 引入括号控制集合操作优先级
--- INTERSECT 优先级高于 UNION 和 EXCEPT
--- BLOB 列不能直接用于集合操作中的去重
+-- INTERSECT/EXCEPT 的实现可基于:
+--   1. Sort-based: 两边排序后做归并 (类似 merge join)
+--   2. Hash-based: 一边建 hash table, 另一边探测
+-- MariaDB 和 PostgreSQL 选择 hash-based 实现
+-- MySQL 8.0.31 的实现也是 hash-based
+-- ALL 变体需要维护计数器: INTERSECT ALL 取最小计数, EXCEPT ALL 做差

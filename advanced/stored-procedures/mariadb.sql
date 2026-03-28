@@ -1,141 +1,86 @@
--- MariaDB: Stored Procedures
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 存储过程
+-- 语法与 MySQL 一致, 新增 Oracle 兼容模式
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Stored Procedures
+--       https://mariadb.com/kb/en/stored-procedures/
 
--- Basic stored procedure (same as MySQL)
+-- ============================================================
+-- 1. 基本存储过程
+-- ============================================================
 DELIMITER //
-CREATE PROCEDURE get_user(IN p_username VARCHAR(64))
+CREATE PROCEDURE get_user_orders(IN p_user_id BIGINT)
 BEGIN
-    SELECT * FROM users WHERE username = p_username;
+    SELECT o.id, o.amount, o.created_at
+    FROM orders o
+    WHERE o.user_id = p_user_id
+    ORDER BY o.created_at DESC;
 END //
 DELIMITER ;
 
--- Call (same as MySQL)
-CALL get_user('alice');
+CALL get_user_orders(1);
 
--- OUT / INOUT parameters (same as MySQL)
+-- ============================================================
+-- 2. 带 OUT 参数
+-- ============================================================
 DELIMITER //
-CREATE PROCEDURE get_user_count(OUT p_count INT)
-BEGIN
-    SELECT COUNT(*) INTO p_count FROM users;
-END //
-DELIMITER ;
-
--- CREATE OR REPLACE PROCEDURE (MariaDB-specific, 10.1.3+)
--- Not available in MySQL (MySQL requires DROP then CREATE)
-DELIMITER //
-CREATE OR REPLACE PROCEDURE get_user(IN p_username VARCHAR(64))
-BEGIN
-    SELECT * FROM users WHERE username = p_username;
-END //
-DELIMITER ;
-
--- Variables and flow control (same as MySQL)
-DELIMITER //
-CREATE PROCEDURE transfer(
-    IN p_from BIGINT, IN p_to BIGINT, IN p_amount DECIMAL(10,2)
+CREATE PROCEDURE get_user_stats(
+    IN p_user_id BIGINT,
+    OUT p_order_count INT,
+    OUT p_total_amount DECIMAL(15,2)
 )
 BEGIN
-    DECLARE v_balance DECIMAL(10,2);
-    START TRANSACTION;
-    SELECT balance INTO v_balance FROM accounts WHERE id = p_from FOR UPDATE;
-    IF v_balance < p_amount THEN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient balance';
-    END IF;
-    UPDATE accounts SET balance = balance - p_amount WHERE id = p_from;
-    UPDATE accounts SET balance = balance + p_amount WHERE id = p_to;
-    COMMIT;
+    SELECT COUNT(*), COALESCE(SUM(amount), 0)
+    INTO p_order_count, p_total_amount
+    FROM orders WHERE user_id = p_user_id;
 END //
 DELIMITER ;
 
--- Cursor (same as MySQL)
-DELIMITER //
-CREATE PROCEDURE process_users()
+CALL get_user_stats(1, @cnt, @total);
+SELECT @cnt, @total;
+
+-- ============================================================
+-- 3. Oracle 兼容模式 (sql_mode=ORACLE, 10.3+)
+-- ============================================================
+-- MariaDB 独有: 可以切换到 Oracle PL/SQL 兼容模式
+SET sql_mode=ORACLE;
+CREATE OR REPLACE PROCEDURE oracle_style_proc(p_id IN NUMBER)
+AS
+    v_name VARCHAR2(100);
 BEGIN
-    DECLARE v_done INT DEFAULT FALSE;
-    DECLARE v_username VARCHAR(64);
-    DECLARE cur CURSOR FOR SELECT username FROM users;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
-    OPEN cur;
-    read_loop: LOOP
-        FETCH cur INTO v_username;
-        IF v_done THEN LEAVE read_loop; END IF;
-        -- process each row
-    END LOOP;
-    CLOSE cur;
-END //
-DELIMITER ;
+    SELECT name INTO v_name FROM employees WHERE id = p_id;
+    DBMS_OUTPUT.PUT_LINE('Name: ' || v_name);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Not found');
+END;
+/
+-- 支持: %TYPE, %ROWTYPE, EXCEPTION, PL/SQL 语法
+-- 对比 MySQL: 无 Oracle 兼容模式
+-- 设计动机: 降低 Oracle → MariaDB 迁移成本
 
--- Function (same as MySQL, but with OR REPLACE)
+-- ============================================================
+-- 4. 存储函数
+-- ============================================================
 DELIMITER //
-CREATE OR REPLACE FUNCTION full_name(first VARCHAR(50), last VARCHAR(50))
-RETURNS VARCHAR(101)
+CREATE FUNCTION calc_tax(amount DECIMAL(10,2)) RETURNS DECIMAL(10,2)
 DETERMINISTIC
 BEGIN
-    RETURN CONCAT(first, ' ', last);
+    RETURN amount * 0.13;
 END //
 DELIMITER ;
 
--- AGGREGATE stored function (10.3.3+, MariaDB-specific)
--- Create custom aggregate functions (not available in MySQL)
-DELIMITER //
-CREATE AGGREGATE FUNCTION group_median(val DOUBLE)
-RETURNS DOUBLE
-DETERMINISTIC
-BEGIN
-    DECLARE cnt INT DEFAULT 0;
-    DECLARE total DOUBLE DEFAULT 0;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND
-        RETURN total / cnt;
-    LOOP
-        FETCH GROUP NEXT ROW;
-        SET cnt = cnt + 1;
-        SET total = total + val;
-    END LOOP;
-END //
-DELIMITER ;
+SELECT calc_tax(100.00);
 
--- Usage of custom aggregate:
--- SELECT city, group_median(age) FROM users GROUP BY city;
-
--- Oracle-compatible PL/SQL (10.3+, with sql_mode=ORACLE)
--- MariaDB supports Oracle-compatible PL/SQL syntax
--- SET sql_mode = 'ORACLE';
-
--- PL/SQL procedure (Oracle mode):
--- CREATE OR REPLACE PROCEDURE get_user(p_username VARCHAR2)
--- IS
---     v_email VARCHAR2(255);
--- BEGIN
---     SELECT email INTO v_email FROM users WHERE username = p_username;
---     DBMS_OUTPUT.PUT_LINE(v_email);
--- EXCEPTION
---     WHEN NO_DATA_FOUND THEN
---         DBMS_OUTPUT.PUT_LINE('User not found');
--- END;
--- /
-
--- PL/SQL supports in Oracle mode:
--- EXCEPTION handling (WHEN ... THEN)
--- FOR ... LOOP (cursor FOR loop)
--- %ROWTYPE, %TYPE for variable declaration
--- RAISE_APPLICATION_ERROR
--- Anonymous blocks (BEGIN ... END)
-
--- Drop (same as MySQL, plus IF EXISTS)
-DROP PROCEDURE IF EXISTS get_user;
-DROP FUNCTION IF EXISTS full_name;
-
--- Differences from MySQL 8.0:
--- CREATE OR REPLACE PROCEDURE/FUNCTION (10.1.3+, not in MySQL)
--- Custom AGGREGATE FUNCTION (10.3.3+, not in MySQL)
--- Oracle-compatible PL/SQL via sql_mode=ORACLE (10.3+)
--- PL/SQL: packages, exceptions, %TYPE, %ROWTYPE in Oracle mode
--- Same core stored procedure capabilities as MySQL
--- Same SIGNAL/RESIGNAL for error handling
+-- ============================================================
+-- 5. 对引擎开发者的启示
+-- ============================================================
+-- Oracle 兼容模式是 MariaDB 的差异化战略:
+--   瞄准 Oracle 迁移市场 (去 IOE 浪潮)
+--   实现复杂度极高: 需要在 parser 中支持两套语法
+--   权衡: 兼容层越厚, 维护成本越高, 但市场价值越大
+-- 对比: TiDB 选择 MySQL 兼容, OceanBase 选择 MySQL + Oracle 双模
+-- 存储过程的执行模型:
+--   解释执行 (MariaDB/MySQL): 每次调用解析 AST 并逐语句执行
+--   编译执行 (Oracle PL/SQL): 编译为字节码, 缓存复用
+--   编译模式性能更好, 但实现复杂度高一个数量级

@@ -1,85 +1,74 @@
--- MariaDB: Window Functions (10.2+)
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
--- MariaDB added window functions in 10.2, earlier than MySQL 8.0.
+-- MariaDB: 窗口函数 (10.2+)
+-- 比 MySQL 8.0 更早支持窗口函数
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Window Functions
+--       https://mariadb.com/kb/en/window-functions/
 
--- All standard window functions supported since 10.2:
--- ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD,
--- FIRST_VALUE, LAST_VALUE, NTH_VALUE, PERCENT_RANK, CUME_DIST
-
--- ROW_NUMBER / RANK / DENSE_RANK (same as MySQL 8.0)
+-- ============================================================
+-- 1. 基本语法
+-- ============================================================
 SELECT username, age,
     ROW_NUMBER() OVER (ORDER BY age) AS rn,
     RANK()       OVER (ORDER BY age) AS rnk,
     DENSE_RANK() OVER (ORDER BY age) AS dense_rnk
 FROM users;
 
--- PARTITION BY (same as MySQL 8.0)
 SELECT username, city, age,
     ROW_NUMBER() OVER (PARTITION BY city ORDER BY age DESC) AS city_rank
 FROM users;
 
--- Aggregate window functions (same as MySQL 8.0)
+-- 聚合窗口函数
 SELECT username, age,
     SUM(age)   OVER () AS total_age,
-    AVG(age)   OVER (PARTITION BY city) AS city_avg,
-    COUNT(*)   OVER () AS total_count
+    AVG(age)   OVER (PARTITION BY city) AS city_avg_age,
+    COUNT(*)   OVER (PARTITION BY city) AS city_count
 FROM users;
 
--- LAG / LEAD (same as MySQL 8.0)
+-- 偏移函数
 SELECT username, age,
     LAG(age, 1)  OVER (ORDER BY id) AS prev_age,
-    LEAD(age, 1) OVER (ORDER BY id) AS next_age
+    LEAD(age, 1) OVER (ORDER BY id) AS next_age,
+    FIRST_VALUE(username) OVER (PARTITION BY city ORDER BY age) AS youngest
 FROM users;
 
--- Named window (same as MySQL 8.0)
+-- NTILE
+SELECT username, age, NTILE(4) OVER (ORDER BY age) AS quartile FROM users;
+
+-- ============================================================
+-- 2. 命名窗口
+-- ============================================================
 SELECT username, age,
     ROW_NUMBER() OVER w AS rn,
-    RANK()       OVER w AS rnk,
+    SUM(age)     OVER w AS running_sum,
     LAG(age)     OVER w AS prev_age
 FROM users
 WINDOW w AS (ORDER BY age);
 
--- Frame clause (same as MySQL 8.0)
+-- ============================================================
+-- 3. 帧子句
+-- ============================================================
 SELECT username, age,
     SUM(age) OVER (ORDER BY id ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS rolling_sum,
     AVG(age) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS moving_avg
 FROM users;
 
--- PERCENTILE_CONT / PERCENTILE_DISC (10.3.3+)
--- MariaDB supports these as window functions (not available in MySQL)
-SELECT city,
-    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY age) OVER (PARTITION BY city) AS median_age,
-    PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY age) OVER (PARTITION BY city) AS median_age_disc
-FROM users;
-
--- MEDIAN (10.3.3+): shorthand for PERCENTILE_CONT(0.5)
--- Not available in MySQL
-SELECT city,
-    MEDIAN(age) OVER (PARTITION BY city) AS median_age
-FROM users;
-
--- Aggregate functions as window functions
--- MariaDB allows GROUP_CONCAT as a window function (10.2+)
--- Not supported in MySQL window context
--- Note: behavior may vary by version
-
--- EXCLUDE clause in frame specification (10.2+)
+-- RANGE 帧
 SELECT username, age,
-    SUM(age) OVER (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
-        EXCLUDE CURRENT ROW) AS neighbor_sum
+    COUNT(*) OVER (ORDER BY age RANGE BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS nearby_count
 FROM users;
--- EXCLUDE options: CURRENT ROW, GROUP, TIES, NO OTHERS
 
--- Differences from MySQL 8.0:
--- Window functions available since 10.2 (earlier than MySQL 8.0)
--- PERCENTILE_CONT/PERCENTILE_DISC supported (not in MySQL)
--- MEDIAN function supported (not in MySQL)
--- EXCLUDE clause in frame specification supported (not in MySQL)
--- Generally similar performance characteristics
--- optimizer_switch controls window function execution strategy
+-- ============================================================
+-- 4. MariaDB 窗口函数 vs MySQL 窗口函数
+-- ============================================================
+-- 时间线: MariaDB 10.2 (2017) vs MySQL 8.0 (2018)
+-- MariaDB 更早引入, 但两者的实现独立:
+--   相同点: 都支持 ROW_NUMBER/RANK/DENSE_RANK/LAG/LEAD/NTILE 等
+--   相同点: 都支持 ROWS/RANGE 帧, 命名窗口
+--   不同点: 内部实现和优化策略不同 (各自独立开发)
+--   不同点: 都不支持 GROUPS 帧, QUALIFY, IGNORE NULLS
+--
+-- 对引擎开发者的启示:
+--   窗口函数是 SQL 标准化程度很高的特性
+--   但内部实现差异导致: 相同查询的性能特征可能不同
+--   排序策略和帧计算的增量优化是性能关键

@@ -1,85 +1,56 @@
--- MariaDB: Full-Text Search
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 全文搜索
+-- 支持 InnoDB FTS 和 Mroonga 引擎
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Full-Text Indexes
+--       https://mariadb.com/kb/en/full-text-indexes/
 
--- Create fulltext index (same as MySQL, InnoDB and MyISAM)
-CREATE FULLTEXT INDEX idx_ft_bio ON users (bio);
-CREATE FULLTEXT INDEX idx_ft_multi ON articles (title, content);
-
--- Natural language mode (same as MySQL)
-SELECT * FROM articles
-WHERE MATCH(title, content) AGAINST('database performance');
-
--- With relevance score
-SELECT title, MATCH(title, content) AGAINST('database performance') AS score
-FROM articles
-WHERE MATCH(title, content) AGAINST('database performance')
-ORDER BY score DESC;
-
--- Boolean mode (same as MySQL)
-SELECT * FROM articles
-WHERE MATCH(title, content) AGAINST('+database -mysql +performance' IN BOOLEAN MODE);
-
--- Phrase search
-SELECT * FROM articles
-WHERE MATCH(title, content) AGAINST('"full text search"' IN BOOLEAN MODE);
-
--- Query expansion
-SELECT * FROM articles
-WHERE MATCH(title, content) AGAINST('database' WITH QUERY EXPANSION);
-
--- Mroonga storage engine: superior CJK full-text search (bundled with MariaDB)
--- Mroonga provides better tokenization for Chinese, Japanese, Korean
-CREATE TABLE articles_mroonga (
-    id      BIGINT NOT NULL AUTO_INCREMENT,
+-- ============================================================
+-- 1. InnoDB 全文索引 (同 MySQL)
+-- ============================================================
+CREATE TABLE articles (
+    id      BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title   VARCHAR(255),
     content TEXT,
-    PRIMARY KEY (id),
-    FULLTEXT INDEX idx_ft (title, content)
+    FULLTEXT INDEX ft_content (title, content)
+) ENGINE=InnoDB;
+
+-- 自然语言模式
+SELECT * FROM articles
+WHERE MATCH(title, content) AGAINST ('database optimization' IN NATURAL LANGUAGE MODE);
+
+-- 布尔模式
+SELECT * FROM articles
+WHERE MATCH(title, content) AGAINST ('+database -mysql +optimization' IN BOOLEAN MODE);
+
+-- 查询扩展
+SELECT * FROM articles
+WHERE MATCH(title, content) AGAINST ('database' WITH QUERY EXPANSION);
+
+-- ============================================================
+-- 2. Mroonga 全文引擎 (MariaDB 独有)
+-- ============================================================
+-- Mroonga 基于 Groonga 全文搜索引擎, CJK 支持比 InnoDB ngram 更好
+CREATE TABLE articles_mroonga (
+    id      BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    title   VARCHAR(255),
+    content TEXT,
+    FULLTEXT INDEX ft_content (title, content) COMMENT 'tokenizer "TokenBigram"'
 ) ENGINE=Mroonga DEFAULT CHARSET=utf8mb4;
+-- Mroonga 的优势:
+--   1. 原生中日韩分词 (TokenBigram, TokenMecab)
+--   2. 列存储模式 (全文搜索 + 范围查询组合)
+--   3. 实时索引更新 (无 MySQL InnoDB FTS 的延迟问题)
+-- MySQL 对比: 只有 InnoDB FTS + ngram parser, 无等价引擎
 
--- Mroonga: search with weights
-SELECT *, MATCH(title) AGAINST('database') * 10 +
-          MATCH(content) AGAINST('database') AS weighted_score
-FROM articles_mroonga
-WHERE MATCH(title, content) AGAINST('database')
-ORDER BY weighted_score DESC;
-
--- Mroonga: snippet function (return highlighted matches)
-SELECT id, mroonga_snippet_html(content, 'database') AS snippet
-FROM articles_mroonga
-WHERE MATCH(content) AGAINST('database');
-
--- Mroonga: escape function for user input
-SELECT mroonga_escape('user+input-with*special');
-
--- InnoDB fulltext: minimum token configuration
--- innodb_ft_min_token_size = 3 (default, same as MySQL)
--- MariaDB-specific: innodb_ft_ignore_stopwords (10.5+)
-
--- FULLTEXT index with parser (same as MySQL, ngram available)
-CREATE FULLTEXT INDEX idx_ft_cjk ON articles (content) WITH PARSER ngram;
-
--- SphinxSE engine: integration with Sphinx search engine (MariaDB-specific)
--- Allows querying a Sphinx search daemon directly from SQL
-CREATE TABLE sphinx_search (
-    id     BIGINT NOT NULL,
-    weight INT NOT NULL,
-    query  VARCHAR(3072) NOT NULL,
-    INDEX(query)
-) ENGINE=SPHINX CONNECTION="sphinx://localhost:9312/idx_articles";
-
-SELECT * FROM sphinx_search WHERE query = 'database performance';
-
--- Differences from MySQL 8.0:
--- Mroonga engine bundled (excellent CJK support, not in MySQL)
--- SphinxSE engine for Sphinx integration (MariaDB-specific)
--- mroonga_snippet_html() for search result highlighting
--- Same InnoDB fulltext capabilities as MySQL
--- Different minimum token size defaults may apply
--- No MySQL 8.0 data dictionary changes affect fulltext behavior
+-- ============================================================
+-- 3. 对引擎开发者: 全文搜索实现
+-- ============================================================
+-- InnoDB FTS 实现:
+--   倒排索引存在辅助表 (FTS_DOC_ID_INDEX 等) 中
+--   增量索引: 新文档先写入 FTS Index Cache, 后台 OPTIMIZE TABLE 合并
+--   删除标记: DELETE 只在 DELETE 辅助表中标记, 不立即删除倒排项
+-- Mroonga 实现:
+--   Groonga 引擎独立维护倒排索引
+--   支持在线索引更新, 无需 OPTIMIZE
+--   可以使用 Wrapper 模式 (Mroonga 包装 InnoDB) 同时获得事务和全文搜索

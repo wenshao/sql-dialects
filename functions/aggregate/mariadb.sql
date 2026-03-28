@@ -1,91 +1,43 @@
--- MariaDB: Aggregate Functions
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 聚合函数
+-- 与 MySQL 基本一致, GROUP_CONCAT 差异值得注意
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - Aggregate Functions
+--       https://mariadb.com/kb/en/aggregate-functions/
 
--- Basic aggregates (same as MySQL)
-SELECT COUNT(*) FROM users;
-SELECT COUNT(DISTINCT city) FROM users;
-SELECT SUM(amount) FROM orders;
-SELECT AVG(amount) FROM orders;
-SELECT MIN(amount) FROM orders;
-SELECT MAX(amount) FROM orders;
+-- ============================================================
+-- 1. 标准聚合函数
+-- ============================================================
+SELECT COUNT(*), COUNT(DISTINCT age), SUM(age), AVG(age), MIN(age), MAX(age)
+FROM users;
 
--- GROUP BY (same as MySQL)
-SELECT city, COUNT(*) AS cnt, AVG(age) AS avg_age
-FROM users
-GROUP BY city;
+SELECT dept_id, COUNT(*) AS cnt, AVG(salary) AS avg_sal
+FROM employees GROUP BY dept_id;
 
--- GROUP BY + HAVING (same as MySQL)
-SELECT city, COUNT(*) AS cnt
-FROM users
-GROUP BY city
-HAVING cnt > 10;
+-- ============================================================
+-- 2. GROUP_CONCAT
+-- ============================================================
+SELECT dept_id, GROUP_CONCAT(name ORDER BY name SEPARATOR ', ') AS members
+FROM employees GROUP BY dept_id;
+-- group_concat_max_len 默认 1024 (同 MySQL), 超长截断
 
--- WITH ROLLUP (same as MySQL)
-SELECT city, COUNT(*) FROM users GROUP BY city WITH ROLLUP;
-
--- GROUP_CONCAT (same as MySQL, with MariaDB extensions)
-SELECT GROUP_CONCAT(username ORDER BY username SEPARATOR ', ') FROM users;
-SELECT GROUP_CONCAT(DISTINCT city SEPARATOR ', ') FROM users;
-
--- GROUP_CONCAT with LIMIT (10.3.3+, MariaDB-specific)
--- Limit the number of values concatenated
-SELECT GROUP_CONCAT(username ORDER BY username SEPARATOR ', ' LIMIT 5) FROM users;
-SELECT GROUP_CONCAT(username ORDER BY username SEPARATOR ', ' LIMIT 3 OFFSET 2) FROM users;
--- Not available in MySQL
-
--- JSON aggregation (10.5+)
+-- ============================================================
+-- 3. JSON 聚合 (10.5+)
+-- ============================================================
 SELECT JSON_ARRAYAGG(username) FROM users;
 SELECT JSON_OBJECTAGG(username, age) FROM users;
 
--- Statistical functions (same as MySQL)
-SELECT STD(amount) FROM orders;
-SELECT STDDEV(amount) FROM orders;
-SELECT STDDEV_POP(amount) FROM orders;
-SELECT STDDEV_SAMP(amount) FROM orders;
-SELECT VARIANCE(amount) FROM orders;
-SELECT VAR_POP(amount) FROM orders;
-SELECT VAR_SAMP(amount) FROM orders;
+-- ============================================================
+-- 4. 统计聚合
+-- ============================================================
+SELECT STDDEV(salary), VARIANCE(salary), STDDEV_POP(salary), VAR_POP(salary)
+FROM employees;
 
--- BIT aggregates (same as MySQL)
-SELECT BIT_AND(flags) FROM settings;
-SELECT BIT_OR(flags) FROM settings;
-SELECT BIT_XOR(flags) FROM settings;
-
--- PERCENTILE_CONT / PERCENTILE_DISC (10.3.3+, MariaDB-specific)
--- Not available as aggregate functions in MySQL
--- Can be used as both aggregate and window functions
-SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY age) FROM users;   -- median
-SELECT PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY age) FROM users;   -- median (discrete)
-
--- PERCENTILE with GROUP BY
-SELECT city,
-    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY age) AS median_age,
-    PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY age) AS p95_age
-FROM users
-GROUP BY city;
-
--- MEDIAN (10.3.3+, MariaDB-specific)
--- Shorthand for PERCENTILE_CONT(0.5)
-SELECT MEDIAN(age) FROM users;
-SELECT city, MEDIAN(age) FROM users GROUP BY city;
-
--- Optimizer differences for aggregation:
--- MariaDB often uses different execution strategies for GROUP BY
--- Hash-based aggregation available in certain cases
-
--- GROUPING SETS: not directly supported (same limitation as MySQL)
--- Use UNION ALL or WITH ROLLUP instead
-
--- Differences from MySQL 8.0:
--- GROUP_CONCAT ... LIMIT (MariaDB-specific, 10.3.3+)
--- PERCENTILE_CONT / PERCENTILE_DISC aggregate functions (10.3.3+)
--- MEDIAN aggregate function (10.3.3+)
--- JSON_ARRAYAGG / JSON_OBJECTAGG from 10.5+ (MySQL from 5.7.22+)
--- No GROUPING SETS or CUBE (same limitation as MySQL)
--- Same core aggregate functions (COUNT, SUM, AVG, MIN, MAX, etc.)
+-- ============================================================
+-- 5. 对引擎开发者的启示
+-- ============================================================
+-- GROUP_CONCAT 是 MySQL/MariaDB 独有的聚合函数
+-- PostgreSQL 等价: string_agg() 或 array_agg() + array_to_string()
+-- 实现要点: 需要在聚合过程中维护可变长度的字符串缓冲区
+-- 排序选项 (ORDER BY) 需要在聚合阶段做局部排序
+-- 截断行为是安全设计: 防止内存溢出, 但可能导致数据丢失

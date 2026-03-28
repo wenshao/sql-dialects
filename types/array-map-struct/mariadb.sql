@@ -1,130 +1,48 @@
--- MariaDB: 复合/复杂类型 (Array, Map, Struct)
+-- MariaDB: 复合类型 (Array / Map / Struct)
+-- MariaDB 不原生支持数组/映射/结构体类型
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base - JSON Data Type
---       https://mariadb.com/kb/en/json-data-type/
---   [2] MariaDB Knowledge Base - JSON Functions
---       https://mariadb.com/kb/en/json-functions/
---   [3] MariaDB Knowledge Base - Dynamic Columns
---       https://mariadb.com/kb/en/dynamic-columns/
+--   [1] MariaDB Knowledge Base - Data Types
+--       https://mariadb.com/kb/en/data-types/
 
 -- ============================================================
--- MariaDB 没有原生 ARRAY / MAP / STRUCT 类型
--- 使用 JSON 或 Dynamic Columns 作为替代
+-- 1. 无原生复合类型
 -- ============================================================
+-- MariaDB (同 MySQL) 不支持 ARRAY、MAP、STRUCT 类型
+-- 对比 PostgreSQL: 原生 ARRAY 类型 (从第一版就有)
+-- 对比 ClickHouse: Array(T), Map(K,V), Tuple(T1,T2,...) 全支持
 
 -- ============================================================
--- JSON 类型（MariaDB 10.2+）
+-- 2. JSON 模拟
 -- ============================================================
--- 注意: MariaDB 的 JSON 是 LONGTEXT 的别名，与 MySQL 不同
+-- 使用 JSON 数组模拟 ARRAY
+INSERT INTO events (data) VALUES ('{"tags": ["vip", "new", "premium"]}');
+SELECT JSON_EXTRACT(data, '$.tags[0]') FROM events;
+SELECT JSON_LENGTH(data, '$.tags') FROM events;
 
-CREATE TABLE users (
-    id       BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name     VARCHAR(100) NOT NULL,
-    tags     JSON,                             -- LONGTEXT 别名
-    metadata JSON
-    -- 注意: MariaDB 不支持 JSON CHECK 约束 (10.4.3 之前)
+-- 使用 JSON 对象模拟 MAP
+INSERT INTO events (data) VALUES ('{"config": {"theme": "dark", "lang": "zh"}}');
+SELECT JSON_EXTRACT(data, '$.config.theme') FROM events;
+SELECT JSON_KEYS(data, '$.config') FROM events;
+
+-- ============================================================
+-- 3. SET 类型 (有限的"数组")
+-- ============================================================
+CREATE TABLE user_roles (
+    id    INT PRIMARY KEY,
+    roles SET('admin', 'editor', 'viewer', 'moderator')
 );
+INSERT INTO user_roles VALUES (1, 'admin,editor');
+SELECT * FROM user_roles WHERE FIND_IN_SET('admin', roles);
+-- SET 限制: 最多 64 个值, 值必须预定义, 不能动态扩展
 
 -- ============================================================
--- JSON 数组（代替 ARRAY）
+-- 4. 对引擎开发者的启示
 -- ============================================================
-
-INSERT INTO users (name, tags) VALUES
-    ('Alice', JSON_ARRAY('admin', 'dev')),
-    ('Bob',   '["user", "tester"]');
-
--- 访问元素
-SELECT JSON_EXTRACT(tags, '$[0]') FROM users;
-SELECT JSON_VALUE(tags, '$[0]') FROM users;    -- 返回标量（MariaDB 10.2.3+）
-SELECT JSON_UNQUOTE(JSON_EXTRACT(tags, '$[0]')) FROM users;
-
--- 数组长度
-SELECT JSON_LENGTH(tags) FROM users;
-
--- 数组包含
-SELECT * FROM users WHERE JSON_CONTAINS(tags, '"admin"');
-SELECT * FROM users WHERE JSON_SEARCH(tags, 'one', 'admin') IS NOT NULL;
-
--- JSON_ARRAY_APPEND / JSON_ARRAY_INSERT
-SELECT JSON_ARRAY_APPEND(tags, '$', 'new_tag') FROM users;
-SELECT JSON_ARRAY_INSERT(tags, '$[1]', 'inserted') FROM users;
-
--- ============================================================
--- JSON 对象（代替 MAP / STRUCT）
--- ============================================================
-
-UPDATE users SET metadata = JSON_OBJECT(
-    'city', 'New York',
-    'settings', JSON_OBJECT('theme', 'dark')
-) WHERE id = 1;
-
-SELECT JSON_VALUE(metadata, '$.city') FROM users;
-SELECT JSON_VALUE(metadata, '$.settings.theme') FROM users;
-
-SELECT JSON_KEYS(metadata) FROM users;
-SELECT JSON_SET(metadata, '$.zip', '10001') FROM users;
-SELECT JSON_REMOVE(metadata, '$.city') FROM users;
-
--- ============================================================
--- UNNEST 替代: JSON_TABLE（MariaDB 10.6+）
--- ============================================================
-
-SELECT u.name, jt.tag
-FROM users u,
-JSON_TABLE(u.tags, '$[*]' COLUMNS (
-    tag VARCHAR(50) PATH '$'
-)) AS jt;
-
--- ============================================================
--- 聚合
--- ============================================================
-
-SELECT department, JSON_ARRAYAGG(name) AS members
-FROM employees
-GROUP BY department;
-
-SELECT JSON_OBJECTAGG(name, salary) FROM employees;
-
--- ============================================================
--- Dynamic Columns（MariaDB 特有，5.3+）
--- ============================================================
-
--- Dynamic Columns 使用 BLOB 存储键值对
-CREATE TABLE products (
-    id    BIGINT PRIMARY KEY,
-    name  VARCHAR(100),
-    attrs BLOB                                -- Dynamic Columns
-);
-
--- 创建 Dynamic Column
-INSERT INTO products VALUES
-    (1, 'Laptop', COLUMN_CREATE('brand', 'Dell', 'ram', '16GB'));
-
--- 访问值
-SELECT COLUMN_GET(attrs, 'brand' AS CHAR) FROM products;
-
--- 检查键存在
-SELECT COLUMN_EXISTS(attrs, 'ram') FROM products;
-
--- 列出所有键
-SELECT COLUMN_LIST(attrs) FROM products;
-
--- 添加/修改
-UPDATE products SET attrs = COLUMN_ADD(attrs, 'cpu', 'i7') WHERE id = 1;
-
--- 删除
-UPDATE products SET attrs = COLUMN_DELETE(attrs, 'ram') WHERE id = 1;
-
--- 转为 JSON
-SELECT COLUMN_JSON(attrs) FROM products;
-
--- ============================================================
--- 注意事项
--- ============================================================
-
--- 1. MariaDB 没有原生 ARRAY / MAP / STRUCT 类型
--- 2. JSON 类型是 LONGTEXT 的别名（非二进制存储，与 MySQL 不同）
--- 3. JSON_TABLE 从 MariaDB 10.6 开始支持
--- 4. Dynamic Columns 是 MariaDB 特有功能（早于 JSON 支持）
--- 5. 不支持 MySQL 的多值索引（Multi-Valued Index）
+-- MySQL/MariaDB 不支持复合类型的原因:
+--   1. 设计哲学: 关系模型第一范式要求列是原子值
+--   2. 索引难题: B-Tree 不能高效索引数组元素
+--   3. 存储复杂: 变长嵌套数据增加行格式复杂度
+-- PostgreSQL 的 ARRAY 证明复合类型在关系数据库中是可行的
+-- 但 PostgreSQL ARRAY 的 GIN 索引维护成本高 (写放大)
+-- 务实方案: 用 JSON 模拟复合类型, 用生成列 + 索引加速查询

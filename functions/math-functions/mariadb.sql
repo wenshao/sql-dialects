@@ -1,61 +1,39 @@
--- MariaDB: Math Functions
+-- MariaDB: 数学函数
+-- 与 MySQL 完全一致
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base - Mathematical Functions
---       https://mariadb.com/kb/en/mathematical-functions/
+--   [1] MariaDB Knowledge Base - Numeric Functions
+--       https://mariadb.com/kb/en/numeric-functions/
 
 -- ============================================================
--- 基本数学函数
+-- 1. 基本数学函数
 -- ============================================================
-SELECT ABS(-42);                          -- 42
-SELECT CEIL(4.3);                         -- 5
-SELECT CEILING(4.3);                      -- 5
-SELECT FLOOR(4.7);                        -- 4
-SELECT ROUND(3.14159, 2);                 -- 3.14
-SELECT TRUNCATE(3.14159, 2);              -- 3.14
+SELECT ABS(-10), CEIL(3.2), FLOOR(3.8), ROUND(3.567, 2), TRUNCATE(3.567, 1);
+SELECT MOD(10, 3), POWER(2, 10), SQRT(16), SIGN(-5);
 
--- 取模
-SELECT MOD(17, 5);                        -- 2
-SELECT 17 % 5;                            -- 2
-SELECT 17 MOD 5;                          -- 2
+-- ============================================================
+-- 2. 对数和指数
+-- ============================================================
+SELECT LOG(100), LOG2(1024), LOG10(1000), LN(2.718281828), EXP(1);
 
--- 幂、根、对数
-SELECT POWER(2, 10);                      -- 1024
-SELECT POW(2, 10);                        -- 1024
-SELECT SQRT(144);                         -- 12
-SELECT EXP(1);                            -- 2.718...
-SELECT LN(EXP(1));                        -- 1.0
-SELECT LOG(EXP(1));                       -- 1.0          (自然对数)
-SELECT LOG(2, 1024);                      -- 10
-SELECT LOG2(1024);                        -- 10
-SELECT LOG10(1000);                       -- 3
+-- ============================================================
+-- 3. 三角函数
+-- ============================================================
+SELECT SIN(PI()/2), COS(0), TAN(PI()/4);
+SELECT ASIN(1), ACOS(0), ATAN(1), ATAN2(1, 1);
+SELECT DEGREES(PI()), RADIANS(180);
 
-SELECT SIGN(-42);                         -- -1
-SELECT PI();                              -- 3.141593
-SELECT RAND();                            -- 0.0 到 1.0
-SELECT RAND(42);                          -- 可重复随机数
+-- ============================================================
+-- 4. 随机数
+-- ============================================================
+SELECT RAND(), RAND(42);     -- 可选种子
+SELECT FLOOR(RAND() * 100);  -- 0-99 随机整数
 
--- 三角函数
-SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
-SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1);
-SELECT ATAN2(1, 1);
-SELECT COT(1);                            -- 余切
-SELECT DEGREES(PI());                     -- 180
-SELECT RADIANS(180);                      -- π
-
--- GREATEST / LEAST
-SELECT GREATEST(1, 5, 3);                -- 5
-SELECT LEAST(1, 5, 3);                   -- 1
-
--- 位运算
-SELECT 5 & 3; SELECT 5 | 3; SELECT 5 ^ 3; SELECT ~5;
-SELECT 1 << 4; SELECT 16 >> 2;
-SELECT BIT_COUNT(7);                      -- 3
-
--- 其他
-SELECT CONV(255, 10, 16);                -- 'FF'
-SELECT CRC32('hello');                    -- 907060870
-
--- 注意：与 MySQL 数学函数高度兼容
--- 注意：LOG(x) 以 e 为底
--- 注意：^ 是 XOR（幂用 POW/POWER）
+-- ============================================================
+-- 5. 对引擎开发者的启示
+-- ============================================================
+-- 数学函数是 SQL 引擎中最标准化的部分
+-- MariaDB/MySQL 的数学函数与 SQL 标准和其他引擎高度一致
+-- 实现通常直接映射到 C 标准库 (libm) 的对应函数
+-- 精度注意: DOUBLE 类型的浮点精度问题在所有引擎中都存在
+-- DECIMAL 精确运算: 需要实现任意精度算术库 (MariaDB 内部使用 decimal 类型)
