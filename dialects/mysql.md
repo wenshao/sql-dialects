@@ -91,7 +91,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### DDL — 数据定义
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [建表](../ddl/create-table/mysql.md) | **ENGINE 可插拔架构是 MySQL 独有设计**——InnoDB 已成为唯一合理选择（8.0 系统表迁入 InnoDB），但 ENGINE 子句仍是全行业独此一家的 DDL 语法。AUTO_INCREMENT 自增最简实现（对比 PG 的 SERIAL/IDENTITY、Oracle 的 SEQUENCE）。`utf8` 只支持 3 字节不含 emoji 是历史最大坑，必须用 `utf8mb4`。 |
 | [改表](../ddl/alter-table/mysql.md) | **Online DDL 三种算法（INSTANT/INPLACE/COPY）是 8.0 的核心改进**——INSTANT ADD COLUMN 毫秒级完成（对比 PG 11 前需重写全表）。但部分 ALTER 仍需 COPY 表，生产环境常用 pt-osc/gh-ost 第三方工具规避锁。DDL 隐式提交事务——不可回滚（对比 PG 的 DDL 事务性可回滚）。 |
@@ -103,7 +103,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### Advanced — 高级特性
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [动态 SQL](../advanced/dynamic-sql/mysql.md) | **PREPARE/EXECUTE 是 MySQL 动态 SQL 的唯一方式**——存储过程内可用但语法冗长（对比 Oracle 的 EXECUTE IMMEDIATE 更简洁）。无匿名块（对比 PG 的 DO $$ ... $$、Oracle 的 DECLARE/BEGIN）。动态 SQL 的绑定变量通过 `?` 占位符实现（对比 PG 的 `$1`）。 |
 | [错误处理](../advanced/error-handling/mysql.md) | **DECLARE HANDLER (CONTINUE/EXIT) 是 MySQL 的过程式错误处理**——CONTINUE 处理后继续执行、EXIT 处理后退出块。功能远弱于 Oracle 的命名异常/RAISE_APPLICATION_ERROR 和 PG 的 EXCEPTION WHEN 块。无 SQLSTATE 精细分类（对比 PG 的标准错误码体系和 GET STACKED DIAGNOSTICS）。 |
@@ -118,7 +118,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### DML — 数据操作
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [删除](../dml/delete/mysql.md) | **DELETE + LIMIT 是 MySQL 独有的安全删除方式**——可分批删除避免长事务锁表。TRUNCATE 不可回滚（DDL 隐式提交）且不触发触发器。对比 PG 的 DELETE...RETURNING（返回被删行）和 Oracle 的 Flashback Table（误删恢复），MySQL 缺少这些安全网。 |
 | [插入](../dml/insert/mysql.md) | **INSERT...SET col=val 是 MySQL 独有的赋值式插入语法**——比 VALUES 列表可读性更好。LOAD DATA INFILE 是批量导入的最快方式（比 INSERT 快 20 倍以上）。Multi-row VALUES 早期即支持。对比 PG 的 COPY 和 Oracle 的 INSERT ALL 多表插入（独有），MySQL 的批量加载方案较单一。 |
@@ -127,7 +127,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### Functions — 内置函数
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [聚合函数](../functions/aggregate/mysql.md) | **GROUP_CONCAT 默认 1024 字节截断是常见陷阱**——需 `SET group_concat_max_len` 调大。无 GROUPING SETS/CUBE/ROLLUP（8.0+ 有限支持）、无 FILTER 子句（对比 PG 的 `COUNT(*) FILTER(WHERE...)` 优雅条件聚合）。不支持 LISTAGG（标准函数，Oracle/Snowflake 支持）。 |
 | [条件函数](../functions/conditional/mysql.md) | **IF(cond, true_val, false_val) 是 MySQL 独有的函数式条件**——比 CASE WHEN 简洁但非标准。`\|\|` 是逻辑 OR 而非字符串拼接（对比 PG/Oracle/SQLite 中 `\|\|` 是拼接），这是**最大的方言陷阱之一**——从 PG 迁移到 MySQL 的 SQL 经常因此出错。需用 CONCAT() 替代。 |
@@ -138,7 +138,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### Query — 查询
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [CTE](../query/cte/mysql.md) | **8.0 才引入 CTE（比 PG/Oracle/SQL Server 晚了多年）**。早期版本 CTE 总是物化（无法优化为内联），8.0.14+ 优化器可选择内联。递归 CTE 仅支持 UNION ALL（不支持 UNION DISTINCT，对比 PG 两者都支持）。无 PG 的可写 CTE（INSERT/UPDATE/DELETE in WITH）。 |
 | [全文搜索](../query/full-text-search/mysql.md) | **InnoDB FULLTEXT（5.6+）内置全文搜索**——支持 BOOLEAN MODE（AND/OR/NOT）和 NATURAL LANGUAGE MODE。ngram 解析器支持中文/日文/韩文分词（对比 PG 的 tsvector+GIN 更灵活可扩展）。无 BM25 排序（对比 DuckDB FTS5、SQLite FTS5），相关性排序算法较基础。 |
@@ -151,7 +151,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### Scenarios — 实战场景
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [日期填充](../scenarios/date-series-fill/mysql.md) | **无 generate_series 是 MySQL 日期填充的最大障碍**——需递归 CTE（8.0+）或预建数字辅助表模拟。对比 PG 的 `generate_series(date,date,interval)` 原生支持和 BigQuery 的 GENERATE_DATE_ARRAY，MySQL 方案最冗长。MariaDB 的 seq_1_to_N 序列引擎是更优替代。 |
 | [去重](../scenarios/deduplication/mysql.md) | **ROW_NUMBER()+CTE 是 8.0+ 的标准去重写法**——`DELETE FROM t WHERE id IN (SELECT id FROM (SELECT id, ROW_NUMBER() OVER(PARTITION BY key ORDER BY ts DESC) rn FROM t) WHERE rn > 1)`。5.x 需用 DELETE+JOIN 自连接。对比 PG 的 DISTINCT ON 一行搞定去重、BigQuery/DuckDB 的 QUALIFY 无需嵌套。 |
@@ -167,7 +167,7 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 ### Types — 数据类型
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
 | [复合类型](../types/array-map-struct/mysql.md) | **无原生 ARRAY/MAP/STRUCT 类型**——只能用 JSON 类型模拟复合结构（对比 PG 的原生 ARRAY+运算符、ClickHouse 的 Array/Map/Tuple、BigQuery 的 STRUCT/ARRAY 一等公民）。JSON 列上可建多值索引（8.0.17+），但查询语法不如原生复合类型直观。 |
 | [日期时间](../types/datetime/mysql.md) | **DATETIME vs TIMESTAMP 的选择是经典困惑**——TIMESTAMP 有 2038 年溢出问题（32 位 Unix 时间戳）且存储为 UTC 自动转换时区，DATETIME 无时区转换且范围到 9999 年。微秒精度需显式指定 `DATETIME(6)`（默认秒级）。对比 PG 的 TIMESTAMPTZ（无 2038 问题）和 BigQuery 的四种时间类型严格区分。 |

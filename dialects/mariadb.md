@@ -58,86 +58,86 @@ MariaDB 是 MySQL 的社区驱动分叉，由 MySQL 原始创始人 Michael "Mon
 
 ### DDL — 数据定义
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [建表](../ddl/create-table/mariadb.sql) | MySQL 分叉，兼容 ENGINE 架构，增加 SEQUENCE(10.3+)/虚拟列 |
-| [改表](../ddl/alter-table/mariadb.sql) | Online DDL 改进(INSTANT ADD COLUMN)，ALGORITHM 指定 |
-| [索引](../ddl/indexes/mariadb.sql) | InnoDB/Aria 引擎索引，与 MySQL 高度兼容 |
-| [约束](../ddl/constraints/mariadb.sql) | CHECK 约束真正执行(10.2+，早于 MySQL 8.0.16) |
-| [视图](../ddl/views/mariadb.sql) | 与 MySQL 兼容，无物化视图 |
-| [序列与自增](../ddl/sequences/mariadb.sql) | SEQUENCE 对象(10.3+，MySQL 无此功能)，AUTO_INCREMENT 兼容 |
-| [数据库/Schema/用户](../ddl/users-databases/mariadb.sql) | user@host 模型(同 MySQL)，角色(10.0.5+) |
+| [建表](../ddl/create-table/mariadb.sql) | **MySQL 分叉保持协议兼容——兼容 ENGINE 可插拔架构**。独立新增 SEQUENCE(10.3+) 引擎（`SELECT * FROM seq_1_to_100` 直接生成序列，MySQL 无此功能）、虚拟列增强。对比 MySQL 的 AUTO_INCREMENT 和 PG 的 IDENTITY——MariaDB 的 SEQUENCE 引擎是独有创新。 |
+| [改表](../ddl/alter-table/mariadb.sql) | **Online DDL 改进——INSTANT ADD COLUMN 秒级完成**。ALGORITHM=INSTANT/INPLACE/COPY 显式指定。对比 MySQL 8.0 的 INSTANT DDL（功能接近）和 PG 的 DDL 事务性可回滚——MariaDB 在 Online DDL 上领先或持平 MySQL。 |
+| [索引](../ddl/indexes/mariadb.sql) | **InnoDB/Aria 引擎索引与 MySQL 高度兼容**——B-tree 聚簇索引。Mroonga 引擎提供 CJK 全文索引增强。对比 MySQL 索引体系和 PG 的 GiST/GIN/BRIN 四框架——MariaDB 索引功能与 MySQL 一致。 |
+| [约束](../ddl/constraints/mariadb.sql) | **CHECK 约束 10.2+ 真正执行——早于 MySQL 8.0.16**。MariaDB 在约束语义上比 MySQL 更早做正确的事。对比 PG/Oracle 始终强制执行——MariaDB 领先 MySQL 但晚于 PG。 |
+| [视图](../ddl/views/mariadb.sql) | **与 MySQL 兼容视图——无物化视图**。对比 PG 的 REFRESH MATERIALIZED VIEW 和 Oracle 的 Fast Refresh+Query Rewrite——MariaDB（同 MySQL）物化视图是空白。 |
+| [序列与自增](../ddl/sequences/mariadb.sql) | **SEQUENCE 对象(10.3+) 是 MariaDB 独有的 MySQL 系增强**——独立序列对象。AUTO_INCREMENT 与 MySQL 完全兼容。对比 PG 的 IDENTITY/SEQUENCE（更早更完善）——MariaDB 填补了 MySQL 缺少 SEQUENCE 的空白。 |
+| [数据库/Schema/用户](../ddl/users-databases/mariadb.sql) | **user@host 权限模型（同 MySQL）+ 角色(10.0.5+，早于 MySQL 8.0)**。对比 PG/Oracle 的纯用户+角色模型——MariaDB 在角色支持上领先 MySQL 约 3 年。 |
 
 ### Advanced — 高级特性
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [动态 SQL](../advanced/dynamic-sql/mariadb.sql) | PREPARE/EXECUTE(同 MySQL)，EXECUTE IMMEDIATE(10.2+)简化 |
-| [错误处理](../advanced/error-handling/mariadb.sql) | DECLARE HANDLER(同 MySQL)，SIGNAL/RESIGNAL |
-| [执行计划](../advanced/explain/mariadb.sql) | EXPLAIN ANALYZE(10.1+)，EXPLAIN FORMAT=JSON |
-| [锁机制](../advanced/locking/mariadb.sql) | InnoDB 行锁+间隙锁(同 MySQL)，Aria 引擎崩溃安全 |
-| [分区](../advanced/partitioning/mariadb.sql) | RANGE/LIST/HASH/KEY 分区(同 MySQL)，SYSTEM_TIME 分区独有 |
-| [权限](../advanced/permissions/mariadb.sql) | user@host 模型，角色(10.0.5+，早于 MySQL 8.0) |
-| [存储过程](../advanced/stored-procedures/mariadb.sql) | PL/SQL 兼容模式(10.3+ sql_mode=ORACLE)，独特卖点 |
-| [临时表](../advanced/temp-tables/mariadb.sql) | CREATE TEMPORARY TABLE(同 MySQL)，Aria 引擎临时表 |
-| [事务](../advanced/transactions/mariadb.sql) | InnoDB MVCC(同 MySQL)，默认 RR，支持 XA 事务 |
-| [触发器](../advanced/triggers/mariadb.sql) | FOR EACH ROW(同 MySQL)，无 INSTEAD OF/语句级 |
+| [动态 SQL](../advanced/dynamic-sql/mariadb.sql) | **PREPARE/EXECUTE（同 MySQL）+ EXECUTE IMMEDIATE(10.2+) 简化**——借鉴 Oracle 语法。对比 Oracle 的 EXECUTE IMMEDIATE 和 PG 的 EXECUTE format()——MariaDB 的 EXECUTE IMMEDIATE 是 MySQL 系独有简化。 |
+| [错误处理](../advanced/error-handling/mariadb.sql) | **DECLARE HANDLER（同 MySQL）+ SIGNAL/RESIGNAL**。Oracle 兼容模式可用命名异常。对比 PG 的 EXCEPTION WHEN——MariaDB 错误处理与 MySQL 一致但 Oracle 模式是独特扩展。 |
+| [执行计划](../advanced/explain/mariadb.sql) | **EXPLAIN ANALYZE(10.1+，早于 MySQL 8.0.18)**。EXPLAIN FORMAT=JSON 结构化输出。对比 PG 的 EXPLAIN ANALYZE（最详细）——MariaDB 在执行计划工具上领先 MySQL。 |
+| [锁机制](../advanced/locking/mariadb.sql) | **InnoDB 行锁+间隙锁（同 MySQL）+ Aria 引擎崩溃安全**——Aria 是 MyISAM 崩溃安全替代。对比 PG 的 MVCC 无间隙锁——MariaDB 并发控制与 MySQL 相同。 |
+| [分区](../advanced/partitioning/mariadb.sql) | **RANGE/LIST/HASH/KEY 分区（同 MySQL）+ SYSTEM_TIME 分区独有**——系统版本表可按时间自动分区历史数据。对比 MySQL 的分区和 PG 的声明式分区——SYSTEM_TIME 分区是 MariaDB 独有创新。 |
+| [权限](../advanced/permissions/mariadb.sql) | **user@host 模型 + 角色(10.0.5+，早于 MySQL 8.0)**——领先 MySQL 约 3 年。对比 PG/Oracle 早已支持角色——MariaDB 在权限上追赶标准。 |
+| [存储过程](../advanced/stored-procedures/mariadb.sql) | **PL/SQL 兼容模式(sql_mode=ORACLE) 是 MariaDB 独特卖点**——可执行 PL/SQL 风格代码。对比 Oracle 原生 PL/SQL 和 PG 的 PL/pgSQL——MariaDB 的 Oracle 兼容降低迁移门槛。 |
+| [临时表](../advanced/temp-tables/mariadb.sql) | **CREATE TEMPORARY TABLE（同 MySQL）+ Aria 引擎崩溃安全临时表**。对比 MySQL 的 MEMORY/InnoDB 临时表和 PG 的 CREATE TEMP TABLE——MariaDB 临时表与 MySQL 一致。 |
+| [事务](../advanced/transactions/mariadb.sql) | **InnoDB MVCC（同 MySQL）——默认 RR + XA 分布式事务**。DDL 隐式提交不可回滚。对比 PG 的 DDL 事务性可回滚——MariaDB 事务语义继承 MySQL。 |
+| [触发器](../advanced/triggers/mariadb.sql) | **FOR EACH ROW 行级触发器（同 MySQL）——无 INSTEAD OF/语句级触发器**。对比 PG 的完整触发器——MariaDB 触发器限制与 MySQL 相同。 |
 
 ### DML — 数据操作
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [删除](../dml/delete/mariadb.sql) | DELETE+LIMIT(同 MySQL)，TRUNCATE 不可回滚 |
-| [插入](../dml/insert/mariadb.sql) | INSERT...SET/RETURNING(10.5+)，LOAD DATA 批量 |
-| [更新](../dml/update/mariadb.sql) | 多表 UPDATE JOIN(同 MySQL)，UPDATE...RETURNING(10.5+) |
-| [Upsert](../dml/upsert/mariadb.sql) | ON DUPLICATE KEY UPDATE(同 MySQL)，INSERT...RETURNING |
+| [删除](../dml/delete/mariadb.sql) | **DELETE+LIMIT 分批删除（同 MySQL）**——TRUNCATE 不可回滚。对比 PG 的 DELETE...RETURNING——MariaDB 删除功能与 MySQL 一致。 |
+| [插入](../dml/insert/mariadb.sql) | **INSERT...SET + RETURNING(10.5+) 独有**——RETURNING 借鉴 PG 一步获取插入结果。LOAD DATA 批量导入。对比 PG 的 RETURNING（更早）和 MySQL（无 RETURNING）——MariaDB 填补了 MySQL 短板。 |
+| [更新](../dml/update/mariadb.sql) | **多表 UPDATE JOIN（同 MySQL）+ UPDATE...RETURNING(10.5+)**——RETURNING 是 MySQL 系独有增强。对比 PG 的 UPDATE...RETURNING（更早）——MariaDB 的 RETURNING 填补 MySQL 空白。 |
+| [Upsert](../dml/upsert/mariadb.sql) | **ON DUPLICATE KEY UPDATE（同 MySQL）+ INSERT...RETURNING**。无标准 MERGE。对比 PG 的 ON CONFLICT（更灵活）——MariaDB Upsert 与 MySQL 一致。 |
 
 ### Functions — 内置函数
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [聚合函数](../functions/aggregate/mariadb.sql) | GROUP_CONCAT(同 MySQL)，无 GROUPING SETS |
-| [条件函数](../functions/conditional/mariadb.sql) | IF()/CASE(同 MySQL)，DECODE(Oracle 兼容模式) |
-| [日期函数](../functions/date-functions/mariadb.sql) | DATE_FORMAT(同 MySQL)，与 MySQL 高度兼容 |
-| [数学函数](../functions/math-functions/mariadb.sql) | 与 MySQL 兼容，完整数学函数 |
-| [字符串函数](../functions/string-functions/mariadb.sql) | CONCAT(同 MySQL)，|| 在 sql_mode=ORACLE 时为拼接 |
-| [类型转换](../functions/type-conversion/mariadb.sql) | CAST/CONVERT(同 MySQL)，隐式转换行为与 MySQL 一致 |
+| [聚合函数](../functions/aggregate/mariadb.sql) | **GROUP_CONCAT（同 MySQL）——无 GROUPING SETS/CUBE/ROLLUP/FILTER**。对比 PG 的完整多维聚合——MariaDB 聚合函数与 MySQL 一致。 |
+| [条件函数](../functions/conditional/mariadb.sql) | **IF()/CASE（同 MySQL）+ DECODE（Oracle 兼容模式可用）**。对比 MySQL 无 DECODE 和 Oracle 原生 DECODE——MariaDB Oracle 模式是独特扩展。 |
+| [日期函数](../functions/date-functions/mariadb.sql) | **DATE_FORMAT（同 MySQL）日期函数完全兼容**。对比 PG 的 to_char 和 Oracle 的 TO_DATE——MariaDB 日期函数继承 MySQL 风格。 |
+| [数学函数](../functions/math-functions/mariadb.sql) | **与 MySQL 兼容完整数学函数**。GREATEST/LEAST 内置，除零返回 NULL。对比 PG/Oracle 除零报错——MariaDB 与 MySQL 数学函数一致。 |
+| [字符串函数](../functions/string-functions/mariadb.sql) | **CONCAT（同 MySQL）+ || 在 sql_mode=ORACLE 时为拼接**——标准模式 || 是逻辑 OR（同 MySQL），Oracle 模式 || 是拼接。对比 PG/Oracle || 始终是拼接——sql_mode 切换解决方言差异。 |
+| [类型转换](../functions/type-conversion/mariadb.sql) | **CAST/CONVERT（同 MySQL）——隐式转换宽松**。无 TRY_CAST。对比 PG 严格类型和 SQL Server 的 TRY_CAST——MariaDB 类型转换与 MySQL 相同。 |
 
 ### Query — 查询
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [CTE](../query/cte/mariadb.sql) | 递归 CTE(10.2+，早于 MySQL 8.0)，WITH 标准语法 |
-| [全文搜索](../query/full-text-search/mariadb.sql) | InnoDB/Mroonga FULLTEXT，Mroonga 引擎 CJK 分词更强 |
-| [连接查询](../query/joins/mariadb.sql) | 无 FULL OUTER JOIN(同 MySQL)，标准 JOIN 完整 |
-| [分页](../query/pagination/mariadb.sql) | LIMIT/OFFSET(同 MySQL)，LIMIT...ROWS EXAMINED 独有 |
-| [行列转换](../query/pivot-unpivot/mariadb.sql) | 无原生 PIVOT，用 CASE+GROUP BY(同 MySQL) |
-| [集合操作](../query/set-operations/mariadb.sql) | INTERSECT/EXCEPT(10.3+，早于 MySQL 8.0.31) |
-| [子查询](../query/subquery/mariadb.sql) | 优化器改进优于早期 MySQL，semi-join 优化 |
-| [窗口函数](../query/window-functions/mariadb.sql) | 10.2+ 支持（早于 MySQL 8.0），CUME_DIST/PERCENT_RANK |
+| [CTE](../query/cte/mariadb.sql) | **递归 CTE(10.2+，早于 MySQL 8.0)**——领先 MySQL 约 1 年。无可写 CTE。对比 PG 的可写 CTE 和 MySQL 8.0 CTE——MariaDB 在 CTE 上领先 MySQL。 |
+| [全文搜索](../query/full-text-search/mariadb.sql) | **InnoDB FULLTEXT + Mroonga 引擎 CJK 分词更强**——Mroonga 对中日韩分词优于 InnoDB ngram。对比 PG 的 tsvector+GIN——MariaDB 的 Mroonga 是 CJK 搜索优势。 |
+| [连接查询](../query/joins/mariadb.sql) | **无 FULL OUTER JOIN（同 MySQL）**——需 UNION 模拟。对比 PG 完整支持——MariaDB 继承 MySQL 的 JOIN 限制。 |
+| [分页](../query/pagination/mariadb.sql) | **LIMIT/OFFSET（同 MySQL）+ LIMIT...ROWS EXAMINED 独有**——限制扫描行数防止全表扫描。对比 MySQL 标准 LIMIT——ROWS EXAMINED 是实用的查询保护功能。 |
+| [行列转换](../query/pivot-unpivot/mariadb.sql) | **无原生 PIVOT（同 MySQL）**——CASE+GROUP BY 模拟。对比 Oracle/BigQuery/DuckDB 原生 PIVOT——MariaDB 继承 MySQL 行列转换短板。 |
+| [集合操作](../query/set-operations/mariadb.sql) | **INTERSECT/EXCEPT(10.3+) 早于 MySQL 8.0.31 约 5 年**。对比 PG 始终完整——MariaDB 在集合操作上领先 MySQL。 |
+| [子查询](../query/subquery/mariadb.sql) | **优化器改进优于早期 MySQL**——semi-join 优化等更早引入。对比 MySQL 5.x 子查询性能噩梦——MariaDB 优化器在某些场景优于同期 MySQL。 |
+| [窗口函数](../query/window-functions/mariadb.sql) | **窗口函数 10.2+ 支持（早于 MySQL 8.0）**——完整窗口函数集。无 QUALIFY。对比 MySQL 8.0 和 PG 8.4——MariaDB 窗口函数比 MySQL 更早交付。 |
 
 ### Scenarios — 实战场景
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [日期填充](../scenarios/date-series-fill/mariadb.sql) | seq_1_to_N 序列引擎独有，无需递归 CTE |
-| [去重](../scenarios/deduplication/mariadb.sql) | ROW_NUMBER+CTE 或 DELETE+JOIN |
-| [区间检测](../scenarios/gap-detection/mariadb.sql) | 窗口函数(10.2+)+seq 序列引擎辅助 |
-| [层级查询](../scenarios/hierarchical-query/mariadb.sql) | 递归 CTE(10.2+)，无 CONNECT BY |
-| [JSON 展开](../scenarios/json-flatten/mariadb.sql) | JSON_TABLE(10.6+)，JSON_EXTRACT 路径查询 |
-| [迁移速查](../scenarios/migration-cheatsheet/mariadb.sql) | 与 MySQL 高度兼容但 10.6+ 出现不可忽略差异 |
-| [TopN 查询](../scenarios/ranking-top-n/mariadb.sql) | ROW_NUMBER(10.2+)+CTE，LIMIT 直接 TopN |
-| [累计求和](../scenarios/running-total/mariadb.sql) | SUM() OVER(10.2+)，窗口函数早于 MySQL |
-| [缓慢变化维](../scenarios/slowly-changing-dim/mariadb.sql) | 无 MERGE 语句，ON DUPLICATE KEY UPDATE 替代 |
-| [字符串拆分](../scenarios/string-split-to-rows/mariadb.sql) | 无原生拆分，JSON_TABLE(10.6+) 或递归 CTE 模拟 |
-| [窗口分析](../scenarios/window-analytics/mariadb.sql) | 10.2+ 窗口函数，早于 MySQL，帧子句完整 |
+| [日期填充](../scenarios/date-series-fill/mariadb.sql) | **seq_1_to_N 序列引擎是 MariaDB 独有的最简日期填充方案**——无需递归 CTE。对比 MySQL 需递归 CTE 和 PG 的 generate_series——MariaDB 序列引擎方案最简洁。 |
+| [去重](../scenarios/deduplication/mariadb.sql) | **ROW_NUMBER+CTE 去重或 DELETE+JOIN 自连接**。对比 PG 的 DISTINCT ON 和 BigQuery 的 QUALIFY——MariaDB 去重方案中规中矩。 |
+| [区间检测](../scenarios/gap-detection/mariadb.sql) | **窗口函数(10.2+)+seq 序列引擎辅助检测间隙**——seq 引擎替代递归 CTE 生成序列。对比 PG 的 generate_series——MariaDB seq 引擎是间隙检测的独特优势。 |
+| [层级查询](../scenarios/hierarchical-query/mariadb.sql) | **递归 CTE(10.2+) 标准层级查询**——无 CONNECT BY。对比 PG 递归 CTE+ltree 和 MySQL 8.0 递归 CTE——MariaDB 层级查询与 MySQL 一致。 |
+| [JSON 展开](../scenarios/json-flatten/mariadb.sql) | **JSON_TABLE(10.6+)+JSON_EXTRACT**——JSON_TABLE 引入晚于 MySQL 8.0。JSON 内部存储为 LONGTEXT（非二进制，效率低于 MySQL）。对比 PG 的 JSONB+GIN——MariaDB JSON 实现在 MySQL 系中反而落后。 |
+| [迁移速查](../scenarios/migration-cheatsheet/mariadb.sql) | **与 MySQL 高度兼容但 10.6+ 差异扩大**——JSON 存储差异、CHECK 行为差异、SEQUENCE 独有、系统版本表独有。迁移需逐项验证。 |
+| [TopN 查询](../scenarios/ranking-top-n/mariadb.sql) | **ROW_NUMBER(10.2+)+CTE 分组 TopN**——无 QUALIFY。对比 BigQuery/DuckDB QUALIFY 无需子查询——MariaDB TopN 方案与 MySQL 一致。 |
+| [累计求和](../scenarios/running-total/mariadb.sql) | **SUM() OVER(10.2+) 累计求和——早于 MySQL 8.0**。对比 PG 8.4 起即支持——MariaDB 在窗口函数上位于 PG 和 MySQL 之间。 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/mariadb.sql) | **无 MERGE——ON DUPLICATE KEY UPDATE 是唯一 Upsert 方案**。对比 Oracle MERGE（首创）和 PG 15+ MERGE——MariaDB 与 MySQL 一样缺少标准 MERGE。 |
+| [字符串拆分](../scenarios/string-split-to-rows/mariadb.sql) | **无原生拆分函数**——JSON_TABLE(10.6+) 或递归 CTE 模拟。seq 引擎+SUBSTRING_INDEX 是独有简洁方案。对比 PG 14 string_to_table——MariaDB 字符串拆分较繁琐。 |
+| [窗口分析](../scenarios/window-analytics/mariadb.sql) | **10.2+ 窗口函数完整——早于 MySQL 8.0**。ROWS/RANGE 帧完整。无 QUALIFY/FILTER/GROUPS。对比 PG 的 FILTER+GROUPS——MariaDB 窗口分析与 MySQL 持平。 |
 
 ### Types — 数据类型
 
-| 模块 | 简评 |
+| 模块 | 特色与分析 |
 |---|---|
-| [复合类型](../types/array-map-struct/mariadb.sql) | 无 ARRAY/STRUCT，JSON 替代(同 MySQL) |
-| [日期时间](../types/datetime/mariadb.sql) | DATETIME vs TIMESTAMP(同 MySQL)，微秒精度 |
-| [JSON](../types/json/mariadb.sql) | JSON 别名 LONGTEXT(非二进制)，JSON_TABLE(10.6+)，不如 MySQL JSONB |
-| [数值类型](../types/numeric/mariadb.sql) | 与 MySQL 兼容，DECIMAL 精确，UNSIGNED 保留 |
-| [字符串类型](../types/string/mariadb.sql) | utf8=utf8mb3(同 MySQL)，utf8mb4 推荐 |
+| [复合类型](../types/array-map-struct/mariadb.sql) | **无 ARRAY/STRUCT（同 MySQL）**——JSON 替代。对比 PG 原生 ARRAY 和 BigQuery STRUCT/ARRAY——MariaDB 复合类型依赖 JSON。 |
+| [日期时间](../types/datetime/mariadb.sql) | **DATETIME vs TIMESTAMP 选择困惑（同 MySQL）**——TIMESTAMP 有 2038 年问题。对比 PG TIMESTAMPTZ——MariaDB 时间类型限制与 MySQL 相同。 |
+| [JSON](../types/json/mariadb.sql) | **JSON 别名 LONGTEXT（非二进制）——不如 MySQL 二进制 JSON**。JSON_TABLE(10.6+) 晚于 MySQL。对比 PG JSONB+GIN（最强）——MariaDB JSON 在 MySQL 系中反而落后。 |
+| [数值类型](../types/numeric/mariadb.sql) | **与 MySQL 兼容数值——DECIMAL 精确+UNSIGNED 保留**。UNSIGNED 仍完整支持（MySQL 8.0 废弃趋势中）。对比 PG 无 UNSIGNED——MariaDB 数值类型与 MySQL 兼容。 |
+| [字符串类型](../types/string/mariadb.sql) | **utf8=utf8mb3 只支持 3 字节（同 MySQL 历史坑）**——必须用 utf8mb4。对比 PG UTF-8 默认完整——MariaDB 继承 MySQL utf8 编码陷阱。 |
