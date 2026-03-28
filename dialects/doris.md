@@ -34,6 +34,10 @@ Apache Doris 是一款开源的 MPP 分析数据库，源自百度内部的 Palo
 | **Multi-Catalog** | 通过 Catalog 机制直接查询 Hive/Iceberg/Hudi/Elasticsearch/MySQL/PostgreSQL 等外部数据源，无需 ETL。 |
 | **Stream Load** | 通过 HTTP PUT 接口实时推送 JSON/CSV 数据到 Doris，支持事务性写入和 exactly-once 语义。 |
 | **Light Schema Change** | 列的增删改可在秒级完成，无需数据重写，对在线业务友好。 |
+| **Variant 类型（2.1+）** | 半结构化数据类型，写入时自动推断 schema 并按列存储。对 JSON 分析场景性能远优于 STRING + JSON 函数。对标 Snowflake VARIANT。 |
+| **倒排索引（2.0+）** | 基于 CLucene 的倒排索引，支持全文检索、等值/范围过滤加速。对日志分析场景（替代 Elasticsearch）极有价值。 |
+| **Nereids 优化器（2.0+）** | 全新的 Cascades 框架 CBO 优化器，替代旧的 RBO 优化器。支持更复杂的查询重写和代价估算。 |
+| **AUTO_INCREMENT（2.1+）** | Unique Key Merge-on-Write 表支持自增列，对从 MySQL 迁移的用户友好。 |
 | **Runtime Filter** | 运行时动态生成 Bloom Filter / IN 谓词下推到扫描侧，减少 JOIN 的数据量，对星型模型查询效果显著。 |
 
 ## 已知不足

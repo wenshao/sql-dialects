@@ -32,6 +32,10 @@ TiDB 采用计算与存储分离的分层架构：**TiDB Server** 负责 SQL 解
 - **资源管控**：通过 Resource Control 实现多租户间 CPU/IO 配额管理。
 - **AUTO_ID_CACHE**：控制自增 ID 缓存粒度，在分布式场景下平衡性能与连续性。
 - **TTL 表**：支持行级 TTL，到期数据自动清理。
+- **向量搜索（8.4+）**：`VECTOR` 数据类型 + `VEC_COSINE_DISTANCE()` 等函数 + HNSW 向量索引。原生支持 AI embedding 存储和 ANN 查询，无需外部向量数据库。
+- **全局索引 GA（8.5+）**：分区表上的全局二级索引，解决了分区表跨分区查询需要扫描所有分区的问题。
+- **快速建表（8.5+）**：`CREATE TABLE` 和 `ADD INDEX` 性能大幅提升（10x+），通过批量 DML 和并行 DDL。
+- **外键正式支持（6.6+）**：从实验特性升级为 GA，支持 CASCADE/SET NULL/RESTRICT。分布式外键有性能代价但保证完整性。
 
 ## 已知不足
 
