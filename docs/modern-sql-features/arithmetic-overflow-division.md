@@ -24,8 +24,8 @@
 | **PostgreSQL** | `2` | INTEGER | `/` 即整数除（整数操作数时） |
 | **Oracle** | `2.5` | NUMBER | 无（用 `TRUNC(5/2)`） |
 | **SQL Server** | `2` | INT | `/` 即整数除（整数操作数时） |
-| **BigQuery** | `2.5` | FLOAT64 | `DIV(5, 2) = 2` |
-| **Snowflake** | `2` | NUMBER(1,0) | `/` 对 NUMBER 操作数是整数除 |
+| **BigQuery** | `2.5` | FLOAT64 | `DIV(a, b)` 函数（`DIV(5, 2) = 2`） |
+| **Snowflake** | `2` | NUMBER | `/` 对 NUMBER 操作数是整数除 |
 | **ClickHouse** | `2` | Int | `intDiv(5, 2) = 2`；`/` 对整数是整数除 |
 | **Hive** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **Spark SQL** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
@@ -37,7 +37,7 @@
 | **Flink SQL** | `2` | INT | `/` 对整数是整数除 |
 | **Redshift** | `2` | INTEGER | `/` 对整数是整数除（PG 兼容） |
 | **Databricks** | `2.5` | DOUBLE | `DIV`（同 Spark） |
-| **Impala** | `2.5` | DOUBLE | `DIV(5, 2) = 2` |
+| **Impala** | `2.5` | DOUBLE | `DIV` 运算符（`5 DIV 2 = 2`） |
 | **Teradata** | `2` | INTEGER | `/` 对整数是整数除 |
 | **Db2** | `2` | INTEGER | `/` 对整数是整数除 |
 | **SAP HANA** | `2` | INTEGER | `/` 对整数是整数除 |
@@ -197,7 +197,7 @@ SQL 标准规则（大多数引擎遵循）:
 
 | 排名 | 差异 | 影响 | 受影响方言 |
 |------|------|------|-----------|
-| 1 | 整数除法结果类型 | 金融计算错误 | PG/SS 返回 `0`，MySQL/Oracle 返回 `0.33` |
+| 1 | 整数除法结果类型 | 金融计算错误 | PG/SS: `5/2=2`（截断），MySQL/Oracle: `5/2=2.5`（真除法） |
 | 2 | 整数溢出静默回绕 | 累加器/计数器翻转为负数 | ClickHouse、Spark 3.x、Flink |
 | 3 | 除零静默返回 NULL | 错误被掩盖 | MySQL、Hive、StarRocks、Doris |
 | 4 | 裸字面量 `0.1` 的类型 | `0.1+0.2≠0.3` | BigQuery、ClickHouse、Hive |
