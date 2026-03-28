@@ -351,7 +351,8 @@ SAP HANA 的隐式转换介于 PostgreSQL 和 Oracle 之间。数字族内向上
 - **VARCHAR ↔ NVARCHAR = ✅**: 两种字符串类型之间双向隐式转换
 - **REAL/DOUBLE → DECIMAL = ❌**: 浮点到精确数需要显式 CAST
 - **DATE → TIMESTAMP = ✅**: 添加午夜时间，无损
-- **BOOLEAN/VARBINARY 完全孤立**: 不与其他类型隐式互转
+- **BOOLEAN 较为孤立**: 不与字符串/日期/浮点隐式互转（在比较上下文中 `WHERE bool_col = 1` 可能允许，但表达式级不自动触发）
+- **VARBINARY 完全孤立**: 不与其他类型隐式互转
 - **NVARCHAR 是默认字符类型**: SAP HANA 列存储默认使用 Unicode
 
 ---
@@ -496,7 +497,7 @@ OceanBase MySQL 模式遵循 MySQL 5.7/8.0 的类型转换规则。在 MySQL 模
 
 ## 16. CockroachDB — 隐式类型转换矩阵
 
-CockroachDB 兼容 PostgreSQL，但比 PostgreSQL 更严格。设计哲学是"避免隐式类型强制转换"——使用上下文感知的多态字面量类型解析代替隐式转换。支持三级转换上下文：隐式（Implicit）、赋值（Assignment）、显式（Explicit），与 PostgreSQL 的 `pg_cast.castcontext` 一致。
+CockroachDB 兼容 PostgreSQL，隐式转换严格度与 PostgreSQL 相当，但采用不同的策略——使用上下文感知的多态字面量类型解析代替隐式类型强制转换。支持三级转换上下文：隐式（Implicit）、赋值（Assignment）、显式（Explicit），与 PostgreSQL 的 `pg_cast.castcontext` 一致。
 
 > 来源: [CockroachDB Data Types](https://www.cockroachlabs.com/docs/stable/data-types)
 > [CockroachDB cast_map.go](https://github.com/cockroachdb/cockroach/blob/master/pkg/sql/sem/cast/cast_map.go)
@@ -771,7 +772,7 @@ Spanner（GoogleSQL）是最严格的引擎之一，与 BigQuery 同源。隐式
 
 ## 24. MaxCompute — 隐式类型转换矩阵
 
-MaxCompute 源自 Hive 但有自己的扩展。单向数字提升链，STRING 可隐式转为 DOUBLE/DECIMAL，BOOLEAN 完全孤立。
+MaxCompute 源自 Hive 但有自己的扩展。数字提升链基于 Hive 排名逻辑，STRING 可隐式转为 DOUBLE（特例），但不能隐式转为 DECIMAL。BOOLEAN 完全孤立。
 
 > 来源: [MaxCompute 数据类型](https://help.aliyun.com/zh/maxcompute/user-guide/data-type-editions)
 
@@ -1074,15 +1075,16 @@ SQL 标准定义的隐式转换仅限数字族内无损提升和 DATE→TIMESTAM
 | 排名 | 引擎 | STRING→NUMBER 隐式 | CAST 失败行为 |
 |------|------|-------------------|-------------|
 | 1（最松） | SQLite | ✅（动态类型） | 静默转为 0 |
-| 2 | MySQL / MariaDB / TiDB / OceanBase(MySQL) / PolarDB / TDSQL | ✅（`'abc'→0`） | 静默转为 0/NULL |
-| 3 | Redshift | ✅（运行时报错） | 运行时报错 / TRY_CAST |
-| 4 | SQL Server / Azure Synapse | ✅（运行时报错） | 运行时报错 / TRY_CAST |
-| 5 | Teradata | ✅（运行时报错） | 运行时报错 / TRY_CAST |
-| 6 | Oracle / 达梦 | ✅（运行时报错） | ORA-01722 |
-| 7 | SAP HANA | ✅（运行时报错） | 运行时报错 |
-| 8 | StarRocks / Doris | ✅（运行时报错） | 运行时报错 |
-| 9 | Flink SQL | ✅（VARCHAR 万能源，但运行时严格验证） | TRY_CAST 返回 NULL |
-| 10 | Hive / MaxCompute | ✅（→DOUBLE，CAST 失败静默返回 NULL） | 返回 NULL |
+| 2 | StarRocks | ✅（几乎全类型互连，比 MySQL 更宽松） | 运行时报错 |
+| 3 | MySQL / MariaDB / TiDB / OceanBase(MySQL) / PolarDB / TDSQL | ✅（`'abc'→0`） | 静默转为 0/NULL |
+| 4 | Redshift | ✅（运行时报错） | 运行时报错 / TRY_CAST |
+| 5 | SQL Server / Azure Synapse | ✅（运行时报错） | 运行时报错 / TRY_CAST |
+| 6 | Teradata | ✅（运行时报错） | 运行时报错 / TRY_CAST |
+| 7 | Oracle / 达梦 | ✅（运行时报错） | ORA-01722 |
+| 8 | SAP HANA | ✅（运行时报错） | 运行时报错 |
+| 9 | Doris | ✅（比 StarRocks 保守：BOOLEAN 孤立、JSON 孤立） | 运行时报错 |
+| 10 | Flink SQL | ✅（VARCHAR 万能源，但运行时严格验证） | TRY_CAST 返回 NULL |
+| 11 | Hive / MaxCompute | ✅（→DOUBLE，CAST 失败静默返回 NULL） | 返回 NULL |
 | 11 | Databricks | ✅（跨类型转换） | TRY_CAST 返回 NULL |
 | 12 | Impala | ❌ | 返回 NULL |
 | 13 | Db2 | ❌ | 运行时报错 |
@@ -1093,10 +1095,9 @@ SQL 标准定义的隐式转换仅限数字族内无损提升和 DATE→TIMESTAM
 | 18 | ClickHouse | ❌ | toTypeOrNull 返回 NULL |
 | 19 | H2 / Derby / Firebird | ❌ | 报错 |
 | 20 | Vertica | ❌ | 报错 |
-| 21 | PostgreSQL / Greenplum / YugabyteDB / TimescaleDB / Materialize / Hologres | ❌ | 报错 |
+| 21 | PostgreSQL / Greenplum / YugabyteDB / TimescaleDB / Materialize / Hologres / CockroachDB | ❌ | 报错 |
 | 22 | openGauss / KingbaseES（PG 模式） | ❌ | 报错 |
-| 23 | ksqlDB / TDengine | ❌ | 报错 |
-| 24 | CockroachDB | ❌（多态字面量 + 赋值级转换替代） | 报错 |
+| 23（最严） | ksqlDB / TDengine | ❌ | 报错 |
 
 ### `SELECT 1/3` 整数除法
 
