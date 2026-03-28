@@ -329,22 +329,34 @@ def _convert_sql_to_md(content: str) -> str:
     """Convert .sql content to .md format. (Simplified version)"""
     # Reuse the full implementation from convert.py
     sys.path.insert(0, str(REPO_ROOT))
-    from convert import convert_sql_to_md
-    return convert_sql_to_md(content)
+    try:
+        from convert import convert_sql_to_md
+        return convert_sql_to_md(content)
+    except ImportError:
+        raise RuntimeError("convert.py not found in repository root. Required for SQL-to-MD conversion.")
 
 
 def cmd_convert(args):
     """Convert .sql files to .md for specified dialects."""
+    sys.path.insert(0, str(REPO_ROOT))
+    try:
+        from convert import convert_sql_to_md, find_sql_files, update_dialect_page
+    except ImportError:
+        print("ERROR: convert.py not found in repository root. This file is required for the convert subcommand.", file=sys.stderr)
+        print("       Please ensure convert.py exists at: " + str(REPO_ROOT / "convert.py"), file=sys.stderr)
+        return 1
+
     if args.dialects:
         dialects = [d.strip() for d in args.dialects.split(",")]
     else:
-        from convert import DIALECTS
-        dialects = DIALECTS
+        try:
+            from convert import DIALECTS
+            dialects = DIALECTS
+        except ImportError:
+            print("ERROR: Could not import DIALECTS from convert.py.", file=sys.stderr)
+            return 1
 
     print(f"Converting .sql → .md for {len(dialects)} dialect(s): {', '.join(dialects[:5])}...\n")
-
-    sys.path.insert(0, str(REPO_ROOT))
-    from convert import convert_sql_to_md, find_sql_files, update_dialect_page
 
     total_created = 0
     total_skipped = 0
@@ -389,7 +401,12 @@ def cmd_convert(args):
 def cmd_expand(args):
     """Expand dialect module tables with enriched descriptions."""
     sys.path.insert(0, str(REPO_ROOT))
-    from expand_tables import EXPANSIONS
+    try:
+        from expand_tables import EXPANSIONS
+    except ImportError:
+        print("ERROR: expand_tables.py not found in repository root. This file is required for the expand subcommand.", file=sys.stderr)
+        print("       Please ensure expand_tables.py exists at: " + str(REPO_ROOT / "expand_tables.py"), file=sys.stderr)
+        return 1
 
     if args.dialect:
         dialects = [args.dialect]
