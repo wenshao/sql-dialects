@@ -138,8 +138,8 @@ WHERE ai_similarity(content, 'database performance tuning') > 0.8;
 方案三：Databricks Vector Search
 将文本转为向量嵌入，使用向量相似度搜索
 
-注意：Databricks 没有原生全文搜索索引
-注意：ILIKE / RLIKE 在大表上需要全表扫描
-注意：REGEXP_EXTRACT_ALL 可用于简单的分词
-注意：向量搜索 / AI 函数是新的语义搜索方向
-注意：对于大规模全文搜索，建议使用专用搜索引擎
+> **注意**: Databricks 没有原生全文搜索索引
+> **注意**: ILIKE / RLIKE 在大表上需要全表扫描
+> **注意**: REGEXP_EXTRACT_ALL 可用于简单的分词
+> **注意**: 向量搜索 / AI 函数是新的语义搜索方向
+> **注意**: 对于大规模全文搜索，建议使用专用搜索引擎

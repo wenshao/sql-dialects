@@ -23,32 +23,42 @@ DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'); STR_TO_DATE()
 
 MySQL → TDSQL: 高度兼容
 所有 MySQL 数据类型直接支持
-JSON → JSON, GEOMETRY → GEOMETRY (部分)
+- JSON → JSON, GEOMETRY → GEOMETRY (部分)
 Oracle → TDSQL:
-NUMBER(p,s) → DECIMAL(p,s), VARCHAR2(n) → VARCHAR(n),
-CLOB → LONGTEXT, DATE → DATETIME,
-SYSDATE → NOW(), SEQUENCE → AUTO_INCREMENT
-八、函数等价映射
+- NUMBER(p,s) → DECIMAL(p,s), VARCHAR2(n) → VARCHAR(n),
+- CLOB → LONGTEXT, DATE → DATETIME,
+- SYSDATE → NOW(), SEQUENCE → AUTO_INCREMENT
+
+### 八、函数等价映射
+
 Oracle → TDSQL:
-NVL → IFNULL/COALESCE, SYSDATE → NOW(),
-TO_CHAR(d,'YYYY-MM-DD') → DATE_FORMAT(d,'%Y-%m-%d'),
-TO_DATE → STR_TO_DATE, ROWNUM → LIMIT,
-DECODE → CASE WHEN, || → CONCAT,
-LISTAGG → GROUP_CONCAT
-九、常见陷阱补充
+- NVL → IFNULL/COALESCE, SYSDATE → NOW(),
+- TO_CHAR(d,'YYYY-MM-DD') → DATE_FORMAT(d,'%Y-%m-%d'),
+- TO_DATE → STR_TO_DATE, ROWNUM → LIMIT,
+- DECODE → CASE WHEN, || → CONCAT,
+- LISTAGG → GROUP_CONCAT
+
+### 九、常见陷阱补充
+
 分布式版需要 shardkey（分片键），选择不当导致数据倾斜
 跨分片 JOIN 有限制（建议使用广播表）
 全局唯一索引必须包含 shardkey
 DDL 操作在分布式模式下可能阻塞
 TDSQL-C (云原生版) 共享存储，无需分片键
 TDSQL-H (分析型) HTAP 混合负载，支持分析查询
-十、NULL 处理
+
+### 十、NULL 处理
+
 IFNULL(a, b); COALESCE(a, b, c);
 NULLIF(a, b); <=> (NULL 安全等于)
 ISNULL(a) 返回 0 或 1
-十一、分页语法
+
+### 十一、分页语法
+
 SELECT * FROM t LIMIT 10 OFFSET 20;               -- 与 MySQL 相同
-十二、分布式事务
+
+### 十二、分布式事务
+
 分布式版支持分布式事务（XA 协议）
 跨分片事务性能有影响
 建议将相关数据放在同一分片

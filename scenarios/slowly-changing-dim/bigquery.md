@@ -98,18 +98,17 @@ WHERE customer_id = 1;
 ## 4. 对比与引擎开发者启示
 
 BigQuery SCD 的实现:
-Type 1: MERGE（单语句，最简洁）
-Type 2: MERGE + INSERT（两步，因为 MERGE 不能对一行做两个操作）
-时间旅行: 辅助 SCD 调试和恢复
+- **Type 1**: MERGE（单语句，最简洁）
+- **Type 2**: MERGE + INSERT（两步，因为 MERGE 不能对一行做两个操作）
+- **时间旅行**: 辅助 SCD 调试和恢复
 
 对比:
-SQLite: ON CONFLICT DO UPDATE (Type1) + 事务 (Type2)
-ClickHouse: ReplacingMergeTree (Type1) + 版本化表 (Type2)
-PostgreSQL: MERGE (15+) 或 CTE + UPDATE + INSERT
+- **SQLite**: ON CONFLICT DO UPDATE (Type1) + 事务 (Type2)
+- **ClickHouse**: ReplacingMergeTree (Type1) + 版本化表 (Type2)
+- **PostgreSQL**: MERGE (15+) 或 CTE + UPDATE + INSERT
 
 对引擎开发者的启示:
 MERGE 是 SCD 实现的最佳语法选择。
 但 SCD Type 2 需要"对一行做两个操作"（关闭旧 + 插入新），
-MERGE 不支持这种模式 → 需要两步操作。
+- MERGE 不支持这种模式 → 需要两步操作。
 如果设计引擎，考虑在 MERGE 中支持"一行触发多个操作"的语义。
-

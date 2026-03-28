@@ -238,20 +238,20 @@ VARCHAR 最大 65535 字节（不是字符）— 无 TEXT 类型
 ## 7. 横向对比: Redshift vs 其他 OLAP 引擎
 
 1. 架构:
-Redshift:   MPP + 列存，传统 data warehouse 架构
-BigQuery:   Serverless，存算完全分离，按查询付费
-Snowflake:  存算分离，虚拟仓库(Virtual Warehouse)，按使用付费
-ClickHouse: MPP + 列存 + MergeTree，OLAP 实时分析
-Databricks: Lakehouse，Delta Lake + Spark
+- **Redshift**: MPP + 列存，传统 data warehouse 架构
+- **BigQuery**: Serverless，存算完全分离，按查询付费
+- **Snowflake**: 存算分离，虚拟仓库(Virtual Warehouse)，按使用付费
+- **ClickHouse**: MPP + 列存 + MergeTree，OLAP 实时分析
+- **Databricks**: Lakehouse，Delta Lake + Spark
 
 2. 数据分布:
-Redshift:   DISTKEY（用户手动选择或 AUTO）
-BigQuery:   自动管理（用户无需关心）
-Snowflake:  自动微分区（用户无需关心）
-ClickHouse: sharding_key + Distributed 引擎
+- **Redshift**: DISTKEY（用户手动选择或 AUTO）
+- **BigQuery**: 自动管理（用户无需关心）
+- **Snowflake**: 自动微分区（用户无需关心）
+- **ClickHouse**: sharding_key + Distributed 引擎
 
 3. 半结构化数据:
-Redshift:   SUPER 类型 + PartiQL 查询（2020+）
-BigQuery:   STRUCT/ARRAY（原生嵌套类型）
-Snowflake:  VARIANT 类型（最灵活）
-ClickHouse: JSON 类型（实验性），嵌套 Nested 类型
+- **Redshift**: SUPER 类型 + PartiQL 查询（2020+）
+- **BigQuery**: STRUCT/ARRAY（原生嵌套类型）
+- **Snowflake**: VARIANT 类型（最灵活）
+- **ClickHouse**: JSON 类型（实验性），嵌套 Nested 类型

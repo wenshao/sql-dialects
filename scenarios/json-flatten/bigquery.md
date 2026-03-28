@@ -118,19 +118,18 @@ GROUP BY user_name;
 ## 6. 对比与引擎开发者启示
 
 BigQuery JSON 展平的核心:
-(1) UNNEST → ARRAY 展开为行（核心操作）
-(2) STRUCT 点号访问 → 最简洁的嵌套访问
-(3) JSON_QUERY_ARRAY → JSON 数组提取
-(4) ARRAY<STRUCT> → 比 JSON 更高效（列式存储）
+- (1) UNNEST → ARRAY 展开为行（核心操作）
+- (2) STRUCT 点号访问 → 最简洁的嵌套访问
+- (3) JSON_QUERY_ARRAY → JSON 数组提取
+- (4) ARRAY<STRUCT> → 比 JSON 更高效（列式存储）
 
 对比:
-ClickHouse: ARRAY JOIN（更简洁的语法）
-PostgreSQL: jsonb_array_elements / LATERAL JOIN
-SQLite:     json_each（虚拟表函数）
-MySQL:      JSON_TABLE（8.0+）
+- **ClickHouse**: ARRAY JOIN（更简洁的语法）
+- **PostgreSQL**: jsonb_array_elements / LATERAL JOIN
+- **SQLite**: json_each（虚拟表函数）
+- **MySQL**: JSON_TABLE（8.0+）
 
 对引擎开发者的启示:
 UNNEST 是嵌套类型引擎的基础操作。
 STRUCT 点号访问 比 JSON_EXTRACT 更直观。
 原生嵌套类型（ARRAY<STRUCT>）比 JSON 字符串更高效。
-

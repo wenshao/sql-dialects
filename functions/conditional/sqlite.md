@@ -71,20 +71,20 @@ END FROM data;
 ## 对比与引擎开发者启示
 
 SQLite 条件函数的特点:
-  (1) CASE / COALESCE / NULLIF / IFNULL → 标准 SQL
-  (2) IIF → 3.32.0+ 三元条件（简洁）
-  (3) typeof → 动态类型系统的必需品
+- (1) CASE / COALESCE / NULLIF / IFNULL → 标准 SQL
+- (2) IIF → 3.32.0+ 三元条件（简洁）
+- (3) typeof → 动态类型系统的必需品
 
 缺少:
-  GREATEST / LEAST → 需要嵌套 CASE 或 MAX()/MIN()
-  DECODE → Oracle 特有，用 CASE 替代
+- GREATEST / LEAST → 需要嵌套 CASE 或 MAX()/MIN()
+- DECODE → Oracle 特有，用 CASE 替代
 
 对比:
-  MySQL:      IF(cond, a, b) 函数
-  PostgreSQL: 无 IIF，用 CASE
-  ClickHouse: if(cond, a, b) + multiIf()
-  BigQuery:   IF(cond, a, b) + IFF
+- **MySQL**: IF(cond, a, b) 函数
+- **PostgreSQL**: 无 IIF，用 CASE
+- **ClickHouse**: if(cond, a, b) + multiIf()
+- **BigQuery**: IF(cond, a, b) + IFF
 
 对引擎开发者的启示:
-  IIF/IF 三元函数是 CASE 的有用简化，实现成本低但用户体验好。
-  typeof 对动态类型引擎是必需的（让用户知道实际存储的是什么类型）。
+  - IIF/IF 三元函数是 CASE 的有用简化，实现成本低但用户体验好。
+  - typeof 对动态类型引擎是必需的（让用户知道实际存储的是什么类型）。

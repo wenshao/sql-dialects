@@ -188,7 +188,7 @@ GTM（Global Transaction Manager）协调全局事务
 ## 批量删除策略
 
 
-策略 1: 分批删除（heap 表推荐）
+- **策略 1**: 分批删除（heap 表推荐）
 DO $$
 BEGIN
 LOOP
@@ -197,12 +197,12 @@ EXIT WHEN NOT FOUND;
 COMMIT;
 END LOOP;
 END $$;
-策略 2: DROP PARTITION（分区表推荐，O(1) 操作）
+- **策略 2**: DROP PARTITION（分区表推荐，O(1) 操作）
 ALTER TABLE logs DROP PARTITION p2020;
 不产生 dead tuples，不阻塞查询
-策略 3: TRUNCATE（清空整表）
+- **策略 3**: TRUNCATE（清空整表）
 最快，但会清空所有数据
-策略 4: VACUUM 回收空间
+- **策略 4**: VACUUM 回收空间
 大量 DELETE 后执行:
 VACUUM users;           -- 普通回收，不锁表
 VACUUM FULL users;      -- 完全回收，锁表但最彻底

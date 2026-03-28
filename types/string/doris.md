@@ -43,24 +43,23 @@ SELECT "hello world";    -- 双引号(MySQL 兼容)
 ## 4. 对比其他引擎
 
 VARCHAR(n) 的 n:
-Doris:     字节数(UTF-8)
-MySQL:     字符数
-PostgreSQL: 字符数
+- **Doris**: 字节数(UTF-8)
+- **MySQL**: 字符数
+- **PostgreSQL**: 字符数
 
 大文本:
-Doris:     STRING(统一，2.0+)
-MySQL:     TEXT/MEDIUMTEXT/LONGTEXT(分级)
-PostgreSQL: TEXT(无大小限制)
-ClickHouse: String(无大小限制)
-BigQuery:  STRING(无大小限制)
+- **Doris**: STRING(统一，2.0+)
+- **MySQL**: TEXT/MEDIUMTEXT/LONGTEXT(分级)
+- **PostgreSQL**: TEXT(无大小限制)
+- **ClickHouse**: String(无大小限制)
+- **BigQuery**: STRING(无大小限制)
 
 COLLATION:
-Doris/StarRocks: 不支持(UTF-8 字节比较)
-MySQL:   utf8mb4_unicode_ci 等(丰富)
-PostgreSQL: ICU collation(12+)
+- **Doris/StarRocks**: 不支持(UTF-8 字节比较)
+- **MySQL**: utf8mb4_unicode_ci 等(丰富)
+- **PostgreSQL**: ICU collation(12+)
 
 对引擎开发者的启示:
 统一的 STRING 类型(不分级)是现代引擎的趋势。
 MySQL 的 TEXT 分级增加了用户认知负担。
 列存引擎不需要分级——列内压缩自动处理长短字符串。
-

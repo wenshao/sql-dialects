@@ -24,26 +24,26 @@ SQL:2023  属性图查询, JSON增强, GREATEST/LEAST标准化
 ## 标准函数与各数据库的差异速查
 
 NULL处理:
-  标准: COALESCE(a,b), NULLIF(a,b)
-  MySQL: IFNULL, Oracle: NVL, SQL Server: ISNULL
+- **标准**: COALESCE(a,b), NULLIF(a,b)
+- **MySQL**: IFNULL, Oracle: NVL, SQL Server: ISNULL
 
 字符串连接:
-  标准: a || b
-  MySQL: CONCAT(a,b), SQL Server: CONCAT(a,b) 或 a + b
+- **标准**: a || b
+- **MySQL**: CONCAT(a,b), SQL Server: CONCAT(a,b) 或 a + b
 
 当前时间:
-  标准: CURRENT_TIMESTAMP
-  MySQL: NOW(), Oracle: SYSDATE, SQL Server: GETDATE()
+- **标准**: CURRENT_TIMESTAMP
+- **MySQL**: NOW(), Oracle: SYSDATE, SQL Server: GETDATE()
 
 结果限制:
-  标准: FETCH FIRST n ROWS ONLY (SQL:2008)
-  MySQL/PG: LIMIT n, SQL Server: TOP n, Oracle: ROWNUM
+- **标准**: FETCH FIRST n ROWS ONLY (SQL:2008)
+- **MySQL/PG**: LIMIT n, SQL Server: TOP n, Oracle: ROWNUM
 
 自增:
-  标准: GENERATED ALWAYS AS IDENTITY (SQL:2003)
-  MySQL: AUTO_INCREMENT, SQL Server: IDENTITY, Oracle: SEQUENCE
+- **标准**: GENERATED ALWAYS AS IDENTITY (SQL:2003)
+- **MySQL**: AUTO_INCREMENT, SQL Server: IDENTITY, Oracle: SEQUENCE
 
 合并:
-  标准: MERGE (SQL:2003)
-  MySQL: INSERT ... ON DUPLICATE KEY UPDATE
-  PostgreSQL: INSERT ... ON CONFLICT
+- **标准**: MERGE (SQL:2003)
+- **MySQL**: INSERT ... ON DUPLICATE KEY UPDATE
+- **PostgreSQL**: INSERT ... ON CONFLICT

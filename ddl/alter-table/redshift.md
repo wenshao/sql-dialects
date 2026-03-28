@@ -129,17 +129,17 @@ IDENTITY 列属性不能修改
 ## 7. 横向对比: OLAP 引擎 ALTER TABLE
 
 1. 列类型修改:
-Redshift:   几乎不能修改（只能增大 VARCHAR）
-BigQuery:   不能修改列类型
-Snowflake:  支持部分（NUMBER 精度调整等）
-ClickHouse: ALTER TABLE MODIFY COLUMN（支持较多类型转换）
+- **Redshift**: 几乎不能修改（只能增大 VARCHAR）
+- **BigQuery**: 不能修改列类型
+- **Snowflake**: 支持部分（NUMBER 精度调整等）
+- **ClickHouse**: ALTER TABLE MODIFY COLUMN（支持较多类型转换）
 
 2. 分布策略修改:
-Redshift:   ALTER DISTSTYLE（全表重建）
-BigQuery:   不能修改已有分区
-Snowflake:  不需要（自动微分区）
-ClickHouse: 不能修改 sharding_key
+- **Redshift**: ALTER DISTSTYLE（全表重建）
+- **BigQuery**: 不能修改已有分区
+- **Snowflake**: 不需要（自动微分区）
+- **ClickHouse**: 不能修改 sharding_key
 
 3. OLAP vs OLTP 的 DDL 差异:
-OLTP（MySQL/PG/TiDB/CRDB）: ALTER TABLE 灵活，频繁变更是常态
-OLAP（Redshift/BQ/SF）: ALTER TABLE 受限，表结构应在设计时确定
+- **OLTP（MySQL/PG/TiDB/CRDB）**: ALTER TABLE 灵活，频繁变更是常态
+- **OLAP（Redshift/BQ/SF）**: ALTER TABLE 受限，表结构应在设计时确定

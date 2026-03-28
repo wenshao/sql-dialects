@@ -30,46 +30,56 @@
 ## 五、数据类型映射（从 PostgreSQL/MySQL 到 DuckDB）
 
 PostgreSQL → DuckDB: 高度兼容
-  INTEGER → INTEGER, TEXT → VARCHAR, SERIAL → 不直接支持,
-  BOOLEAN → BOOLEAN, JSONB → JSON,
-  ARRAY → T[] (原生数组), BYTEA → BLOB,
-  TIMESTAMPTZ → TIMESTAMPTZ, NUMERIC → DECIMAL,
-  UUID → UUID
+- INTEGER → INTEGER, TEXT → VARCHAR, SERIAL → 不直接支持,
+- BOOLEAN → BOOLEAN, JSONB → JSON,
+- ARRAY → T[] (原生数组), BYTEA → BLOB,
+- TIMESTAMPTZ → TIMESTAMPTZ, NUMERIC → DECIMAL,
+- UUID → UUID
 MySQL → DuckDB:
-  INT → INTEGER, BIGINT → BIGINT, FLOAT → FLOAT,
-  DOUBLE → DOUBLE, DECIMAL(p,s) → DECIMAL(p,s),
-  VARCHAR(n) → VARCHAR, TEXT → VARCHAR,
-  DATETIME → TIMESTAMP, DATE → DATE,
-  BOOLEAN → BOOLEAN, JSON → JSON,
-  AUTO_INCREMENT → 不直接支持,
-  BLOB → BLOB, ENUM → ENUM (DuckDB 支持)
+- INT → INTEGER, BIGINT → BIGINT, FLOAT → FLOAT,
+- DOUBLE → DOUBLE, DECIMAL(p,s) → DECIMAL(p,s),
+- VARCHAR(n) → VARCHAR, TEXT → VARCHAR,
+- DATETIME → TIMESTAMP, DATE → DATE,
+- BOOLEAN → BOOLEAN, JSON → JSON,
+- AUTO_INCREMENT → 不直接支持,
+- BLOB → BLOB, ENUM → ENUM (DuckDB 支持)
 
-六、函数等价映射
+
+### 六、函数等价映射
+
 MySQL → DuckDB:
-  IFNULL → IFNULL/COALESCE, NOW() → NOW(),
-  DATE_FORMAT → strftime, CONCAT → CONCAT/||,
-  GROUP_CONCAT → STRING_AGG/LIST_AGG,
-  LIMIT → LIMIT, STR_TO_DATE → strptime
+- IFNULL → IFNULL/COALESCE, NOW() → NOW(),
+- DATE_FORMAT → strftime, CONCAT → CONCAT/||,
+- GROUP_CONCAT → STRING_AGG/LIST_AGG,
+- LIMIT → LIMIT, STR_TO_DATE → strptime
 
-七、常见陷阱补充
-  嵌入式数据库（无客户端-服务器模式）
-  面向 OLAP（不适合高并发 OLTP）
-  可直接读取 CSV/Parquet/JSON 文件
-  兼容 PostgreSQL 语法（大部分）
-  LIST 类型（PostgreSQL ARRAY 的超集）
-  STRUCT、MAP 原生支持
-  支持窗口函数的 QUALIFY 子句
-  httpfs 扩展可读取远程文件 (S3/HTTP)
 
-八、NULL 处理
+### 七、常见陷阱补充
+
+  - 嵌入式数据库（无客户端-服务器模式）
+  - 面向 OLAP（不适合高并发 OLTP）
+  - 可直接读取 CSV/Parquet/JSON 文件
+  - 兼容 PostgreSQL 语法（大部分）
+  - LIST 类型（PostgreSQL ARRAY 的超集）
+  - STRUCT、MAP 原生支持
+  - 支持窗口函数的 QUALIFY 子句
+  - httpfs 扩展可读取远程文件 (S3/HTTP)
+
+
+### 八、NULL 处理
+
 IFNULL(a, b); COALESCE(a, b, c);
 NULLIF(a, b);
 IS DISTINCT FROM / IS NOT DISTINCT FROM
 
-九、分页语法
+
+### 九、分页语法
+
 SELECT * FROM t ORDER BY id LIMIT 10 OFFSET 20;
 
-十、直接文件查询
+
+### 十、直接文件查询
+
 SELECT * FROM 'data.csv';
 SELECT * FROM 'data.parquet';
 SELECT * FROM read_json_auto('data.json');

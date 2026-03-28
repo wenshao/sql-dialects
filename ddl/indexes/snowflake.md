@@ -228,4 +228,3 @@ Snowflake 的"无索引"策略在 OLAP 场景下是正确的选择。
 Search Optimization Service 是对这一短板的后期补救。
 Hybrid Tables (2024) 引入 B+树索引，标志着 Snowflake 承认纯列存
 在 OLTP 场景的局限，开始向 HTAP 混合架构演进。
-

@@ -74,7 +74,7 @@ Vertica 内置审计功能
 SELECT * FROM v_internal.dc_requests_issued;
 SELECT * FROM v_monitor.query_requests;
 
-注意：Vertica 不支持触发器
-注意：使用存储过程封装数据变更可以模拟触发器行为
-注意：Access Policy 替代安全相关的触发器
-注意：分析型数据库通常不需要触发器
+> **注意**: Vertica 不支持触发器
+> **注意**: 使用存储过程封装数据变更可以模拟触发器行为
+> **注意**: Access Policy 替代安全相关的触发器
+> **注意**: 分析型数据库通常不需要触发器

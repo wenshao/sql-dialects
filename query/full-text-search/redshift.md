@@ -116,8 +116,8 @@ ORDER BY relevance DESC;
 在 Glue 中预处理全文索引
 通过 Spectrum 外部表查询
 
-注意：Redshift 没有原生全文搜索（无 tsvector / tsquery / FULLTEXT INDEX）
-注意：LIKE / ILIKE 在大表上性能较差（全表扫描）
-注意：正则表达式匹配比 LIKE 更灵活但也更慢
-注意：SORTKEY 不能加速 LIKE '%keyword%' 查询
-注意：建议将全文搜索需求卸载到 Amazon OpenSearch 等专用搜索引擎
+> **注意**: Redshift 没有原生全文搜索（无 tsvector / tsquery / FULLTEXT INDEX）
+> **注意**: LIKE / ILIKE 在大表上性能较差（全表扫描）
+> **注意**: 正则表达式匹配比 LIKE 更灵活但也更慢
+> **注意**: SORTKEY 不能加速 LIKE '%keyword%' 查询
+> **注意**: 建议将全文搜索需求卸载到 Amazon OpenSearch 等专用搜索引擎

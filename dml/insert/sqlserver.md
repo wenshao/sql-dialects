@@ -172,12 +172,12 @@ SQL Server 的 INSERT 默认在插入行上获取 X 锁（排他锁），
 这在高并发场景下是 IDENTITY 列的经典问题——所有插入都竞争最后一页。
 
 解决方案:
-  (1) 使用 GUID 键（随机分布）——但增加索引碎片
-  (2) 使用反向索引或 Hash 分区
-  (3) In-Memory OLTP 表（无闩锁设计）
+- (1) 使用 GUID 键（随机分布）——但增加索引碎片
+- (2) 使用反向索引或 Hash 分区
+- (3) In-Memory OLTP 表（无闩锁设计）
 
 版本说明:
-SQL Server 2005+ : OUTPUT 子句
-SQL Server 2008+ : 多行 VALUES（最多 1000 行）
-SQL Server 2008+ : MERGE（见 upsert 章节）
-SQL Server 2014+ : In-Memory OLTP 优化的 INSERT
+- **SQL Server 2005+**: OUTPUT 子句
+- **SQL Server 2008+**: 多行 VALUES（最多 1000 行）
+- **SQL Server 2008+**: MERGE（见 upsert 章节）
+- **SQL Server 2014+**: In-Memory OLTP 优化的 INSERT

@@ -131,8 +131,8 @@ locf(AVG(avg_val)) AS filled_value
 FROM hourly_avg
 WHERE bucket >= '2024-01-01' AND bucket < '2024-01-02'
 GROUP BY filled_bucket ORDER BY filled_bucket;
-注意：time_bucket_gapfill 是 TimescaleDB 特有函数
-注意：locf = Last Observation Carried Forward（前值填充）
-注意：interpolate 执行线性插值
-注意：time_bucket_gapfill 必须配合 WHERE 子句指定时间范围
-注意：TimescaleDB 完全兼容 PostgreSQL 的 generate_series
+> **注意**: time_bucket_gapfill 是 TimescaleDB 特有函数
+> **注意**: locf = Last Observation Carried Forward（前值填充）
+> **注意**: interpolate 执行线性插值
+> **注意**: time_bucket_gapfill 必须配合 WHERE 子句指定时间范围
+> **注意**: TimescaleDB 完全兼容 PostgreSQL 的 generate_series

@@ -100,16 +100,16 @@ Flink preserves DECIMAL precision through computations
 SUM of DECIMAL(10,2) may produce DECIMAL(38,2) to avoid overflow
 
 Type mapping with connectors
-JSON format:  integer -> INT/BIGINT, number -> DOUBLE, decimal string -> DECIMAL
-Avro format:  int -> INT, long -> BIGINT, float -> FLOAT, double -> DOUBLE
-CSV format:   all fields are strings, require explicit CAST
+- **JSON format**: integer -> INT/BIGINT, number -> DOUBLE, decimal string -> DECIMAL
+- **Avro format**: int -> INT, long -> BIGINT, float -> FLOAT, double -> DOUBLE
+- **CSV format**: all fields are strings, require explicit CAST
 
-Note: Flink uses Java types internally (byte, short, int, long, float, double)
-Note: No unsigned integer types
-Note: No HUGEINT or 128-bit integers
-Note: DECIMAL max precision is 38 digits
-Note: No auto-increment (IDs come from source systems)
-Note: No MONEY type (use DECIMAL for currency)
-Note: Numeric overflow behavior depends on the data type
-      (integers overflow silently, DECIMAL throws error)
-Note: JSON numbers map to DOUBLE by default; use DECIMAL for exact precision
+> **Note**: Flink uses Java types internally (byte, short, int, long, float, double)
+> **Note**: No unsigned integer types
+> **Note**: No HUGEINT or 128-bit integers
+> **Note**: DECIMAL max precision is 38 digits
+> **Note**: No auto-increment (IDs come from source systems)
+> **Note**: No MONEY type (use DECIMAL for currency)
+> **Note**: Numeric overflow behavior depends on the data type
+  - (integers overflow silently, DECIMAL throws error)
+> **Note**: JSON numbers map to DOUBLE by default; use DECIMAL for exact precision

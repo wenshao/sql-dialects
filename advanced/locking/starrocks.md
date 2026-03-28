@@ -56,16 +56,15 @@ KILL query_id;
 ## 6. StarRocks vs Doris 并发控制差异
 
 Primary Key 并发更新:
-StarRocks: Last Write Wins(按写入顺序)
-Doris:     可配置 sequence_col(按版本列)——更灵活
+- **StarRocks**: Last Write Wins(按写入顺序)
+- **Doris**: 可配置 sequence_col(按版本列)——更灵活
 
 DDL 锁:
-StarRocks 3.0+: Fast Schema Evolution(毫秒级锁)
-Doris 1.2+:     Light Schema Change(秒级锁)
+- **StarRocks 3.0+**: Fast Schema Evolution(毫秒级锁)
+- **Doris 1.2+**: Light Schema Change(秒级锁)
 
 对引擎开发者的启示:
 多源并发写入同一 Key 的冲突解决是 OLAP 引擎的实际挑战。
 Doris 的 sequence_col 和 StarRocks 的 Last Write Wins 是两种路径:
-sequence_col: 更可控(用户定义"最新")但配置复杂
-Last Write Wins: 更简单但依赖写入顺序(可能不确定)
-
+- **sequence_col**: 更可控(用户定义"最新")但配置复杂
+- **Last Write Wins**: 更简单但依赖写入顺序(可能不确定)

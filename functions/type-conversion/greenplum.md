@@ -81,7 +81,7 @@ BEGIN RETURN $1::INTEGER;
 EXCEPTION WHEN OTHERS THEN RETURN NULL;
 END; $$ LANGUAGE plpgsql;
 
-注意：Greenplum 兼容 PostgreSQL 类型转换
-注意：支持 CAST, ::, TO_CHAR, TO_NUMBER, TO_DATE
-注意：MPP 环境下类型转换在每个 Segment 独立执行
-限制：无 TRY_CAST
+> **注意**: Greenplum 兼容 PostgreSQL 类型转换
+> **注意**: 支持 CAST, ::, TO_CHAR, TO_NUMBER, TO_DATE
+> **注意**: MPP 环境下类型转换在每个 Segment 独立执行
+> **限制**: 无 TRY_CAST

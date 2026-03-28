@@ -252,4 +252,3 @@ RENAME TABLE   支持       支持        支持        不支持     支持
 Hive 选择了最低代价（只改元数据），但牺牲了功能（无法删列）。
 Iceberg/Delta 通过 table format 层实现了更丰富的 Schema Evolution，
 证明了可以在不重写数据文件的前提下支持列删除、重命名、重排等操作。
-

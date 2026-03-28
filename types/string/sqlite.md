@@ -67,18 +67,18 @@ TEXT vs BLOB:
 ## 对比与引擎开发者启示
 
 SQLite 字符串的设计:
-  (1) 只有 TEXT → 极简，无 VARCHAR 长度限制
-  (2) 动态类型 → 任何列可存字符串
-  (3) 默认 UTF-8 → 现代编码选择
-  (4) 有限的排序规则 → BINARY / NOCASE / RTRIM
+- (1) 只有 TEXT → 极简，无 VARCHAR 长度限制
+- (2) 动态类型 → 任何列可存字符串
+- (3) 默认 UTF-8 → 现代编码选择
+- (4) 有限的排序规则 → BINARY / NOCASE / RTRIM
 
 对比:
-  MySQL:      VARCHAR(n)/CHAR(n)/TEXT/MEDIUMTEXT/LONGTEXT + utf8mb4
-  PostgreSQL: VARCHAR(n)/TEXT（推荐 TEXT）+ ICU 排序规则
-  ClickHouse: String（无长度限制）+ FixedString(N)
-  BigQuery:   STRING（无长度限制）
+- **MySQL**: VARCHAR(n)/CHAR(n)/TEXT/MEDIUMTEXT/LONGTEXT + utf8mb4
+- **PostgreSQL**: VARCHAR(n)/TEXT（推荐 TEXT）+ ICU 排序规则
+- **ClickHouse**: String（无长度限制）+ FixedString(N)
+- **BigQuery**: STRING（无长度限制）
 
 对引擎开发者的启示:
-  现代引擎趋向于统一的 TEXT/STRING 类型（无长度限制）。
-  VARCHAR(n) 的 n 在大多数场景下只是文档化意图，不是真正的约束。
-  SQLite 和 BigQuery/ClickHouse 证明了"无长度限制的字符串类型"是可行的。
+  - 现代引擎趋向于统一的 TEXT/STRING 类型（无长度限制）。
+  - VARCHAR(n) 的 n 在大多数场景下只是文档化意图，不是真正的约束。
+  - SQLite 和 BigQuery/ClickHouse 证明了"无长度限制的字符串类型"是可行的。

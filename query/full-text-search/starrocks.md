@@ -36,18 +36,17 @@ SELECT * FROM articles WHERE content LIKE '%database%';
 ## 3. 对比 Doris
 
 Doris 2.0+:
-INVERTED INDEX: 真正的倒排索引(CLucene)
-MATCH_ALL/MATCH_ANY/MATCH_PHRASE: 专用全文检索语法
+- **INVERTED INDEX**: 真正的倒排索引(CLucene)
+- **MATCH_ALL/MATCH_ANY/MATCH_PHRASE**: 专用全文检索语法
 chinese/english/unicode 分词器
 
 StarRocks 3.1+:
-GIN Index: 倒排索引
+- **GIN Index**: 倒排索引
 功能正在追赶 Doris
 
 对引擎开发者的启示:
 全文检索是"分析引擎 vs 搜索引擎"的交叉地带。
 Doris 选择集成 CLucene(成熟的搜索库)是务实的决策。
 StarRocks 选择自研 GIN 可能在长期有更好的集成度。
-对比 Elasticsearch: 专业搜索引擎仍是最优选择，
+- **对比 Elasticsearch**: 专业搜索引擎仍是最优选择，
 但 Doris 的倒排索引减少了"分析 + 搜索"双引擎的运维成本。
-

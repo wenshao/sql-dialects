@@ -41,24 +41,23 @@ SELECT PARSE_JSON('{"a":1}');  -- StarRocks 特有
 ## 5. StarRocks vs Doris JSON 差异
 
 构造函数:
-StarRocks: PARSE_JSON (更语义化)
-Doris:     CAST('...' AS JSON)
+- **StarRocks**: PARSE_JSON (更语义化)
+- **Doris**: CAST('...' AS JSON)
 
 查询函数:
-StarRocks: json_query / json_value
-Doris:     json_extract / json_extract_string
+- **StarRocks**: json_query / json_value
+- **Doris**: json_extract / json_extract_string
 
 优化:
-StarRocks: Flat JSON(自动列化)
-Doris:     Variant 类型(2.1+，更激进的列化)
+- **StarRocks**: Flat JSON(自动列化)
+- **Doris**: Variant 类型(2.1+，更激进的列化)
 
 JSONB:
-Doris 2.1+: 支持 JSONB(二进制存储)
-StarRocks:   JSON 内部已是二进制(无需单独类型)
+- **Doris 2.1+**: 支持 JSONB(二进制存储)
+- **StarRocks**: JSON 内部已是二进制(无需单独类型)
 
 对引擎开发者的启示:
 JSON 列化(Flat JSON / Variant)是分析引擎的趋势:
-存储时自动推断字段类型 → 按列存储
-查询时按列读取 → 性能接近原生列
+- 存储时自动推断字段类型 → 按列存储
+- 查询时按列读取 → 性能接近原生列
 ClickHouse 的 JSON Object 类型也采用了类似设计。
-

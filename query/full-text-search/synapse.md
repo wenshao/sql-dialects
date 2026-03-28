@@ -110,8 +110,8 @@ WHERE data.content LIKE '%database%';
 方案三：Azure Databricks 上的全文搜索
 使用 Spark MLlib 或专用搜索库
 
-注意：Synapse 专用池不支持 FULLTEXT INDEX / CONTAINS / FREETEXT
-注意：这些是 SQL Server 的功能，Synapse 专用池不支持
-注意：LIKE 在大表上性能差（全表扫描，无法利用列存索引）
-注意：建议将全文搜索需求卸载到 Azure Cognitive Search
-注意：Serverless 池同样不支持全文搜索
+> **注意**: Synapse 专用池不支持 FULLTEXT INDEX / CONTAINS / FREETEXT
+> **注意**: 这些是 SQL Server 的功能，Synapse 专用池不支持
+> **注意**: LIKE 在大表上性能差（全表扫描，无法利用列存索引）
+> **注意**: 建议将全文搜索需求卸载到 Azure Cognitive Search
+> **注意**: Serverless 池同样不支持全文搜索

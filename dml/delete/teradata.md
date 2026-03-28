@@ -183,17 +183,17 @@ Teradata 使用行哈希锁（row-hash lock）
 
 ## 8. 横向对比: Teradata vs 其他数据仓库 DELETE
 
-Teradata:        支持 DELETE（行级），all-AMP 操作性能差
+- **Teradata**: 支持 DELETE（行级），all-AMP 操作性能差
 DELETE ALL 快速但不产生日志
 需要 COLLECT STATISTICS 维护统计信息
-Redshift:        支持 DELETE，但大数据量删除产生大量 vacuum 开销
-推荐: DROP PARTITION 或 INSERT INTO + TRUNCATE + RENAME
-Snowflake:       支持 DELETE，自动回收空间（Time Travel 保留历史版本）
+- **Redshift**: 支持 DELETE，但大数据量删除产生大量 vacuum 开销
+- **推荐**: DROP PARTITION 或 INSERT INTO + TRUNCATE + RENAME
+- **Snowflake**: 支持 DELETE，自动回收空间（Time Travel 保留历史版本）
 不需要手动维护统计信息（自动统计）
-BigQuery:        支持 DELETE，但有 DML 配额限制
-推荐: WHERE 过滤 + 覆盖写入
-Hive:            支持 ACID DELETE（需 ORC + 事务表 + 分桶）
+- **BigQuery**: 支持 DELETE，但有 DML 配额限制
+- **推荐**: WHERE 过滤 + 覆盖写入
+- **Hive**: 支持 ACID DELETE（需 ORC + 事务表 + 分桶）
 DELETE 性能差，产生大量 delta 文件需要 compaction
-Spark:           不支持直接 DELETE（需要 overwrite 或 merge）
+- **Spark**: 不支持直接 DELETE（需要 overwrite 或 merge）
 
-结论: 数据仓库场景下，应使用分区策略（DROP PARTITION）替代大量 DELETE
+- **结论**: 数据仓库场景下，应使用分区策略（DROP PARTITION）替代大量 DELETE

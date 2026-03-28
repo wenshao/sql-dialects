@@ -51,11 +51,11 @@ CEIL(humidity) AS ceil_humidity,
 SQRT(temperature * temperature + humidity * humidity) AS magnitude
 FROM sensor_readings
 EMIT CHANGES;
-注意：ksqlDB 数学函数非常有限，面向流处理场景
-注意：ROUND 仅支持整数舍入，不支持指定小数位
-限制：无三角函数（SIN, COS, TAN 等）
-限制：无 POWER, LOG, LOG2, LOG10, MOD 等
-限制：无 PI() 常量
-限制：无 GREATEST/LEAST（需 CASE 模拟）
-限制：无位运算
-限制：无 DEGREES/RADIANS 转换
+> **注意**: ksqlDB 数学函数非常有限，面向流处理场景
+> **注意**: ROUND 仅支持整数舍入，不支持指定小数位
+> **限制**: 无三角函数（SIN, COS, TAN 等）
+> **限制**: 无 POWER, LOG, LOG2, LOG10, MOD 等
+> **限制**: 无 PI() 常量
+> **限制**: 无 GREATEST/LEAST（需 CASE 模拟）
+> **限制**: 无位运算
+> **限制**: 无 DEGREES/RADIANS 转换

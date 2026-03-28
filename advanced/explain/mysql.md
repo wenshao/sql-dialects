@@ -155,8 +155,8 @@ Using temporary     使用临时表（可能需要优化）
 Using filesort      额外排序（可能需要优化）
 Using index condition  索引条件下推（5.6+ ICP）
 
-注意：EXPLAIN 不会实际执行查询，EXPLAIN ANALYZE 会
-注意：JSON 格式提供最详细的成本估算信息
-注意：TREE 格式（8.0.16+）展示迭代器执行模型
-注意：PROFILE 已废弃，推荐使用 Performance Schema
-注意：优化器跟踪可以了解为什么选择了特定的执行计划
+> **注意**: EXPLAIN 不会实际执行查询，EXPLAIN ANALYZE 会
+> **注意**: JSON 格式提供最详细的成本估算信息
+> **注意**: TREE 格式（8.0.16+）展示迭代器执行模型
+> **注意**: PROFILE 已废弃，推荐使用 Performance Schema
+> **注意**: 优化器跟踪可以了解为什么选择了特定的执行计划

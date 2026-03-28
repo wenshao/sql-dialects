@@ -135,18 +135,18 @@ ORDER BY p.partition_number;
 
 ## 分区限制与注意事项
 
-(1) 分区列必须包含在聚集索引中（与 MySQL 限制类似）
-(2) Enterprise Edition 才支持分区（Standard 版不支持——这是最大的限制）
-(3) 单表最多 15000 个分区（2012+ 扩展到 15000，之前是 1000）
-(4) SWITCH 要求源和目标结构完全匹配（包括索引、约束）
+- (1) 分区列必须包含在聚集索引中（与 MySQL 限制类似）
+- (2) Enterprise Edition 才支持分区（Standard 版不支持——这是最大的限制）
+- (3) 单表最多 15000 个分区（2012+ 扩展到 15000，之前是 1000）
+- (4) SWITCH 要求源和目标结构完全匹配（包括索引、约束）
 
 横向对比:
-  PostgreSQL: 所有版本都支持分区（无 Enterprise 限制）
-  MySQL:      所有版本都支持分区
-  Oracle:     Enterprise Edition 才支持（同 SQL Server）
+- **PostgreSQL**: 所有版本都支持分区（无 Enterprise 限制）
+- **MySQL**: 所有版本都支持分区
+- **Oracle**: Enterprise Edition 才支持（同 SQL Server）
 
 对引擎开发者的启示:
-  分区是 OLTP/OLAP 混合负载的核心功能。
-  将分区锁定在付费版本是合理的商业策略但不利于用户。
-  SWITCH（零拷贝分区交换）是 SQL Server 分区的杀手级功能——
-  其他数据库的 ATTACH/DETACH PARTITION 类似但语义不完全等价。
+  - 分区是 OLTP/OLAP 混合负载的核心功能。
+  - 将分区锁定在付费版本是合理的商业策略但不利于用户。
+  - SWITCH（零拷贝分区交换）是 SQL Server 分区的杀手级功能——
+  - 其他数据库的 ATTACH/DETACH PARTITION 类似但语义不完全等价。

@@ -61,19 +61,19 @@ SELECT * FROM users LIMIT (SELECT setting_value FROM config WHERE key = 'page_si
 ## 对比与引擎开发者启示
 
 SQLite 分页的特点:
-  (1) LIMIT/OFFSET → 标准语法
-  (2) LIMIT m, n → MySQL 兼容语法
-  (3) LIMIT -1 → 无限制（SQLite 特有）
-  (4) 游标分页 → WHERE id > last_id 模式
+- (1) LIMIT/OFFSET → 标准语法
+- (2) LIMIT m, n → MySQL 兼容语法
+- (3) LIMIT -1 → 无限制（SQLite 特有）
+- (4) 游标分页 → WHERE id > last_id 模式
 
 对比:
-  MySQL: LIMIT offset, count
-  PostgreSQL: LIMIT count OFFSET offset + FETCH FIRST
-  ClickHouse: LIMIT count OFFSET offset
-  BigQuery: LIMIT count OFFSET offset
+- **MySQL**: LIMIT offset, count
+- **PostgreSQL**: LIMIT count OFFSET offset + FETCH FIRST
+- **ClickHouse**: LIMIT count OFFSET offset
+- **BigQuery**: LIMIT count OFFSET offset
 
 对引擎开发者的启示:
-  LIMIT/OFFSET 是必需语法，但应该鼓励游标分页。
-  OFFSET 的性能问题是所有数据库的通病:
-  B-Tree 引擎需要遍历 OFFSET 行，列存引擎需要跳过 OFFSET 行。
-  游标分页利用索引直接定位，性能恒定。
+  - LIMIT/OFFSET 是必需语法，但应该鼓励游标分页。
+  - OFFSET 的性能问题是所有数据库的通病:
+  - B-Tree 引擎需要遍历 OFFSET 行，列存引擎需要跳过 OFFSET 行。
+  - 游标分页利用索引直接定位，性能恒定。

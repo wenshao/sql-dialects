@@ -73,13 +73,13 @@ RETURNS DOUBLE
 LANGUAGE JAVA
 EXTERNAL NAME 'java.lang.Math.pow'
 PARAMETER STYLE JAVA NO SQL;
-注意：Derby 数学函数有限但核心函数齐全
-注意：LOG 等同于 LN（自然对数），不同于 PostgreSQL
-注意：可通过 Java UDF 扩展缺失函数
-限制：无 ROUND 函数（需 Java UDF 或 CAST 模拟）
-限制：无 POWER/POW 函数（使用 EXP(n * LN(x)) 模拟）
-限制：无 TRUNC/TRUNCATE
-限制：无 PI() 函数（使用 ACOS(-1) 代替）
-限制：无 GREATEST/LEAST
-限制：无位运算
-限制：无 CBRT 立方根
+> **注意**: Derby 数学函数有限但核心函数齐全
+> **注意**: LOG 等同于 LN（自然对数），不同于 PostgreSQL
+> **注意**: 可通过 Java UDF 扩展缺失函数
+> **限制**: 无 ROUND 函数（需 Java UDF 或 CAST 模拟）
+> **限制**: 无 POWER/POW 函数（使用 EXP(n * LN(x)) 模拟）
+> **限制**: 无 TRUNC/TRUNCATE
+> **限制**: 无 PI() 函数（使用 ACOS(-1) 代替）
+> **限制**: 无 GREATEST/LEAST
+> **限制**: 无位运算
+> **限制**: 无 CBRT 立方根

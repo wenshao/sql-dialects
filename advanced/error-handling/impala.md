@@ -71,8 +71,8 @@ SET MAX_RETRIES=3;
 INVALIDATE METADATA users;
 REFRESH users;
 
-注意：Impala 面向交互式 OLAP，不支持服务端错误处理
-注意：兼容 HiveServer2 协议
-注意：使用 INVALIDATE METADATA / REFRESH 解决元数据同步问题
-限制：无 TRY/CATCH, EXCEPTION WHEN, DECLARE HANDLER
-限制：无存储过程或 PL/SQL 块
+> **注意**: Impala 面向交互式 OLAP，不支持服务端错误处理
+> **注意**: 兼容 HiveServer2 协议
+> **注意**: 使用 INVALIDATE METADATA / REFRESH 解决元数据同步问题
+> **限制**: 无 TRY/CATCH, EXCEPTION WHEN, DECLARE HANDLER
+> **限制**: 无存储过程或 PL/SQL 块

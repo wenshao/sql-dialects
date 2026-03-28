@@ -444,40 +444,40 @@ Oracle Flashback（Oracle 独有特性）:
               WITH (UPDLOCK) / WITH (XLOCK) / WITH (HOLDLOCK) / WITH (NOLOCK)
 ```
 
-              READPAST（类似 SKIP LOCKED），NOWAIT
-              独有概念: 锁升级（Lock Escalation）
-              当行锁超过约 5000 个时自动升级为表锁，可能导致严重阻塞
-              Oracle 永远不做锁升级（100万行 = 100万个行锁）
-              PostgreSQL 也不做锁升级
+  - READPAST（类似 SKIP LOCKED），NOWAIT
+- **独有概念**: 锁升级（Lock Escalation）
+  - 当行锁超过约 5000 个时自动升级为表锁，可能导致严重阻塞
+  - Oracle 永远不做锁升级（100万行 = 100万个行锁）
+  - PostgreSQL 也不做锁升级
 
 Advisory Lock 对比:
-  PostgreSQL: pg_advisory_lock()（会话级 + 事务级），应用层分布式锁
-  MySQL:      GET_LOCK() / RELEASE_LOCK()（只有会话级，一次只能持有一个名字的锁，5.7+ 可多个）
-  Oracle:     DBMS_LOCK 包（功能强大但需要权限）
-  SQL Server: sp_getapplock / sp_releaseapplock（应用锁，类似 advisory lock）
+- **PostgreSQL**: pg_advisory_lock()（会话级 + 事务级），应用层分布式锁
+- **MySQL**: GET_LOCK() / RELEASE_LOCK()（只有会话级，一次只能持有一个名字的锁，5.7+ 可多个）
+- **Oracle**: DBMS_LOCK 包（功能强大但需要权限）
+- **SQL Server**: sp_getapplock / sp_releaseapplock（应用锁，类似 advisory lock）
 
 两阶段提交对比:
-  PostgreSQL: PREPARE TRANSACTION / COMMIT PREPARED（内置）
-  MySQL:      XA START / XA PREPARE / XA COMMIT（XA 协议）
-  Oracle:     DBMS_XA 包 或 XA 接口
-  SQL Server: MSDTC（分布式事务协调器，操作系统级服务）
+- **PostgreSQL**: PREPARE TRANSACTION / COMMIT PREPARED（内置）
+- **MySQL**: XA START / XA PREPARE / XA COMMIT（XA 协议）
+- **Oracle**: DBMS_XA 包 或 XA 接口
+- **SQL Server**: MSDTC（分布式事务协调器，操作系统级服务）
 
 错误处理对比:
-  PostgreSQL: 事务中任何错误导致事务进入"aborted"状态，后续语句全部失败，必须 ROLLBACK
-  MySQL:      错误不自动中止事务，可以继续执行其他语句（可能导致部分提交）
-  Oracle:     错误不自动中止事务（同 MySQL）
-              Oracle 的 '' = NULL 在事务中的影响:
-              WHERE column = '' 永远不返回行（因为 '' 被视为 NULL，NULL = NULL 为 UNKNOWN）
-              迁移到 PostgreSQL 时必须将 '' 检查改为 IS NULL 或保持 = '' 语义
-  SQL Server: 取决于 XACT_ABORT 设置（ON=自动回滚，OFF=可继续，默认 OFF）
-              最佳实践: 始终 SET XACT_ABORT ON + TRY/CATCH 组合使用
+- **PostgreSQL**: 事务中任何错误导致事务进入"aborted"状态，后续语句全部失败，必须 ROLLBACK
+- **MySQL**: 错误不自动中止事务，可以继续执行其他语句（可能导致部分提交）
+- **Oracle**: 错误不自动中止事务（同 MySQL）
+  - Oracle 的 '' = NULL 在事务中的影响:
+  - WHERE column = '' 永远不返回行（因为 '' 被视为 NULL，NULL = NULL 为 UNKNOWN）
+  - 迁移到 PostgreSQL 时必须将 '' 检查改为 IS NULL 或保持 = '' 语义
+- **SQL Server**: 取决于 XACT_ABORT 设置（ON=自动回滚，OFF=可继续，默认 OFF）
+- **最佳实践**: 始终 SET XACT_ABORT ON + TRY/CATCH 组合使用
 
 数值类型在事务中的影响（金融计算场景）:
-  PostgreSQL: NUMERIC(p,s) 精确十进制，还有 INTEGER/BIGINT/REAL/DOUBLE PRECISION
-  Oracle:     NUMBER(p,s) 是唯一的数值类型，涵盖整数和浮点数
-              NUMBER vs NUMERIC: 语义类似，但 NUMBER 是 Oracle 独有类型名
-              NUMBER 无参数时可存储任意精度数值（PostgreSQL 的 NUMERIC 也可以）
-              迁移时: NUMBER(10,0) -> BIGINT, NUMBER(10,2) -> NUMERIC(10,2)
-  SQL Server: INT/BIGINT/DECIMAL(p,s)/MONEY
-              MONEY 类型只有 4 位小数精度，不推荐用于需要灵活精度的场景
-  MySQL:      INT/BIGINT/DECIMAL(p,s)，与 PostgreSQL 最接近
+- **PostgreSQL**: NUMERIC(p,s) 精确十进制，还有 INTEGER/BIGINT/REAL/DOUBLE PRECISION
+- **Oracle**: NUMBER(p,s) 是唯一的数值类型，涵盖整数和浮点数
+- **NUMBER vs NUMERIC**: 语义类似，但 NUMBER 是 Oracle 独有类型名
+  - NUMBER 无参数时可存储任意精度数值（PostgreSQL 的 NUMERIC 也可以）
+- **迁移时**: NUMBER(10,0) -> BIGINT, NUMBER(10,2) -> NUMERIC(10,2)
+- **SQL Server**: INT/BIGINT/DECIMAL(p,s)/MONEY
+  - MONEY 类型只有 4 位小数精度，不推荐用于需要灵活精度的场景
+- **MySQL**: INT/BIGINT/DECIMAL(p,s)，与 PostgreSQL 最接近

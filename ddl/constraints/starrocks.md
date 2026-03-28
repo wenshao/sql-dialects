@@ -122,18 +122,18 @@ INSERT INTO users_pk VALUES (1, 'alice_new', 'new@example.com');
 ## 9. StarRocks vs Doris 约束对比
 
 PRIMARY KEY 语法:
-StarRocks: PRIMARY KEY(id) — 独立语法
-Doris:     UNIQUE KEY(id) + PROPERTIES — 复用语法
+- **StarRocks**: PRIMARY KEY(id) — 独立语法
+- **Doris**: UNIQUE KEY(id) + PROPERTIES — 复用语法
 
 唯一性保证:
-StarRocks Primary Key: 实时唯一(HashIndex 内存索引)
-Doris Unique Key MoW:  实时唯一(类似实现)
-StarRocks Unique Key:  最终一致(Compaction 后)
-Doris Unique Key MoR:  最终一致(Compaction 后)
+- **StarRocks Primary Key**: 实时唯一(HashIndex 内存索引)
+- **Doris Unique Key MoW**: 实时唯一(类似实现)
+- **StarRocks Unique Key**: 最终一致(Compaction 后)
+- **Doris Unique Key MoR**: 最终一致(Compaction 后)
 
 内存代价:
-StarRocks Primary Key: 约 16 字节/主键
-10 亿行 → 约 16GB 内存用于主键索引
+- **StarRocks Primary Key**: 约 16 字节/主键
+- 10 亿行 → 约 16GB 内存用于主键索引
 
 对引擎开发者的启示:
 StarRocks 的 PRIMARY KEY 设计展示了一个重要 trade-off:
@@ -142,8 +142,7 @@ Doris 通过 PROPERTIES 开关让用户自己选择(灵活但不直观)。
 StarRocks 通过独立模型让选择更清晰(直观但不灵活)。
 
 约束的分布式挑战:
-单节点 UNIQUE: 本地 Hash 检查 → O(1)
-分布式 UNIQUE: 需要路由到正确节点 → 依赖 DISTRIBUTED BY HASH
-如果 UNIQUE 列 != 分桶列，则需要全局协调 → 不支持
-所以: PRIMARY KEY 列必须包含分桶列(与 MySQL 分区表限制类似)。
-
+- **单节点 UNIQUE**: 本地 Hash 检查 → O(1)
+- **分布式 UNIQUE**: 需要路由到正确节点 → 依赖 DISTRIBUTED BY HASH
+- 如果 UNIQUE 列 != 分桶列，则需要全局协调 → 不支持
+- **所以**: PRIMARY KEY 列必须包含分桶列(与 MySQL 分区表限制类似)。

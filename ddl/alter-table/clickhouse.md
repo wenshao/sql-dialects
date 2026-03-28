@@ -300,18 +300,17 @@ RENAME TABLE users TO members;
 
 ## 7. 版本演进与设计启示
 
-19.x:  基本 ALTER TABLE（ADD/DROP/MODIFY COLUMN, 分区操作）
-20.4:  RENAME COLUMN（元数据操作，零开销）
-20.x:  TTL 分层存储（TO VOLUME / TO DISK）
-21.x:  Projection（投影，预聚合加速）
-22.x:  轻量级 DELETE（实验性，不通过 mutation）
+- **19.x**: 基本 ALTER TABLE（ADD/DROP/MODIFY COLUMN, 分区操作）
+- **20.4**: RENAME COLUMN（元数据操作，零开销）
+- **20.x**: TTL 分层存储（TO VOLUME / TO DISK）
+- **21.x**: Projection（投影，预聚合加速）
+- **22.x**: 轻量级 DELETE（实验性，不通过 mutation）
 
 对引擎开发者的启示:
 ClickHouse 的 ALTER TABLE 设计体现了列存 OLAP 引擎的核心哲学:
-(1) 列独立存储 → 列级 DDL 天然高效
-(2) 数据不可变（append-only + merge）→ 修改通过 mutation 异步执行
-(3) 分区是原子操作单位 → 分区操作替代事务
-(4) TTL 内置 → 分析数据有生命周期
+- (1) 列独立存储 → 列级 DDL 天然高效
+- (2) 数据不可变（append-only + merge）→ 修改通过 mutation 异步执行
+- (3) 分区是原子操作单位 → 分区操作替代事务
+- (4) TTL 内置 → 分析数据有生命周期
 传统 OLTP 引擎的 ALTER TABLE 优化方向（Online DDL / INSTANT）
 在列存引擎中是自然而然的，但 mutation 的异步性质增加了运维复杂度。
-

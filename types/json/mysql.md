@@ -205,17 +205,17 @@ JSON Duality View (23c): 同一数据既可以关系表方式访问也可以 JSO
 
 ## 版本演进与最佳实践
 
-MySQL 5.7.8:  引入 JSON 类型和基本函数
-MySQL 5.7.13: ->> 操作符（JSON_UNQUOTE + JSON_EXTRACT 简写）
-MySQL 5.7.22: JSON_ARRAYAGG / JSON_OBJECTAGG
-MySQL 8.0.4:  JSON_TABLE
-MySQL 8.0.13: 函数索引（间接索引 JSON 路径）
-MySQL 8.0.17: 多值索引，MEMBER OF 操作符
-MySQL 8.0.21: JSON 部分更新优化
+- **MySQL 5.7.8**: 引入 JSON 类型和基本函数
+- **MySQL 5.7.13**: ->> 操作符（JSON_UNQUOTE + JSON_EXTRACT 简写）
+- **MySQL 5.7.22**: JSON_ARRAYAGG / JSON_OBJECTAGG
+- **MySQL 8.0.4**: JSON_TABLE
+- **MySQL 8.0.13**: 函数索引（间接索引 JSON 路径）
+- **MySQL 8.0.17**: 多值索引，MEMBER OF 操作符
+- **MySQL 8.0.21**: JSON 部分更新优化
 
 实践建议:
-  1. JSON 列适合: schema 不固定的扩展属性、标签、配置项
-  2. JSON 列不适合: 高频查询过滤条件（索引支持有限）、需要参与 JOIN 的字段
-  3. 需要索引的 JSON 字段: 优先用虚拟生成列 + B-Tree，其次函数索引
-  4. JSON 数组查询: 8.0.17+ 多值索引是首选方案
-  5. 避免在 JSON 列上做复杂聚合 -- 解析开销随数据量线性增长
+1. JSON 列适合: schema 不固定的扩展属性、标签、配置项
+2. JSON 列不适合: 高频查询过滤条件（索引支持有限）、需要参与 JOIN 的字段
+3. 需要索引的 JSON 字段: 优先用虚拟生成列 + B-Tree，其次函数索引
+4. JSON 数组查询: 8.0.17+ 多值索引是首选方案
+5. 避免在 JSON 列上做复杂聚合 -- 解析开销随数据量线性增长

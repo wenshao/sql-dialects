@@ -21,27 +21,31 @@ TO_CHAR(ts, 'YYYY-MM-DD HH24:MI:SS'); TO_DATE('2024-01-15', 'YYYY-MM-DD');
 ## 六、数据类型映射（从 PostgreSQL/MySQL/Oracle 到 Greenplum）
 
 PostgreSQL → Greenplum: 基本相同
-JSONB → JSONB (GP 6+), TEXT → TEXT, SERIAL → SERIAL
+- JSONB → JSONB (GP 6+), TEXT → TEXT, SERIAL → SERIAL
 MySQL → Greenplum:
-INT/INTEGER → INTEGER, BIGINT → BIGINT,
-VARCHAR(n) → VARCHAR(n), TEXT → TEXT, MEDIUMTEXT → TEXT,
-DATETIME → TIMESTAMP, AUTO_INCREMENT → SERIAL,
-TINYINT(1) → BOOLEAN, ENUM → VARCHAR + CHECK
+- INT/INTEGER → INTEGER, BIGINT → BIGINT,
+- VARCHAR(n) → VARCHAR(n), TEXT → TEXT, MEDIUMTEXT → TEXT,
+- DATETIME → TIMESTAMP, AUTO_INCREMENT → SERIAL,
+- TINYINT(1) → BOOLEAN, ENUM → VARCHAR + CHECK
 Oracle → Greenplum:
-NUMBER(p,s) → NUMERIC(p,s), VARCHAR2(n) → VARCHAR(n),
-CLOB → TEXT, DATE → TIMESTAMP, SYSDATE → NOW()
+- NUMBER(p,s) → NUMERIC(p,s), VARCHAR2(n) → VARCHAR(n),
+- CLOB → TEXT, DATE → TIMESTAMP, SYSDATE → NOW()
 
-七、函数等价映射
+
+### 七、函数等价映射
+
 MySQL → Greenplum:
-IFNULL → COALESCE, NOW() → NOW(),
-DATE_FORMAT(d,'%Y-%m-%d') → TO_CHAR(d,'YYYY-MM-DD'),
-CONCAT(a,b) → a || b, GROUP_CONCAT → STRING_AGG,
-LIMIT n → LIMIT n, AUTO_INCREMENT → SERIAL
+- IFNULL → COALESCE, NOW() → NOW(),
+- DATE_FORMAT(d,'%Y-%m-%d') → TO_CHAR(d,'YYYY-MM-DD'),
+- CONCAT(a,b) → a || b, GROUP_CONCAT → STRING_AGG,
+- LIMIT n → LIMIT n, AUTO_INCREMENT → SERIAL
 Oracle → Greenplum:
-NVL → COALESCE, SYSDATE → NOW(), ROWNUM → ROW_NUMBER(),
-DECODE → CASE WHEN, || → ||, FROM DUAL → (省略)
+- NVL → COALESCE, SYSDATE → NOW(), ROWNUM → ROW_NUMBER(),
+- DECODE → CASE WHEN, || → ||, FROM DUAL → (省略)
 
-八、常见陷阱补充
+
+### 八、常见陷阱补充
+
 DISTRIBUTED BY 列选择不当会导致数据倾斜
 外键约束不强制执行（仅用于优化器提示）
 SERIAL 在每个 Segment 独立生成，不保证全局递增
@@ -49,13 +53,17 @@ SERIAL 在每个 Segment 独立生成，不保证全局递增
 VACUUM/ANALYZE 需要定期执行
 分区表使用 Greenplum 分区语法而非 PostgreSQL 声明式分区
 
-九、分页语法
-MySQL: SELECT * FROM t LIMIT 10 OFFSET 20;
-Greenplum: SELECT * FROM t LIMIT 10 OFFSET 20;    -- 相同
-Oracle: 使用 FETCH FIRST/ROW_NUMBER
-Greenplum: SELECT * FROM t ORDER BY id OFFSET 20 FETCH FIRST 10 ROWS ONLY;
 
-十、NULL 处理
+### 九、分页语法
+
+- **MySQL**: SELECT * FROM t LIMIT 10 OFFSET 20;
+- **Greenplum**: SELECT * FROM t LIMIT 10 OFFSET 20;    -- 相同
+- **Oracle**: 使用 FETCH FIRST/ROW_NUMBER
+- **Greenplum**: SELECT * FROM t ORDER BY id OFFSET 20 FETCH FIRST 10 ROWS ONLY;
+
+
+### 十、NULL 处理
+
 COALESCE(a, b, c)                                  -- 返回第一个非 NULL
 NULLIF(a, b)                                       -- a=b 时返回 NULL
 IS DISTINCT FROM / IS NOT DISTINCT FROM             -- NULL 安全比较

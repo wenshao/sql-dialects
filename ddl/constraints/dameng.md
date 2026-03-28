@@ -271,24 +271,24 @@ Oracle RAC 集群下约束验证需要跨节点协调（但用户透明）
 
 
 12.1 可延迟约束的实现复杂度:
-立即约束: 每条 DML 后立即验证，简单直观
-延迟约束: 在事务提交时批量验证，需要:
+- **立即约束**: 每条 DML 后立即验证，简单直观
+- **延迟约束**: 在事务提交时批量验证，需要:
 a. 在事务上下文中记录所有待验证的约束
 b. 提交时按正确顺序验证（先 CHECK，再 UNIQUE，最后 FK）
 c. 验证失败需要回滚整个事务
-启发: 可延迟约束是高级特性，大多数应用不需要，但对数据迁移场景很有价值
+- **启发**: 可延迟约束是高级特性，大多数应用不需要，但对数据迁移场景很有价值
 12.2 NOVALIDATE 的设计意义:
-数据仓库场景: 历史数据可能有脏数据，但新数据需要约束
-数据迁移场景: 先导入数据（不验证），后启用约束（NOVALIDATE）
-性能: NOVALIDATE 启用约束不需要扫描全表（瞬间完成）
+- **数据仓库场景**: 历史数据可能有脏数据，但新数据需要约束
+- **数据迁移场景**: 先导入数据（不验证），后启用约束（NOVALIDATE）
+- **性能**: NOVALIDATE 启用约束不需要扫描全表（瞬间完成）
 12.3 跨方言对比:
-DamengDB:  Oracle 兼容，DEFERRABLE, ENABLE/DISABLE, NOVALIDATE
-Oracle:    最完整（RELY, USING INDEX, EXCEPTIONS INTO 等）
-PostgreSQL: DEFERRABLE（仅 FK 和 UNIQUE），无 ENABLE/DISABLE
-MySQL:     无 DEFERRABLE，无 ENABLE/DISABLE（约束始终生效）
-SQL Server: 无 DEFERRABLE，NOCHECK 类似 DISABLE，但语法不同
-SQLite:    简单约束支持，PRAGMA foreign_keys 控制外键开关
+- **DamengDB**: Oracle 兼容，DEFERRABLE, ENABLE/DISABLE, NOVALIDATE
+- **Oracle**: 最完整（RELY, USING INDEX, EXCEPTIONS INTO 等）
+- **PostgreSQL**: DEFERRABLE（仅 FK 和 UNIQUE），无 ENABLE/DISABLE
+- **MySQL**: 无 DEFERRABLE，无 ENABLE/DISABLE（约束始终生效）
+- **SQL Server**: 无 DEFERRABLE，NOCHECK 类似 DISABLE，但语法不同
+- **SQLite**: 简单约束支持，PRAGMA foreign_keys 控制外键开关
 12.4 版本演进:
-DM7: 基础约束支持（PK, UK, FK, CHECK, NOT NULL）
-DM8: DEFERRABLE, ENABLE/DISABLE, NOVALIDATE 增强
-DM8 最新: 完整 Oracle 约束兼容，系统视图对齐
+- **DM7**: 基础约束支持（PK, UK, FK, CHECK, NOT NULL）
+- **DM8**: DEFERRABLE, ENABLE/DISABLE, NOVALIDATE 增强
+- **DM8 最新**: 完整 Oracle 约束兼容，系统视图对齐

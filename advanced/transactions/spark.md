@@ -194,17 +194,16 @@ ALTER TABLE users SET TBLPROPERTIES ('delta.isolationLevel' = 'Serializable');
 
 ## 9. 版本演进
 
-Spark 2.0: 无事务支持
-Delta 0.1: 单表 ACID 事务（乐观并发控制）
-Delta 1.0: Time Travel, RESTORE, 隔离级别
-Delta 2.0: Deletion Vectors（行级删除优化）
-Iceberg 1.0: 快照隔离, WAP 模式
-Databricks: 多语句事务（Preview）
+- **Spark 2.0**: 无事务支持
+- **Delta 0.1**: 单表 ACID 事务（乐观并发控制）
+- **Delta 1.0**: Time Travel, RESTORE, 隔离级别
+- **Delta 2.0**: Deletion Vectors（行级删除优化）
+- **Iceberg 1.0**: 快照隔离, WAP 模式
+- **Databricks**: 多语句事务（Preview）
 
-限制:
+> **限制**: 
 原生 Spark SQL（Parquet/ORC）无任何事务保证
 Delta Lake / Iceberg 仅提供单表原子事务（无跨表事务）
 多语句事务仅 Databricks Preview
 并发写入冲突需要应用层重试
 VACUUM 后历史版本不可恢复
-

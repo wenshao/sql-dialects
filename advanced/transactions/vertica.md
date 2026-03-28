@@ -152,8 +152,8 @@ ROLLBACK;  -- 只回滚第二个 INSERT
 END;
 $$;
 
-注意：Vertica 默认 AUTOCOMMIT 开启
-注意：使用表级锁（不支持行级锁）
-注意：支持 READ COMMITTED 和 SERIALIZABLE 隔离级别
-注意：COPY 是原子操作
-注意：MVCC 实现读写互不阻塞
+> **注意**: Vertica 默认 AUTOCOMMIT 开启
+> **注意**: 使用表级锁（不支持行级锁）
+> **注意**: 支持 READ COMMITTED 和 SERIALIZABLE 隔离级别
+> **注意**: COPY 是原子操作
+> **注意**: MVCC 实现读写互不阻塞

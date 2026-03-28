@@ -139,8 +139,8 @@ DDL operations are transactional within TiDB's online DDL framework
 
 Distributed transaction internals:
 TiDB uses Percolator-based 2PC (two-phase commit)
-Coordinator: TiDB server
-Participants: TiKV nodes holding the affected key-value pairs
+- **Coordinator**: TiDB server
+- **Participants**: TiKV nodes holding the affected key-value pairs
 TSO (Timestamp Oracle) from PD for global ordering
 
 Limitations:
@@ -149,5 +149,5 @@ READ UNCOMMITTED not truly supported (mapped to READ COMMITTED)
 Transaction size limits (100MB default, configurable)
 Optimistic transactions may fail at commit time on conflict
 Long-running transactions may be rolled back by GC
-XA transactions: limited support
+- **XA transactions**: limited support
 No two-phase commit across different TiDB clusters

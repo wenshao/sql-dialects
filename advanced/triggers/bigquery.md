@@ -84,20 +84,19 @@ FROM myproject.mydataset.orders GROUP BY user_id;
 ## 3. 对比与引擎开发者启示
 
 BigQuery 不支持触发器，替代方案:
-计划查询 → 定时触发（最简单）
-物化视图 → 自动刷新聚合（最接近触发器）
-Cloud Functions → 实时事件响应（最灵活）
-Dataflow → 流式处理管道（最强大）
+- 计划查询 → 定时触发（最简单）
+- 物化视图 → 自动刷新聚合（最接近触发器）
+- Cloud Functions → 实时事件响应（最灵活）
+- Dataflow → 流式处理管道（最强大）
 
 对比:
-MySQL/PostgreSQL: 完整的 BEFORE/AFTER 触发器
-SQLite:           BEFORE/AFTER + INSTEAD OF
-ClickHouse:       物化视图替代（INSERT 触发的数据管道）
-BigQuery:         外部服务替代（Scheduled Query / Cloud Function）
+- **MySQL/PostgreSQL**: 完整的 BEFORE/AFTER 触发器
+- **SQLite**: BEFORE/AFTER + INSTEAD OF
+- **ClickHouse**: 物化视图替代（INSERT 触发的数据管道）
+- **BigQuery**: 外部服务替代（Scheduled Query / Cloud Function）
 
 对引擎开发者的启示:
 无服务器引擎天然不适合传统触发器。
 物化视图（自动刷新）是更好的抽象:
 声明式（用户定义"要什么"）vs 命令式（触发器定义"做什么"）。
 计划查询是触发器的"最小可用替代"，实现成本极低。
-

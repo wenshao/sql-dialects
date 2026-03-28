@@ -112,17 +112,17 @@ FOR SYSTEM_TIME FROM '2024-01-01' TO '2024-12-31';
 ```
 
 设计分析（对引擎开发者）:
-  时态表是 SQL:2011 标准特性，SQL Server 是最早完整实现的主流数据库（2016）。
-  它从根本上解决了 SCD 问题——引擎自动维护历史版本。
+  - 时态表是 SQL:2011 标准特性，SQL Server 是最早完整实现的主流数据库（2016）。
+  - 它从根本上解决了 SCD 问题——引擎自动维护历史版本。
 
 横向对比:
-  PostgreSQL: 无原生时态表（需要触发器模拟或使用 temporal_tables 扩展）
-  MySQL:      不支持时态表
-  Oracle:     Flashback Data Archive（类似功能但不同实现）
-  MariaDB:    10.3+ 支持系统版本化表（WITH SYSTEM VERSIONING）
+- **PostgreSQL**: 无原生时态表（需要触发器模拟或使用 temporal_tables 扩展）
+- **MySQL**: 不支持时态表
+- **Oracle**: Flashback Data Archive（类似功能但不同实现）
+- **MariaDB**: 10.3+ 支持系统版本化表（WITH SYSTEM VERSIONING）
 
 对引擎开发者的启示:
-  时态表的实现核心: UPDATE/DELETE 时自动将旧行写入 history 表。
-  这需要在 DML 执行路径中注入额外的写操作——对引擎代码有侵入性。
-  FOR SYSTEM_TIME 查询需要优化器支持跨两个表的谓词下推。
-  这是一个非常有价值的特性——数据审计和合规是企业客户的刚需。
+- **时态表的实现核心**: UPDATE/DELETE 时自动将旧行写入 history 表。
+  - 这需要在 DML 执行路径中注入额外的写操作——对引擎代码有侵入性。
+  - FOR SYSTEM_TIME 查询需要优化器支持跨两个表的谓词下推。
+  - 这是一个非常有价值的特性——数据审计和合规是企业客户的刚需。

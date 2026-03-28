@@ -89,17 +89,17 @@ END;
 ## 对比与引擎开发者启示
 
 SQLite SCD 的实现:
-  Type 1: ON CONFLICT DO UPDATE（最简洁）
-  Type 2: 事务中 UPDATE + INSERT（两步操作）
-  自动化: INSTEAD OF 触发器
+- **Type 1**: ON CONFLICT DO UPDATE（最简洁）
+- **Type 2**: 事务中 UPDATE + INSERT（两步操作）
+- **自动化**: INSTEAD OF 触发器
 
 对比:
-  MySQL:      没有 MERGE，用 INSERT ON DUPLICATE KEY UPDATE (Type1)
-  PostgreSQL: MERGE (15+) 或 CTE + UPDATE + INSERT
-  ClickHouse: ReplacingMergeTree（Type1 天然支持）
-  BigQuery:   MERGE 语句（最适合 SCD）
+- **MySQL**: 没有 MERGE，用 INSERT ON DUPLICATE KEY UPDATE (Type1)
+- **PostgreSQL**: MERGE (15+) 或 CTE + UPDATE + INSERT
+- **ClickHouse**: ReplacingMergeTree（Type1 天然支持）
+- **BigQuery**: MERGE 语句（最适合 SCD）
 
 对引擎开发者的启示:
-  SCD Type 2 是数仓的核心需求。
-  MERGE 语句是实现 SCD2 最简洁的方案。
-  SQLite 没有 MERGE，需要事务+两步操作（更复杂但可行）。
+  - SCD Type 2 是数仓的核心需求。
+  - MERGE 语句是实现 SCD2 最简洁的方案。
+  - SQLite 没有 MERGE，需要事务+两步操作（更复杂但可行）。

@@ -172,17 +172,16 @@ SELECT * FROM merged_users;
 
 ## 9. 版本演进
 
-Spark 2.0: 无 MERGE（只能用 ANTI JOIN + UNION 模拟）
-Delta 0.3: MERGE INTO 基本支持
-Delta 1.0: UPDATE SET * / INSERT * 简写
-Spark 3.4: WHEN NOT MATCHED BY SOURCE
-Iceberg:   MERGE INTO 支持（Spark 3.0+）
+- **Spark 2.0**: 无 MERGE（只能用 ANTI JOIN + UNION 模拟）
+- **Delta 0.3**: MERGE INTO 基本支持
+- **Delta 1.0**: UPDATE SET * / INSERT * 简写
+- **Spark 3.4**: WHEN NOT MATCHED BY SOURCE
+- **Iceberg**: MERGE INTO 支持（Spark 3.0+）
 
-限制:
+> **限制**: 
 MERGE INTO 需要 Delta Lake 或 Iceberg 表格式
 无 INSERT ... ON CONFLICT 语法
 无 RETURNING 子句
 MERGE 的性能取决于 JOIN 效率——ON 条件必须高效
 MERGE 不支持 self-merge（目标表和源表不能是同一张表）
 源表中的 ON 条件匹配多行时会报错（一行不能被多次更新）
-

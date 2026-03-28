@@ -86,18 +86,18 @@ SELECT datetime('2024-01-15', 'utc');    -- 本地时间转 UTC
 ## 对比与引擎开发者启示
 
 SQLite 日期时间的设计:
-  (1) 无专用类型 → TEXT/INTEGER/REAL 三选一
-  (2) 函数丰富 → datetime()/strftime() 覆盖大部分需求
-  (3) 无时区类型 → 存 UTC + 应用层转换
-  (4) 三种格式互操作 → 函数可以解析任意格式
+- (1) 无专用类型 → TEXT/INTEGER/REAL 三选一
+- (2) 函数丰富 → datetime()/strftime() 覆盖大部分需求
+- (3) 无时区类型 → 存 UTC + 应用层转换
+- (4) 三种格式互操作 → 函数可以解析任意格式
 
 对比:
-  MySQL:      DATETIME / TIMESTAMP（带时区转换）
-  PostgreSQL: TIMESTAMP / TIMESTAMPTZ（最完善的时区支持）
-  ClickHouse: DateTime / DateTime64（纳秒精度）
-  BigQuery:   DATETIME / TIMESTAMP / DATE / TIME（4 种类型）
+- **MySQL**: DATETIME / TIMESTAMP（带时区转换）
+- **PostgreSQL**: TIMESTAMP / TIMESTAMPTZ（最完善的时区支持）
+- **ClickHouse**: DateTime / DateTime64（纳秒精度）
+- **BigQuery**: DATETIME / TIMESTAMP / DATE / TIME（4 种类型）
 
 对引擎开发者的启示:
-  SQLite 证明了"无专用日期类型 + 强大的日期函数"是可行的方案。
-  但缺少时区支持是明显的不足。
-  现代引擎至少需要: TIMESTAMP WITH TIME ZONE + 纳秒精度。
+  - SQLite 证明了"无专用日期类型 + 强大的日期函数"是可行的方案。
+  - 但缺少时区支持是明显的不足。
+- **现代引擎至少需要**: TIMESTAMP WITH TIME ZONE + 纳秒精度。

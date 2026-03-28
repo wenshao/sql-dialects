@@ -168,14 +168,14 @@ tags TEXT
 ## Hologres 字符串拆分特性:
 
 完全兼容 PostgreSQL 的字符串函数
-STRING_TO_ARRAY + UNNEST: 标准方案
-regexp_split_to_table: 正则拆分
-WITH ORDINALITY: 保留序号
+- **STRING_TO_ARRAY + UNNEST**: 标准方案
+- **regexp_split_to_table**: 正则拆分
+- **WITH ORDINALITY**: 保留序号
 2. 与其他分析引擎对比:
-Hologres:     STRING_TO_ARRAY + UNNEST（PostgreSQL 兼容）
-MaxCompute:   LATERAL VIEW explode(SPLIT(...))（Hive 语法）
-ClickHouse:   splitByChar + arrayJoin
-BigQuery:     SPLIT + UNNEST
+- **Hologres**: STRING_TO_ARRAY + UNNEST（PostgreSQL 兼容）
+- **MaxCompute**: LATERAL VIEW explode(SPLIT(...))（Hive 语法）
+- **ClickHouse**: splitByChar + arrayJoin
+- **BigQuery**: SPLIT + UNNEST
 对引擎开发者:
 兼容 PostgreSQL 生态意味着用户可以直接复用 PostgreSQL 知识
 STRING_TO_ARRAY + UNNEST 是最优雅的拆分组合

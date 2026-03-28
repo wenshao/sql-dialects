@@ -238,18 +238,17 @@ SELECT * FROM users WHERE created_at > '2024-01-01';
 ## 11. 横向对比: 建表核心差异
 
 Primary Key 语法:
-StarRocks: PRIMARY KEY(cols) — 独立模型，语义清晰
-Doris:     UNIQUE KEY + PROPERTIES — 复用 Unique Key，语义模糊
-ClickHouse: ReplacingMergeTree(ver) — 异步去重，不保证实时
-MySQL:     PRIMARY KEY — 原生唯一约束 + 行级锁
+- **StarRocks**: PRIMARY KEY(cols) — 独立模型，语义清晰
+- **Doris**: UNIQUE KEY + PROPERTIES — 复用 Unique Key，语义模糊
+- **ClickHouse**: ReplacingMergeTree(ver) — 异步去重，不保证实时
+- **MySQL**: PRIMARY KEY — 原生唯一约束 + 行级锁
 
 排序键分离:
-StarRocks: PRIMARY KEY + ORDER BY 分离(2.0+) — 灵活
-Doris:     Key 列 = 排序键，不可分离
-ClickHouse: PRIMARY KEY + ORDER BY 分离 — 最早实现此设计
+- **StarRocks**: PRIMARY KEY + ORDER BY 分离(2.0+) — 灵活
+- **Doris**: Key 列 = 排序键，不可分离
+- **ClickHouse**: PRIMARY KEY + ORDER BY 分离 — 最早实现此设计
 
 对引擎开发者的参考:
 StarRocks 的 CBO 优化器基于 Cascades 框架(Columbia 变体)，
 其 Rule 设计和 Cost Model 对自研优化器有直接参考价值。
 Primary Key 模型的内存索引设计是实时更新列存表的核心挑战。
-

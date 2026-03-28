@@ -132,15 +132,15 @@ SELECT device_id, tag4 AS tag FROM sensor_multi_tags WHERE tag4 IS NOT NULL;
 
 ## TDengine 字符串拆分策略:
 
-最佳方案: 数据写入时预拆分为多行
-备选方案 A: UDF 自定义拆分函数
-备选方案 B: 应用层拆分 + 批量写入
-备选方案 C: 多标签列 + UNION ALL
+- **最佳方案**: 数据写入时预拆分为多行
+- **备选方案 A**: UDF 自定义拆分函数
+- **备选方案 B**: 应用层拆分 + 批量写入
+- **备选方案 C**: 多标签列 + UNION ALL
 2. 与其他数据库对比:
-PostgreSQL: STRING_TO_ARRAY + UNNEST（一行搞定）
-ClickHouse: splitByChar + arrayJoin
-BigQuery:   SPLIT + UNNEST（最简洁）
-TDengine:   无内置支持，需 ETL 拆分
+- **PostgreSQL**: STRING_TO_ARRAY + UNNEST（一行搞定）
+- **ClickHouse**: splitByChar + arrayJoin
+- **BigQuery**: SPLIT + UNNEST（最简洁）
+- **TDengine**: 无内置支持，需 ETL 拆分
 对引擎开发者:
 时序数据库的设计目标是高性能时间序列操作
 字符串拆分是 OLTP/分析型操作，不是时序数据库的核心场景

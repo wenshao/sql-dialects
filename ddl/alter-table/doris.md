@@ -201,16 +201,15 @@ SHOW ALTER TABLE ROLLUP;
 Aggregate Key 模型的 Value 列聚合方式不能修改
 
 Doris vs StarRocks ALTER TABLE 差异:
-Doris 2.0+:    支持 RENAME COLUMN
-StarRocks:     不支持 RENAME COLUMN(需重建表)
-Doris:         REPLACE WITH TABLE
-StarRocks:     SWAP WITH (语法不同，功能相同)
-Doris 2.1+:    批量 ADD PARTITIONS ... INTERVAL
-StarRocks 3.1: Expression Partition(自动分区更优)
+- **Doris 2.0+**: 支持 RENAME COLUMN
+- **StarRocks**: 不支持 RENAME COLUMN(需重建表)
+- **Doris**: REPLACE WITH TABLE
+- **StarRocks**: SWAP WITH (语法不同，功能相同)
+- **Doris 2.1+**: 批量 ADD PARTITIONS ... INTERVAL
+- **StarRocks 3.1**: Expression Partition(自动分区更优)
 
 对引擎开发者的启示:
 列存引擎的 DDL 核心挑战是 Key 列变更——因为 Key 列决定物理排序。
 修改排序键 = 全表数据重写 + 索引重建，代价极高。
 StarRocks 的 Fast Schema Evolution 通过延迟物化(Lazy Materialization)
 进一步减少 DDL 对在线查询的影响。
-

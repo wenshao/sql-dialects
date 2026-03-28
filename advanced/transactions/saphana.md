@@ -111,8 +111,8 @@ END;
 DML statements here
 COMMIT;
 END;
-Note: SAP HANA defaults to auto-commit mode
-Note: MVCC provides snapshot isolation for column store
-Note: row store uses traditional locking
-Note: DDL auto-commits (cannot roll back DDL)
-Note: HANA's in-memory architecture makes transactions very fast
+> **Note**: SAP HANA defaults to auto-commit mode
+> **Note**: MVCC provides snapshot isolation for column store
+> **Note**: row store uses traditional locking
+> **Note**: DDL auto-commits (cannot roll back DDL)
+> **Note**: HANA's in-memory architecture makes transactions very fast

@@ -63,14 +63,14 @@ WHERE JSON_EXISTS(metadata, '$.tags[*] ? (@ == "database")');
 
 SQL 标准始终没有定义完整的全文搜索功能
 各数据库的全文搜索实现都是私有扩展：
-  PostgreSQL: tsvector / tsquery / @@
-  MySQL: MATCH ... AGAINST
-  Oracle: CONTAINS / CTXSYS
-  SQL Server: CONTAINS / FREETEXT
-  SQLite: FTS5 虚拟表
+- **PostgreSQL**: tsvector / tsquery / @@
+- **MySQL**: MATCH ... AGAINST
+- **Oracle**: CONTAINS / CTXSYS
+- **SQL Server**: CONTAINS / FREETEXT
+- **SQLite**: FTS5 虚拟表
 
 标准只提供了基础模式匹配：
-LIKE（SQL-92）: 简单通配符匹配
+- **LIKE（SQL-92）**: 简单通配符匹配
 SIMILAR TO（SQL:1999）: 正则风格模式匹配
 
 标准没有定义的全文搜索特性：

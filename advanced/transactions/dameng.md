@@ -68,7 +68,9 @@ LOCK TABLE accounts IN EXCLUSIVE MODE;
 LOCK TABLE accounts IN SHARE MODE;
 ```
 
-自治事务（PL/SQL 中使用）
+## 自治事务（PL/SQL 中使用）
+
+```sql
 CREATE OR REPLACE PROCEDURE log_action(...)
 AS
 PRAGMA AUTONOMOUS_TRANSACTION;
@@ -76,10 +78,12 @@ BEGIN
 INSERT INTO log_table ...;
 COMMIT;  -- 独立提交，不影响主事务
 END;
-注意事项：
-与 Oracle 一样，DML 自动开启事务
-没有显式 BEGIN TRANSACTION
-DDL 语句会隐式提交当前事务
-支持自治事务（AUTONOMOUS_TRANSACTION）
-使用 MVCC 实现读不阻塞写
-支持 FOR UPDATE WAIT n 等待指定秒数
+```
+
+> **注意事项**:
+> - 与 Oracle 一样，DML 自动开启事务
+> - 没有显式 BEGIN TRANSACTION
+> - DDL 语句会隐式提交当前事务
+> - 支持自治事务（AUTONOMOUS_TRANSACTION）
+> - 使用 MVCC 实现读不阻塞写
+> - 支持 FOR UPDATE WAIT n 等待指定秒数

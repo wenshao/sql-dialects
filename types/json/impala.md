@@ -111,7 +111,7 @@ age INT
 STORED AS TEXTFILE
 LOCATION '/data/json_events/';
 
-注意：Impala 没有原生 JSON 类型
-注意：使用 GET_JSON_OBJECT 解析 JSON 字符串
-注意：复杂类型（STRUCT/ARRAY/MAP）比 JSON 字符串更高效
-注意：GET_JSON_OBJECT 返回 STRING 类型，需要 CAST 转换
+> **注意**: Impala 没有原生 JSON 类型
+> **注意**: 使用 GET_JSON_OBJECT 解析 JSON 字符串
+> **注意**: 复杂类型（STRUCT/ARRAY/MAP）比 JSON 字符串更高效
+> **注意**: GET_JSON_OBJECT 返回 STRING 类型，需要 CAST 转换

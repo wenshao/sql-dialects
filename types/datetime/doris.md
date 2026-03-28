@@ -57,18 +57,17 @@ SELECT UNIX_TIMESTAMP(), FROM_UNIXTIME(1705276800);
 ## 6. 对比其他引擎
 
 时区:
-Doris:     无 TIMESTAMPTZ。时区由 FE time_zone 参数决定。
-StarRocks: 同样无 TIMESTAMPTZ。
-MySQL:     TIMESTAMP(存 UTC 自动转) vs DATETIME(存原值)
-PostgreSQL: TIMESTAMPTZ(推荐)
-BigQuery:  TIMESTAMP(有时区) vs DATETIME(无时区)
+- **Doris**: 无 TIMESTAMPTZ。时区由 FE time_zone 参数决定。
+- **StarRocks**: 同样无 TIMESTAMPTZ。
+- **MySQL**: TIMESTAMP(存 UTC 自动转) vs DATETIME(存原值)
+- **PostgreSQL**: TIMESTAMPTZ(推荐)
+- **BigQuery**: TIMESTAMP(有时区) vs DATETIME(无时区)
 
 精度:
-Doris 2.0+: 微秒(6位)
-ClickHouse: DateTime64(纳秒，9位)
-MySQL:      微秒(6位)
+- **Doris 2.0+**: 微秒(6位)
+- **ClickHouse**: DateTime64(纳秒，9位)
+- **MySQL**: 微秒(6位)
 
 对引擎开发者的启示:
 分区表常用 DATE 作为分区键——DATE 类型的存储和比较成本最低。
 DATETIME 的微秒精度增加了存储开销(8 字节 vs 4 字节)。
-

@@ -173,22 +173,21 @@ SHOW ALTER TABLE ROLLUP;
 ## 8. StarRocks vs Doris ALTER TABLE 差异总结
 
 Schema 变更速度:
-StarRocks 3.0+: Fast Schema Evolution(毫秒级，默认启用)
-Doris 1.2+:     Light Schema Change(秒级)
+- **StarRocks 3.0+**: Fast Schema Evolution(毫秒级，默认启用)
+- **Doris 1.2+**: Light Schema Change(秒级)
 
 语法差异:
-StarRocks: ALTER TABLE t SWAP WITH t_new;
-Doris:     ALTER TABLE t REPLACE WITH TABLE t_new;
+- **StarRocks**: ALTER TABLE t SWAP WITH t_new;
+- **Doris**: ALTER TABLE t REPLACE WITH TABLE t_new;
 
-StarRocks: 不支持 RENAME COLUMN
-Doris 2.0+: 支持 ALTER TABLE t RENAME COLUMN old TO new
+- **StarRocks**: 不支持 RENAME COLUMN
+- **Doris 2.0+**: 支持 ALTER TABLE t RENAME COLUMN old TO new
 
 分区管理:
-StarRocks 3.1+: Expression Partition(最优方案)
-Doris 2.1+:     ADD PARTITIONS ... INTERVAL(批量便捷)
+- **StarRocks 3.1+**: Expression Partition(最优方案)
+- **Doris 2.1+**: ADD PARTITIONS ... INTERVAL(批量便捷)
 
 对引擎开发者的启示:
 SWAP/REPLACE 原子替换是分析型引擎的核心 DDL 操作——
 用于数据修复、全量刷新场景。实现依赖 FE 元数据的原子切换。
 比 MySQL 的 RENAME TABLE old TO bak, new TO old 更安全。
-

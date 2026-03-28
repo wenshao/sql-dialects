@@ -73,18 +73,18 @@ FROM orders GROUP BY user_id;
 ## 对比与引擎开发者启示
 
 SQLite 不支持存储过程的替代方案:
-  CTE + 复杂查询 → 纯 SQL 逻辑
-  自定义函数 API → 宿主语言扩展
-  触发器 → 事件驱动逻辑
-  视图 → 查询封装
+- CTE + 复杂查询 → 纯 SQL 逻辑
+- 自定义函数 API → 宿主语言扩展
+- 触发器 → 事件驱动逻辑
+- 视图 → 查询封装
 
 对比:
-  MySQL:      DELIMITER + CREATE PROCEDURE（自有过程语言）
-  PostgreSQL: PL/pgSQL, PL/Python, PL/Perl（最灵活）
-  ClickHouse: 用户定义函数 UDF（SQL 表达式或外部脚本，无过程语言）
-  BigQuery:   BEGIN...END 脚本 + UDF（JavaScript/SQL）
+- **MySQL**: DELIMITER + CREATE PROCEDURE（自有过程语言）
+- **PostgreSQL**: PL/pgSQL, PL/Python, PL/Perl（最灵活）
+- **ClickHouse**: 用户定义函数 UDF（SQL 表达式或外部脚本，无过程语言）
+- **BigQuery**: BEGIN...END 脚本 + UDF（JavaScript/SQL）
 
 对引擎开发者的启示:
-  嵌入式数据库不需要过程式语言:
-  应用代码本身就是"过程"，数据库只需要提供 SQL 和自定义函数 API。
-  自定义函数 API（sqlite3_create_function）是比 SQL UDF 更适合嵌入式的设计。
+  - 嵌入式数据库不需要过程式语言:
+  - 应用代码本身就是"过程"，数据库只需要提供 SQL 和自定义函数 API。
+  - 自定义函数 API（sqlite3_create_function）是比 SQL UDF 更适合嵌入式的设计。

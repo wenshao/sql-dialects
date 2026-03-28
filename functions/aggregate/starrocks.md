@@ -79,15 +79,14 @@ SELECT ARRAY_AGG(username) FROM users GROUP BY city;
 核心函数完全相同(同源)。
 
 差异:
-StarRocks: ARRAY_AGG (更标准)
-Doris:     COLLECT_LIST / COLLECT_SET (Hive 风格)
+- **StarRocks**: ARRAY_AGG (更标准)
+- **Doris**: COLLECT_LIST / COLLECT_SET (Hive 风格)
 
-StarRocks: QUANTILE_STATE 不支持(用 PERCENTILE_APPROX)
-Doris:     QUANTILE_STATE 聚合类型(Aggregate Key 模型)
+- **StarRocks**: QUANTILE_STATE 不支持(用 PERCENTILE_APPROX)
+- **Doris**: QUANTILE_STATE 聚合类型(Aggregate Key 模型)
 
 对引擎开发者的启示:
 聚合函数的向量化实现是 OLAP 引擎性能的关键:
-Batch Aggregation: 一次处理一个向量(1024 行)而非逐行
-SIMD 加速: SUM/COUNT 可用 AVX2/AVX512 指令
-Two-Phase Aggregation: 先本地聚合(Partial)，再全局聚合(Final)
-
+- **Batch Aggregation**: 一次处理一个向量(1024 行)而非逐行
+- **SIMD 加速**: SUM/COUNT 可用 AVX2/AVX512 指令
+- **Two-Phase Aggregation**: 先本地聚合(Partial)，再全局聚合(Final)

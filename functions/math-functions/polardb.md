@@ -88,8 +88,8 @@ SELECT LOG10(1000);                    -- 3
 SELECT PI();                           -- 3.141593
 SELECT RAND();                         -- 0.0 到 1.0 之间
 SELECT RAND(42);                       -- 可重复随机数
-注意：PolarDB 有 PostgreSQL 和 MySQL 两个版本，数学函数跟随对应引擎
-注意：PostgreSQL 版 LOG(x) 以 10 为底；MySQL 版 LOG(x) 以 e 为底
-注意：PostgreSQL 版用 TRUNC；MySQL 版用 TRUNCATE
-注意：PostgreSQL 版用 RANDOM()；MySQL 版用 RAND()
-注意：PostgreSQL 版支持 CBRT 立方根；MySQL 版不支持
+> **注意**: PolarDB 有 PostgreSQL 和 MySQL 两个版本，数学函数跟随对应引擎
+> **注意**: PostgreSQL 版 LOG(x) 以 10 为底；MySQL 版 LOG(x) 以 e 为底
+> **注意**: PostgreSQL 版用 TRUNC；MySQL 版用 TRUNCATE
+> **注意**: PostgreSQL 版用 RANDOM()；MySQL 版用 RAND()
+> **注意**: PostgreSQL 版支持 CBRT 立方根；MySQL 版不支持

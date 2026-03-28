@@ -20,35 +20,45 @@ TO_CHAR(ts, 'YYYY-MM-DD HH24:MI:SS'); TO_DATE('2024-01-15', 'YYYY-MM-DD');
 ## 七、数据类型映射（从 PostgreSQL/MySQL 到 Hologres）
 
 PostgreSQL → Hologres: 基本兼容
-INT → INT, TEXT → TEXT, JSONB → JSONB,
-TIMESTAMPTZ → TIMESTAMPTZ, BOOLEAN → BOOLEAN,
-SERIAL → SERIAL, ARRAY → ARRAY (部分支持)
+- INT → INT, TEXT → TEXT, JSONB → JSONB,
+- TIMESTAMPTZ → TIMESTAMPTZ, BOOLEAN → BOOLEAN,
+- SERIAL → SERIAL, ARRAY → ARRAY (部分支持)
 MySQL → Hologres:
-INT → INT, VARCHAR(n) → VARCHAR(n)/TEXT,
-DATETIME → TIMESTAMP, TINYINT(1) → BOOLEAN,
-JSON → JSONB, AUTO_INCREMENT → SERIAL
+- INT → INT, VARCHAR(n) → VARCHAR(n)/TEXT,
+- DATETIME → TIMESTAMP, TINYINT(1) → BOOLEAN,
+- JSON → JSONB, AUTO_INCREMENT → SERIAL
 MaxCompute → Hologres:
-STRING → TEXT, BIGINT → BIGINT, DOUBLE → FLOAT8,
-DECIMAL → DECIMAL, DATETIME → TIMESTAMP
-八、函数等价映射
+- STRING → TEXT, BIGINT → BIGINT, DOUBLE → FLOAT8,
+- DECIMAL → DECIMAL, DATETIME → TIMESTAMP
+
+### 八、函数等价映射
+
 MySQL → Hologres:
-IFNULL → COALESCE, NOW() → NOW(),
-DATE_FORMAT → TO_CHAR, STR_TO_DATE → TO_DATE,
-CONCAT(a,b) → a || b, GROUP_CONCAT → STRING_AGG,
-LIMIT → LIMIT
-九、常见陷阱补充
-建表选择存储模式: 列存(分析)、行存(点查)、行列混存
+- IFNULL → COALESCE, NOW() → NOW(),
+- DATE_FORMAT → TO_CHAR, STR_TO_DATE → TO_DATE,
+- CONCAT(a,b) → a || b, GROUP_CONCAT → STRING_AGG,
+- LIMIT → LIMIT
+
+### 九、常见陷阱补充
+
+- **建表选择存储模式**: 列存(分析)、行存(点查)、行列混存
 Distribution Key 选择影响数据分布和查询效率
 Segment Key 用于时间裁剪（时序数据推荐）
 Clustering Key 优化排序扫描
 与 MaxCompute 可通过外表互通
 不支持 UPDATE/DELETE（行存表除外）
 OLAP 实时数仓，不适合高并发 OLTP
-十、NULL 处理
+
+### 十、NULL 处理
+
 COALESCE(a, b, c)                                  -- 返回第一个非 NULL
 NULLIF(a, b)                                       -- a=b 时返回 NULL
-十一、分页语法
+
+### 十一、分页语法
+
 SELECT * FROM t ORDER BY id LIMIT 10 OFFSET 20;
-十二、MaxCompute 外表查询
+
+### 十二、MaxCompute 外表查询
+
 CREATE FOREIGN TABLE mc_table (id int, name text)
 SERVER odps_server OPTIONS (project 'prj', table 'tbl');

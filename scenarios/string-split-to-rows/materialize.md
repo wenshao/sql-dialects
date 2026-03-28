@@ -149,16 +149,16 @@ LEFT   JOIN tag_categories tc ON tc.tag = TRIM(s.tag);
 兼容 PostgreSQL 的 STRING_TO_ARRAY + UNNEST
 regexp_split_to_table 支持正则拆分
 WITH ORDINALITY 保留序号
-物化视图 + 拆分: 实时预计算
+- **物化视图 + 拆分**: 实时预计算
 2. Materialize 的独特优势:
 物化视图自动维护拆分结果
 源数据变化时，展开结果实时更新
 对高频查询的拆分场景性能极佳
 3. 与其他流/实时引擎对比:
-Materialize: STRING_TO_ARRAY + UNNEST + 物化视图
-ksqlDB:      EXPLODE(SPLIT(...)) + 流
-Flink SQL:   STRING_TO_ARRAY + UNNEST + 动态表
-RisingWave:  兼容 PostgreSQL，语法类似 Materialize
+- **Materialize**: STRING_TO_ARRAY + UNNEST + 物化视图
+- **ksqlDB**: EXPLODE(SPLIT(...)) + 流
+- **Flink SQL**: STRING_TO_ARRAY + UNNEST + 动态表
+- **RisingWave**: 兼容 PostgreSQL，语法类似 Materialize
 对引擎开发者:
 物化视图 + 拆分函数的组合是实时数据库的杀手特性
 兼容 PostgreSQL 降低了用户迁移成本

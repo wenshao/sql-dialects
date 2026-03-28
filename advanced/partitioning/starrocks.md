@@ -97,24 +97,23 @@ ALTER TABLE orders DROP PARTITION p2023;
 ## 7. StarRocks vs Doris 分区对比
 
 Expression Partition:
-StarRocks 3.1+: PARTITION BY expr(最灵活)
-Doris 2.1+:     AUTO PARTITION(功能类似但语法不同)
+- **StarRocks 3.1+**: PARTITION BY expr(最灵活)
+- **Doris 2.1+**: AUTO PARTITION(功能类似但语法不同)
 
 自动分桶:
-StarRocks 3.0+: 支持(省略 BUCKETS)
-Doris:          不支持(必须手动指定)
+- **StarRocks 3.0+**: 支持(省略 BUCKETS)
+- **Doris**: 不支持(必须手动指定)
 
 动态分区:
 两者相同(同源语法)
 
 Colocate Group:
 两者都支持(建表时 "colocate_with" = "group_name")
-同组表的相同分桶键 → 本地 JOIN(零网络开销)
+- 同组表的相同分桶键 → 本地 JOIN(零网络开销)
 
 对引擎开发者的启示:
 分区设计的核心价值是 Partition Pruning:
-WHERE order_date = '2024-01-15' → 只扫描 p2024_01
+- WHERE order_date = '2024-01-15' → 只扫描 p2024_01
 减少 I/O 是 OLAP 性能的关键。
 Expression Partition 的实现需要在写入时"即时创建分区"——
 这要求 FE 的元数据管理支持并发分区创建。
-

@@ -135,17 +135,16 @@ FROM dim_customers_history GROUP BY customer_id;
 ## 4. 对比与引擎开发者启示
 
 ClickHouse SCD 的实现:
-Type 1: ReplacingMergeTree（最自然，INSERT 新版本）
-Type 2: 版本化表 + argMax（比 mutation 更适合）
+- **Type 1**: ReplacingMergeTree（最自然，INSERT 新版本）
+- **Type 2**: 版本化表 + argMax（比 mutation 更适合）
 
 对比:
-BigQuery: MERGE 语句（最适合 SCD）
-PostgreSQL: MERGE 或 CTE + UPDATE + INSERT
-SQLite: ON CONFLICT + 事务
+- **BigQuery**: MERGE 语句（最适合 SCD）
+- **PostgreSQL**: MERGE 或 CTE + UPDATE + INSERT
+- **SQLite**: ON CONFLICT + 事务
 
 对引擎开发者的启示:
 INSERT-only 引擎的 SCD 实现与传统数据库不同:
 不需要 UPDATE 旧记录，直接 INSERT 新版本。
 ReplacingMergeTree（保留最新）+ 全历史表（保留所有版本）
 是 INSERT-only 引擎的标准 SCD 模式。
-

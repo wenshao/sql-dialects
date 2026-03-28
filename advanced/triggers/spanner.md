@@ -117,12 +117,12 @@ Example application-level audit pattern (in transaction):
 BEGIN TRANSACTION;
 UPDATE Users SET Email = @newEmail WHERE UserId = @id;
 INSERT INTO AuditLog (LogId, TableName, Action, UserId, CommitTs)
-    VALUES (@logId, 'Users', 'UPDATE', @id, PENDING_COMMIT_TIMESTAMP());
+  - VALUES (@logId, 'Users', 'UPDATE', @id, PENDING_COMMIT_TIMESTAMP());
 COMMIT;
 
-Note: Triggers are NOT supported in Spanner
-Note: Change streams are the primary alternative (async, external)
-Note: PENDING_COMMIT_TIMESTAMP() provides auto-timestamp (like update trigger)
-Note: Row deletion policies provide TTL-based cleanup
-Note: Application code handles complex business logic
-Note: Cloud Functions can react to change stream events
+> **Note**: Triggers are NOT supported in Spanner
+> **Note**: Change streams are the primary alternative (async, external)
+> **Note**: PENDING_COMMIT_TIMESTAMP() provides auto-timestamp (like update trigger)
+> **Note**: Row deletion policies provide TTL-based cleanup
+> **Note**: Application code handles complex business logic
+> **Note**: Cloud Functions can react to change stream events

@@ -141,11 +141,11 @@ TRUNCATE TABLE myproject.mydataset.users;
 ## 6. 对比与引擎开发者启示
 
 BigQuery DELETE 的设计:
-(1) COW 机制 → DELETE 成本与分区大小成正比
-(2) DML 配额 → 不适合高频 DELETE
-(3) TRUNCATE → 元数据操作，不受配额限制
-(4) 分区过期 → 最推荐的数据清理方式
-(5) 时间旅行 → 误删保护（7 天窗口）
+- (1) COW 机制 → DELETE 成本与分区大小成正比
+- (2) DML 配额 → 不适合高频 DELETE
+- (3) TRUNCATE → 元数据操作，不受配额限制
+- (4) 分区过期 → 最推荐的数据清理方式
+- (5) 时间旅行 → 误删保护（7 天窗口）
 
 对引擎开发者的启示:
 云数仓应该将数据生命周期管理内置到引擎中:
@@ -153,4 +153,3 @@ BigQuery DELETE 的设计:
 时间旅行（快照保留）是删除安全的重要保障。
 ClickHouse 的 TTL 和 BigQuery 的 partition_expiration 是同一思路，
 只是实现层不同（存储引擎 vs 元数据服务）。
-

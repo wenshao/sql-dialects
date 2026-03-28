@@ -25,28 +25,27 @@
 ## 2. 替代方案
 
 
-方案一: Routine Load (Kafka 消费 → 类似 CDC 触发器)
+- **方案一**: Routine Load (Kafka 消费 → 类似 CDC 触发器)
 CREATE ROUTINE LOAD db.my_load ON target_table
 COLUMNS (id, username, email, action)
 FROM KAFKA ("kafka_broker_list"="broker:9092", "kafka_topic"="changes");
 
-方案二: Flink CDC (实时同步 → binlog 触发器)
-Flink CDC 监听上游 MySQL binlog → 实时写入 Doris
+- **方案二**: Flink CDC (实时同步 → binlog 触发器)
+- Flink CDC 监听上游 MySQL binlog → 实时写入 Doris
 
-方案三: 异步物化视图 (定时刷新 → 定时触发器)
+- **方案三**: 异步物化视图 (定时刷新 → 定时触发器)
 CREATE MATERIALIZED VIEW mv_stats
 REFRESH COMPLETE ON SCHEDULE EVERY 1 HOUR AS
 SELECT dt, COUNT(*) AS cnt FROM orders GROUP BY dt;
 
-方案四: 外部调度 (Airflow/DolphinScheduler)
+- **方案四**: 外部调度 (Airflow/DolphinScheduler)
 
-方案五: 审计日志
+- **方案五**: 审计日志
 Doris 自带审计日志插件，记录所有 SQL 操作:
 SET GLOBAL audit_log_enabled = true;
 
 对引擎开发者的启示:
 ClickHouse 的"MV 即触发器"是分析引擎的创新设计:
-INSERT INTO source → 自动触发 MV 的 INSERT INTO target
+- INSERT INTO source → 自动触发 MV 的 INSERT INTO target
 本质上是管道(Pipeline)而非传统触发器
 Doris/StarRocks 的同步 MV 类似，但不暴露触发器语义
-

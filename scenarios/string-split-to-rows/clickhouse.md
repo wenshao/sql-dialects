@@ -104,18 +104,17 @@ SELECT arrayJoin(alphaTokens('hello123world456foo')) AS word;
 ## 5. 对比与引擎开发者启示
 
 ClickHouse 字符串拆分:
-splitByChar/splitByString → 分割为数组
-arrayJoin / ARRAY JOIN → 数组展开为行
+- splitByChar/splitByString → 分割为数组
+- arrayJoin / ARRAY JOIN → 数组展开为行
 两步组合 = 完整的 SPLIT-TO-ROWS 管道
 
 对比:
-PostgreSQL: string_to_array() + unnest()（最接近）
-BigQuery:   SPLIT() + UNNEST()
-MySQL:      无内置方案（需要递归 CTE 或 JSON_TABLE）
-SQLite:     递归 CTE 或 json_each
+- **PostgreSQL**: string_to_array() + unnest()（最接近）
+- **BigQuery**: SPLIT() + UNNEST()
+- **MySQL**: 无内置方案（需要递归 CTE 或 JSON_TABLE）
+- **SQLite**: 递归 CTE 或 json_each
 
 对引擎开发者的启示:
 splitBy* + arrayJoin 的两步设计是最灵活的:
-分割（返回数组）和展开（数组→行）是独立操作，可以自由组合。
+- 分割（返回数组）和展开（数组→行）是独立操作，可以自由组合。
 内置多种分割函数（char/string/regexp/whitespace）覆盖各种场景。
-

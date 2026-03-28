@@ -131,10 +131,10 @@ SESSION window functions
 SESSION_START(event_time, INTERVAL '30' MINUTE)
 SESSION_END(event_time, INTERVAL '30' MINUTE)
 
-Note: Date format uses Java SimpleDateFormat patterns (yyyy-MM-dd)
-Note: TIMESTAMPADD/TIMESTAMPDIFF are the primary arithmetic/difference functions
-Note: CEIL/FLOOR on timestamps is unique to Flink (truncation alternative)
-Note: TO_TIMESTAMP_LTZ handles epoch seconds (precision 0) and milliseconds (precision 3)
-Note: No generate_series for date ranges
-Note: Window helper functions (TUMBLE_START, etc.) are for streaming time windows
-Note: PROCTIME() returns a special processing-time attribute
+> **Note**: Date format uses Java SimpleDateFormat patterns (yyyy-MM-dd)
+> **Note**: TIMESTAMPADD/TIMESTAMPDIFF are the primary arithmetic/difference functions
+> **Note**: CEIL/FLOOR on timestamps is unique to Flink (truncation alternative)
+> **Note**: TO_TIMESTAMP_LTZ handles epoch seconds (precision 0) and milliseconds (precision 3)
+> **Note**: No generate_series for date ranges
+> **Note**: Window helper functions (TUMBLE_START, etc.) are for streaming time windows
+> **Note**: PROCTIME() returns a special processing-time attribute

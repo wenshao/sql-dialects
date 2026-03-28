@@ -248,16 +248,18 @@ ALTER TABLE myproject.mydataset.users RENAME TO members;
 ## 6. 对比总结与引擎开发者启示
 
 BigQuery ALTER TABLE 的核心设计原则:
-(1) 只允许不重写数据的操作 → O(1) 元数据变更
-(2) OPTIONS 统一管理表属性 → 简化语法但牺牲标准兼容
-(3) STRUCT 字段可增量添加 → 支持嵌套 schema 演进
-(4) 分区过期自动管理 → 内置数据生命周期
-(5) require_partition_filter → DDL 层面的成本控制
+- (1) 只允许不重写数据的操作 → O(1) 元数据变更
+- (2) OPTIONS 统一管理表属性 → 简化语法但牺牲标准兼容
+- (3) STRUCT 字段可增量添加 → 支持嵌套 schema 演进
+- (4) 分区过期自动管理 → 内置数据生命周期
+- (5) require_partition_filter → DDL 层面的成本控制
 
 传统数据库的 ALTER TABLE 优化索引和锁（Online DDL），
 云数仓的 ALTER TABLE 优化元数据和成本控制。
 引擎开发者应根据目标场景选择:
+
+```
 OLTP: 优先考虑 Online DDL（不锁表的 schema 变更）
 OLAP: 优先考虑列存友好的 DDL（列级操作 + TTL + 成本控制）
-云原生: 优先考虑元数据操作（不重写数据，CTAS 替代复杂变更）
-
+```
+- **云原生**: 优先考虑元数据操作（不重写数据，CTAS 替代复杂变更）

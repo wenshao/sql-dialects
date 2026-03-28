@@ -163,7 +163,7 @@ ON DUPLICATE KEY UPDATE email = VALUES(email), age = VALUES(age);
 
 ## 横向对比: TDSQL vs 单机 MySQL UPDATE
 
-语法兼容性: TDSQL UPDATE 语法与 MySQL 完全兼容
+- **语法兼容性**: TDSQL UPDATE 语法与 MySQL 完全兼容
 主要差异在执行层面:
 单机 MySQL:
 UPDATE 直接修改本地 InnoDB 页
@@ -175,6 +175,6 @@ UPDATE 按 shardkey 路由到分片
 跨分片使用分布式事务（2PC）
 多表 JOIN UPDATE 推荐 shardkey 对齐
 迁移注意:
-(1) 检查是否有 UPDATE shardkey 列的语句（需要改为 DELETE + INSERT）
-(2) 大范围 UPDATE 需要按 shardkey 分批执行
-(3) 多表 UPDATE 确保 JOIN 的表 shardkey 设计一致
+- (1) 检查是否有 UPDATE shardkey 列的语句（需要改为 DELETE + INSERT）
+- (2) 大范围 UPDATE 需要按 shardkey 分批执行
+- (3) 多表 UPDATE 确保 JOIN 的表 shardkey 设计一致

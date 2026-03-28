@@ -118,17 +118,17 @@ SQLite 触发器不支持:
 ## 对比与引擎开发者启示
 
 SQLite 触发器的设计:
-  (1) 只有 FOR EACH ROW → 简化实现
-  (2) INSTEAD OF → 视图可写性的唯一途径
-  (3) RAISE → 触发器内的错误处理
-  (4) 无 ENABLE/DISABLE → 简化但不灵活
+- (1) 只有 FOR EACH ROW → 简化实现
+- (2) INSTEAD OF → 视图可写性的唯一途径
+- (3) RAISE → 触发器内的错误处理
+- (4) 无 ENABLE/DISABLE → 简化但不灵活
 
 对比:
-  MySQL:      BEFORE/AFTER + FOR EACH ROW（无 INSTEAD OF，无 FOR EACH STATEMENT）
-  PostgreSQL: BEFORE/AFTER/INSTEAD OF + FOR EACH ROW/STATEMENT + EXECUTE FUNCTION
-  ClickHouse: 无触发器（物化视图是 INSERT 触发器的替代）
-  BigQuery:   无触发器
+- **MySQL**: BEFORE/AFTER + FOR EACH ROW（无 INSTEAD OF，无 FOR EACH STATEMENT）
+- **PostgreSQL**: BEFORE/AFTER/INSTEAD OF + FOR EACH ROW/STATEMENT + EXECUTE FUNCTION
+- **ClickHouse**: 无触发器（物化视图是 INSERT 触发器的替代）
+- **BigQuery**: 无触发器
 
 对引擎开发者的启示:
-  嵌入式引擎的触发器应保持简洁（只需 ROW 级别）。
-  INSTEAD OF 触发器是避免实现复杂视图更新规则的优雅方案。
+  - 嵌入式引擎的触发器应保持简洁（只需 ROW 级别）。
+  - INSTEAD OF 触发器是避免实现复杂视图更新规则的优雅方案。

@@ -107,17 +107,17 @@ RETURNING id, username, age;
 ## 对比与引擎开发者启示
 
 SQLite UPSERT 的设计演进:
-  阶段 1 (2000): INSERT OR REPLACE（有 DELETE+INSERT 陷阱）
-  阶段 2 (2018): ON CONFLICT DO UPDATE（真正的 UPSERT）
-  等了 18 年才有真正的 UPSERT!
+- **阶段 1 (2000)**: INSERT OR REPLACE（有 DELETE+INSERT 陷阱）
+- **阶段 2 (2018)**: ON CONFLICT DO UPDATE（真正的 UPSERT）
+  - 等了 18 年才有真正的 UPSERT!
 
 EXCLUDED 伪表:
-  SQLite 和 PostgreSQL 都使用 EXCLUDED 引用冲突行
-  MySQL 使用 VALUES()（在 INSERT ... ON DUPLICATE KEY UPDATE 中）
-  MySQL 8.0.19+ 也支持别名方式（AS new_row）
+  - SQLite 和 PostgreSQL 都使用 EXCLUDED 引用冲突行
+  - MySQL 使用 VALUES()（在 INSERT ... ON DUPLICATE KEY UPDATE 中）
+  - MySQL 8.0.19+ 也支持别名方式（AS new_row）
 
 对引擎开发者的启示:
-  (1) REPLACE (DELETE+INSERT) 不是真正的 UPSERT（语义不同）
-  (2) ON CONFLICT DO UPDATE 是更好的设计（原地修改，rowid 不变）
-  (3) EXCLUDED 伪表比 VALUES() 函数更清晰
-  (4) 支持多 ON CONFLICT 子句增加了灵活性但也增加了复杂度
+- (1) REPLACE (DELETE+INSERT) 不是真正的 UPSERT（语义不同）
+- (2) ON CONFLICT DO UPDATE 是更好的设计（原地修改，rowid 不变）
+- (3) EXCLUDED 伪表比 VALUES() 函数更清晰
+- (4) 支持多 ON CONFLICT 子句增加了灵活性但也增加了复杂度

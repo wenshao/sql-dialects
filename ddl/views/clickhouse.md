@@ -179,20 +179,19 @@ FROM raw_events WHERE event_type != 'heartbeat';
 ## 5. 对比与引擎开发者启示
 
 ClickHouse 物化视图的核心设计:
-(1) INSERT 触发器模式（不是快照刷新）→ 实时增量
-(2) 聚合状态函数（countState/sumState）→ 精确增量聚合
-(3) 引擎可选（SummingMergeTree/AggregatingMergeTree）→ 灵活
-(4) 多视图扇出 → 一次 INSERT 触发多个下游计算
+- (1) INSERT 触发器模式（不是快照刷新）→ 实时增量
+- (2) 聚合状态函数（countState/sumState）→ 精确增量聚合
+- (3) 引擎可选（SummingMergeTree/AggregatingMergeTree）→ 灵活
+- (4) 多视图扇出 → 一次 INSERT 触发多个下游计算
 
 对比其他物化视图实现:
-PostgreSQL: REFRESH MATERIALIZED VIEW（全量刷新或 CONCURRENTLY 增量）
-BigQuery:   自动刷新（30 分钟间隔），限于单表聚合
-Oracle:     ON COMMIT / ON DEMAND 刷新，fast refresh 需要 MV log
-ClickHouse: INSERT 触发，最实时但只处理新数据
+- **PostgreSQL**: REFRESH MATERIALIZED VIEW（全量刷新或 CONCURRENTLY 增量）
+- **BigQuery**: 自动刷新（30 分钟间隔），限于单表聚合
+- **Oracle**: ON COMMIT / ON DEMAND 刷新，fast refresh 需要 MV log
+- **ClickHouse**: INSERT 触发，最实时但只处理新数据
 
 对引擎开发者的启示:
 ClickHouse 的物化视图本质上是"嵌入式流处理引擎":
-每个物化视图定义了一个 INSERT → SELECT → INSERT 的数据流。
+- 每个物化视图定义了一个 INSERT → SELECT → INSERT 的数据流。
 这使得 ClickHouse 可以替代简单的 Kafka Streams / Flink 作业。
 如果设计 OLAP 引擎，这种"INSERT 触发"的物化视图模式值得考虑。
-

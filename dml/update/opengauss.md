@@ -178,7 +178,7 @@ GTM（Global Transaction Manager）协调全局快照
 ## 批量更新策略与性能优化
 
 
-(1) heap 表分批更新:
+- (1) heap 表分批更新:
 DO $$
 BEGIN
 LOOP
@@ -190,10 +190,10 @@ EXIT WHEN NOT FOUND;
 COMMIT;
 END LOOP;
 END $$;
-(2) 列存储表更新策略:
+- (2) 列存储表更新策略:
 不适合频繁 UPDATE，应使用 INSERT + DELETE 策略
 或使用分区表的 EXCHANGE PARTITION 操作
-(3) 更新统计信息:
+- (3) 更新统计信息:
 大量 UPDATE 后执行 ANALYZE:
 ANALYZE users;
 VACUUM users;      -- 回收 dead tuples

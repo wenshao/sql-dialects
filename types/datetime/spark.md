@@ -150,17 +150,16 @@ SELECT EXPLODE(SEQUENCE(DATE '2024-01-01', DATE '2024-12-01', INTERVAL 1 MONTH))
 
 ## 10. 版本演进
 
-Spark 2.0: DATE, TIMESTAMP, 基本日期函数
-Spark 3.0: MAKE_DATE, MAKE_TIMESTAMP, EXTRACT
-Spark 3.2: INTERVAL 子类型（YEAR-MONTH / DAY-TIME）
-Spark 3.3: TIMESTAMPDIFF
-Spark 3.4: TIMESTAMP_NTZ, TRY_TO_TIMESTAMP, NOW()
-Spark 4.0: 时区处理改进
+- **Spark 2.0**: DATE, TIMESTAMP, 基本日期函数
+- **Spark 3.0**: MAKE_DATE, MAKE_TIMESTAMP, EXTRACT
+- **Spark 3.2**: INTERVAL 子类型（YEAR-MONTH / DAY-TIME）
+- **Spark 3.3**: TIMESTAMPDIFF
+- **Spark 3.4**: TIMESTAMP_NTZ, TRY_TO_TIMESTAMP, NOW()
+- **Spark 4.0**: 时区处理改进
 
-限制:
+> **限制**: 
 无 TIME 类型（用 STRING 或 TIMESTAMP 存纯时间）
 日期格式使用 Java 模式（yyyy-MM-dd，不是 YYYY-MM-DD）
 DAYOFWEEK 返回 1=Sunday（与 ISO 不一致）
-TIMESTAMP 精度: 微秒（不是纳秒——对比 ClickHouse 支持纳秒）
+- **TIMESTAMP 精度**: 微秒（不是纳秒——对比 ClickHouse 支持纳秒）
 无 generate_series（使用 EXPLODE(SEQUENCE(...))）
-

@@ -24,29 +24,33 @@ TO_CHAR(d, 'YYYY-MM-DD'); TO_DATE(s, 'YYYY-MM-DD')
 ## 七、数据类型映射（从 Oracle/MySQL/PostgreSQL 到 Teradata）
 
 Oracle → Teradata:
-NUMBER(p,s) → DECIMAL(p,s)/INTEGER, VARCHAR2(n) → VARCHAR(n),
-CLOB → CLOB, DATE → TIMESTAMP (Oracle DATE含时间),
-TIMESTAMP → TIMESTAMP, BLOB → BLOB,
-SYSDATE → CURRENT_TIMESTAMP, SEQUENCE → IDENTITY
+- NUMBER(p,s) → DECIMAL(p,s)/INTEGER, VARCHAR2(n) → VARCHAR(n),
+- CLOB → CLOB, DATE → TIMESTAMP (Oracle DATE含时间),
+- TIMESTAMP → TIMESTAMP, BLOB → BLOB,
+- SYSDATE → CURRENT_TIMESTAMP, SEQUENCE → IDENTITY
 MySQL → Teradata:
-INT → INTEGER, BIGINT → BIGINT, FLOAT → FLOAT,
-DOUBLE → DOUBLE PRECISION, VARCHAR(n) → VARCHAR(n),
-TEXT → CLOB, DATETIME → TIMESTAMP, DATE → DATE,
-BOOLEAN → BYTEINT (0/1), AUTO_INCREMENT → IDENTITY,
-JSON → JSON (15.0+)
+- INT → INTEGER, BIGINT → BIGINT, FLOAT → FLOAT,
+- DOUBLE → DOUBLE PRECISION, VARCHAR(n) → VARCHAR(n),
+- TEXT → CLOB, DATETIME → TIMESTAMP, DATE → DATE,
+- BOOLEAN → BYTEINT (0/1), AUTO_INCREMENT → IDENTITY,
+- JSON → JSON (15.0+)
 PostgreSQL → Teradata:
-INTEGER → INTEGER, TEXT → CLOB, SERIAL → IDENTITY,
-BOOLEAN → BYTEINT, JSONB → JSON
+- INTEGER → INTEGER, TEXT → CLOB, SERIAL → IDENTITY,
+- BOOLEAN → BYTEINT, JSONB → JSON
 
-八、函数等价映射
+
+### 八、函数等价映射
+
 MySQL → Teradata:
-IFNULL → COALESCE/NVL, NOW() → CURRENT_TIMESTAMP,
-DATE_FORMAT → CAST(d AS FORMAT '...'),
-CONCAT(a,b) → a || b, GROUP_CONCAT → 不直接支持,
-LIMIT → TOP/SAMPLE/QUALIFY ROW_NUMBER()
-特有: QUALIFY 子句 (窗口函数过滤)
+- IFNULL → COALESCE/NVL, NOW() → CURRENT_TIMESTAMP,
+- DATE_FORMAT → CAST(d AS FORMAT '...'),
+- CONCAT(a,b) → a || b, GROUP_CONCAT → 不直接支持,
+- LIMIT → TOP/SAMPLE/QUALIFY ROW_NUMBER()
+- **特有**: QUALIFY 子句 (窗口函数过滤)
 
-九、常见陷阱补充
+
+### 九、常见陷阱补充
+
 MPP 架构，PI (Primary Index) 选择很重要
 日期格式独特（DATE 类型内部为 INTEGER）
 默认无 AUTO_COMMIT（需显式 COMMIT）
@@ -55,12 +59,16 @@ MERGE INTO 语法支持（UPSERT）
 COLLECT STATISTICS 替代 ANALYZE
 SET vs MULTISET 表（默认 SET 去重）
 
-十、NULL 处理
-COALESCE(a, b, c); NVL(a, b);
-NULLIF(a, b); ZEROIFNULL(a);                       -- NULL→0
-NULLIFZERO(a);                                     -- 0→NULL
 
-十一、分页语法
+### 十、NULL 处理
+
+COALESCE(a, b, c); NVL(a, b);
+- NULLIF(a, b); ZEROIFNULL(a);                       -- NULL→0
+- NULLIFZERO(a);                                     -- 0→NULL
+
+
+### 十一、分页语法
+
 SELECT TOP 10 * FROM t ORDER BY id;                -- 前 N 行
 SELECT * FROM t SAMPLE 100;                        -- 采样
 SELECT * FROM t QUALIFY ROW_NUMBER() OVER (ORDER BY id) BETWEEN 21 AND 30;

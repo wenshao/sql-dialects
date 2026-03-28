@@ -148,7 +148,7 @@ TDSQL 对 LOAD DATA 有专门的分布式优化
 
 ## 横向对比: TDSQL vs 单机 MySQL INSERT
 
-语法兼容性: TDSQL INSERT 语法与 MySQL 完全兼容
+- **语法兼容性**: TDSQL INSERT 语法与 MySQL 完全兼容
 主要差异在执行层面:
 单机 MySQL:
 INSERT 直接写入本地 InnoDB
@@ -160,7 +160,7 @@ AUTO_INCREMENT 全局唯一但不连续
 跨分片操作使用分布式事务
 LOAD DATA 自动按 shardkey 分发
 迁移注意:
-(1) 检查 INSERT 是否包含 shardkey 列
-(2) 检查唯一索引是否包含 shardkey 列
-(3) 应用中依赖 LAST_INSERT_ID() 连续的逻辑需要调整
-(4) 大事务需要拆分为小事务以适配分布式环境
+- (1) 检查 INSERT 是否包含 shardkey 列
+- (2) 检查唯一索引是否包含 shardkey 列
+- (3) 应用中依赖 LAST_INSERT_ID() 连续的逻辑需要调整
+- (4) 大事务需要拆分为小事务以适配分布式环境

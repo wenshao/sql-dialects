@@ -164,20 +164,19 @@ SELECT * FROM users FINAL WHERE id = 1;
 ## 7. 对比与引擎开发者启示
 
 ClickHouse 的事务设计:
-支持: 单语句原子性、分区原子替换、INSERT 去重、insert_quorum
-不支持: 传统多语句 ACID 事务（实验性除外）
+- **支持**: 单语句原子性、分区原子替换、INSERT 去重、insert_quorum
+- **不支持**: 传统多语句 ACID 事务（实验性除外）
 
 对比:
-MySQL/PostgreSQL: 完整 ACID 事务（MVCC + WAL）
-SQLite:           完整 ACID 事务（WAL / journal）
-BigQuery:         有限的多语句事务（快照隔离）
-ClickHouse:       单语句原子性 + 分区原子替换
+- **MySQL/PostgreSQL**: 完整 ACID 事务（MVCC + WAL）
+- **SQLite**: 完整 ACID 事务（WAL / journal）
+- **BigQuery**: 有限的多语句事务（快照隔离）
+- **ClickHouse**: 单语句原子性 + 分区原子替换
 
 对引擎开发者的启示:
 OLAP 引擎不需要完整的 ACID 事务，但需要:
-(1) 单语句原子性（最基本的保证）
-(2) 批量操作的原子性（分区替换/表交换）
-(3) 幂等写入（INSERT 去重，支持重试）
-(4) 多副本确认（write quorum）
+- (1) 单语句原子性（最基本的保证）
+- (2) 批量操作的原子性（分区替换/表交换）
+- (3) 幂等写入（INSERT 去重，支持重试）
+- (4) 多副本确认（write quorum）
 这些"轻量级事务"覆盖了 95% 的分析场景需求。
-

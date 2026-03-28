@@ -70,12 +70,12 @@ FROM raw_stream
 EMIT CHANGES;
 隐式转换
 ksqlDB 隐式转换非常有限
-数值类型可自动提升 (INT → BIGINT → DOUBLE)
+- 数值类型可自动提升 (INT → BIGINT → DOUBLE)
 字符串和数值之间必须显式 CAST
 错误处理（无 TRY_CAST）
 CAST 转换失败会导致记录被丢弃或查询失败
 建议在上游 Kafka 生产者端确保数据质量
-注意：ksqlDB CAST 类型有限
-注意：日期使用 Java DateTimeFormatter 模式
-注意：流处理中转换失败可能导致消息丢失
-限制：无 TRY_CAST, ::, CONVERT, TO_NUMBER, TO_CHAR
+> **注意**: ksqlDB CAST 类型有限
+> **注意**: 日期使用 Java DateTimeFormatter 模式
+> **注意**: 流处理中转换失败可能导致消息丢失
+> **限制**: 无 TRY_CAST, ::, CONVERT, TO_NUMBER, TO_CHAR

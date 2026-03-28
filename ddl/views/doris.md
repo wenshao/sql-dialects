@@ -120,15 +120,14 @@ DROP MATERIALIZED VIEW mv_order_detail;                -- 异步 MV
 
 
 Doris 的实现:
-同步 MV: 随基表写入同步更新 → 强一致但限制多
-异步 MV: 定时/事件刷新 → 最终一致但灵活
+- **同步 MV**: 随基表写入同步更新 → 强一致但限制多
+- **异步 MV**: 定时/事件刷新 → 最终一致但灵活
 
 StarRocks 的优势:
-CBO 改写更成熟: 支持更多 SQL 模式的自动改写
-外部表 MV: 可以基于 Hive/Iceberg 外部表创建 MV
+- **CBO 改写更成熟**: 支持更多 SQL 模式的自动改写
+- **外部表 MV**: 可以基于 Hive/Iceberg 外部表创建 MV
 
 对引擎开发者的启示:
 物化视图的查询改写是最难的部分——本质上是"查询等价判断"问题。
 StarRocks 的实现基于 SQL 代数规则(列映射 + 谓词推导)。
 BigQuery 使用更激进的策略——允许"近似匹配"(freshness 参数)。
-

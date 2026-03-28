@@ -262,20 +262,19 @@ SELECT * FROM users WHERE created_at > '2024-01-01';
 ## 9. 横向对比: 建表核心差异
 
 数据模型:
-Doris:      4 种模型(DDL 选择)，UNIQUE KEY 用 PROPERTIES 切换 MoR/MoW
-StarRocks:  4 种模型(DDL 选择)，PRIMARY KEY 独立语法，更清晰
-ClickHouse: ENGINE 选择(MergeTree/Replacing/Aggregating/...)
-MySQL:      无模型概念，统一行存 + MVCC
-BigQuery:   无模型概念，统一列存 + 追加写入
+- **Doris**: 4 种模型(DDL 选择)，UNIQUE KEY 用 PROPERTIES 切换 MoR/MoW
+- **StarRocks**: 4 种模型(DDL 选择)，PRIMARY KEY 独立语法，更清晰
+- **ClickHouse**: ENGINE 选择(MergeTree/Replacing/Aggregating/...)
+- **MySQL**: 无模型概念，统一行存 + MVCC
+- **BigQuery**: 无模型概念，统一列存 + 追加写入
 
 分布策略:
-Doris:      DISTRIBUTED BY HASH (必选) + PARTITION BY RANGE/LIST
-StarRocks:  相同(同源)。3.0+ 支持自动 BUCKETS
-ClickHouse: PARTITION BY 表达式 + Distributed 引擎分片
-BigQuery:   自动分布 + 可选 CLUSTER BY
+- **Doris**: DISTRIBUTED BY HASH (必选) + PARTITION BY RANGE/LIST
+- **StarRocks**: 相同(同源)。3.0+ 支持自动 BUCKETS
+- **ClickHouse**: PARTITION BY 表达式 + Distributed 引擎分片
+- **BigQuery**: 自动分布 + 可选 CLUSTER BY
 
 对引擎开发者的启示:
 Doris 建表语法的设计反映了"用户负责数据分布"的理念。
 这在性能上是最优的，但用户体验不佳。
-现代趋势是自动化: BigQuery 全自动，StarRocks 3.0 半自动。
-
+- **现代趋势是自动化**: BigQuery 全自动，StarRocks 3.0 半自动。

@@ -160,17 +160,16 @@ SELECT * FROM events WHERE CAST(get_json_object(data, '$.age') AS INT) > 20;
 
 ## 10. 版本演进
 
-Spark 2.0: get_json_object, json_tuple
-Spark 2.1: from_json, to_json
-Spark 2.4: schema_of_json
-Spark 3.5: JSON_OBJECT, JSON_ARRAY
-Spark 4.0: Variant 类型（原生半结构化支持）
+- **Spark 2.0**: get_json_object, json_tuple
+- **Spark 2.1**: from_json, to_json
+- **Spark 2.4**: schema_of_json
+- **Spark 3.5**: JSON_OBJECT, JSON_ARRAY
+- **Spark 4.0**: Variant 类型（原生半结构化支持）
 
-限制:
+> **限制**: 
 无原生 JSON 列类型（存为 STRING，每次查询重新解析）
 无 JSON 路径操作符（-> / ->>），使用 get_json_object 函数
 get_json_object 总是返回 STRING（需要 CAST）
 from_json 需要提供完整 Schema（不支持部分 Schema）
 无 JSON 索引（无法加速 JSON 字段查询）
 Spark 4.0 的 Variant 类型将大幅改善 JSON 处理性能
-

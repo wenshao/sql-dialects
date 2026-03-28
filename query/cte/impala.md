@@ -94,7 +94,7 @@ SELECT id, username, email, age FROM staging_users
 )
 SELECT * FROM updated;
 
-注意：Impala 支持 CTE（WITH 子句）
-注意：不支持递归 CTE（WITH RECURSIVE）
-注意：CTE 不能与 INSERT / UPDATE / DELETE 结合（部分版本限制）
-注意：CTE 默认内联展开
+> **注意**: Impala 支持 CTE（WITH 子句）
+> **注意**: 不支持递归 CTE（WITH RECURSIVE）
+> **注意**: CTE 不能与 INSERT / UPDATE / DELETE 结合（部分版本限制）
+> **注意**: CTE 默认内联展开

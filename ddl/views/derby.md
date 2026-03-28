@@ -177,22 +177,25 @@ Derby 的视图实现是嵌入式数据库的典型代表:
 每次访问视图都重新执行底层查询（无缓存）
 简单、可靠、无一致性问题
 适合嵌入式场景（数据量小、查询频率低）
-对比 PostgreSQL: 视图查询计划可缓存，且支持物化视图
-对比 Oracle: 视图可使用 NO_MERGE / PUSH_PRED 等优化提示
+- **对比 PostgreSQL**: 视图查询计划可缓存，且支持物化视图
+- **对比 Oracle**: 视图可使用 NO_MERGE / PUSH_PRED 等优化提示
 7.2 WITH CHECK OPTION 的实现:
 Derby 的 WITH CHECK_OPTION 是 ANSI SQL 标准
 在 INSERT/UPDATE 时，Derby 通过视图的 WHERE 条件验证数据
 如果违反条件则抛出 SQLException
-对比 MySQL: 同样支持 WITH CHECK OPTION（CASCADED / LOCAL）
-对比 SQLite: 不支持 WITH CHECK OPTION
+- **对比 MySQL**: 同样支持 WITH CHECK OPTION（CASCADED / LOCAL）
+- **对比 SQLite**: 不支持 WITH CHECK OPTION
 7.3 跨方言对比:
-Derby:        简单视图支持，可更新视图，WITH CHECK OPTION
-H2:           更丰富（CREATE OR REPLACE, 可更新 Join 视图）
+- **Derby**: 简单视图支持，可更新视图，WITH CHECK OPTION
+- **H2**: 更丰富（CREATE OR REPLACE, 可更新 Join 视图）
+
+```
 HSQLDB:       最完整（物化视图、CREATE OR REPLACE）
-SQLite:       只读视图，不支持 WITH CHECK OPTION
-PostgreSQL:   物化视图、可更新视图（简单）、WITH CHECK OPTION
-Oracle:       最完整（物化视图、可更新 Join 视图、超多选项）
+```
+- **SQLite**: 只读视图，不支持 WITH CHECK OPTION
+- **PostgreSQL**: 物化视图、可更新视图（简单）、WITH CHECK OPTION
+- **Oracle**: 最完整（物化视图、可更新 Join 视图、超多选项）
 7.4 版本演进:
-Derby 10.x: 基于 IBM Cloudscape 的成熟版本
-Derby 10.16 (2023): 最新稳定版，Java 11+ 要求
+- **Derby 10.x**: 基于 IBM Cloudscape 的成熟版本
+- **Derby 10.16 (2023)**: 最新稳定版，Java 11+ 要求
 Apache Derby 是 JDK 自带的 JavaDB 基础

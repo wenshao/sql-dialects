@@ -107,8 +107,7 @@ content String,
 INDEX idx_inv content TYPE full_text(0) GRANULARITY 1
 ) ENGINE = MergeTree() ORDER BY id;
 
-注意：ClickHouse 的 tokenbf_v1 索引支持 hasToken 高效搜索
-注意：ngrambf_v1 索引支持 LIKE 和 ngram 搜索
-注意：23.1+ 支持 inverted（全文）索引，大幅提升全文搜索性能
-注意：ClickHouse 不支持 tsvector/tsquery 等传统全文搜索语法
-
+> **注意**: ClickHouse 的 tokenbf_v1 索引支持 hasToken 高效搜索
+> **注意**: ngrambf_v1 索引支持 LIKE 和 ngram 搜索
+> **注意**: 23.1+ 支持 inverted（全文）索引，大幅提升全文搜索性能
+> **注意**: ClickHouse 不支持 tsvector/tsquery 等传统全文搜索语法

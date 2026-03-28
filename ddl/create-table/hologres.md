@@ -111,16 +111,22 @@ CREATE TABLE users_backup AS SELECT * FROM users WHERE created_at > '2024-01-01'
 ```
 
 数据类型（兼容 PostgreSQL）：
-INT / BIGINT / SMALLINT: 整数
-REAL / DOUBLE PRECISION / FLOAT: 浮点
+- **INT / BIGINT / SMALLINT**: 整数
+- **REAL / DOUBLE PRECISION / FLOAT**: 浮点
 NUMERIC(P,S) / DECIMAL(P,S): 定点
-TEXT / VARCHAR(N) / CHAR(N): 字符串
+- **TEXT / VARCHAR(N) / CHAR(N)**: 字符串
+
+```
 BOOLEAN: 布尔
-DATE / TIMESTAMP / TIMESTAMPTZ: 时间
+```
+- **DATE / TIMESTAMP / TIMESTAMPTZ**: 时间
+
+```
 BYTEA: 二进制
-JSON / JSONB: JSON
+```
+- **JSON / JSONB**: JSON
 INT[] / TEXT[]: 数组
-SERIAL / BIGSERIAL: 自增
-注意：Hologres 兼容 PostgreSQL 协议和语法
-注意：PRIMARY KEY 是强制执行的（与 BigQuery/Snowflake 不同）
-注意：通过 set_table_property 设置表属性是 Hologres 的核心用法
+- **SERIAL / BIGSERIAL**: 自增
+> **注意**: Hologres 兼容 PostgreSQL 协议和语法
+> **注意**: PRIMARY KEY 是强制执行的（与 BigQuery/Snowflake 不同）
+> **注意**: 通过 set_table_property 设置表属性是 Hologres 的核心用法

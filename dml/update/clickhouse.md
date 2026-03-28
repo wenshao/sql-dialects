@@ -176,19 +176,18 @@ SELECT * FROM users FINAL WHERE id = 1;
 ## 6. 对比与引擎开发者启示
 
 ClickHouse UPDATE 的设计代价:
-(1) 语法特殊: ALTER TABLE UPDATE（非标准 SQL）
-(2) 异步执行: 不是即时可见的
-(3) 性能差: 重写整个 data part（传统 mutation）
-(4) 功能受限: 无 JOIN UPDATE，无 RETURNING
+- (1) 语法特殊: ALTER TABLE UPDATE（非标准 SQL）
+- (2) 异步执行: 不是即时可见的
+- (3) 性能差: 重写整个 data part（传统 mutation）
+- (4) 功能受限: 无 JOIN UPDATE，无 RETURNING
 
 但这些代价换来了:
-(1) INSERT 吞吐量极高（列存 + 不可变 part）
-(2) 查询性能极高（压缩数据不被 UPDATE 破坏）
-(3) 存储效率极高（列式压缩不被碎片化）
+- (1) INSERT 吞吐量极高（列存 + 不可变 part）
+- (2) 查询性能极高（压缩数据不被 UPDATE 破坏）
+- (3) 存储效率极高（列式压缩不被碎片化）
 
 对引擎开发者的启示:
 列存引擎的 UPDATE 是先天劣势。如果必须支持:
 (a) 轻量级 UPDATE（掩码机制）是好的折中
 (b) ReplacingMergeTree 模式（版本化 INSERT）是更自然的方案
 (c) 明确告知用户: UPDATE 是重量级操作，不适合高频使用
-

@@ -161,17 +161,16 @@ ALTER TABLE users_new RENAME TO users;
 
 ## 8. 版本演进
 
-Spark 2.0: 无 UPDATE（只能 INSERT OVERWRITE）
-Delta 0.3: UPDATE 支持（Copy-on-Write）
-Delta 2.0: Deletion Vectors（Merge-on-Read，更新性能大幅提升）
-Iceberg 0.12: UPDATE 支持
-Spark 3.4: 子查询 UPDATE 改进
+- **Spark 2.0**: 无 UPDATE（只能 INSERT OVERWRITE）
+- **Delta 0.3**: UPDATE 支持（Copy-on-Write）
+- **Delta 2.0**: Deletion Vectors（Merge-on-Read，更新性能大幅提升）
+- **Iceberg 0.12**: UPDATE 支持
+- **Spark 3.4**: 子查询 UPDATE 改进
 
-限制:
+> **限制**: 
 原生 Parquet/ORC 表不支持 UPDATE
 无 RETURNING 子句
 无 FROM 子句的多表 UPDATE（使用子查询或 MERGE 替代）
 无 UPDATE ... JOIN 语法（使用 MERGE INTO 替代）
 大规模 UPDATE 涉及大量文件重写，建议在低峰期执行
 更新分区列可能导致数据在分区间移动（性能开销大）
-

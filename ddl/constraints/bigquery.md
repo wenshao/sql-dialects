@@ -212,19 +212,18 @@ SELECT * FROM users QUALIFY ROW_NUMBER() OVER (PARTITION BY id ORDER BY created_
 ## 7. 对比与引擎开发者启示
 
 BigQuery 的约束设计代表了云数仓的共识:
-Snowflake: PRIMARY KEY/UNIQUE/FOREIGN KEY 都不强制执行
-Redshift:  PRIMARY KEY/UNIQUE 不强制执行，FOREIGN KEY 同样
-Databricks: 完全不支持约束
+- **Snowflake**: PRIMARY KEY/UNIQUE/FOREIGN KEY 都不强制执行
+- **Redshift**: PRIMARY KEY/UNIQUE 不强制执行，FOREIGN KEY 同样
+- **Databricks**: 完全不支持约束
 
-这不是偶然: 分布式列存系统中强制约束的成本远高于收益。
+- **这不是偶然**: 分布式列存系统中强制约束的成本远高于收益。
 但"接受语法+不执行"是比"不接受语法"更好的设计选择:
-(1) 迁移兼容: 从 MySQL/PostgreSQL 迁移时不需要删除约束语法
-(2) 优化器提示: 约束元数据帮助查询优化
-(3) 文档化意图: 约束声明了数据的业务语义
+- (1) 迁移兼容: 从 MySQL/PostgreSQL 迁移时不需要删除约束语法
+- (2) 优化器提示: 约束元数据帮助查询优化
+- (3) 文档化意图: 约束声明了数据的业务语义
 
 对引擎开发者的启示:
 如果设计分布式分析引擎，建议采用 NOT ENFORCED 模式:
-接受约束语法 → 存储元数据 → 优化器利用 → 但不在写入路径检查。
+- 接受约束语法 → 存储元数据 → 优化器利用 → 但不在写入路径检查。
 这是 MySQL 8.0 之前 CHECK 约束"接受但不执行"的合理版本
 （区别在于 BigQuery 明确标记了 NOT ENFORCED）。
-

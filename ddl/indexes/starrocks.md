@@ -147,17 +147,16 @@ SELECT dt, COUNT(*) AS cnt FROM orders GROUP BY dt;
 
 ## 9. 索引选择对比: StarRocks vs Doris
 
-前缀索引:      两者相同。StarRocks 支持 "short_key" 粒度调整。
-Zone Map:       两者相同。自动创建。
-Bloom Filter:   两者相同。PROPERTIES 方式设置。
-Bitmap:         两者相同。CREATE INDEX USING BITMAP。
-倒排索引:       Doris 2.0(早) vs StarRocks 3.1(晚)。Doris 更成熟。
-N-Gram BF:      Doris 2.0 支持，StarRocks 也支持(ngram_bf_index)。
-Sort Key 分离:  StarRocks 独有(ORDER BY 子句)——更灵活。
-物化视图改写:   StarRocks 更强(CBO 自动改写更成熟)。
+- **前缀索引**: 两者相同。StarRocks 支持 "short_key" 粒度调整。
+- **Zone Map**: 两者相同。自动创建。
+- **Bloom Filter**: 两者相同。PROPERTIES 方式设置。
+- **Bitmap**: 两者相同。CREATE INDEX USING BITMAP。
+- **倒排索引**: Doris 2.0(早) vs StarRocks 3.1(晚)。Doris 更成熟。
+- **N-Gram BF**: Doris 2.0 支持，StarRocks 也支持(ngram_bf_index)。
+- **Sort Key 分离**: StarRocks 独有(ORDER BY 子句)——更灵活。
+- **物化视图改写**: StarRocks 更强(CBO 自动改写更成熟)。
 
 对引擎开发者的参考:
 索引设计应遵循"分层过滤"原则:
-Zone Map(最粗) → Bloom Filter(中等) → 前缀索引(精确) → 行级过滤
+- Zone Map(最粗) → Bloom Filter(中等) → 前缀索引(精确) → 行级过滤
 每一层过滤掉的数据越多，下一层的负载越小。
-

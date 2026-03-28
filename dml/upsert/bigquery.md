@@ -147,21 +147,20 @@ WHEN NOT MATCHED THEN
 ## 6. 对比与引擎开发者启示
 
 BigQuery UPSERT/MERGE 的设计:
-(1) 无 UNIQUE 约束 → 无冲突检测 → 无 ON CONFLICT 语法
-(2) MERGE 是唯一的 UPSERT 方案 → 标准 SQL，功能最完整
-(3) 单次 DML 配额 → 比 DELETE + INSERT 更经济
-(4) UNNEST 批量 → 不需要 staging 表即可多行 UPSERT
+- (1) 无 UNIQUE 约束 → 无冲突检测 → 无 ON CONFLICT 语法
+- (2) MERGE 是唯一的 UPSERT 方案 → 标准 SQL，功能最完整
+- (3) 单次 DML 配额 → 比 DELETE + INSERT 更经济
+- (4) UNNEST 批量 → 不需要 staging 表即可多行 UPSERT
 
 对比:
-MySQL:      ON DUPLICATE KEY UPDATE（最简洁但非标准）
-PostgreSQL: ON CONFLICT DO UPDATE（简洁且标准化）
-SQLite:     ON CONFLICT DO UPDATE（与 PostgreSQL 相同）
-ClickHouse: 无 UPSERT（用 ReplacingMergeTree 最终一致去重）
-BigQuery:   MERGE（最标准但最冗长）
+- **MySQL**: ON DUPLICATE KEY UPDATE（最简洁但非标准）
+- **PostgreSQL**: ON CONFLICT DO UPDATE（简洁且标准化）
+- **SQLite**: ON CONFLICT DO UPDATE（与 PostgreSQL 相同）
+- **ClickHouse**: 无 UPSERT（用 ReplacingMergeTree 最终一致去重）
+- **BigQuery**: MERGE（最标准但最冗长）
 
 对引擎开发者的启示:
 MERGE 是最通用的 UPSERT 方案，但语法冗长。
 ON CONFLICT DO UPDATE 更简洁但需要 UNIQUE 约束支持。
 如果引擎不支持 UNIQUE 约束（如 BigQuery/ClickHouse），
 MERGE 是唯一合理的选择。
-

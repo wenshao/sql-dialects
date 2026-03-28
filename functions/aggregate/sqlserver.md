@@ -130,24 +130,24 @@ SELECT APPROX_COUNT_DISTINCT(city) FROM users;
 ```
 
 设计分析:
-  APPROX_COUNT_DISTINCT 使用 HyperLogLog 算法，误差约 2%。
-  对于数十亿行的表，比 COUNT(DISTINCT) 快 10-100x。
+  - APPROX_COUNT_DISTINCT 使用 HyperLogLog 算法，误差约 2%。
+  - 对于数十亿行的表，比 COUNT(DISTINCT) 快 10-100x。
 
 横向对比:
-  PostgreSQL: 无内置近似函数（需要 pg_hll 扩展）
-  MySQL:      无内置近似函数
-  ClickHouse: uniq(), uniqHLL12(), uniqExact()（多种近似算法）
-  BigQuery:   APPROX_COUNT_DISTINCT（默认行为）
+- **PostgreSQL**: 无内置近似函数（需要 pg_hll 扩展）
+- **MySQL**: 无内置近似函数
+- **ClickHouse**: uniq(), uniqHLL12(), uniqExact()（多种近似算法）
+- **BigQuery**: APPROX_COUNT_DISTINCT（默认行为）
 
 对引擎开发者的启示:
-  近似计算是大数据分析的关键能力。HyperLogLog 是最成熟的基数估算算法。
-  分析型引擎应默认提供近似函数（ClickHouse 的做法最丰富）。
-  2022+: APPROX_PERCENTILE_CONT / APPROX_PERCENTILE_DISC（近似百分位数）
+  - 近似计算是大数据分析的关键能力。HyperLogLog 是最成熟的基数估算算法。
+  - 分析型引擎应默认提供近似函数（ClickHouse 的做法最丰富）。
+- **2022+**: APPROX_PERCENTILE_CONT / APPROX_PERCENTILE_DISC（近似百分位数）
 
 版本演进:
-2005+ : COUNT_BIG, GROUPING
-2008+ : GROUPING SETS, ROLLUP, CUBE（标准语法）
-2016+ : FOR JSON
-2017+ : STRING_AGG
-2019+ : APPROX_COUNT_DISTINCT
-2022+ : APPROX_PERCENTILE_CONT/DISC
+- **2005+**: COUNT_BIG, GROUPING
+- **2008+**: GROUPING SETS, ROLLUP, CUBE（标准语法）
+- **2016+**: FOR JSON
+- **2017+**: STRING_AGG
+- **2019+**: APPROX_COUNT_DISTINCT
+- **2022+**: APPROX_PERCENTILE_CONT/DISC

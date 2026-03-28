@@ -60,16 +60,18 @@ SELECT customer.name FROM orders;
 ## 4. StarRocks vs Doris 差异
 
 展开语法(核心差异):
-Doris:     LATERAL VIEW EXPLODE(arr) t AS col    (Hive 风格)
-StarRocks: UNNEST(arr) AS t(col)                  (SQL 标准风格)
+- **Doris**: LATERAL VIEW EXPLODE(arr) t AS col    (Hive 风格)
+- **StarRocks**: UNNEST(arr) AS t(col)                  (SQL 标准风格)
 
 版本:
-Doris:     ARRAY 1.2+, MAP/STRUCT 2.0+
-StarRocks: ARRAY 2.0+, MAP/STRUCT 2.5+
+- **Doris**: ARRAY 1.2+, MAP/STRUCT 2.0+
+- **StarRocks**: ARRAY 2.0+, MAP/STRUCT 2.5+
 
 对引擎开发者的启示:
 复合类型的列存实现需要嵌套编码(Nested Column Encoding):
+
+```
 ARRAY: repetition level + definition level(类似 Parquet)
 MAP:   key array + value array
 STRUCT: 展平为多列(每个字段一列)
-
+```

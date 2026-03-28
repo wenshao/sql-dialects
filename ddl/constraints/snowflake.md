@@ -213,7 +213,7 @@ ALTER TABLE users ALTER COLUMN email SET MASKING POLICY email_mask;
 | CHECK       | 不执行    | 不支持   | 不支持   | 执行       | 执行  | 执行 |
 | DEFAULT     | 执行      | 执行     | 执行     | 执行       | 执行  | 执行 |
 
-规律: 云数仓 (Snowflake/BigQuery/Redshift) 普遍不执行约束
+- **规律**: 云数仓 (Snowflake/BigQuery/Redshift) 普遍不执行约束
 传统 OLTP (MySQL/PostgreSQL/Oracle) 强制执行约束
 
 对引擎开发者的启示:
@@ -221,6 +221,5 @@ ALTER TABLE users ALTER COLUMN email SET MASKING POLICY email_mask;
 OLAP 引擎不执行约束可以大幅提升写入吞吐。
 OLTP 或 HTAP 引擎必须执行约束。
 Snowflake Hybrid Tables (2024) 开始支持约束执行，向 HTAP 演进。
-最差的设计: MySQL 8.0.16 之前接受 CHECK 但静默忽略。
-正确的做法: 要么执行，要么明确标注 NOT ENFORCED，要么不接受语法。
-
+- **最差的设计**: MySQL 8.0.16 之前接受 CHECK 但静默忽略。
+- **正确的做法**: 要么执行，要么明确标注 NOT ENFORCED，要么不接受语法。
