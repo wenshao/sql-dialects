@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 7792 行
 
+> **关键人物**：[Jim Gray](../docs/people/sql-server-people.md)（图灵奖 1998）、[Pat Selinger](../docs/people/sql-server-people.md)（查询优化器）
+
 ## 概述与定位
 
 SQL Server 是微软的企业级关系型数据库，也是 Windows 生态中数据库的默认选择。它的核心竞争力在于**与微软技术栈的深度集成** — .NET、Azure、Active Directory、SSIS/SSAS/SSRS、Visual Studio、Power BI。对于已经投入微软生态的企业，SQL Server 几乎是唯一合理的选择。

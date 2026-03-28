@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 9047 行
 
+> **关键人物**：[Michael Stonebraker](../docs/people/michael-stonebraker.md)（POSTGRES 创始人, 图灵奖 2014）
+
 ## 概述与定位
 
 PostgreSQL 是当今功能最完善的开源关系型数据库，也是最忠实于 SQL 标准的主流实现。如果说 MySQL 的哲学是"够用就好"，PostgreSQL 的哲学就是**"做就做对"**。它在类型系统、可扩展性、并发控制、查询能力等维度上全面领先，是学术研究成果转化为工业实践的典范。

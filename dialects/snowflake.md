@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 5306 行
 
+> **关键人物**：[Dageville, Cruanes, Żukowski](../docs/people/snowflake-founders.md)（Oracle/VectorWise 出身）
+
 ## 概述与定位
 
 Snowflake 是云原生数据仓库的领导者，以**存储与计算完全分离**的架构著称。不同于传统数仓绑定特定硬件或虚拟机，Snowflake 在 AWS/Azure/GCP 之上构建了独立的三层架构，实现了真正的弹性伸缩。其核心理念是"零管理"——用户无需关心索引创建、数据分布、VACUUM 或统计信息收集，引擎自动处理一切物理优化。

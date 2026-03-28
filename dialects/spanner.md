@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 5017 行
 
+> **关键人物**：[Jeff Dean, Sanjay Ghemawat](../docs/people/cockroachdb-spanner.md)（Spanner 论文）
+
 ## 概述与定位
 
 Google Cloud Spanner 是 Google 开发的全球分布式关系型数据库，也是业界首个实现外部一致性（external consistency）的商用系统。Spanner 定位于需要全球多区域部署、强一致事务和极高可用性的关键业务场景，如金融交易、全球用户系统和游戏后端。它提供关系模型和 SQL 查询能力，同时保持近乎无限的水平扩展。

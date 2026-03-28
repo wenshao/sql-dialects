@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 6690 行
 
+> **关键人物**：[Alexey Milovidov](../docs/people/alexey-milovidov.md)（ClickHouse 创始人 & CTO）
+
 ## 概述与定位
 
 ClickHouse 是一款开源的列式 OLAP 数据库，以**极致的查询性能**闻名。它的设计目标是在商用硬件上实现亿级行数据的亚秒级聚合查询。ClickHouse 不试图成为通用数据库，而是专注于分析场景——大批量写入、低频更新、高速聚合查询。

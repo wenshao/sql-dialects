@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4880 行
 
+> **关键人物**：[Raasveldt & Mühleisen](../docs/people/duckdb-founders.md)（CWI, 2025 荷兰 ICT 奖）
+
 ## 概述与定位
 
 DuckDB 是一款嵌入式列式分析数据库，常被称为"分析领域的 SQLite"。由 CWI（荷兰国家数学与计算机科学研究中心）的 Mark Raasveldt 和 Hannes Muhleisen 于 2018 年创建，DuckDB 以进程内嵌入方式运行——无需安装服务器、无需配置网络，直接作为库链接到 Python/R/Java/Node.js 应用中。它采用 PostgreSQL 兼容的 SQL 方言，并在此基础上引入了大量便利的语法糖，使交互式数据分析极为高效。

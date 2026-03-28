@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4134 行
 
+> **关键人物**：[关涛](../docs/people/maxcompute-hologres.md)（MaxCompute 技术负责人）
+
 ## 概述与定位
 
 MaxCompute（原 ODPS）是阿里云自研的 Serverless 大数据计算平台。在阿里内部每天处理 EB 级数据，是双十一数据分析的核心引擎。对外提供按量付费（SQL 扫描量）或预留 CU（计算单元）两种模式。

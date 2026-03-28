@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4552 行
 
+> **关键人物**：[Traverso, Sundstrom, Phillips](../docs/people/trino-founders.md)（Facebook Presto 创始人）
+
 ## 概述与定位
 
 Trino（原 PrestoSQL）是一款开源的分布式 SQL 查询引擎，最初由 Facebook 的 Martin Traverso、Dain Sundstrom、David Phillips 和 Eric Hwang 于 2012 年创建。Trino 的核心理念是"一个引擎查所有数据"——通过 Connector 插件化架构，用统一的 ANSI SQL 查询分布在不同系统中的数据（Hive、MySQL、PostgreSQL、Kafka、Elasticsearch、S3 等），无需将数据搬运到统一的数仓中。Trino 不存储数据，它是纯粹的计算引擎。

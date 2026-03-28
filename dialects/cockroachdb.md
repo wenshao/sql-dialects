@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4696 行
 
+> **关键人物**：[Spencer Kimball](../docs/people/cockroachdb-spanner.md)（前 Google, GIMP 创建者）
+
 ## 概述与定位
 
 CockroachDB 是 Cockroach Labs 于 2015 年开源的分布式 SQL 数据库，兼容 PostgreSQL 协议和大部分语法。其命名源自蟑螂的生存韧性——设计目标是构建一个"杀不死"的数据库：自动分片、自动故障恢复、跨地域强一致。CockroachDB 定位于需要全球部署、零停机和强一致事务保证的云原生应用场景。

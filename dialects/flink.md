@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 5042 行
 
+> **关键人物**：[Stephan Ewen](../docs/people/flink-creators.md)（TU Berlin → Ververica）
+
 ## 概述与定位
 
 Flink SQL 是 Apache Flink 流批一体计算引擎的 SQL 层，是当前**实时流计算领域最成熟的 SQL 引擎**。与 Spark SQL 以批处理为核心再扩展到流不同，Flink 从设计之初就以流处理为第一优先级（Stream-first），批处理被视为流处理的特例（有界流）。

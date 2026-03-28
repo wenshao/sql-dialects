@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4301 行
 
+> **关键人物**：[李超等](../docs/people/doris-starrocks-founders.md)（2020 分叉）
+
 ## 概述与定位
 
 StarRocks 是一款高性能 MPP 分析数据库，2020 年从 Apache Doris 分叉而来（最初名为 DorisDB），由 StarRocks Inc. 主导开发。StarRocks 定位于"极速统一分析"——在一个引擎中同时满足实时分析、Ad-hoc 查询、多维报表和数据湖分析需求。它以向量化执行引擎、CBO 优化器和灵活的存储模型为核心竞争力，在中国互联网、电商、游戏和金融行业有快速增长的用户群。

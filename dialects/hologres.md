@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4482 行
 
+> **关键人物**：[阿里云实时数仓团队](../docs/people/maxcompute-hologres.md)
+
 ## 概述与定位
 
 Hologres 是阿里云自主研发的实时交互式分析引擎，兼容 PostgreSQL 协议和生态。它定位于"实时数仓"——在同一引擎中同时支持实时写入（毫秒级延迟）和复杂分析查询（亚秒级响应），消除传统架构中实时层（如 Flink + HBase/Redis）与离线层（如 MaxCompute/Hive）之间的数据搬运。Hologres 与 MaxCompute 深度集成，可直接加速查询 MaxCompute 离线表。

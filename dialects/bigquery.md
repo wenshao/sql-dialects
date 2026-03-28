@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 6290 行
 
+> **关键人物**：[Sergey Melnik](../docs/people/bigquery-dremel.md)（Dremel 论文第一作者）
+
 ## 概述与定位
 
 BigQuery 是 Google Cloud 提供的无服务器（Serverless）云数据仓库。用户无需管理服务器、索引或连接池，只需编写 SQL 即可分析 PB 级数据。其核心计费模型是**按扫描数据量付费**（on-demand）或按预留 Slot 付费（flat-rate），这一商业模式直接影响了 SQL 层的设计取舍——没有索引、没有手动调优旋钮，一切由平台透明管理。

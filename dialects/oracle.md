@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 8199 行
 
+> **关键人物**：[Larry Ellison](../docs/people/larry-ellison.md)（Oracle 创始人, 首个商业 SQL 数据库）
+
 ## 概述与定位
 
 Oracle Database 是企业级关系型数据库的标杆，也是 SQL 语言实际演进的最大推动力。在 SQL 标准委员会讨论一个特性之前，Oracle 往往已经实现并在生产中验证了多年。窗口函数、物化视图、Flashback、多租户 — 这些后来被标准化或被其他数据库借鉴的功能，几乎都是 Oracle 先行。

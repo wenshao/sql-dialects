@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4391 行
 
+> **关键人物**：[百度 Palo → Apache Doris](../docs/people/doris-starrocks-founders.md)
+
 ## 概述与定位
 
 Apache Doris 是一款开源的 MPP 分析数据库，源自百度内部的 Palo 项目，2018 年捐赠给 Apache 基金会。Doris 定位于实时分析场景——亚秒级查询响应、高并发低延迟的 OLAP 查询，兼顾批量数据导入和实时数据摄取。它与 StarRocks 同源（StarRocks 是 2020 年从 Doris 分叉），二者在架构和 SQL 方言上有大量相似之处。Doris 在中国互联网、金融、电信行业有广泛应用。

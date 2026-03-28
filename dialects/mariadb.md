@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4792 行
 
+> **关键人物**：[Monty Widenius](../docs/people/monty-widenius.md)（MySQL/MariaDB 创始人）、[Sergei Golubchik](../docs/people/mariadb-community.md)（MariaDB 首席架构师）
+
 ## 概述与定位
 
 MariaDB 是 MySQL 的社区驱动分叉，由 MySQL 原始创始人 Michael "Monty" Widenius 于 2009 年创建。它定位为 MySQL 的"增强型替代品"（drop-in replacement），在保持协议级和 SQL 级兼容的前提下，独立推进许多 MySQL 未能实现或推迟实现的特性。MariaDB 既适用于 OLTP 场景，也通过 ColumnStore 存储引擎涵盖分析型负载，形成了"一个内核、多引擎"的混合定位。
