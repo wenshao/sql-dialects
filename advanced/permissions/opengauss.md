@@ -5,7 +5,9 @@ PostgreSQL compatible with security extensions.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 创建用户/角色
+
+
+## 创建用户/角色
 
 ```sql
 CREATE ROLE alice LOGIN PASSWORD 'password123';

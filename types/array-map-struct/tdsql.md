@@ -5,21 +5,23 @@ TDSQL uses MySQL-compatible JSON type as the primary complex data structure.
 > 参考资料:
 > - [TDSQL 文档 - JSON 类型](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - JSON Functions](https://dev.mysql.com/doc/refman/8.0/en/json-functions.html)
-> - ============================================================
-> - 1. 概述: TDSQL 没有原生 ARRAY / MAP / STRUCT 类型
-> - ============================================================
-> - TDSQL 兼容 MySQL，使用 JSON 类型替代原生的复合类型:
-> - 数组需求 → JSON 数组: ["a", "b", "c"]
-> - 映射需求 → JSON 对象: {"key1": "val1", "key2": "val2"}
-> - 结构体需求 → JSON 对象: {"name": "alice", "age": 25}
-> - 与 PostgreSQL / KingbaseES / openGauss 的对比:
-> - PostgreSQL: 原生 ARRAY、COMPOSITE、hstore、JSONB
-> - TDSQL:      仅 JSON（MySQL 兼容）
-> - ClickHouse: 原生 Array、Map、Tuple、Nested
-> - BigQuery:   原生 ARRAY、STRUCT
-> - ============================================================
-> - 2. JSON 数组（替代 ARRAY）
-> - ============================================================
+
+
+## 概述: TDSQL 没有原生 ARRAY / MAP / STRUCT 类型
+
+
+TDSQL 兼容 MySQL，使用 JSON 类型替代原生的复合类型:
+数组需求 → JSON 数组: ["a", "b", "c"]
+映射需求 → JSON 对象: {"key1": "val1", "key2": "val2"}
+结构体需求 → JSON 对象: {"name": "alice", "age": 25}
+与 PostgreSQL / KingbaseES / openGauss 的对比:
+PostgreSQL: 原生 ARRAY、COMPOSITE、hstore、JSONB
+TDSQL:      仅 JSON（MySQL 兼容）
+ClickHouse: 原生 Array、Map、Tuple、Nested
+BigQuery:   原生 ARRAY、STRUCT
+
+## JSON 数组（替代 ARRAY）
+
 
 ```sql
 CREATE TABLE users (

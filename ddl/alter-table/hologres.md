@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres SQL - ALTER TABLE](https://help.aliyun.com/zh/hologres/user-guide/alter-table)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 添加列（兼容 PostgreSQL 语法）
+
+
+## 添加列（兼容 PostgreSQL 语法）
 
 ```sql
 ALTER TABLE users ADD COLUMN phone TEXT;

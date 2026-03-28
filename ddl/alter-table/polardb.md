@@ -5,7 +5,9 @@ PolarDB-X (distributed, MySQL compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - 添加列
+
+
+## 添加列
 
 ```sql
 ALTER TABLE users ADD COLUMN phone VARCHAR(20) AFTER email;

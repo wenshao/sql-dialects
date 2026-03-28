@@ -3,9 +3,10 @@
 > 参考资料:
 > - [PolarDB Documentation - CTE](https://www.alibabacloud.com/help/en/polardb/latest/with)
 > - [PolarDB Documentation - Date Functions](https://www.alibabacloud.com/help/en/polardb/latest/date-and-time-functions)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

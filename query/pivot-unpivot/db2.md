@@ -4,9 +4,9 @@
 > - [IBM DB2 Documentation - PIVOT clause](https://www.ibm.com/docs/en/db2/11.5?topic=queries-pivot-clause)
 > - [IBM DB2 Documentation - UNPIVOT clause](https://www.ibm.com/docs/en/db2/11.5?topic=queries-unpivot-clause)
 > - [IBM DB2 Documentation - SELECT](https://www.ibm.com/docs/en/db2/11.5?topic=statements-select)
-> - ============================================================
-> - PIVOT: 原生语法（11.1+）
-> - ============================================================
+
+
+## PIVOT: 原生语法（11.1+）
 
 ```sql
 SELECT * FROM (

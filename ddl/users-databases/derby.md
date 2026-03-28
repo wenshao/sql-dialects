@@ -3,26 +3,28 @@
 > 参考资料:
 > - [Apache Derby Documentation - CREATE SCHEMA](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj31580.html)
 > - [Apache Derby Documentation - GRANT / REVOKE](https://db.apache.org/derby/docs/10.16/ref/rrefsqljgrant.html)
-> - ============================================================
-> - Derby 特性：
-> - 嵌入式 Java 数据库
-> - 数据库 = 一个目录
-> - 支持 schema
-> - 简单的权限管理
-> - 命名层级: database > schema > object
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
-> - 数据库通过 JDBC 连接字符串创建（非 SQL）
-> - 嵌入式：jdbc:derby:myapp;create=true
-> - 网络：jdbc:derby://localhost:1527/myapp;create=true
-> - 删除数据库 = 删除目录（文件系统操作）
-> - 数据库属性
-> - CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.fullAccessUsers', 'admin');
-> - ============================================================
-> - 2. 模式管理
-> - ============================================================
+
+
+Derby 特性：
+嵌入式 Java 数据库
+数据库 = 一个目录
+支持 schema
+简单的权限管理
+命名层级: database > schema > object
+
+
+## 数据库管理
+
+
+数据库通过 JDBC 连接字符串创建（非 SQL）
+嵌入式：jdbc:derby:myapp;create=true
+网络：jdbc:derby://localhost:1527/myapp;create=true
+删除数据库 = 删除目录（文件系统操作）
+数据库属性
+CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.database.fullAccessUsers', 'admin');
+
+## 模式管理
+
 
 ```sql
 CREATE SCHEMA myschema;

@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 的全文搜索功能
-> - 支持 tsvector/tsquery、GIN 索引
-> - ============================================================
-> - 基本全文搜索
-> - ============================================================
-> - to_tsvector + to_tsquery
+
+
+## TimescaleDB 继承 PostgreSQL 的全文搜索功能
+
+支持 tsvector/tsquery、GIN 索引
+
+## 基本全文搜索
+
+
+## to_tsvector + to_tsquery
 
 ```sql
 SELECT * FROM articles

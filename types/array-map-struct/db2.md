@@ -4,10 +4,12 @@
 > - [IBM Db2 Documentation - ARRAY Data Type](https://www.ibm.com/docs/en/db2/11.5?topic=types-array-data-type)
 > - [IBM Db2 Documentation - ROW Data Type](https://www.ibm.com/docs/en/db2/11.5?topic=types-row-data-type)
 > - [IBM Db2 Documentation - JSON Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-json)
-> - ============================================================
-> - ARRAY 类型（Db2 10.5+）
-> - ============================================================
-> - 创建数组类型
+
+
+## ARRAY 类型（Db2 10.5+）
+
+
+## 创建数组类型
 
 ```sql
 CREATE TYPE string_array AS VARCHAR(100) ARRAY[100];

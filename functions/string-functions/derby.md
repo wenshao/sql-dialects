@@ -1,6 +1,6 @@
 # Derby: 字符串函数
 
-拼接
+## 拼接
 
 ```sql
 SELECT username || ' <' || email || '>' FROM users;

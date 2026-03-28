@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [Firebird Documentation - Window Functions (Firebird 3.0+)](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-windowfns)
-> - 注意：窗口函数需要 Firebird 3.0+
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## 注意：窗口函数需要 Firebird 3.0+
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

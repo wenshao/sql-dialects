@@ -3,7 +3,9 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - LIMIT / OFFSET
+
+
+## LIMIT / OFFSET
 
 ```sql
 SELECT * FROM d1001 ORDER BY ts DESC LIMIT 10 OFFSET 20;

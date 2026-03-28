@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - BEFORE INSERT trigger
+
+
+## BEFORE INSERT trigger
 
 ```sql
 CREATE OR REPLACE TRIGGER trg_users_before_insert

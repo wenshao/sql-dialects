@@ -3,18 +3,20 @@
 > 参考资料:
 > - [Materialize Documentation - CREATE TABLE](https://materialize.com/docs/sql/create-table/)
 > - [Materialize Documentation - SQL Functions](https://materialize.com/docs/sql/functions/)
-> - ============================================
-> - Materialize 不支持 CREATE SEQUENCE（截至当前版本）
-> - ============================================
-> - ============================================
-> - 替代方案
-> - ============================================
-> - 方法 1：使用源系统的 ID
-> - Materialize 通常从 Kafka、PostgreSQL CDC 等源读取数据
-> - 数据已有主键/ID，不需要数据库生成
-> - 方法 2：使用 mz_now() 等内部函数
-> - mz_now() 返回 Materialize 的逻辑时间戳
-> - 方法 3：使用 ROW_NUMBER() 窗口函数
+
+
+## Materialize 不支持 CREATE SEQUENCE（截至当前版本）
+
+
+## 替代方案
+
+
+方法 1：使用源系统的 ID
+Materialize 通常从 Kafka、PostgreSQL CDC 等源读取数据
+数据已有主键/ID，不需要数据库生成
+方法 2：使用 mz_now() 等内部函数
+mz_now() 返回 Materialize 的逻辑时间戳
+方法 3：使用 ROW_NUMBER() 窗口函数
 
 ```sql
 CREATE MATERIALIZED VIEW users_ranked AS

@@ -7,10 +7,12 @@ TDSQL distributed MySQL-compatible database (Tencent Cloud).
 > - [TDSQL MySQL 版文档](https://cloud.tencent.com/document/product/557)
 > - [TDSQL 分布式架构指南](https://cloud.tencent.com/document/product/557/43296)
 > - [MySQL 8.0 Reference Manual - ALTER TABLE](https://dev.mysql.com/doc/refman/8.0/en/alter-table.html)
-> - ============================================================
-> - 1. 基本列操作（MySQL 兼容语法）
-> - ============================================================
-> - 添加列
+
+
+## 基本列操作（MySQL 兼容语法）
+
+
+## 添加列
 
 ```sql
 ALTER TABLE users ADD COLUMN phone VARCHAR(20) AFTER email;

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Apache Derby Reference Manual](https://db.apache.org/derby/docs/10.17/ref/)
 > - [Apache Derby MERGE Statement (10.11+)](https://db.apache.org/derby/docs/10.17/ref/rrefsqljmerge.html)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
+
+
+## 维度表结构
+
 
 ```sql
 CREATE TABLE dim_customer (

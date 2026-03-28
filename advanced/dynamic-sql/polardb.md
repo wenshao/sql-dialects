@@ -3,9 +3,9 @@
 > 参考资料:
 > - [PolarDB for PostgreSQL Documentation](https://www.alibabacloud.com/help/en/polardb/polardb-for-postgresql/)
 > - [PolarDB for MySQL Documentation](https://www.alibabacloud.com/help/en/polardb/polardb-for-mysql/)
-> - ============================================================
-> - PolarDB for PostgreSQL: PREPARE / EXECUTE
-> - ============================================================
+
+
+## PolarDB for PostgreSQL: PREPARE / EXECUTE
 
 ```sql
 PREPARE user_query(INT) AS SELECT * FROM users WHERE age > $1;

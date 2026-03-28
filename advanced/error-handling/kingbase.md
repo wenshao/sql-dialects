@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [KingbaseES PL/SQL 参考手册](https://help.kingbase.com.cn/)
-> - ============================================================
-> - EXCEPTION WHEN (兼容 Oracle/PostgreSQL)
-> - ============================================================
+
+
+## EXCEPTION WHEN (兼容 Oracle/PostgreSQL)
 
 ```sql
 DECLARE

@@ -5,7 +5,9 @@ DamengDB has built-in full-text search using CONTEXT INDEX.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 创建全文索引
+
+
+## 创建全文索引
 
 ```sql
 CREATE CONTEXT INDEX idx_ft_content ON articles (content) LEXER DEFAULT_LEXER;

@@ -4,12 +4,16 @@
 > - [Materialize Documentation - Scalar Functions](https://materialize.com/docs/sql/functions/)
 > - [Materialize Documentation - Types and Casting](https://materialize.com/docs/sql/types/)
 > - [Materialize Documentation - SELECT Statement](https://materialize.com/docs/sql/select/)
-> - 说明: Materialize 基于 PostgreSQL 语法，条件函数与 PostgreSQL 高度兼容。
-> - 部分高级条件表达式在流式计算场景中有特殊语义。
-> - ============================================================
-> - 1. CASE WHEN: 标准条件表达式
-> - ============================================================
-> - 搜索式 CASE WHEN
+
+
+## 说明: Materialize 基于 PostgreSQL 语法，条件函数与 PostgreSQL 高度兼容。
+
+部分高级条件表达式在流式计算场景中有特殊语义。
+
+## CASE WHEN: 标准条件表达式
+
+
+## 搜索式 CASE WHEN
 
 ```sql
 SELECT username,

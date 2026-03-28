@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - Apache Derby 是 Java 嵌入式数据库（也称 Java DB）
-> - 基本建表
+
+
+## Apache Derby 是 Java 嵌入式数据库（也称 Java DB）
+
+基本建表
 
 ```sql
 CREATE TABLE users (

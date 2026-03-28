@@ -3,9 +3,10 @@
 > 参考资料:
 > - [PolarDB for MySQL 文档 - JSON 支持](https://help.aliyun.com/document_detail/316770.html)
 > - [PolarDB for PostgreSQL 文档 - 数据类型](https://help.aliyun.com/document_detail/472096.html)
-> - ============================================================
-> - PolarDB for MySQL — JSON 类型
-> - ============================================================
+
+
+## PolarDB for MySQL — JSON 类型
+
 
 ```sql
 CREATE TABLE users (

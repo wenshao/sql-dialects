@@ -5,7 +5,9 @@ PostgreSQL compatible syntax.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - INNER JOIN
+
+
+## INNER JOIN
 
 ```sql
 SELECT u.username, o.amount

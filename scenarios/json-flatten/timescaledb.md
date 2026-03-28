@@ -4,9 +4,10 @@
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL Documentation - JSON Functions（TimescaleDB 完全兼容）](https://www.postgresql.org/docs/current/functions-json.html)
 > - [TimescaleDB Hypertable 概念](https://docs.timescale.com/use-timescale/latest/hypertables/)
-> - ============================================================
-> - 1. 示例数据（时序场景：传感器 JSON 事件）
-> - ============================================================
+
+
+## 示例数据（时序场景：传感器 JSON 事件）
+
 
 ```sql
 CREATE TABLE sensor_events (

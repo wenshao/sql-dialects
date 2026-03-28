@@ -3,10 +3,12 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Hypertables](https://docs.timescale.com/timescaledb/latest/how-to-guides/hypertables/)
 > - [TimescaleDB Documentation - Chunks](https://docs.timescale.com/timescaledb/latest/how-to-guides/hypertables/about-hypertables/)
-> - ============================================================
-> - 超表（Hypertable）—— 自动时间分区
-> - ============================================================
-> - 创建普通表
+
+
+## 超表（Hypertable）—— 自动时间分区
+
+
+## 创建普通表
 
 ```sql
 CREATE TABLE sensor_data (

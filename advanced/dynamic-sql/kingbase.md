@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [KingbaseES PL/SQL 参考手册](https://help.kingbase.com.cn/)
-> - ============================================================
-> - EXECUTE IMMEDIATE (兼容 Oracle PL/SQL)
-> - ============================================================
+
+
+## EXECUTE IMMEDIATE (兼容 Oracle PL/SQL)
 
 ```sql
 DECLARE

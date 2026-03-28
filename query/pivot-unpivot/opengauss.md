@@ -3,9 +3,9 @@
 > 参考资料:
 > - [openGauss Documentation - SELECT](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/SELECT.html)
 > - [openGauss Documentation - tablefunc](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/)
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY（兼容 PostgreSQL）
-> - ============================================================
+
+
+## PIVOT: CASE WHEN + GROUP BY（兼容 PostgreSQL）
 
 ```sql
 SELECT

@@ -4,9 +4,10 @@
 > - [ksqlDB Documentation - Data Types (ARRAY)](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#array)
 > - [ksqlDB Documentation - Data Types (MAP)](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#map)
 > - [ksqlDB Documentation - Data Types (STRUCT)](https://docs.ksqldb.io/en/latest/reference/sql/data-types/#struct)
-> - ============================================================
-> - ARRAY 类型
-> - ============================================================
+
+
+## ARRAY 类型
+
 
 ```sql
 CREATE STREAM users (

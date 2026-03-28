@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Hologres Documentation - EXPLAIN](https://help.aliyun.com/document_detail/410670.html)
 > - [Hologres Documentation - 查询优化](https://help.aliyun.com/document_detail/321181.html)
-> - ============================================================
-> - EXPLAIN 基本用法（兼容 PostgreSQL）
-> - ============================================================
+
+
+## EXPLAIN 基本用法（兼容 PostgreSQL）
+
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE username = 'alice';

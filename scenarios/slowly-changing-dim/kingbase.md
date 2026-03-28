@@ -5,10 +5,12 @@
 > - [KingbaseES 文档 - INSERT ON CONFLICT](https://help.kingbase.com.cn/v8/developer/sql-reference/insert.html)
 > - [KingbaseES - PostgreSQL 兼容性](https://help.kingbase.com.cn/v8/developer/compatibility.html)
 > - [Kimball Group - SCD Types](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - KingbaseES 高度兼容 PostgreSQL DDL/DML
+
+
+## 维度表结构
+
+
+## KingbaseES 高度兼容 PostgreSQL DDL/DML
 
 ```sql
 CREATE TABLE dim_customer (

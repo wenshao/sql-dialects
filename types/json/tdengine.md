@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 3.0+ 支持 JSON 类型（仅用于标签列）
-> - 数据列不支持 JSON 类型
-> - ============================================================
-> - JSON 标签
-> - ============================================================
-> - 创建带 JSON 标签的超级表
+
+
+## TDengine 3.0+ 支持 JSON 类型（仅用于标签列）
+
+数据列不支持 JSON 类型
+
+## JSON 标签
+
+
+## 创建带 JSON 标签的超级表
 
 ```sql
 CREATE STABLE devices (

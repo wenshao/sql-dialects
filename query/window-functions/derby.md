@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - Derby 10.11+ 支持有限的窗口函数
-> - ROW_NUMBER（最常用）
+
+
+## Derby 10.11+ 支持有限的窗口函数
+
+ROW_NUMBER（最常用）
 
 ```sql
 SELECT username, age,

@@ -4,11 +4,14 @@
 > - [Materialize Documentation - Date and Time Functions](https://materialize.com/docs/sql/functions/numeric/)
 > - [Materialize Documentation - Types](https://materialize.com/docs/sql/types/)
 > - [PostgreSQL Documentation - Date/Time Functions](https://www.postgresql.org/docs/current/functions-datetime.html)
-> - 说明: Materialize 基于 PostgreSQL 语法，日期函数与 PostgreSQL 高度兼容。
-> - 流式计算场景中，时间函数有特殊的语义（如 mz_now() 基于系统时钟）。
-> - ============================================================
-> - 1. 获取当前时间
-> - ============================================================
+
+
+## 说明: Materialize 基于 PostgreSQL 语法，日期函数与 PostgreSQL 高度兼容。
+
+流式计算场景中，时间函数有特殊的语义（如 mz_now() 基于系统时钟）。
+
+## 获取当前时间
+
 
 ```sql
 SELECT NOW();                                         -- 当前事务时间戳 (TIMESTAMPTZ)

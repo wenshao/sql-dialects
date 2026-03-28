@@ -3,13 +3,14 @@
 > 参考资料:
 > - [Materialize Documentation - SELECT](https://materialize.com/docs/sql/select/)
 > - [Materialize Documentation - Functions](https://materialize.com/docs/sql/functions/)
-> - ============================================================
-> - 注意：Materialize 没有原生 PIVOT / UNPIVOT 语法
-> - 兼容 PostgreSQL，使用 CASE WHEN + GROUP BY / LATERAL 实现
-> - ============================================================
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY
-> - ============================================================
+
+
+## 注意：Materialize 没有原生 PIVOT / UNPIVOT 语法
+
+兼容 PostgreSQL，使用 CASE WHEN + GROUP BY / LATERAL 实现
+
+
+## PIVOT: CASE WHEN + GROUP BY
 
 ```sql
 SELECT

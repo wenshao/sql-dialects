@@ -5,10 +5,12 @@
 > - [Hologres Documentation - Table Types](https://help.aliyun.com/document_detail/176116.html)
 > - [Hologres Documentation - DML](https://help.aliyun.com/document_detail/181551.html)
 > - [Hologres - PostgreSQL Compatibility](https://help.aliyun.com/document_detail/193895.html)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - Hologres 兼容 PostgreSQL DDL/DML，支持 ON CONFLICT UPSERT
+
+
+## 维度表结构
+
+
+## Hologres 兼容 PostgreSQL DDL/DML，支持 ON CONFLICT UPSERT
 
 ```sql
 CREATE TABLE dim_customer (

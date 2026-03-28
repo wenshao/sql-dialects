@@ -3,15 +3,17 @@
 > 参考资料:
 > - [IBM Db2 Documentation - OLAP Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-olap-window)
 > - [IBM Db2 Documentation - FETCH FIRST](https://www.ibm.com/docs/en/db2/11.5?topic=clause-fetch-first)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - orders(order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
-> - FETCH FIRST（Db2 经典语法）
+
+
+## 示例数据上下文
+
+假设表结构:
+orders(order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
+
+## FETCH FIRST（Db2 经典语法）
 
 ```sql
 SELECT order_id, customer_id, amount

@@ -3,16 +3,20 @@
 > 参考资料:
 > - [ksqlDB Documentation - Data Types](https://docs.ksqldb.io/en/latest/reference/sql/data-types/)
 > - [ksqlDB Documentation - Scalar Functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/)
-> - ============================================
-> - ksqlDB 是流处理引擎，不支持传统的序列和自增
-> - ============================================
-> - 不支持 CREATE SEQUENCE
-> - 不支持 AUTO_INCREMENT / IDENTITY / SERIAL
-> - ============================================
-> - 替代方案
-> - ============================================
-> - 方法 1：使用 Kafka 消息的 KEY 作为标识符
-> - Kafka 消息天然有 offset，可作为序列号
+
+
+## ksqlDB 是流处理引擎，不支持传统的序列和自增
+
+## 不支持 CREATE SEQUENCE
+
+不支持 AUTO_INCREMENT / IDENTITY / SERIAL
+
+## 替代方案
+
+
+## 方法 1：使用 Kafka 消息的 KEY 作为标识符
+
+Kafka 消息天然有 offset，可作为序列号
 
 ```sql
 CREATE STREAM events (

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [SAP HANA Documentation](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/5f14e09987ef4c638a83e1a015e3bd17.html)
 > - [SAP HANA Documentation](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

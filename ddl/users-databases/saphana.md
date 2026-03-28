@@ -3,16 +3,18 @@
 > 参考资料:
 > - [SAP HANA Documentation - CREATE SCHEMA](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d4ecad7519101497d192700ce5f3df.html)
 > - [SAP HANA Documentation - CREATE USER](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d5ddb075191014b594f7b11ff08ee2.html)
-> - ============================================================
-> - SAP HANA 命名层级:
-> - 单租户: system > schema > object
-> - 多租户 (MDC): system > database(tenant) > schema > object
-> - 每个用户自动拥有同名 schema
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理（多租户 MDC）
-> - ============================================================
-> - 创建租户数据库（需要在 SYSTEMDB 执行）
+
+
+SAP HANA 命名层级:
+单租户: system > schema > object
+多租户 (MDC): system > database(tenant) > schema > object
+每个用户自动拥有同名 schema
+
+
+## 数据库管理（多租户 MDC）
+
+
+## 创建租户数据库（需要在 SYSTEMDB 执行）
 
 ```sql
 CREATE DATABASE myapp SYSTEM USER PASSWORD 'Secret123!';

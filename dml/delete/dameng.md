@@ -6,10 +6,12 @@ Oracle compatible syntax.
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
 > - [DamengDB dmfldr User Guide](https://eco.dameng.com/document/dm/zh-cn/pm/zh-cn/pm2-appendix-dmfldr.html)
-> - ============================================================
-> - 1. 基本 DELETE
-> - ============================================================
-> - 单行删除
+
+
+## 基本 DELETE
+
+
+## 单行删除
 
 ```sql
 DELETE FROM users WHERE username = 'alice';

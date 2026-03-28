@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 约束支持有限，兼容部分 PostgreSQL 语法
-> - ============================================================
-> - NOT NULL
-> - ============================================================
+
+
+## Materialize 约束支持有限，兼容部分 PostgreSQL 语法
+
+## NOT NULL
+
 
 ```sql
 CREATE TABLE users (

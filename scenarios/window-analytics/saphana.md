@@ -2,14 +2,16 @@
 
 > 参考资料:
 > - [SAP HANA Documentation - Window Functions](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20a353327519101495dfd0a87060a0d3.html)
-> - 假设表结构:
-> - daily_sales(sale_date DATE, product_id INTEGER, region NVARCHAR(50),
-> - amount DECIMAL(10,2), quantity INTEGER)
-> - user_events(user_id INTEGER, event_time TIMESTAMP, event_type NVARCHAR(50), page NVARCHAR(255))
-> - employee_salaries(emp_id INTEGER, department NVARCHAR(50), salary DECIMAL(10,2), hire_date DATE)
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+假设表结构:
+daily_sales(sale_date DATE, product_id INTEGER, region NVARCHAR(50),
+amount DECIMAL(10,2), quantity INTEGER)
+user_events(user_id INTEGER, event_time TIMESTAMP, event_type NVARCHAR(50), page NVARCHAR(255))
+employee_salaries(emp_id INTEGER, department NVARCHAR(50), salary DECIMAL(10,2), hire_date DATE)
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

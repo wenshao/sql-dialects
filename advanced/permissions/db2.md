@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Create user (OS-level, not SQL; Db2 relies on OS authentication)
-> - Db2 users are OS users; create them at OS level first
-> - Db2 Cloud: CREATE USER via admin console
-> - Create role (Db2 9.5+)
+
+
+Create user (OS-level, not SQL; Db2 relies on OS authentication)
+Db2 users are OS users; create them at OS level first
+Db2 Cloud: CREATE USER via admin console
+Create role (Db2 9.5+)
 
 ```sql
 CREATE ROLE app_read;

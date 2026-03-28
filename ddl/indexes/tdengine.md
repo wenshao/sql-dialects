@@ -3,13 +3,18 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 不支持传统的 B-tree / Hash 索引
-> - 时序数据通过内置优化机制高效查询
-> - ============================================================
-> - 内置索引机制（自动，无需手动创建）
-> - ============================================================
-> - 1. 时间戳列自动索引
-> - 第一列（TIMESTAMP）自动建立索引，按时间范围查询非常高效
+
+
+## TDengine 不支持传统的 B-tree / Hash 索引
+
+时序数据通过内置优化机制高效查询
+
+## 内置索引机制（自动，无需手动创建）
+
+
+## 时间戳列自动索引
+
+## 第一列（TIMESTAMP）自动建立索引，按时间范围查询非常高效
 
 ```sql
 SELECT * FROM meters WHERE ts >= '2024-01-01' AND ts < '2024-02-01';

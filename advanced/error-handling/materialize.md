@@ -2,28 +2,30 @@
 
 > 参考资料:
 > - [Materialize Documentation](https://materialize.com/docs/sql/)
-> - ============================================================
-> - Materialize 不支持服务端错误处理
-> - ============================================================
-> - Materialize 没有存储过程或异常处理语法
-> - 错误处理必须在应用层完成
-> - ============================================================
-> - 应用层替代方案 (Python/psycopg2)
-> - ============================================================
-> - import psycopg2
-> - from psycopg2 import errors
-> - try:
-> - cursor.execute('CREATE SOURCE ...')
-> - except psycopg2.errors.DuplicateTable:
-> - print('Object already exists')
-> - except psycopg2.errors.UndefinedTable:
-> - print('Object does not exist')
-> - except psycopg2.Error as e:
-> - print(f'Materialize error: {e.pgcode} - {e.pgerror}')
-> - ============================================================
-> - SQL 层面的错误避免
-> - ============================================================
-> - IF NOT EXISTS 防止重复创建
+
+
+## Materialize 不支持服务端错误处理
+
+## Materialize 没有存储过程或异常处理语法
+
+错误处理必须在应用层完成
+
+## 应用层替代方案 (Python/psycopg2)
+
+import psycopg2
+from psycopg2 import errors
+try:
+cursor.execute('CREATE SOURCE ...')
+except psycopg2.errors.DuplicateTable:
+print('Object already exists')
+except psycopg2.errors.UndefinedTable:
+print('Object does not exist')
+except psycopg2.Error as e:
+print(f'Materialize error: {e.pgcode} - {e.pgerror}')
+
+## SQL 层面的错误避免
+
+## IF NOT EXISTS 防止重复创建
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (id INT, name TEXT);

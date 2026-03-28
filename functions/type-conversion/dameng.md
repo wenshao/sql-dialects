@@ -2,7 +2,9 @@
 
 > 参考资料:
 > - [达梦数据库 SQL 参考手册](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
-> - CAST (SQL 标准)
+
+
+## CAST (SQL 标准)
 
 ```sql
 SELECT CAST(42 AS VARCHAR2(10)) FROM DUAL;

@@ -3,9 +3,9 @@
 > 参考资料:
 > - [KingbaseES Documentation - UNION / INTERSECT / EXCEPT](https://help.kingbase.com.cn/v8/)
 > - [KingbaseES Documentation - SELECT](https://help.kingbase.com.cn/v8/)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

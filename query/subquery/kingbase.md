@@ -6,12 +6,14 @@ KingbaseES is PostgreSQL-compatible, inheriting PG subquery features.
 > - [KingbaseES SQL Reference - Subqueries](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Server Programming Guide](https://help.kingbase.com.cn/v8/develop-guide/index.html)
 > - [PostgreSQL Documentation - Subquery Expressions](https://www.postgresql.org/docs/current/functions-subquery.html)
-> - ============================================================
-> - 1. 标量子查询
-> - ============================================================
-> - 示例数据:
-> - users(id, username, age, city)
-> - orders(id, user_id, amount, status)
+
+
+## 标量子查询
+
+
+示例数据:
+users(id, username, age, city)
+orders(id, user_id, amount, status)
 
 ```sql
 SELECT username,

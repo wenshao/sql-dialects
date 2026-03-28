@@ -3,14 +3,15 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Setup](https://docs.timescale.com/self-hosted/latest/install/)
 > - [PostgreSQL Documentation (TimescaleDB 基于 PostgreSQL)](https://www.postgresql.org/docs/current/sql-createdatabase.html)
-> - ============================================================
-> - TimescaleDB 是 PostgreSQL 扩展，完全兼容 PostgreSQL
-> - 命名层级: cluster > database > schema > object
-> - 所有 PostgreSQL 的用户/数据库管理语法都适用
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理（同 PostgreSQL）
-> - ============================================================
+
+
+TimescaleDB 是 PostgreSQL 扩展，完全兼容 PostgreSQL
+命名层级: cluster > database > schema > object
+所有 PostgreSQL 的用户/数据库管理语法都适用
+
+
+## 数据库管理（同 PostgreSQL）
+
 
 ```sql
 CREATE DATABASE myapp;

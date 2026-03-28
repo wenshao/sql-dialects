@@ -3,12 +3,14 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Db2 auto-commits by default (CLI/ODBC)
-> - In CLP: use +c flag to disable auto-commit
-> - db2 +c "UPDATE accounts SET balance = balance - 100 WHERE id = 1"
-> - Explicit transaction control
-> - Note: no explicit BEGIN TRANSACTION in Db2
-> - A transaction starts implicitly with the first SQL statement
+
+
+Db2 auto-commits by default (CLI/ODBC)
+In CLP: use +c flag to disable auto-commit
+db2 +c "UPDATE accounts SET balance = balance - 100 WHERE id = 1"
+Explicit transaction control
+Note: no explicit BEGIN TRANSACTION in Db2
+A transaction starts implicitly with the first SQL statement
 
 ```sql
 UPDATE accounts SET balance = balance - 100 WHERE id = 1;

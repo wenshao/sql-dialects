@@ -5,7 +5,9 @@ Oracle compatible syntax.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 单行插入
+
+
+## 单行插入
 
 ```sql
 INSERT INTO users (username, email, age) VALUES ('alice', 'alice@example.com', 25);

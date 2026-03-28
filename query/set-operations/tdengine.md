@@ -3,9 +3,9 @@
 > 参考资料:
 > - [TDengine Documentation - SELECT](https://docs.tdengine.com/reference/sql/select/)
 > - [TDengine Documentation - SQL Reference](https://docs.tdengine.com/reference/sql/)
-> - ============================================================
-> - UNION / UNION ALL（3.0+）
-> - ============================================================
+
+
+## UNION / UNION ALL（3.0+）
 
 ```sql
 SELECT ts, value FROM meters.d1001

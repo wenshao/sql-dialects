@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Hologres SQL - DELETE](https://help.aliyun.com/zh/hologres/user-guide/delete-2)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 注意: Hologres 兼容 PostgreSQL DELETE 语法
-> - 行存表和列存表均支持 DELETE
-> - 基本删除
+
+
+注意: Hologres 兼容 PostgreSQL DELETE 语法
+行存表和列存表均支持 DELETE
+基本删除
 
 ```sql
 DELETE FROM users WHERE username = 'alice';

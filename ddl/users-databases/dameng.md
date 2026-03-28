@@ -3,22 +3,25 @@
 > 参考资料:
 > - [达梦数据库 SQL 参考手册 - CREATE USER](https://eco.dameng.com/docs/zh-cn/sql-dev/dmpl-sql/create-user.html)
 > - [达梦数据库 SQL 参考手册 - 用户与权限](https://eco.dameng.com/docs/zh-cn/sql-dev/dmpl-sql/grant.html)
-> - ============================================================
-> - 达梦命名层级: 实例 > 数据库 > 模式(=用户) > 对象
-> - 类似 Oracle: 用户和模式一一对应
-> - 创建用户自动创建同名模式
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
-> - 达梦的数据库通过 dminit 工具创建（非 SQL）
-> - $ dminit PATH=/dm/data DB_NAME=myapp INSTANCE_NAME=DMSERVER
-> - 一个达梦实例通常对应一个数据库
-> - 不支持 SQL 的 CREATE DATABASE
-> - ============================================================
-> - 2. 模式管理
-> - ============================================================
-> - 创建模式（需要 DBA 权限）
+
+
+达梦命名层级: 实例 > 数据库 > 模式(=用户) > 对象
+类似 Oracle: 用户和模式一一对应
+创建用户自动创建同名模式
+
+
+## 数据库管理
+
+
+达梦的数据库通过 dminit 工具创建（非 SQL）
+$ dminit PATH=/dm/data DB_NAME=myapp INSTANCE_NAME=DMSERVER
+一个达梦实例通常对应一个数据库
+不支持 SQL 的 CREATE DATABASE
+
+## 模式管理
+
+
+## 创建模式（需要 DBA 权限）
 
 ```sql
 CREATE SCHEMA myschema AUTHORIZATION myuser;

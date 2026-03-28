@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 支持丰富的子查询（兼容 PostgreSQL）
-> - 标量子查询
+
+
+## Materialize 支持丰富的子查询（兼容 PostgreSQL）
+
+标量子查询
 
 ```sql
 SELECT username,

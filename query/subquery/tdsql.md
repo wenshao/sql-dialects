@@ -6,12 +6,14 @@ TDSQL distributed MySQL-compatible syntax.
 > - [TDSQL-C MySQL Documentation - SQL Statements](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation - Distributed Queries](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference - Subqueries](https://dev.mysql.com/doc/refman/8.0/en/subqueries.html)
-> - ============================================================
-> - 1. 标量子查询
-> - ============================================================
-> - 示例数据:
-> - users(id, username, age, city, shardkey)
-> - orders(id, user_id, amount, shardkey)
+
+
+## 标量子查询
+
+
+示例数据:
+users(id, username, age, city, shardkey)
+orders(id, user_id, amount, shardkey)
 
 ```sql
 SELECT username,

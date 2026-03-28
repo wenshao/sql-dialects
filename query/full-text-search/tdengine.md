@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 不支持全文搜索
-> - 仅提供基本的字符串匹配功能
-> - ============================================================
-> - LIKE 模糊搜索
-> - ============================================================
-> - 基本 LIKE
+
+
+## TDengine 不支持全文搜索
+
+仅提供基本的字符串匹配功能
+
+## LIKE 模糊搜索
+
+
+## 基本 LIKE
 
 ```sql
 SELECT * FROM log WHERE content LIKE '%error%';

@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres - Window Functions](https://help.aliyun.com/zh/hologres/user-guide/window-functions)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - ROW_NUMBER / RANK / DENSE_RANK
+
+
+## ROW_NUMBER / RANK / DENSE_RANK
 
 ```sql
 SELECT username, age,

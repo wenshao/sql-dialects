@@ -3,9 +3,9 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - Set Operators](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20fcf24075191014a89e9dc7b8408b26.html)
 > - [SAP HANA SQL Reference - SELECT](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20fcf24075191014a89e9dc7b8408b26.html)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

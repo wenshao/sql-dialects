@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - CHAR(n) / CHARACTER(n): fixed-length, 1-254 bytes
-> - VARCHAR(n) / CHARACTER VARYING(n): variable-length, max 32672 bytes
-> - CLOB(n): Character Large Object, up to 2GB
+
+
+CHAR(n) / CHARACTER(n): fixed-length, 1-254 bytes
+VARCHAR(n) / CHARACTER VARYING(n): variable-length, max 32672 bytes
+CLOB(n): Character Large Object, up to 2GB
 
 ```sql
 CREATE TABLE examples (

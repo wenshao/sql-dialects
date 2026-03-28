@@ -3,14 +3,15 @@
 > 参考资料:
 > - [TDSQL for MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL-C (TDSQL Serverless) Documentation](https://cloud.tencent.com/document/product/1003)
-> - ============================================================
-> - TDSQL 兼容 MySQL 协议
-> - DATABASE 和 SCHEMA 是同义词
-> - 命名层级: 集群(实例) > 数据库 > 对象
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
+
+
+TDSQL 兼容 MySQL 协议
+DATABASE 和 SCHEMA 是同义词
+命名层级: 集群(实例) > 数据库 > 对象
+
+
+## 数据库管理
+
 
 ```sql
 CREATE DATABASE myapp;

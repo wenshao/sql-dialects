@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Hologres Documentation - SELECT](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres Documentation - SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

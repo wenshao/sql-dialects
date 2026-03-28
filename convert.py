@@ -65,18 +65,38 @@ def convert_sql_to_md(content):
                 i += 1
 
                 # Collect subsequent comment lines that are part of the header
-                # (sub-description lines before references)
+                # (sub-description lines directly after title, no blank line gap)
                 header_comments = []
+                saw_blank = False
                 while i < len(lines):
                     s = lines[i].strip()
                     if not s:
+                        saw_blank = True
                         i += 1
-                        continue
+                        # Peek: if next non-blank is a reference block, skip to it
+                        peek = i
+                        while peek < len(lines) and not lines[peek].strip():
+                            peek += 1
+                        if peek < len(lines):
+                            peek_text = lines[peek].strip().lstrip("- ").strip()
+                            if "参考资料" in peek_text or "Reference" in peek_text:
+                                continue
+                        break
                     if s.startswith("--"):
                         text = s.lstrip("- ").strip()
                         if not text:
+                            # bare "--" line acts as separator
+                            saw_blank = True
                             i += 1
-                            continue
+                            # Check if next is references
+                            peek = i
+                            while peek < len(lines) and not lines[peek].strip():
+                                peek += 1
+                            if peek < len(lines):
+                                peek_text = lines[peek].strip().lstrip("- ").strip()
+                                if "参考资料" in peek_text or "Reference" in peek_text:
+                                    continue
+                            break
                         # Check if this is the start of references
                         if "参考资料" in text or "Reference" in text:
                             break
@@ -84,6 +104,9 @@ def convert_sql_to_md(content):
                         if text.startswith("[") and "]" in text:
                             break
                         if text.startswith("http"):
+                            break
+                        if saw_blank:
+                            # Blank line gap means this is no longer header
                             break
                         header_comments.append(text)
                         i += 1

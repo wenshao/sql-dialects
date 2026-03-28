@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Scalar subquery
+
+
+## Scalar subquery
 
 ```sql
 SELECT username, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count

@@ -3,10 +3,12 @@
 > 参考资料:
 > - [ksqlDB Documentation - Queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
 > - [ksqlDB Documentation - Window Functions](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/)
-> - ============================================================
-> - ksqlDB 是流处理引擎，间隙检测的概念与传统数据库不同
-> - ============================================================
-> - 创建流
+
+
+## ksqlDB 是流处理引擎，间隙检测的概念与传统数据库不同
+
+
+## 创建流
 
 ```sql
 CREATE STREAM orders_stream (

@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部窗口函数
-> - 额外提供 time_bucket 等时序窗口功能
-> - ROW_NUMBER / RANK / DENSE_RANK
+
+
+TimescaleDB 继承 PostgreSQL 全部窗口函数
+额外提供 time_bucket 等时序窗口功能
+ROW_NUMBER / RANK / DENSE_RANK
 
 ```sql
 SELECT sensor_id, time, temperature,

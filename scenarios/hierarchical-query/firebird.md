@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Firebird Documentation - Common Table Expressions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-commons-cte)
 > - [Firebird Documentation - Recursive CTEs](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

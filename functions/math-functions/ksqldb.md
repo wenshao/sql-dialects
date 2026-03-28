@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [ksqlDB Function Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/)
-> - ============================================================
-> - 基本数学函数
-> - ============================================================
+
+
+## 基本数学函数
 
 ```sql
 SELECT ABS(-42);                          -- 42

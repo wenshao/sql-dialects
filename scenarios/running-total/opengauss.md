@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [openGauss Documentation - Window Functions](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/window-functions.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(txn_id SERIAL, account_id INT, amount NUMERIC(10,2), txn_date DATE)
-> - ============================================================
-> - 1. 累计求和
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+transactions(txn_id SERIAL, account_id INT, amount NUMERIC(10,2), txn_date DATE)
+
+## 累计求和
+
 
 ```sql
 SELECT txn_id, account_id, amount, txn_date,

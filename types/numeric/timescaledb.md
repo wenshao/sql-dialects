@@ -3,11 +3,13 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部数值类型
-> - 整数
-> - SMALLINT: 2 字节，-32768 ~ 32767
-> - INTEGER / INT: 4 字节，-2^31 ~ 2^31-1
-> - BIGINT: 8 字节，-2^63 ~ 2^63-1
+
+
+TimescaleDB 继承 PostgreSQL 全部数值类型
+整数
+SMALLINT: 2 字节，-32768 ~ 32767
+INTEGER / INT: 4 字节，-2^31 ~ 2^31-1
+BIGINT: 8 字节，-2^63 ~ 2^63-1
 
 ```sql
 CREATE TABLE sensor_data (

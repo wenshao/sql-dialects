@@ -4,18 +4,21 @@
 > - [TDengine Documentation - JSON 数据类型](https://docs.tdengine.com/taos-sql/data-type/#json)
 > - [TDengine Documentation - 超级表 (STable)](https://docs.tdengine.com/taos-sql/stable/)
 > - [TDengine 3.0 Documentation - JSON 标签](https://docs.tdengine.com/3.0/taos-sql/data-type/)
-> - ============================================================
-> - 1. TDengine JSON 支持概述
-> - ============================================================
-> - TDengine 是专用时序数据库，JSON 支持有以下限制:
-> - (a) JSON 类型仅可用于超级表（STable）的标签列（TAG）
-> - (b) 数据列不支持 JSON 类型
-> - (c) 不支持 JSON 数组展开为多行
-> - (d) JSON 查询仅支持基本的键值提取
-> - ============================================================
-> - 2. 示例数据（时序场景: 传感器 + JSON 标签）
-> - ============================================================
-> - 创建超级表: JSON 类型作为标签
+
+
+## TDengine JSON 支持概述
+
+
+TDengine 是专用时序数据库，JSON 支持有以下限制:
+(a) JSON 类型仅可用于超级表（STable）的标签列（TAG）
+(b) 数据列不支持 JSON 类型
+(c) 不支持 JSON 数组展开为多行
+(d) JSON 查询仅支持基本的键值提取
+
+## 示例数据（时序场景: 传感器 + JSON 标签）
+
+
+## 创建超级表: JSON 类型作为标签
 
 ```sql
 CREATE STABLE IF NOT EXISTS sensor_data (

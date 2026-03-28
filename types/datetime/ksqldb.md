@@ -3,9 +3,11 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - TIMESTAMP: 毫秒精度的日期时间
-> - DATE: 日期
-> - TIME: 时间
+
+
+TIMESTAMP: 毫秒精度的日期时间
+DATE: 日期
+TIME: 时间
 
 ```sql
 CREATE STREAM events (

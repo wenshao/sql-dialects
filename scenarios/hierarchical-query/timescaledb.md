@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TimescaleDB Documentation - SQL Reference](https://docs.timescale.com/api/latest/)
 > - [PostgreSQL Documentation - WITH RECURSIVE](https://www.postgresql.org/docs/current/queries-with.html)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

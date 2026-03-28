@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - users(user_id INT, email VARCHAR(255), username VARCHAR(64), created_at TIMESTAMP)
-> - ============================================================
-> - 1. 查找重复数据
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+users(user_id INT, email VARCHAR(255), username VARCHAR(64), created_at TIMESTAMP)
+
+## 查找重复数据
+
 
 ```sql
 SELECT email, COUNT(*) AS cnt

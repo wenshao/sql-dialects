@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [Hologres Documentation](https://www.alibabacloud.com/help/en/hologres/)
-> - ============================================================
-> - 基本数学函数（PostgreSQL 兼容）
-> - ============================================================
+
+
+## 基本数学函数（PostgreSQL 兼容）
 
 ```sql
 SELECT ABS(-42);                          -- 42

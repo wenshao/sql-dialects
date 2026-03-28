@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Firebird Documentation - Window Functions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-windowfuncs)
 > - [Firebird Documentation - Common Table Expressions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-commons-cte)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INTEGER NOT NULL PRIMARY KEY, info VARCHAR(100));

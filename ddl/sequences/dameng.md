@@ -3,9 +3,9 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言参考 - CREATE SEQUENCE](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-sequence.html)
 > - [达梦数据库 SQL 语言参考 - IDENTITY 列](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-table.html)
-> - ============================================
-> - SEQUENCE
-> - ============================================
+
+
+## SEQUENCE
 
 ```sql
 CREATE SEQUENCE user_id_seq

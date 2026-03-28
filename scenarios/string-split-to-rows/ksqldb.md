@@ -4,10 +4,12 @@
 > - [ksqlDB Documentation - SPLIT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#split)
 > - [ksqlDB Documentation - EXPLODE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/table-functions/#explode)
 > - [ksqlDB Documentation - Arrays](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/data-types/#array)
-> - ============================================================
-> - 1. 示例数据（流和表）
-> - ============================================================
-> - 流: 实时标签事件
+
+
+## 示例数据（流和表）
+
+
+## 流: 实时标签事件
 
 ```sql
 CREATE STREAM tags_stream (

@@ -3,9 +3,9 @@
 > 参考资料:
 > - [ksqlDB Documentation - JSON Format](https://docs.ksqldb.io/en/latest/reference/serialization/#json)
 > - [ksqlDB Documentation - EXTRACTJSONFIELD](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/#extractjsonfield)
-> - ============================================================
-> - ksqlDB 原生支持 JSON 格式，schema 在建流/表时定义
-> - ============================================================
+
+
+## ksqlDB 原生支持 JSON 格式，schema 在建流/表时定义
 
 ```sql
 CREATE STREAM orders_stream (

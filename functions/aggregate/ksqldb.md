@@ -1,6 +1,6 @@
 # ksqlDB: 聚合函数
 
-基本聚合（仅在 GROUP BY 或 窗口中使用）
+## 基本聚合（仅在 GROUP BY 或 窗口中使用）
 
 ```sql
 CREATE TABLE user_stats AS

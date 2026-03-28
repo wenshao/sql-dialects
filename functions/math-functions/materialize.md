@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [Materialize Documentation - Math Functions](https://materialize.com/docs/sql/functions/#numbers)
-> - ============================================================
-> - 基本数学函数（PostgreSQL 兼容）
-> - ============================================================
+
+
+## 基本数学函数（PostgreSQL 兼容）
 
 ```sql
 SELECT ABS(-42);                          -- 42

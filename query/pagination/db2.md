@@ -5,10 +5,12 @@
 > - [Db2 SQL Reference - FETCH FIRST](https://www.ibm.com/docs/en/db2/11.5?topic=clause-fetch-first-clause)
 > - [Db2 SQL Reference - OPTIMIZE FOR](https://www.ibm.com/docs/en/db2/11.5?topic=clauses-optimize-clause)
 > - [Db2 Window Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - ============================================================
-> - 1. FETCH FIRST（Db2 原创语法，后被 SQL 标准采纳）
-> - ============================================================
-> - FETCH FIRST N ROWS ONLY（Db2 的原创语法，比 SQL 标准更早）
+
+
+## FETCH FIRST（Db2 原创语法，后被 SQL 标准采纳）
+
+
+## FETCH FIRST N ROWS ONLY（Db2 的原创语法，比 SQL 标准更早）
 
 ```sql
 SELECT * FROM users ORDER BY id FETCH FIRST 10 ROWS ONLY;

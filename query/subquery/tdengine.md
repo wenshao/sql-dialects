@@ -3,11 +3,14 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 支持基本的子查询，但有较多限制
-> - ============================================================
-> - FROM 子查询（最常用）
-> - ============================================================
-> - 基本子查询
+
+
+## TDengine 支持基本的子查询，但有较多限制
+
+## FROM 子查询（最常用）
+
+
+## 基本子查询
 
 ```sql
 SELECT * FROM (

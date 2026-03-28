@@ -3,9 +3,10 @@
 > 参考资料:
 > - [openGauss Documentation - Recursive CTEs](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/)
 > - [openGauss Documentation - CONNECT BY](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

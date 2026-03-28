@@ -3,16 +3,18 @@
 > 参考资料:
 > - [TDengine Documentation - SELECT](https://docs.tdengine.com/reference/sql/select/)
 > - [TDengine Documentation - Aggregate Functions](https://docs.tdengine.com/reference/sql/function/#aggregate-functions)
-> - ============================================================
-> - 注意：TDengine 是时序数据库，不支持标准 PIVOT / UNPIVOT
-> - 提供有限的行转列功能（通过聚合和超级表标签）
-> - ============================================================
-> - ============================================================
-> - PIVOT: 使用超级表标签做隐式 PIVOT
-> - ============================================================
-> - TDengine 的超级表天然支持按标签分组
-> - 每个子表对应一个设备，可将多设备数据按时间对齐
-> - 查询多个子表数据（类似 PIVOT）
+
+
+## 注意：TDengine 是时序数据库，不支持标准 PIVOT / UNPIVOT
+
+提供有限的行转列功能（通过聚合和超级表标签）
+
+
+## PIVOT: 使用超级表标签做隐式 PIVOT
+
+TDengine 的超级表天然支持按标签分组
+每个子表对应一个设备，可将多设备数据按时间对齐
+查询多个子表数据（类似 PIVOT）
 
 ```sql
 SELECT

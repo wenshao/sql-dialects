@@ -5,9 +5,10 @@
 > - [Hologres Documentation - PL/pgSQL (Procedural Language)](https://www.alibabacloud.com/help/en/hologres/developer-guide/plpgsql-procedural-language)
 > - [Hologres Documentation - PostgreSQL Compatibility](https://www.alibabacloud.com/help/en/hologres/developer-guide/postgresql-compatibility)
 > - [Hologres Documentation - Stored Procedures](https://www.alibabacloud.com/help/en/hologres/developer-guide/stored-procedures)
-> - ============================================================
-> - 1. PREPARE / EXECUTE / DEALLOCATE (PostgreSQL 兼容)
-> - ============================================================
+
+
+## PREPARE / EXECUTE / DEALLOCATE (PostgreSQL 兼容)
+
 
 ```sql
 PREPARE user_by_age(INT) AS SELECT * FROM users WHERE age > $1;

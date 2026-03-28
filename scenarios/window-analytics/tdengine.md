@@ -3,19 +3,22 @@
 > 参考资料:
 > - [TDengine Documentation - Window Functions](https://docs.taosdata.com/reference/sql/select/#window-clause)
 > - [TDengine Documentation - Aggregate Functions](https://docs.taosdata.com/reference/sql/functions/)
-> - ============================================================
-> - TDengine 是时序数据库，窗口模型与传统 SQL 不同
-> - TDengine 使用时间窗口（INTERVAL, SLIDING, SESSION, STATE_WINDOW）
-> - 不支持传统 OVER() 窗口函数（如 LAG, LEAD, RANK 等）
-> - ============================================================
-> - 假设超级表:
-> - CREATE STABLE metrics (
-> - ts TIMESTAMP, value DOUBLE, quality INT
-> - ) TAGS (device_id NCHAR(50), region NCHAR(20));
-> - ============================================================
-> - 1. 移动平均（使用 INTERVAL + SLIDING）
-> - ============================================================
-> - 每小时平均值
+
+
+TDengine 是时序数据库，窗口模型与传统 SQL 不同
+TDengine 使用时间窗口（INTERVAL, SLIDING, SESSION, STATE_WINDOW）
+不支持传统 OVER() 窗口函数（如 LAG, LEAD, RANK 等）
+
+
+假设超级表:
+CREATE STABLE metrics (
+ts TIMESTAMP, value DOUBLE, quality INT
+) TAGS (device_id NCHAR(50), region NCHAR(20));
+
+## 移动平均（使用 INTERVAL + SLIDING）
+
+
+## 每小时平均值
 
 ```sql
 SELECT _wstart, AVG(value) AS hourly_avg

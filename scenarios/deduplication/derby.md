@@ -2,14 +2,16 @@
 
 > 参考资料:
 > - [Apache Derby Documentation](https://db.apache.org/derby/docs/10.15/ref/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - users(user_id INT, email VARCHAR(255), username VARCHAR(64), created_at DATE)
-> - ============================================================
-> - 1. 查找重复数据
-> - ============================================================
+
+
+## 示例数据上下文
+
+## 假设表结构:
+
+users(user_id INT, email VARCHAR(255), username VARCHAR(64), created_at DATE)
+
+## 查找重复数据
+
 
 ```sql
 SELECT email, COUNT(*) AS cnt

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/)
 > - KingbaseES 基于 PostgreSQL，EXPLAIN 语法兼容
-> - ============================================================
-> - EXPLAIN 基本用法（兼容 PostgreSQL）
-> - ============================================================
+
+
+## EXPLAIN 基本用法（兼容 PostgreSQL）
+
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE username = 'alice';

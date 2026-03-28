@@ -3,9 +3,9 @@
 > 参考资料:
 > - [IBM DB2 Documentation - XMLTABLE](https://www.ibm.com/docs/en/db2/11.5?topic=functions-xmltable)
 > - [IBM DB2 Documentation - Recursive CTE](https://www.ibm.com/docs/en/db2/11.5?topic=queries-common-table-expression)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

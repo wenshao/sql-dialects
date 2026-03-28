@@ -3,9 +3,9 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言参考 - CREATE VIEW](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-view.html)
 > - [达梦数据库 SQL 语言参考 - 物化视图](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-mview.html)
-> - ============================================
-> - 基本视图
-> - ============================================
+
+
+## 基本视图
 
 ```sql
 CREATE VIEW active_users AS

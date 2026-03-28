@@ -3,9 +3,10 @@
 > 参考资料:
 > - [openGauss Documentation - EXPLAIN](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/EXPLAIN.html)
 > - [openGauss Documentation - Performance Tuning](https://docs.opengauss.org/zh/docs/latest/docs/PerformanceTuningGuide/)
-> - ============================================================
-> - EXPLAIN 基本用法（兼容 PostgreSQL）
-> - ============================================================
+
+
+## EXPLAIN 基本用法（兼容 PostgreSQL）
+
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE username = 'alice';

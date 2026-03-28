@@ -3,18 +3,20 @@
 > 参考资料:
 > - [Hologres 文档 - 并发写入](https://help.aliyun.com/document_detail/312450.html)
 > - [Hologres 文档 - 行存表与列存表](https://help.aliyun.com/document_detail/160755.html)
-> - ============================================================
-> - Hologres 并发模型概述
-> - ============================================================
-> - Hologres 是阿里云实时数仓（兼容 PostgreSQL）:
-> - 1. 支持行存和列存表
-> - 2. 使用 MVCC 和乐观并发控制
-> - 3. 支持 SELECT FOR UPDATE（行存表）
-> - 4. 高并发写入通过主键 upsert 实现
-> - ============================================================
-> - 行级锁（行存表）
-> - ============================================================
-> - SELECT FOR UPDATE（行存表支持）
+
+
+## Hologres 并发模型概述
+
+Hologres 是阿里云实时数仓（兼容 PostgreSQL）:
+1. 支持行存和列存表
+2. 使用 MVCC 和乐观并发控制
+3. 支持 SELECT FOR UPDATE（行存表）
+4. 高并发写入通过主键 upsert 实现
+
+## 行级锁（行存表）
+
+
+## SELECT FOR UPDATE（行存表支持）
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

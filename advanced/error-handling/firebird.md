@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Firebird Documentation - Exception Handling](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-psql-exception)
 > - [Firebird Documentation - WHEN ... DO](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-psql-when)
-> - ============================================================
-> - WHEN ... DO (PSQL 异常处理)
-> - ============================================================
+
+
+## WHEN ... DO (PSQL 异常处理)
 
 ```sql
 CREATE OR REPLACE PROCEDURE safe_insert(p_id INTEGER, p_name VARCHAR(100))

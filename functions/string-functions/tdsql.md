@@ -4,12 +4,16 @@
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - String Functions](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html)
-> - 说明: TDSQL 是腾讯云分布式数据库，语法与 MySQL 高度兼容。
-> - 字符串函数行为与 MySQL 完全一致，分布式场景有额外注意事项。
-> - ============================================================
-> - 1. 字符串拼接
-> - ============================================================
-> - CONCAT: 拼接字符串，任一参数为 NULL 则结果为 NULL
+
+
+## 说明: TDSQL 是腾讯云分布式数据库，语法与 MySQL 高度兼容。
+
+字符串函数行为与 MySQL 完全一致，分布式场景有额外注意事项。
+
+## 字符串拼接
+
+
+## CONCAT: 拼接字符串，任一参数为 NULL 则结果为 NULL
 
 ```sql
 SELECT CONCAT('hello', ' ', 'world');                  -- 'hello world'

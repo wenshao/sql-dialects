@@ -3,15 +3,18 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Hyperfunctions (Window)](https://docs.timescale.com/api/latest/hyperfunctions/)
 > - [PostgreSQL Documentation - Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
-> - TimescaleDB 继承 PostgreSQL 所有窗口函数，并添加时序特有函数
-> - 假设表结构（hypertable）:
-> - daily_sales(sale_date TIMESTAMPTZ, product_id INT, region VARCHAR,
-> - amount NUMERIC(10,2), quantity INT)
-> - SELECT create_hypertable('daily_sales', 'sale_date');
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
-> - 标准窗口函数（同 PostgreSQL）
+
+
+TimescaleDB 继承 PostgreSQL 所有窗口函数，并添加时序特有函数
+假设表结构（hypertable）:
+daily_sales(sale_date TIMESTAMPTZ, product_id INT, region VARCHAR,
+amount NUMERIC(10,2), quantity INT)
+SELECT create_hypertable('daily_sales', 'sale_date');
+
+## 移动平均
+
+
+## 标准窗口函数（同 PostgreSQL）
 
 ```sql
 SELECT sale_date, amount,

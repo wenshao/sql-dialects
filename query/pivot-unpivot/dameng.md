@@ -3,9 +3,9 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言手册 - PIVOT / UNPIVOT](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-query.html)
 > - [达梦数据库 SQL 语言手册 - SELECT](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
-> - ============================================================
-> - PIVOT: 原生语法（兼容 Oracle 11g+）
-> - ============================================================
+
+
+## PIVOT: 原生语法（兼容 Oracle 11g+）
 
 ```sql
 SELECT * FROM (

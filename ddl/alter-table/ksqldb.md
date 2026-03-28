@@ -3,14 +3,18 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 的 ALTER 功能非常有限
-> - 主要通过重建 STREAM/TABLE 实现 schema 变更
-> - ============================================================
-> - ALTER STREAM（仅支持有限操作）
-> - ============================================================
-> - 目前 ksqlDB 不支持传统的 ALTER STREAM ADD COLUMN
-> - schema 变更通常通过重建实现
-> - 方式一：使用 CREATE OR REPLACE 重建
+
+
+## ksqlDB 的 ALTER 功能非常有限
+
+主要通过重建 STREAM/TABLE 实现 schema 变更
+
+## ALTER STREAM（仅支持有限操作）
+
+
+目前 ksqlDB 不支持传统的 ALTER STREAM ADD COLUMN
+schema 变更通常通过重建实现
+方式一：使用 CREATE OR REPLACE 重建
 
 ```sql
 CREATE OR REPLACE STREAM pageviews (

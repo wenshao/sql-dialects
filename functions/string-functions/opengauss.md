@@ -5,7 +5,9 @@ PostgreSQL compatible syntax.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 拼接
+
+
+## 拼接
 
 ```sql
 SELECT 'hello' || ' ' || 'world';                    -- 'hello world'

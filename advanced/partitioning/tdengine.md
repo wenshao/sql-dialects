@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [TDengine Documentation - Data Model](https://docs.taosdata.com/concept/)
-> - TDengine 使用超级表 + 子表模型代替传统分区
-> - ============================================================
-> - 超级表（STable）= 分区模板
-> - ============================================================
+
+
+## TDengine 使用超级表 + 子表模型代替传统分区
+
+## 超级表（STable）= 分区模板
+
 
 ```sql
 CREATE STABLE meters (

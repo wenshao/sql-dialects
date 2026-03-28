@@ -5,7 +5,9 @@ Hologres 兼容 PostgreSQL 字符串函数
 > 参考资料:
 > - [Hologres - String Functions](https://help.aliyun.com/zh/hologres/user-guide/string-functions)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - 拼接
+
+
+## 拼接
 
 ```sql
 SELECT 'hello' || ' ' || 'world';                        -- 'hello world'

@@ -3,10 +3,12 @@
 > 参考资料:
 > - [PolarDB Documentation](https://www.alibabacloud.com/help/en/polardb/)
 > - [PolarDB for PostgreSQL Documentation](https://www.alibabacloud.com/help/en/polardb/polardb-for-postgresql/)
-> - ============================================================
-> - PolarDB for PostgreSQL: CASE WHEN + GROUP BY / FILTER / crosstab
-> - ============================================================
-> - CASE WHEN + GROUP BY
+
+
+## PolarDB for PostgreSQL: CASE WHEN + GROUP BY / FILTER / crosstab
+
+
+## CASE WHEN + GROUP BY
 
 ```sql
 SELECT

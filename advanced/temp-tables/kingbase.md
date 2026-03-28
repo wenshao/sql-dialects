@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [KingbaseES 基于 PostgreSQL，临时表语法兼容](https://help.kingbase.com.cn/)
-> - ============================================================
-> - CREATE TEMPORARY TABLE（兼容 PostgreSQL）
-> - ============================================================
+
+
+## CREATE TEMPORARY TABLE（兼容 PostgreSQL）
+
 
 ```sql
 CREATE TEMP TABLE temp_users (

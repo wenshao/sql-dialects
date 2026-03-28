@@ -6,11 +6,14 @@ PostgreSQL compatible JSON/JSONB support with Oracle-compatible extensions.
 > - [openGauss SQL Reference - JSON Types](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
 > - [PostgreSQL Documentation - JSON Types](https://www.postgresql.org/docs/current/datatype-json.html)
-> - ============================================================
-> - 1. JSON 类型: JSON vs JSONB
-> - ============================================================
-> - JSON:  存储原始文本，每次查询时解析，保留格式信息
-> - JSONB: 二进制格式存储，插入时验证并解析，支持索引（推荐）
+
+
+## JSON 类型: JSON vs JSONB
+
+
+## JSON:  存储原始文本，每次查询时解析，保留格式信息
+
+JSONB: 二进制格式存储，插入时验证并解析，支持索引（推荐）
 
 ```sql
 CREATE TABLE events (

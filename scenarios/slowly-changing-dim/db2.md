@@ -3,9 +3,9 @@
 > 参考资料:
 > - [IBM DB2 Documentation - MERGE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-merge)
 > - [IBM DB2 Documentation - Temporal Tables](https://www.ibm.com/docs/en/db2/11.5?topic=tables-temporal)
-> - ============================================================
-> - SCD Type 1: MERGE
-> - ============================================================
+
+
+## SCD Type 1: MERGE
 
 ```sql
 MERGE INTO dim_customer AS t

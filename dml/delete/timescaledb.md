@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部 DELETE 语法
-> - 额外提供 drop_chunks 高效删除整个时间范围
-> - 基本删除
+
+
+TimescaleDB 继承 PostgreSQL 全部 DELETE 语法
+额外提供 drop_chunks 高效删除整个时间范围
+基本删除
 
 ```sql
 DELETE FROM sensor_data WHERE sensor_id = 1 AND time = '2024-01-15 10:00:00+08';

@@ -3,10 +3,12 @@
 > 参考资料:
 > - [SAP HANA Documentation - EXPLAIN PLAN](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d9fda075191014b12fcc10cdf42570.html)
 > - [SAP HANA Documentation - SQL Plan Cache](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20c57b8375191014b536e2f0b40c47f7.html)
-> - ============================================================
-> - EXPLAIN PLAN 基本用法
-> - ============================================================
-> - 将执行计划存入 EXPLAIN_PLAN_TABLE
+
+
+## EXPLAIN PLAN 基本用法
+
+
+## 将执行计划存入 EXPLAIN_PLAN_TABLE
 
 ```sql
 EXPLAIN PLAN FOR

@@ -4,9 +4,9 @@
 > - [TimescaleDB Documentation - Continuous Aggregates](https://docs.timescale.com/use-timescale/latest/continuous-aggregates/)
 > - [PostgreSQL Documentation - CREATE VIEW](https://www.postgresql.org/docs/current/sql-createview.html)
 > - [TimescaleDB Documentation - Real-time Aggregates](https://docs.timescale.com/use-timescale/latest/continuous-aggregates/real-time-aggregates/)
-> - ============================================
-> - 基本视图（完全兼容 PostgreSQL）
-> - ============================================
+
+
+## 基本视图（完全兼容 PostgreSQL）
 
 ```sql
 CREATE VIEW active_users AS

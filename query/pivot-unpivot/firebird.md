@@ -3,14 +3,14 @@
 > 参考资料:
 > - [Firebird Documentation - SELECT](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-dml-select)
 > - [Firebird Documentation - Aggregate Functions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-aggfuncs)
-> - ============================================================
-> - 注意：Firebird 没有原生 PIVOT / UNPIVOT 语法
-> - 使用 CASE WHEN + GROUP BY 实现 PIVOT
-> - 使用 UNION ALL 实现 UNPIVOT
-> - ============================================================
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY
-> - ============================================================
+
+
+注意：Firebird 没有原生 PIVOT / UNPIVOT 语法
+使用 CASE WHEN + GROUP BY 实现 PIVOT
+使用 UNION ALL 实现 UNPIVOT
+
+
+## PIVOT: CASE WHEN + GROUP BY
 
 ```sql
 SELECT

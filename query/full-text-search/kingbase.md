@@ -5,7 +5,9 @@ PostgreSQL compatible tsvector/tsquery approach.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - 基本搜索：tsvector + tsquery
+
+
+## 基本搜索：tsvector + tsquery
 
 ```sql
 SELECT * FROM articles

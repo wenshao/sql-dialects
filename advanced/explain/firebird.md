@@ -3,16 +3,19 @@
 > 参考资料:
 > - [Firebird Documentation - Query Plan](https://firebirdsql.org/file/documentation/chunk/en/refdocs/fblangref40/fblangref40-commons.html#fblangref40-commons-plan)
 > - [Firebird Documentation - SET PLANONLY](https://firebirdsql.org/file/documentation/chunk/en/refdocs/fblangref40/fblangref40-management.html)
-> - ============================================================
-> - 自动执行计划输出（isql）
-> - ============================================================
-> - 在 isql 中启用执行计划显示
-> - SET PLAN ON;
-> - SET PLANONLY ON;  -- 只显示计划，不执行
-> - ============================================================
-> - PLAN 子句（手动指定执行计划）
-> - ============================================================
-> - Firebird 允许在查询中显式指定执行计划
+
+
+## 自动执行计划输出（isql）
+
+
+在 isql 中启用执行计划显示
+SET PLAN ON;
+SET PLANONLY ON;  -- 只显示计划，不执行
+
+## PLAN 子句（手动指定执行计划）
+
+
+## Firebird 允许在查询中显式指定执行计划
 
 ```sql
 SELECT * FROM users

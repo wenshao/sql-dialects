@@ -6,11 +6,14 @@ PostgreSQL compatible JSON/JSONB support with Oracle-compatible extensions.
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Oracle Compatibility Guide](https://help.kingbase.com.cn/v8/development/sql-plsql/oracle-compat.html)
 > - [PostgreSQL Documentation - JSON Types](https://www.postgresql.org/docs/current/datatype-json.html)
-> - ============================================================
-> - 1. JSON 类型: JSON vs JSONB
-> - ============================================================
-> - JSON:  存储原始文本，每次查询时解析
-> - JSONB: 二进制格式存储，解析一次后缓存，支持索引（推荐）
+
+
+## JSON 类型: JSON vs JSONB
+
+
+## JSON:  存储原始文本，每次查询时解析
+
+JSONB: 二进制格式存储，解析一次后缓存，支持索引（推荐）
 
 ```sql
 CREATE TABLE events (

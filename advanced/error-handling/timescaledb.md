@@ -3,9 +3,9 @@
 > 参考资料:
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL PL/pgSQL Error Handling](https://www.postgresql.org/docs/current/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING)
-> - ============================================================
-> - EXCEPTION WHEN (完全兼容 PostgreSQL)
-> - ============================================================
+
+
+## EXCEPTION WHEN (完全兼容 PostgreSQL)
 
 ```sql
 CREATE OR REPLACE FUNCTION safe_insert_reading(

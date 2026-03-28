@@ -6,12 +6,14 @@ DamengDB supports JSON data via SQL/JSON standard with Oracle-compatible functio
 > - [DamengDB SQL Reference - JSON Functions](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
 > - SQL/JSON Standard (ISO/IEC 9075-2:2016)
-> - ============================================================
-> - 1. JSON 存储: 使用 CLOB / VARCHAR 而非原生 JSON 类型
-> - ============================================================
-> - 达梦没有独立的 JSON 列类型，使用 CLOB 或 VARCHAR 存储 JSON 文档
-> - 建议使用 CLOB 存储较大的 JSON（超过 VARCHAR 最大长度）
-> - 建议使用 VARCHAR 存储较小的 JSON（性能更好）
+
+
+## JSON 存储: 使用 CLOB / VARCHAR 而非原生 JSON 类型
+
+
+达梦没有独立的 JSON 列类型，使用 CLOB 或 VARCHAR 存储 JSON 文档
+建议使用 CLOB 存储较大的 JSON（超过 VARCHAR 最大长度）
+建议使用 VARCHAR 存储较小的 JSON（性能更好）
 
 ```sql
 CREATE TABLE events (

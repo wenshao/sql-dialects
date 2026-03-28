@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 的 TABLE 支持 DELETE
-> - SOURCE 和 MATERIALIZED VIEW 不支持 DELETE
-> - 基本删除
+
+
+Materialize 的 TABLE 支持 DELETE
+SOURCE 和 MATERIALIZED VIEW 不支持 DELETE
+基本删除
 
 ```sql
 DELETE FROM users WHERE username = 'alice';

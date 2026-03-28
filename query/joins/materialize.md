@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 支持丰富的 JOIN 语法（兼容 PostgreSQL）
-> - 在物化视图中 JOIN 会增量维护
-> - INNER JOIN
+
+
+Materialize 支持丰富的 JOIN 语法（兼容 PostgreSQL）
+在物化视图中 JOIN 会增量维护
+INNER JOIN
 
 ```sql
 SELECT u.username, o.amount

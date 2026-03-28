@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 的 JSON 和 JSONB 类型
-> - JSON: 存储原始文本（保留空格、键顺序）
-> - JSONB: 二进制格式（更高效，支持索引，推荐）
+
+
+TimescaleDB 继承 PostgreSQL 的 JSON 和 JSONB 类型
+JSON: 存储原始文本（保留空格、键顺序）
+JSONB: 二进制格式（更高效，支持索引，推荐）
 
 ```sql
 CREATE TABLE events (

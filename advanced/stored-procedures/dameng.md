@@ -5,7 +5,9 @@ Oracle compatible PL/SQL syntax.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 创建存储过程
+
+
+## 创建存储过程
 
 ```sql
 CREATE OR REPLACE PROCEDURE get_user(p_username IN VARCHAR)

@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 使用数据库 → 超级表 → 子表的层次结构
-> - 专为时序数据（IoT）设计
-> - 创建数据库
+
+
+TDengine 使用数据库 → 超级表 → 子表的层次结构
+专为时序数据（IoT）设计
+创建数据库
 
 ```sql
 CREATE DATABASE IF NOT EXISTS power

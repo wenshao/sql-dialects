@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Hologres 文档 - 数据类型](https://help.aliyun.com/document_detail/130660.html)
 > - [Hologres 文档 - JSON 和 JSONB](https://help.aliyun.com/document_detail/401513.html)
-> - ============================================================
-> - Hologres 兼容 PostgreSQL，支持 ARRAY 和 JSON/JSONB
-> - ============================================================
-> - ARRAY 类型
+
+
+## Hologres 兼容 PostgreSQL，支持 ARRAY 和 JSON/JSONB
+
+
+## ARRAY 类型
 
 ```sql
 CREATE TABLE users (

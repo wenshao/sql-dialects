@@ -6,12 +6,14 @@ TDSQL distributed MySQL-compatible JSON support.
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - JSON Data Type](https://dev.mysql.com/doc/refman/8.0/en/json.html)
-> - ============================================================
-> - 1. JSON 列类型
-> - ============================================================
-> - TDSQL 兼容 MySQL 的原生 JSON 类型
-> - JSON 数据在存储时自动验证格式，非法 JSON 插入报错
-> - 内部使用二进制格式存储（与 MySQL 一致），查询时无需重新解析
+
+
+## JSON 列类型
+
+
+TDSQL 兼容 MySQL 的原生 JSON 类型
+JSON 数据在存储时自动验证格式，非法 JSON 插入报错
+内部使用二进制格式存储（与 MySQL 一致），查询时无需重新解析
 
 ```sql
 CREATE TABLE events (

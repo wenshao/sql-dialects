@@ -3,15 +3,16 @@
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL for MySQL Documentation](https://cloud.tencent.com/document/product/557/7700)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（兼容 MySQL 语法）:
-> - orders(order_id INT AUTO_INCREMENT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
-> - shardkey=customer_id
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构（兼容 MySQL 语法）:
+orders(order_id INT AUTO_INCREMENT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
+shardkey=customer_id
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

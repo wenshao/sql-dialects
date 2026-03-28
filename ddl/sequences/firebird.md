@@ -4,10 +4,11 @@
 > - [Firebird Documentation - CREATE SEQUENCE / GENERATOR](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-ddl-sequence)
 > - [Firebird Documentation - IDENTITY Columns](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-ddl-tbl-identity)
 > - [Firebird Documentation - GEN_UUID()](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-funcs-gen-uuid)
-> - ============================================
-> - SEQUENCE (也称为 GENERATOR)
-> - Firebird 的 SEQUENCE 和 GENERATOR 是同义词
-> - ============================================
+
+
+## SEQUENCE (也称为 GENERATOR)
+
+Firebird 的 SEQUENCE 和 GENERATOR 是同义词
 
 ```sql
 CREATE SEQUENCE user_id_seq;

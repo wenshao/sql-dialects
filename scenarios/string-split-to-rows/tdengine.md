@@ -4,19 +4,23 @@
 > - [TDengine Documentation - SQL Reference](https://docs.tdengine.com/taos-sql/)
 > - [TDengine Documentation - String Functions](https://docs.tdengine.com/taos-sql/function/#string-functions)
 > - [TDengine Documentation - UDF（用户自定义函数）](https://docs.tdengine.com/taos-sql/udf/)
-> - ============================================================
-> - 1. TDengine 字符串拆分概述
-> - ============================================================
-> - TDengine 是专用时序数据库，对字符串拆分的原生支持有限:
-> - (a) 无内置的 SPLIT 或字符串拆分函数
-> - (b) 不支持 UNNEST 或数组展开
-> - (c) 不支持递归 CTE（WITH RECURSIVE）
-> - (d) 可通过 UDF（用户自定义函数）扩展功能
-> - ============================================================
-> - 2. 推荐数据模型: 预拆分为多行
-> - ============================================================
-> - 时序数据库的最佳实践是数据写入时即完成拆分
-> - 将标签字符串拆分为多行存储（每个标签一条记录）
+
+
+## TDengine 字符串拆分概述
+
+
+TDengine 是专用时序数据库，对字符串拆分的原生支持有限:
+(a) 无内置的 SPLIT 或字符串拆分函数
+(b) 不支持 UNNEST 或数组展开
+(c) 不支持递归 CTE（WITH RECURSIVE）
+(d) 可通过 UDF（用户自定义函数）扩展功能
+
+## 推荐数据模型: 预拆分为多行
+
+
+## 时序数据库的最佳实践是数据写入时即完成拆分
+
+将标签字符串拆分为多行存储（每个标签一条记录）
 
 ```sql
 CREATE STABLE IF NOT EXISTS sensor_tags (

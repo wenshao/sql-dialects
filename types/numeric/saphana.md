@@ -3,11 +3,13 @@
 > 参考资料:
 > - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
 > - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
-> - Integer types
-> - TINYINT:   1 byte, 0 ~ 255 (unsigned)
-> - SMALLINT:  2 bytes, -32768 ~ 32767
-> - INTEGER:   4 bytes, -2^31 ~ 2^31-1
-> - BIGINT:    8 bytes, -2^63 ~ 2^63-1
+
+
+Integer types
+TINYINT:   1 byte, 0 ~ 255 (unsigned)
+SMALLINT:  2 bytes, -32768 ~ 32767
+INTEGER:   4 bytes, -2^31 ~ 2^31-1
+BIGINT:    8 bytes, -2^63 ~ 2^63-1
 
 ```sql
 CREATE COLUMN TABLE examples (

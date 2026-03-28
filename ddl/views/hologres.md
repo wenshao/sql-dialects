@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Hologres Documentation - CREATE VIEW](https://www.alibabacloud.com/help/en/hologres/developer-reference/create-view)
 > - [Hologres Documentation - SQL Reference](https://www.alibabacloud.com/help/en/hologres/developer-reference/overview-16)
-> - ============================================
-> - 基本视图（兼容 PostgreSQL 语法）
-> - ============================================
+
+
+## 基本视图（兼容 PostgreSQL 语法）
 
 ```sql
 CREATE VIEW active_users AS

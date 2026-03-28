@@ -4,25 +4,26 @@
 > - [ksqlDB Documentation - CREATE STREAM / TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
 > - [ksqlDB Documentation - Materialized Views](https://docs.ksqldb.io/en/latest/concepts/materialized-views/)
 > - [ksqlDB Documentation - CREATE TABLE AS SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-table-as-select/)
-> - ============================================
-> - ksqlDB 没有传统的 CREATE VIEW
-> - 使用 CREATE STREAM AS SELECT / CREATE TABLE AS SELECT 替代
-> - 这些在 ksqlDB 中被称为"持久化查询"或"物化视图"
-> - ============================================
-> - ============================================
-> - 基于 STREAM 的派生流（类似视图）
-> - ============================================
-> - 首先定义源 STREAM
-> - CREATE STREAM users_stream (
-> - id BIGINT KEY,
-> - username VARCHAR,
-> - email VARCHAR,
-> - age INT
-> - ) WITH (
-> - KAFKA_TOPIC = 'users',
-> - VALUE_FORMAT = 'JSON'
-> - );
-> - 创建派生 STREAM（持续查询，实时处理）
+
+
+ksqlDB 没有传统的 CREATE VIEW
+使用 CREATE STREAM AS SELECT / CREATE TABLE AS SELECT 替代
+这些在 ksqlDB 中被称为"持久化查询"或"物化视图"
+
+
+## 基于 STREAM 的派生流（类似视图）
+
+首先定义源 STREAM
+CREATE STREAM users_stream (
+id BIGINT KEY,
+username VARCHAR,
+email VARCHAR,
+age INT
+) WITH (
+KAFKA_TOPIC = 'users',
+VALUE_FORMAT = 'JSON'
+);
+创建派生 STREAM（持续查询，实时处理）
 
 ```sql
 CREATE STREAM active_users AS

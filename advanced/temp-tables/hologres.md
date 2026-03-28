@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [Hologres 兼容 PostgreSQL 语法](https://help.aliyun.com/document_detail/321181.html)
-> - ============================================================
-> - CREATE TEMPORARY TABLE（兼容 PostgreSQL）
-> - ============================================================
+
+
+## CREATE TEMPORARY TABLE（兼容 PostgreSQL）
+
 
 ```sql
 CREATE TEMP TABLE temp_users (

@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [Apache Derby Documentation - Data Types](https://db.apache.org/derby/docs/10.16/ref/crefsqlj31068.html)
-> - ============================================================
-> - Derby 不支持原生的 ARRAY / MAP / STRUCT 类型
-> - ============================================================
-> - 替代方案 1: 使用关联表（规范化设计）
+
+
+## Derby 不支持原生的 ARRAY / MAP / STRUCT 类型
+
+
+## 替代方案 1: 使用关联表（规范化设计）
 
 ```sql
 CREATE TABLE users (

@@ -3,11 +3,14 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 兼容 PostgreSQL ALTER 语法（部分支持）
-> - ============================================================
-> - ALTER TABLE
-> - ============================================================
-> - 添加列
+
+
+## Materialize 兼容 PostgreSQL ALTER 语法（部分支持）
+
+## ALTER TABLE
+
+
+## 添加列
 
 ```sql
 ALTER TABLE users ADD COLUMN phone TEXT;

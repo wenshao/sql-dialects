@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Apache Derby Reference Manual - Set Operations](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj13658.html)
 > - [Apache Derby Reference Manual - SELECT](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj41360.html)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

@@ -3,10 +3,12 @@
 > 参考资料:
 > - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
 > - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
-> - VARCHAR(n): variable-length, ASCII, max 5000 characters
-> - NVARCHAR(n): variable-length, Unicode (UTF-8), max 5000 characters (recommended)
-> - CHAR(n): fixed-length, ASCII
-> - NCHAR(n): fixed-length, Unicode
+
+
+VARCHAR(n): variable-length, ASCII, max 5000 characters
+NVARCHAR(n): variable-length, Unicode (UTF-8), max 5000 characters (recommended)
+CHAR(n): fixed-length, ASCII
+NCHAR(n): fixed-length, Unicode
 
 ```sql
 CREATE TABLE examples (

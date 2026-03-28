@@ -5,7 +5,9 @@ PostgreSQL compatible with security extensions.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - 创建用户/角色
+
+
+## 创建用户/角色
 
 ```sql
 CREATE ROLE alice LOGIN PASSWORD 'password123';

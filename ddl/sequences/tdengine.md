@@ -4,14 +4,15 @@
 > - [TDengine Documentation - Data Types](https://docs.tdengine.com/reference/sql/data-type/)
 > - [TDengine Documentation - CREATE TABLE](https://docs.tdengine.com/reference/sql/table/)
 > - [TDengine Documentation - SQL Functions](https://docs.tdengine.com/reference/sql/function/)
-> - ============================================
-> - TDengine 不支持 SEQUENCE、AUTO_INCREMENT、IDENTITY
-> - ============================================
-> - TDengine 是时序数据库，数据以时间戳为主键
-> - 每条记录天然以时间戳唯一标识
-> - ============================================
-> - 时间戳作为主键
-> - ============================================
+
+
+## TDengine 不支持 SEQUENCE、AUTO_INCREMENT、IDENTITY
+
+## TDengine 是时序数据库，数据以时间戳为主键
+
+每条记录天然以时间戳唯一标识
+
+## 时间戳作为主键
 
 ```sql
 CREATE STABLE sensor_data (

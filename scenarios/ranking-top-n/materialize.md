@@ -3,14 +3,15 @@
 > 参考资料:
 > - [Materialize Documentation - Window Functions](https://materialize.com/docs/sql/functions/#window-functions)
 > - [Materialize Documentation - SELECT](https://materialize.com/docs/sql/select/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（兼容 PostgreSQL 语法）:
-> - orders(order_id INT, customer_id INT, amount DECIMAL(10,2), order_date TIMESTAMP)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构（兼容 PostgreSQL 语法）:
+orders(order_id INT, customer_id INT, amount DECIMAL(10,2), order_date TIMESTAMP)
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

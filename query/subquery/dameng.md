@@ -6,12 +6,14 @@ DamengDB is Oracle-compatible, with DM-specific extensions.
 > - [DamengDB SQL Language Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Administration Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
 > - [DamengDB Performance Tuning Guide](https://eco.dameng.com/document/dm/zh-cn/perf/index.html)
-> - ============================================================
-> - 1. 标量子查询
-> - ============================================================
-> - 示例数据:
-> - users(id, username, age, city)
-> - orders(id, user_id, amount, status)
+
+
+## 标量子查询
+
+
+示例数据:
+users(id, username, age, city)
+orders(id, user_id, amount, status)
 
 ```sql
 SELECT username,

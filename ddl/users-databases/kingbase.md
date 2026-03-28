@@ -4,14 +4,15 @@
 > - [KingbaseES V8R6 文档 - SQL 参考](https://help.kingbase.com.cn/v8/development/sql-reference/)
 > - [KingbaseES V8R6 文档 - 数据库管理](https://help.kingbase.com.cn/v8/administrator/)
 > - [KingbaseES V8R6 文档 - 安全管理](https://help.kingbase.com.cn/v8/administrator/security-management/)
-> - ============================================================
-> - KingbaseES 兼容 PostgreSQL（也支持 Oracle 兼容模式）
-> - 命名层级: cluster > database > schema > object
-> - 默认: security 数据库, public 模式
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
+
+
+KingbaseES 兼容 PostgreSQL（也支持 Oracle 兼容模式）
+命名层级: cluster > database > schema > object
+默认: security 数据库, public 模式
+
+
+## 数据库管理
+
 
 ```sql
 CREATE DATABASE myapp;

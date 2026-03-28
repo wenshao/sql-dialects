@@ -4,9 +4,9 @@
 > - [SAP HANA SQL Reference - CREATE SEQUENCE](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d9b8187519101489a2a91a3671b13c.html)
 > - [SAP HANA SQL Reference - Identity Columns](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d58a5f75191014b2fe92141b7df228.html)
 > - [SAP HANA SQL Reference - SYSUUID](https://help.sap.com/docs/SAP_HANA_PLATFORM)
-> - ============================================
-> - SEQUENCE
-> - ============================================
+
+
+## SEQUENCE
 
 ```sql
 CREATE SEQUENCE user_id_seq

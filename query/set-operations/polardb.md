@@ -3,9 +3,9 @@
 > 参考资料:
 > - [PolarDB Documentation](https://www.alibabacloud.com/help/en/polardb/)
 > - [PolarDB-X Documentation - SQL Reference](https://www.alibabacloud.com/help/en/polardb/polardb-for-xscale/)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

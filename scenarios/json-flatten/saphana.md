@@ -3,9 +3,9 @@
 > 参考资料:
 > - [SAP HANA JSON Document Store](https://help.sap.com/docs/HANA_CLOUD/c1d3f60099654ecfb3fe36ac93c121bb/ddd10cbe63c04ce48c3c882fec38faff.html)
 > - [SAP HANA SQL Reference - JSON Functions](https://help.sap.com/docs/HANA_CLOUD/c1d3f60099654ecfb3fe36ac93c121bb/30f3c3dc14a5419ba459f5af9d5a8815.html)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE orders_json (

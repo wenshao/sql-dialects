@@ -5,7 +5,9 @@ PolarDB-X (distributed, MySQL 8.0 compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - JSON 列
+
+
+## JSON 列
 
 ```sql
 CREATE TABLE events (

@@ -5,13 +5,15 @@ Oracle compatible types.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - DATE: 日期时间（含时分秒，与 Oracle 相同）
-> - TIME: 时间
-> - TIMESTAMP: 日期时间，精度可达纳秒
-> - TIMESTAMP WITH TIME ZONE: 带时区
-> - INTERVAL YEAR TO MONTH: 年月间隔
-> - INTERVAL DAY TO SECOND: 日秒间隔
-> - DATETIME: 日期时间（达梦扩展）
+
+
+DATE: 日期时间（含时分秒，与 Oracle 相同）
+TIME: 时间
+TIMESTAMP: 日期时间，精度可达纳秒
+TIMESTAMP WITH TIME ZONE: 带时区
+INTERVAL YEAR TO MONTH: 年月间隔
+INTERVAL DAY TO SECOND: 日秒间隔
+DATETIME: 日期时间（达梦扩展）
 
 ```sql
 CREATE TABLE events (

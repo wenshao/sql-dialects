@@ -3,10 +3,12 @@
 > 参考资料:
 > - [TDSQL for MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - MySQL 8.0 Window Functions (TDSQL 兼容)
-> - TDSQL 兼容 MySQL 协议，窗口函数语法同 MySQL 8.0
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## TDSQL 兼容 MySQL 协议，窗口函数语法同 MySQL 8.0
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

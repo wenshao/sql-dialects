@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部 JOIN 语法
-> - 时序表与维度表的 JOIN 是常见模式
-> - INNER JOIN
+
+
+TimescaleDB 继承 PostgreSQL 全部 JOIN 语法
+时序表与维度表的 JOIN 是常见模式
+INNER JOIN
 
 ```sql
 SELECT s.time, s.temperature, d.name AS device_name

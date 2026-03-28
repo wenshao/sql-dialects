@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Apache Derby Documentation - String Functions](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Apache Derby Documentation - Built-in Functions](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj29026.html)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

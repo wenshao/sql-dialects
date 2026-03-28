@@ -3,14 +3,16 @@
 > 参考资料:
 > - [IBM Db2 Documentation - OLAP Specifications](https://www.ibm.com/docs/en/db2/11.5?topic=expressions-olap-specifications)
 > - [IBM Db2 Documentation - Window Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-aggregate)
-> - 假设表结构:
-> - daily_sales(sale_date DATE, product_id INTEGER, region VARCHAR(50),
-> - amount DECIMAL(10,2), quantity INTEGER)
-> - user_events(user_id INTEGER, event_time TIMESTAMP, event_type VARCHAR(50), page VARCHAR(255))
-> - employee_salaries(emp_id INTEGER, department VARCHAR(50), salary DECIMAL(10,2), hire_date DATE)
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+假设表结构:
+daily_sales(sale_date DATE, product_id INTEGER, region VARCHAR(50),
+amount DECIMAL(10,2), quantity INTEGER)
+user_events(user_id INTEGER, event_time TIMESTAMP, event_type VARCHAR(50), page VARCHAR(255))
+employee_salaries(emp_id INTEGER, department VARCHAR(50), salary DECIMAL(10,2), hire_date DATE)
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

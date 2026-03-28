@@ -1,9 +1,10 @@
 # Derby: 权限管理
 
-Derby 支持 SQL 标准的权限管理
-============================================================
-认证配置
-============================================================
+## Derby 支持 SQL 标准的权限管理
+
+## 认证配置
+
+
 启用用户认证（在 derby.properties 中）
 derby.connection.requireAuthentication=true
 derby.authentication.provider=BUILTIN

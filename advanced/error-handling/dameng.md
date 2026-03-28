@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [达梦数据库 PL/SQL 编程指南](https://eco.dameng.com/document/dm/zh-cn/pm/pl-sql.html)
-> - ============================================================
-> - EXCEPTION WHEN (兼容 Oracle PL/SQL)
-> - ============================================================
+
+
+## EXCEPTION WHEN (兼容 Oracle PL/SQL)
 
 ```sql
 DECLARE

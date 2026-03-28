@@ -5,8 +5,11 @@ Hologres 兼容 PostgreSQL JSON 类型
 > 参考资料:
 > - [Hologres - JSON/JSONB](https://help.aliyun.com/zh/hologres/user-guide/json-and-jsonb)
 > - [Hologres - Data Types](https://help.aliyun.com/zh/hologres/user-guide/data-types)
-> - JSON:  存储原始文本，每次访问都要解析
-> - JSONB: 存储二进制格式，支持索引，更快（推荐）
+
+
+## JSON:  存储原始文本，每次访问都要解析
+
+JSONB: 存储二进制格式，支持索引，更快（推荐）
 
 ```sql
 CREATE TABLE events (

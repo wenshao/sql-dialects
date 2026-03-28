@@ -3,9 +3,10 @@
 > 参考资料:
 > - [DB2 Documentation - Recursive Common Table Expressions](https://www.ibm.com/docs/en/db2/11.5?topic=queries-recursive-common-table-expressions)
 > - [DB2 Documentation - SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=reference-sql)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

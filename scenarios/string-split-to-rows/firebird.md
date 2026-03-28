@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Firebird Documentation - POSITION](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
 > - [Firebird Documentation - Recursive CTE](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-commons-cte)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

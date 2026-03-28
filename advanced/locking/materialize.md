@@ -3,18 +3,20 @@
 > 参考资料:
 > - [Materialize Documentation - Transactions](https://materialize.com/docs/sql/begin/)
 > - [Materialize Documentation - Architecture](https://materialize.com/docs/overview/architecture/)
-> - ============================================================
-> - Materialize 并发模型概述
-> - ============================================================
-> - Materialize 是流式数据库（Streaming Database）:
-> - 1. 专注于增量计算和物化视图
-> - 2. 使用严格可序列化隔离
-> - 3. 不支持传统的行级锁或表级锁
-> - 4. 写入通过 CDC/sources 进行，不通过传统 DML
-> - ============================================================
-> - 事务（有限支持）
-> - ============================================================
-> - 只读事务
+
+
+## Materialize 并发模型概述
+
+Materialize 是流式数据库（Streaming Database）:
+1. 专注于增量计算和物化视图
+2. 使用严格可序列化隔离
+3. 不支持传统的行级锁或表级锁
+4. 写入通过 CDC/sources 进行，不通过传统 DML
+
+## 事务（有限支持）
+
+
+## 只读事务
 
 ```sql
 BEGIN;

@@ -5,7 +5,9 @@ TDSQL distributed MySQL 8.0 compatible.
 > 参考资料:
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
-> - 基本 CTE
+
+
+## 基本 CTE
 
 ```sql
 WITH active_users AS (

@@ -4,73 +4,77 @@
 > - [TDengine Documentation - Error Codes](https://docs.tdengine.com/reference/taos-error-codes/)
 > - [TDengine Documentation - SQL Reference](https://docs.tdengine.com/reference/sql/)
 > - [TDengine Documentation - Connector API](https://docs.tdengine.com/connector/)
-> - ============================================================
-> - 1. TDengine 错误处理概述
-> - ============================================================
-> - TDengine 是高性能时序数据库，不支持存储过程或 SQL 级异常处理。
-> - 错误处理完全依赖应用层 (C/Python/Java/Go 等连接器) 和 SQL 防御性写法。
-> - TDengine 错误码使用十六进制编码（不同于 SQL 标准 SQLSTATE）。
-> - ============================================================
-> - 2. 应用层错误捕获
-> - ================================================================
-> - Python (taospy) 示例: 基本错误捕获
-> - import taos
-> - conn = taos.connect(host='localhost', port=6030)
-> - cursor = conn.cursor()
-> - try:
-> - cursor.execute("INSERT INTO meters VALUES(NOW, 10.5)")
-> - except taos.error.ProgrammingError as e:
-> - print(f'TDengine error [{e.errno}]: {e.msg}')
-> - except taos.error.OperationalError as e:
-> - print(f'Operational error [{e.errno}]: {e.msg}')
-> - except taos.error.Error as e:
-> - print(f'General error: {e}')
-> - Java (JDBC) 示例:
-> - import com.taosdata.jdbc.TSDBError;
-> - import com.taosdata.jdbc.TSDBErrorNumbers;
-> - try {
-> - stmt.execute("INSERT INTO meters VALUES(NOW, 10.5)");
-> - } catch (SQLException e) {
-> - int errno = e.getErrorCode();
-> - if (errno == TSDBErrorNumbers.TSDB_CODE_INVALID_SQL) {
-> - System.out.println("Invalid SQL: " + e.getMessage());
-> - } else if (errno == TSDBErrorNumbers.TSDB_CODE_TABLE_NOT_EXIST) {
-> - System.out.println("Table not found: " + e.getMessage());
-> - }
-> - }
-> - C/C++ 示例:
-> - TAOS_RES* res = taos_query(conn, "INSERT INTO meters VALUES(NOW, 10.5)");
-> - if (res == NULL || taos_errno(res) != 0) {
-> - fprintf(stderr, "Error [%d]: %s\n", taos_errno(res), taos_errstr(res));
-> - taos_free_result(res);
-> - }
-> - ============================================================
-> - 3. TDengine 常见错误码
-> - ============================================================
-> - TDengine 使用数字错误码（十六进制），不遵循 SQL 标准 SQLSTATE:
-> - 0x0000 (0)    = 成功 (Success)
-> - 0x0200 (512)  = 无效参数 (Invalid Parameters)
-> - 0x0300 (768)  = 表不存在 (Invalid Table Name)
-> - 0x0388 (904)  = 数据库不存在 (Invalid Database Name)
-> - 0x03B4 (948)  = 语法错误 (Syntax Error)
-> - 0x0A00 (2560) = 网络错误 (Network Error)
-> - 0x0B00 (2816) = 内存不足 (Out of Memory)
-> - 0x2600 (9728) = 无效时间戳 (Invalid Timestamp)
-> - 0x2602 (9730) = 列数据类型不匹配
-> - 0x2640 (9792) = 标签值过长 (Tag Value Too Long)
-> - 0x26F0 (9968) = 超级表查询 STABLE 不支持的操作
-> - 0x0544 (1352) = 重复连接 (Duplicate Connection)
-> - 0x0545 (1353) = 用户已存在 (User Already Exists)
-> - 错误码规律:
-> - 0x02xx = 参数/输入错误
-> - 0x03xx = 对象不存在错误
-> - 0x05xx = 连接/认证错误
-> - 0x0Axx = 网络错误
-> - 0x26xx = 数据/时间序列错误
-> - ============================================================
-> - 4. SQL 层面的错误避免: 防御性写法
-> - ============================================================
-> - 使用 IF NOT EXISTS 避免对象已存在错误
+
+
+## TDengine 错误处理概述
+
+TDengine 是高性能时序数据库，不支持存储过程或 SQL 级异常处理。
+错误处理完全依赖应用层 (C/Python/Java/Go 等连接器) 和 SQL 防御性写法。
+TDengine 错误码使用十六进制编码（不同于 SQL 标准 SQLSTATE）。
+
+## 应用层错误捕获
+
+
+Python (taospy) 示例: 基本错误捕获
+import taos
+conn = taos.connect(host='localhost', port=6030)
+cursor = conn.cursor()
+try:
+cursor.execute("INSERT INTO meters VALUES(NOW, 10.5)")
+except taos.error.ProgrammingError as e:
+print(f'TDengine error [{e.errno}]: {e.msg}')
+except taos.error.OperationalError as e:
+print(f'Operational error [{e.errno}]: {e.msg}')
+except taos.error.Error as e:
+print(f'General error: {e}')
+Java (JDBC) 示例:
+import com.taosdata.jdbc.TSDBError;
+import com.taosdata.jdbc.TSDBErrorNumbers;
+try {
+stmt.execute("INSERT INTO meters VALUES(NOW, 10.5)");
+} catch (SQLException e) {
+int errno = e.getErrorCode();
+if (errno == TSDBErrorNumbers.TSDB_CODE_INVALID_SQL) {
+System.out.println("Invalid SQL: " + e.getMessage());
+} else if (errno == TSDBErrorNumbers.TSDB_CODE_TABLE_NOT_EXIST) {
+System.out.println("Table not found: " + e.getMessage());
+}
+}
+C/C++ 示例:
+TAOS_RES* res = taos_query(conn, "INSERT INTO meters VALUES(NOW, 10.5)");
+if (res == NULL || taos_errno(res) != 0) {
+fprintf(stderr, "Error [%d]: %s\n", taos_errno(res), taos_errstr(res));
+taos_free_result(res);
+}
+
+## TDengine 常见错误码
+
+
+TDengine 使用数字错误码（十六进制），不遵循 SQL 标准 SQLSTATE:
+0x0000 (0)    = 成功 (Success)
+0x0200 (512)  = 无效参数 (Invalid Parameters)
+0x0300 (768)  = 表不存在 (Invalid Table Name)
+0x0388 (904)  = 数据库不存在 (Invalid Database Name)
+0x03B4 (948)  = 语法错误 (Syntax Error)
+0x0A00 (2560) = 网络错误 (Network Error)
+0x0B00 (2816) = 内存不足 (Out of Memory)
+0x2600 (9728) = 无效时间戳 (Invalid Timestamp)
+0x2602 (9730) = 列数据类型不匹配
+0x2640 (9792) = 标签值过长 (Tag Value Too Long)
+0x26F0 (9968) = 超级表查询 STABLE 不支持的操作
+0x0544 (1352) = 重复连接 (Duplicate Connection)
+0x0545 (1353) = 用户已存在 (User Already Exists)
+错误码规律:
+0x02xx = 参数/输入错误
+0x03xx = 对象不存在错误
+0x05xx = 连接/认证错误
+0x0Axx = 网络错误
+0x26xx = 数据/时间序列错误
+
+## SQL 层面的错误避免: 防御性写法
+
+
+## 使用 IF NOT EXISTS 避免对象已存在错误
 
 ```sql
 CREATE DATABASE IF NOT EXISTS mydb;

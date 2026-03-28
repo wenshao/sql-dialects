@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Integer types
-> - SMALLINT:  2 bytes, -32768 ~ 32767
-> - INTEGER:   4 bytes, -2^31 ~ 2^31-1
-> - BIGINT:    8 bytes, -2^63 ~ 2^63-1
+
+
+Integer types
+SMALLINT:  2 bytes, -32768 ~ 32767
+INTEGER:   4 bytes, -2^31 ~ 2^31-1
+BIGINT:    8 bytes, -2^63 ~ 2^63-1
 
 ```sql
 CREATE TABLE examples (

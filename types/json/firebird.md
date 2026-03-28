@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - Firebird does not have a native JSON type
-> - JSON is stored as VARCHAR or BLOB SUB_TYPE TEXT
-> - JSON processing available via built-in functions (5.0+) or UDFs
+
+
+Firebird does not have a native JSON type
+JSON is stored as VARCHAR or BLOB SUB_TYPE TEXT
+JSON processing available via built-in functions (5.0+) or UDFs
 
 ```sql
 CREATE TABLE events (

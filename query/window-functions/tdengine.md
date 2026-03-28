@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 不支持传统的 SQL 窗口函数（ROW_NUMBER, RANK 等）
-> - 但提供时序特有的窗口查询：INTERVAL, SESSION, STATE_WINDOW
-> - ============================================================
-> - INTERVAL 窗口（时间降采样，最重要的功能）
-> - ============================================================
-> - 每小时平均值
+
+
+## TDengine 不支持传统的 SQL 窗口函数（ROW_NUMBER, RANK 等）
+
+但提供时序特有的窗口查询：INTERVAL, SESSION, STATE_WINDOW
+
+## INTERVAL 窗口（时间降采样，最重要的功能）
+
+
+## 每小时平均值
 
 ```sql
 SELECT _WSTART, AVG(current), MAX(voltage)

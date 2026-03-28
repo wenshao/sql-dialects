@@ -3,18 +3,20 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 兼容 PostgreSQL 数值类型
-> - 整数
-> - SMALLINT / INT2: 2 字节
-> - INTEGER / INT / INT4: 4 字节
-> - BIGINT / INT8: 8 字节
-> - 浮点数
-> - REAL / FLOAT4: 4 字节
-> - DOUBLE PRECISION / FLOAT8: 8 字节
-> - 定点数
-> - NUMERIC(p,s) / DECIMAL(p,s): 精确数值
-> - 布尔
-> - BOOLEAN / BOOL
+
+
+Materialize 兼容 PostgreSQL 数值类型
+整数
+SMALLINT / INT2: 2 字节
+INTEGER / INT / INT4: 4 字节
+BIGINT / INT8: 8 字节
+浮点数
+REAL / FLOAT4: 4 字节
+DOUBLE PRECISION / FLOAT8: 8 字节
+定点数
+NUMERIC(p,s) / DECIMAL(p,s): 精确数值
+布尔
+BOOLEAN / BOOL
 
 ```sql
 CREATE TABLE products (

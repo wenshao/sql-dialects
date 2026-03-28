@@ -4,15 +4,17 @@
 > - [Firebird 5.0 Language Reference - JSON Functions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref50/firebird-50-language-reference.html)
 > - [Firebird 4.0 Language Reference](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
 > - [Firebird 5.0 Release Notes - JSON Support](https://firebirdsql.org/en/firebird-5-0/)
-> - ============================================================
-> - 1. Firebird JSON 支持概述
-> - ============================================================
-> - Firebird 4.0: 无原生 JSON 类型或函数
-> - Firebird 5.0: 新增 JSON 函数（json_value, json_query, json_table 等）
-> - 本文件以 Firebird 5.0 语法为准
-> - ============================================================
-> - 2. 示例数据
-> - ============================================================
+
+
+## Firebird JSON 支持概述
+
+
+Firebird 4.0: 无原生 JSON 类型或函数
+Firebird 5.0: 新增 JSON 函数（json_value, json_query, json_table 等）
+本文件以 Firebird 5.0 语法为准
+
+## 示例数据
+
 
 ```sql
 CREATE TABLE orders_json (

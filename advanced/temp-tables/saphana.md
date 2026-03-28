@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [SAP HANA Documentation - CREATE TABLE (Temporary)](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
-> - ============================================================
-> - 全局临时表
-> - ============================================================
+
+
+## 全局临时表
+
 
 ```sql
 CREATE GLOBAL TEMPORARY TABLE gtt_users (

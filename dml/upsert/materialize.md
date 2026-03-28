@@ -3,13 +3,16 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize Source Envelopes](https://materialize.com/docs/sql/create-source/)
-> - Materialize 不支持 INSERT ... ON CONFLICT 语法
-> - 也不支持 MERGE 语句
-> - UPSERT 语义通过 SOURCE 的 ENVELOPE UPSERT 或物化视图实现
-> - ============================================================
-> - TABLE: INSERT（无 UPSERT 语法支持）
-> - ============================================================
-> - 创建表（支持 UNIQUE 约束，但 ON CONFLICT 不可用）
+
+
+Materialize 不支持 INSERT ... ON CONFLICT 语法
+也不支持 MERGE 语句
+UPSERT 语义通过 SOURCE 的 ENVELOPE UPSERT 或物化视图实现
+
+## TABLE: INSERT（无 UPSERT 语法支持）
+
+
+## 创建表（支持 UNIQUE 约束，但 ON CONFLICT 不可用）
 
 ```sql
 CREATE TABLE users (

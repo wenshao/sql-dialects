@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Hologres SQL - INSERT](https://help.aliyun.com/zh/hologres/user-guide/insert-into-statement)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 注意: Hologres 兼容 PostgreSQL 语法，同时针对 OLAP 场景做了优化
-> - 单行插入
+
+
+## 注意: Hologres 兼容 PostgreSQL 语法，同时针对 OLAP 场景做了优化
+
+单行插入
 
 ```sql
 INSERT INTO users (username, email, age) VALUES ('alice', 'alice@example.com', 25);

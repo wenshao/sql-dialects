@@ -3,9 +3,10 @@
 > 参考资料:
 > - [openGauss Documentation - SQL Reference](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/)
 > - [openGauss Documentation - Window Functions](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount NUMERIC(10,2));

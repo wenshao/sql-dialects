@@ -3,12 +3,16 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - Derby 没有原生 UPSERT 语法
-> - 使用 MERGE 语句或应用层逻辑实现
-> - ============================================================
-> - MERGE（SQL 标准语法，10.11+）
-> - ============================================================
-> - 基本 MERGE
+
+
+## Derby 没有原生 UPSERT 语法
+
+使用 MERGE 语句或应用层逻辑实现
+
+## MERGE（SQL 标准语法，10.11+）
+
+
+## 基本 MERGE
 
 ```sql
 MERGE INTO users AS t

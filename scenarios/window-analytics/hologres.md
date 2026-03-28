@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Hologres Documentation - 窗口函数](https://help.aliyun.com/document_detail/171699.html)
 > - PostgreSQL Documentation (Hologres 兼容 PostgreSQL)
-> - Hologres 兼容 PostgreSQL 协议，窗口函数语法相同
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## Hologres 兼容 PostgreSQL 协议，窗口函数语法相同
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

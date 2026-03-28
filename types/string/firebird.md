@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - CHAR(n) / CHARACTER(n): fixed-length, max 32767 bytes
-> - VARCHAR(n) / CHARACTER VARYING(n): variable-length, max 32765 bytes
-> - Note: actual max depends on page size and character set
+
+
+CHAR(n) / CHARACTER(n): fixed-length, max 32767 bytes
+VARCHAR(n) / CHARACTER VARYING(n): variable-length, max 32765 bytes
+Note: actual max depends on page size and character set
 
 ```sql
 CREATE TABLE examples (

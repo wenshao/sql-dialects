@@ -5,7 +5,9 @@ PostgreSQL compatible PL/pgSQL with Oracle compatible PL/SQL.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - 创建函数（PL/pgSQL）
+
+
+## 创建函数（PL/pgSQL）
 
 ```sql
 CREATE OR REPLACE FUNCTION get_user(p_username VARCHAR)

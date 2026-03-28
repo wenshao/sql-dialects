@@ -6,7 +6,9 @@ GaussDB is the commercial version with additional enterprise features.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 基本建表（PostgreSQL 兼容语法）
+
+
+## 基本建表（PostgreSQL 兼容语法）
 
 ```sql
 CREATE TABLE users (

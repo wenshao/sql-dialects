@@ -3,11 +3,13 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - Firebird requires explicit transaction management
-> - Every statement runs within a transaction
-> - isql auto-starts transactions; API clients must manage explicitly
-> - Basic transaction (isql)
-> - Transactions are auto-started; use COMMIT/ROLLBACK to end
+
+
+Firebird requires explicit transaction management
+Every statement runs within a transaction
+isql auto-starts transactions; API clients must manage explicitly
+Basic transaction (isql)
+Transactions are auto-started; use COMMIT/ROLLBACK to end
 
 ```sql
 UPDATE accounts SET balance = balance - 100 WHERE id = 1;

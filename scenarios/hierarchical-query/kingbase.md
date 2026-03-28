@@ -3,9 +3,10 @@
 > 参考资料:
 > - [KingbaseES Documentation - Recursive CTE](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/)
 > - [KingbaseES Documentation - CONNECT BY](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

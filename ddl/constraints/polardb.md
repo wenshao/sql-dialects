@@ -8,10 +8,12 @@ Alibaba Cloud managed database service.
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
 > - [PolarDB-X Global Secondary Index](https://help.aliyun.com/zh/polardb/polardb-for-xscale/user-guide/global-secondary-index)
 > - [MySQL 8.0 Reference Manual - Constraints](https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html)
-> - ============================================================
-> - 1. PRIMARY KEY（主键约束）
-> - ============================================================
-> - 单列主键
+
+
+## PRIMARY KEY（主键约束）
+
+
+## 单列主键
 
 ```sql
 CREATE TABLE users (

@@ -3,6 +3,7 @@
 > 参考资料:
 > - [TDengine Documentation](https://docs.tdengine.com/reference/sql/function/)
 
+
 ```sql
 SELECT CAST(42 AS VARCHAR(10)); SELECT CAST('42' AS INT);
 SELECT CAST('42' AS BIGINT); SELECT CAST(42 AS FLOAT);

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Materialize Documentation - WITH RECURSIVE](https://materialize.com/docs/sql/select/#recursive-ctes)
 > - [Materialize Documentation - SQL Reference](https://materialize.com/docs/sql/select/)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

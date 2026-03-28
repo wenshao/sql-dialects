@@ -3,15 +3,15 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - MAP Function](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
 > - [SAP HANA SQL Reference - SELECT](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20fcf24075191014a89e9dc7b8408b26.html)
-> - ============================================================
-> - 注意：SAP HANA 没有原生 PIVOT / UNPIVOT 语法
-> - 使用 CASE WHEN + GROUP BY 实现 PIVOT
-> - 使用 UNION ALL 实现 UNPIVOT
-> - SAP HANA 的 MAP 函数可简化条件表达式
-> - ============================================================
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY
-> - ============================================================
+
+
+注意：SAP HANA 没有原生 PIVOT / UNPIVOT 语法
+使用 CASE WHEN + GROUP BY 实现 PIVOT
+使用 UNION ALL 实现 UNPIVOT
+SAP HANA 的 MAP 函数可简化条件表达式
+
+
+## PIVOT: CASE WHEN + GROUP BY
 
 ```sql
 SELECT

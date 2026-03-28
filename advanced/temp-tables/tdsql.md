@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
-> - ============================================================
-> - CREATE TEMPORARY TABLE（兼容 MySQL）
-> - ============================================================
+
+
+## CREATE TEMPORARY TABLE（兼容 MySQL）
+
 
 ```sql
 CREATE TEMPORARY TABLE temp_users (

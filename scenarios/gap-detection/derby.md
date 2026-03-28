@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Apache Derby Documentation - Window Functions](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Apache Derby Documentation - WITH clause](https://db.apache.org/derby/docs/10.16/ref/rrefsqljwith.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT NOT NULL PRIMARY KEY, info VARCHAR(100));

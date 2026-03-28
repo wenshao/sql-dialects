@@ -3,7 +3,9 @@
 > 参考资料:
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL Type Conversion](https://www.postgresql.org/docs/current/typeconv.html)
-> - 完全兼容 PostgreSQL
+
+
+## 完全兼容 PostgreSQL
 
 ```sql
 SELECT CAST(42 AS TEXT); SELECT 42::TEXT; SELECT '42'::INTEGER;

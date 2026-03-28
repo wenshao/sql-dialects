@@ -3,9 +3,9 @@
 > 参考资料:
 > - [KingbaseES 兼容 PostgreSQL / Oracle 语法](https://help.kingbase.com.cn/)
 > - KingbaseES SQL 参考手册
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

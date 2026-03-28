@@ -6,10 +6,12 @@ PostgreSQL compatible syntax.
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Oracle Compatibility Guide](https://help.kingbase.com.cn/v8/develop-guide/oracle-compat.html)
 > - [KingbaseES PL/SQL Reference](https://help.kingbase.com.cn/v8/server-programming/pl-sql.html)
-> - ============================================================
-> - 1. 基本 DELETE（PostgreSQL 标准语法）
-> - ============================================================
-> - 单行删除
+
+
+## 基本 DELETE（PostgreSQL 标准语法）
+
+
+## 单行删除
 
 ```sql
 DELETE FROM users WHERE username = 'alice';

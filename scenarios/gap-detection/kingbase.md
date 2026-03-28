@@ -3,9 +3,10 @@
 > 参考资料:
 > - [KingbaseES Documentation - Window Functions](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/function-window.html)
 > - [KingbaseES Documentation - generate_series](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/function-srf.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info VARCHAR(100));

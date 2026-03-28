@@ -4,12 +4,16 @@
 > - [KingbaseES SQL Reference Manual](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation - String Functions](https://help.kingbase.com.cn/v8/developer/sql-reference/functions/string.html)
 > - [PostgreSQL Documentation - String Functions](https://www.postgresql.org/docs/current/functions-string.html)
-> - 说明: KingbaseES 兼容 PostgreSQL 和 Oracle 双语法体系。
-> - 字符串函数以 PostgreSQL 语法为基础，Oracle 模式下额外支持 Oracle 函数。
-> - ============================================================
-> - 1. 字符串拼接
-> - ============================================================
-> - || 操作符: SQL 标准拼接（推荐）
+
+
+## 说明: KingbaseES 兼容 PostgreSQL 和 Oracle 双语法体系。
+
+字符串函数以 PostgreSQL 语法为基础，Oracle 模式下额外支持 Oracle 函数。
+
+## 字符串拼接
+
+
+## || 操作符: SQL 标准拼接（推荐）
 
 ```sql
 SELECT 'hello' || ' ' || 'world';                     -- 'hello world'

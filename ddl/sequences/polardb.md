@@ -4,9 +4,9 @@
 > - [PolarDB for MySQL Documentation - AUTO_INCREMENT](https://www.alibabacloud.com/help/en/polardb/polardb-for-mysql/auto-increment)
 > - [PolarDB for PostgreSQL Documentation - CREATE SEQUENCE](https://www.alibabacloud.com/help/en/polardb/polardb-for-postgresql/create-sequence)
 > - [PolarDB Documentation - Distributed ID](https://www.alibabacloud.com/help/en/polardb/polardb-for-mysql/sequence)
-> - ============================================
-> - AUTO_INCREMENT（MySQL 兼容模式）
-> - ============================================
+
+
+## AUTO_INCREMENT（MySQL 兼容模式）
 
 ```sql
 CREATE TABLE users (

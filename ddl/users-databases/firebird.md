@@ -3,17 +3,19 @@
 > 参考资料:
 > - [Firebird Documentation - CREATE DATABASE](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-ddl-db-create)
 > - [Firebird Documentation - CREATE USER](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-security-user-create)
-> - ============================================================
-> - Firebird 特性：
-> - 数据库 = 一个文件（类似 SQLite）
-> - 没有 schema 概念（所有对象在同一命名空间）
-> - 有内建的用户管理
-> - 命名层级: server > database > object
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
-> - 创建数据库（ISQL 工具中执行）
+
+
+Firebird 特性：
+数据库 = 一个文件（类似 SQLite）
+没有 schema 概念（所有对象在同一命名空间）
+有内建的用户管理
+命名层级: server > database > object
+
+
+## 数据库管理
+
+
+## 创建数据库（ISQL 工具中执行）
 
 ```sql
 CREATE DATABASE 'C:\data\myapp.fdb'

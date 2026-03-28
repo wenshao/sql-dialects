@@ -3,9 +3,9 @@
 > 参考资料:
 > - [openGauss Documentation - PL/pgSQL](https://docs.opengauss.org/en/docs/latest/docs/DeveloperGuide/pl-pgsql.html)
 > - [openGauss Documentation - EXECUTE IMMEDIATE](https://docs.opengauss.org/en/docs/latest/docs/DeveloperGuide/dynamic-statements.html)
-> - ============================================================
-> - PREPARE / EXECUTE / DEALLOCATE (PostgreSQL 兼容)
-> - ============================================================
+
+
+## PREPARE / EXECUTE / DEALLOCATE (PostgreSQL 兼容)
 
 ```sql
 PREPARE user_query(INT) AS SELECT * FROM users WHERE age > $1;

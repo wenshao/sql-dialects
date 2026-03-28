@@ -3,14 +3,15 @@
 > 参考资料:
 > - [PolarDB-MySQL Documentation](https://help.aliyun.com/product/172538.html)
 > - [PolarDB-PostgreSQL Documentation](https://help.aliyun.com/product/173613.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（MySQL 兼容模式）:
-> - orders(order_id INT AUTO_INCREMENT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构（MySQL 兼容模式）:
+orders(order_id INT AUTO_INCREMENT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

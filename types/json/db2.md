@@ -3,11 +3,13 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Db2 supports JSON in multiple ways:
-> - 1. BSON storage (Db2 JSON functions, Db2 10.5+)
-> - 2. ISO SQL/JSON functions (Db2 11.1+, recommended)
-> - 3. JSON stored as VARCHAR/CLOB with SQL/JSON functions
-> - JSON column (stored as CLOB or VARCHAR)
+
+
+Db2 supports JSON in multiple ways:
+1. BSON storage (Db2 JSON functions, Db2 10.5+)
+2. ISO SQL/JSON functions (Db2 11.1+, recommended)
+3. JSON stored as VARCHAR/CLOB with SQL/JSON functions
+JSON column (stored as CLOB or VARCHAR)
 
 ```sql
 CREATE TABLE events (

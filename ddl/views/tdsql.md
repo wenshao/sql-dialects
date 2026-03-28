@@ -3,9 +3,9 @@
 > 参考资料:
 > - [TDSQL Documentation - CREATE VIEW](https://cloud.tencent.com/document/product/557/7714)
 > - [TDSQL Documentation - SQL Reference](https://cloud.tencent.com/document/product/557)
-> - ============================================
-> - 基本视图（兼容 MySQL 语法）
-> - ============================================
+
+
+## 基本视图（兼容 MySQL 语法）
 
 ```sql
 CREATE VIEW active_users AS

@@ -1,6 +1,7 @@
 # TimescaleDB: 权限管理
 
-TimescaleDB 继承 PostgreSQL 全部权限管理功能
+## TimescaleDB 继承 PostgreSQL 全部权限管理功能
+
 创建用户
 
 ```sql

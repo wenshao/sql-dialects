@@ -4,12 +4,16 @@
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - Flow Control Functions](https://dev.mysql.com/doc/refman/8.0/en/flow-control-functions.html)
-> - 说明: TDSQL 是腾讯云分布式数据库，条件函数与 MySQL 完全兼容。
-> - MySQL 拥有丰富的专有条件函数（IF/IFNULL/ELT/FIELD 等）。
-> - ============================================================
-> - 1. CASE WHEN: 标准条件表达式
-> - ============================================================
-> - 搜索式 CASE WHEN（推荐，更灵活）
+
+
+## 说明: TDSQL 是腾讯云分布式数据库，条件函数与 MySQL 完全兼容。
+
+MySQL 拥有丰富的专有条件函数（IF/IFNULL/ELT/FIELD 等）。
+
+## CASE WHEN: 标准条件表达式
+
+
+## 搜索式 CASE WHEN（推荐，更灵活）
 
 ```sql
 SELECT username,

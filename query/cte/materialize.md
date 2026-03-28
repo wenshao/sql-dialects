@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 支持 CTE（兼容 PostgreSQL）
-> - 基本 CTE
+
+
+## Materialize 支持 CTE（兼容 PostgreSQL）
+
+基本 CTE
 
 ```sql
 WITH active_users AS (

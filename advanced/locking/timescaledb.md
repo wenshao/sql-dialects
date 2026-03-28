@@ -3,11 +3,13 @@
 > 参考资料:
 > - [TimescaleDB Documentation - FAQ: Concurrency](https://docs.timescale.com/timescaledb/latest/overview/)
 > - [PostgreSQL Documentation - Explicit Locking](https://www.postgresql.org/docs/current/explicit-locking.html)
-> - (TimescaleDB 作为 PostgreSQL 扩展，继承 PostgreSQL 锁机制)
-> - ============================================================
-> - TimescaleDB 继承 PostgreSQL 的完整锁机制
-> - ============================================================
-> - 行级锁
+
+## (TimescaleDB 作为 PostgreSQL 扩展，继承 PostgreSQL 锁机制)
+
+## TimescaleDB 继承 PostgreSQL 的完整锁机制
+
+
+## 行级锁
 
 ```sql
 SELECT * FROM metrics WHERE time > NOW() - INTERVAL '1 hour'

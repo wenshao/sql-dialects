@@ -5,7 +5,9 @@ Hologres 兼容 PostgreSQL 日期函数
 > 参考资料:
 > - [Hologres - Date/Time Functions](https://help.aliyun.com/zh/hologres/user-guide/date-time-functions)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - 当前日期时间
+
+
+## 当前日期时间
 
 ```sql
 SELECT NOW();                                            -- TIMESTAMPTZ

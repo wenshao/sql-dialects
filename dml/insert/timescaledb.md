@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部 INSERT 语法
-> - 超级表插入自动路由到对应的 chunk
-> - 单行插入
+
+
+TimescaleDB 继承 PostgreSQL 全部 INSERT 语法
+超级表插入自动路由到对应的 chunk
+单行插入
 
 ```sql
 INSERT INTO sensor_data (time, sensor_id, temperature, humidity)

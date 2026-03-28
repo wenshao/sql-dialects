@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [Firebird Documentation - Array Data Type](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-datatypes-array)
-> - ============================================================
-> - ARRAY 类型（Firebird 原生支持）
-> - ============================================================
-> - Firebird 支持固定维度的数组
+
+
+## ARRAY 类型（Firebird 原生支持）
+
+
+## Firebird 支持固定维度的数组
 
 ```sql
 CREATE TABLE users (

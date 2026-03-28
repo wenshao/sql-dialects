@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Query performance](https://docs.timescale.com/timescaledb/latest/how-to-guides/query-data/)
 > - [PostgreSQL Documentation - EXPLAIN (TimescaleDB 基于 PostgreSQL)](https://www.postgresql.org/docs/current/sql-explain.html)
-> - ============================================================
-> - EXPLAIN 基本用法（继承自 PostgreSQL）
-> - ============================================================
+
+
+## EXPLAIN 基本用法（继承自 PostgreSQL）
+
 
 ```sql
 EXPLAIN SELECT * FROM sensor_data WHERE time > NOW() - INTERVAL '1 hour';

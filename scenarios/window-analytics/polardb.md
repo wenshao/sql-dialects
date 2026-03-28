@@ -3,11 +3,14 @@
 > 参考资料:
 > - [PolarDB for MySQL Documentation](https://www.alibabacloud.com/help/en/polardb-for-mysql/)
 > - [PolarDB for PostgreSQL Documentation](https://www.alibabacloud.com/help/en/polardb-for-postgresql/)
-> - PolarDB for MySQL 兼容 MySQL 8.0，PolarDB for PostgreSQL 兼容 PostgreSQL
-> - 以下使用 PolarDB for MySQL 语法
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## PolarDB for MySQL 兼容 MySQL 8.0，PolarDB for PostgreSQL 兼容 PostgreSQL
+
+以下使用 PolarDB for MySQL 语法
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

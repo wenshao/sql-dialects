@@ -4,10 +4,12 @@
 > - [达梦数据库 SQL 语言参考 - 锁管理](https://eco.dameng.com/document/dm/zh-cn/sql-dev/sql-lock.html)
 > - [达梦数据库 SQL 语言参考 - SELECT FOR UPDATE](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-select.html)
 > - [达梦数据库 SQL 语言参考 - 事务管理](https://eco.dameng.com/document/dm/zh-cn/sql-dev/sql-transaction.html)
-> - ============================================================
-> - 行级锁
-> - ============================================================
-> - SELECT FOR UPDATE
+
+
+## 行级锁
+
+
+## SELECT FOR UPDATE
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

@@ -4,9 +4,10 @@
 > - [Hologres Documentation - PostgreSQL 兼容](https://help.aliyun.com/document_detail/130408.html)
 > - [Hologres SQL Reference - UNNEST](https://help.aliyun.com/document_detail/416498.html)
 > - [Hologres SQL Reference - String Functions](https://help.aliyun.com/document_detail/102813.html)
-> - ============================================================
-> - 1. 示例数据
-> - ============================================================
+
+
+## 示例数据
+
 
 ```sql
 CREATE TABLE tags_csv (

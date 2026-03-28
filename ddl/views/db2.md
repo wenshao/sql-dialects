@@ -4,9 +4,9 @@
 > - [IBM DB2 Documentation - CREATE VIEW](https://www.ibm.com/docs/en/db2/11.5?topic=statements-create-view)
 > - [IBM DB2 Documentation - Materialized Query Tables (MQT)](https://www.ibm.com/docs/en/db2/11.5?topic=tables-materialized-query)
 > - [IBM DB2 Documentation - Updatable Views](https://www.ibm.com/docs/en/db2/11.5?topic=views-updatable-deletable)
-> - ============================================
-> - 基本视图
-> - ============================================
+
+
+## 基本视图
 
 ```sql
 CREATE VIEW active_users AS

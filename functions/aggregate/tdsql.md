@@ -4,11 +4,14 @@
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - Aggregate Functions](https://dev.mysql.com/doc/refman/8.0/en/aggregate-functions.html)
-> - 说明: TDSQL 是腾讯云分布式数据库，聚合函数与 MySQL 兼容。
-> - 分布式环境下聚合需要合并各分片结果，有额外性能注意事项。
-> - ============================================================
-> - 1. 基本聚合函数
-> - ============================================================
+
+
+## 说明: TDSQL 是腾讯云分布式数据库，聚合函数与 MySQL 兼容。
+
+分布式环境下聚合需要合并各分片结果，有额外性能注意事项。
+
+## 基本聚合函数
+
 
 ```sql
 SELECT COUNT(*) FROM users;                           -- 总行数

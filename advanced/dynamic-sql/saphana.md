@@ -3,9 +3,9 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - EXECUTE IMMEDIATE](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20fdf93675191014a4b1e35c756e7a15.html)
 > - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/d12d86a0d3f04ebf9ac0cb3e5a700e50.html)
-> - ============================================================
-> - EXEC / EXECUTE IMMEDIATE (SQLScript)
-> - ============================================================
+
+
+## EXEC / EXECUTE IMMEDIATE (SQLScript)
 
 ```sql
 DO BEGIN

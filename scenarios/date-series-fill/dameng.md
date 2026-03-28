@@ -3,9 +3,10 @@
 > 参考资料:
 > - [DamengDB (达梦) Documentation - SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-dataquery.html)
 > - [DamengDB (达梦) Documentation - Functions](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-function.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

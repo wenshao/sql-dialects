@@ -3,11 +3,13 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部字符串类型
-> - TEXT: 变长字符串，无长度限制（推荐）
-> - VARCHAR(n): 变长字符串，最大 n 个字符
-> - CHAR(n): 定长字符串，自动补空格
-> - NAME: 系统类型名（64 字符）
+
+
+TimescaleDB 继承 PostgreSQL 全部字符串类型
+TEXT: 变长字符串，无长度限制（推荐）
+VARCHAR(n): 变长字符串，最大 n 个字符
+CHAR(n): 定长字符串，自动补空格
+NAME: 系统类型名（64 字符）
 
 ```sql
 CREATE TABLE devices (

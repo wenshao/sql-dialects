@@ -3,11 +3,13 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Data Types](https://docs.timescale.com/timescaledb/latest/overview/)
 > - [PostgreSQL Documentation - Arrays](https://www.postgresql.org/docs/current/arrays.html)
-> - (TimescaleDB 完全继承 PostgreSQL 的数据类型)
-> - ============================================================
-> - TimescaleDB 完全继承 PostgreSQL 的复杂类型
-> - ============================================================
-> - ARRAY
+
+## (TimescaleDB 完全继承 PostgreSQL 的数据类型)
+
+## TimescaleDB 完全继承 PostgreSQL 的复杂类型
+
+
+## ARRAY
 
 ```sql
 CREATE TABLE sensor_data (

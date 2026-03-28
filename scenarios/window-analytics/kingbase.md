@@ -3,10 +3,12 @@
 > 参考资料:
 > - [KingbaseES 文档 - 窗口函数](https://help.kingbase.com.cn/v8/index.html)
 > - PostgreSQL Documentation (KingbaseES 兼容 PostgreSQL)
-> - KingbaseES 兼容 PostgreSQL，窗口函数语法完全相同
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## KingbaseES 兼容 PostgreSQL，窗口函数语法完全相同
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

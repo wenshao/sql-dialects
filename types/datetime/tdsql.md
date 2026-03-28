@@ -6,14 +6,16 @@ TDSQL distributed MySQL-compatible syntax.
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - Date and Time Types](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-types.html)
-> - ============================================================
-> - 1. 日期时间类型一览
-> - ============================================================
-> - DATE:      3 字节，'YYYY-MM-DD'，范围 1000-01-01 ~ 9999-12-31
-> - TIME:      3 字节 + 小数秒，'HH:MM:SS[.ffffff]'，范围 -838:59:59 ~ 838:59:59
-> - DATETIME:  5-8 字节，'YYYY-MM-DD HH:MM:SS[.ffffff]'，不受时区影响
-> - TIMESTAMP: 4-7 字节，UTC 存储，自动转换时区，范围 1970-01-01 ~ 2038-01-19
-> - YEAR:      1 字节，1901 ~ 2155
+
+
+## 日期时间类型一览
+
+
+DATE:      3 字节，'YYYY-MM-DD'，范围 1000-01-01 ~ 9999-12-31
+TIME:      3 字节 + 小数秒，'HH:MM:SS[.ffffff]'，范围 -838:59:59 ~ 838:59:59
+DATETIME:  5-8 字节，'YYYY-MM-DD HH:MM:SS[.ffffff]'，不受时区影响
+TIMESTAMP: 4-7 字节，UTC 存储，自动转换时区，范围 1970-01-01 ~ 2038-01-19
+YEAR:      1 字节，1901 ~ 2155
 
 ```sql
 CREATE TABLE events (

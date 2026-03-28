@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 的 TABLE 支持 UPDATE
-> - SOURCE 和 MATERIALIZED VIEW 不支持 UPDATE
-> - 基本更新
+
+
+Materialize 的 TABLE 支持 UPDATE
+SOURCE 和 MATERIALIZED VIEW 不支持 UPDATE
+基本更新
 
 ```sql
 UPDATE users SET age = 26 WHERE username = 'alice';

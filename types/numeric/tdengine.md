@@ -3,16 +3,18 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - 整数
-> - TINYINT: 1 字节，-128 ~ 127
-> - SMALLINT: 2 字节，-32768 ~ 32767
-> - INT: 4 字节，-2^31 ~ 2^31-1
-> - BIGINT: 8 字节，-2^63 ~ 2^63-1
-> - 无符号整数（3.0+）
-> - TINYINT UNSIGNED: 1 字节，0 ~ 255
-> - SMALLINT UNSIGNED: 2 字节，0 ~ 65535
-> - INT UNSIGNED: 4 字节，0 ~ 2^32-1
-> - BIGINT UNSIGNED: 8 字节，0 ~ 2^64-1
+
+
+整数
+TINYINT: 1 字节，-128 ~ 127
+SMALLINT: 2 字节，-32768 ~ 32767
+INT: 4 字节，-2^31 ~ 2^31-1
+BIGINT: 8 字节，-2^63 ~ 2^63-1
+无符号整数（3.0+）
+TINYINT UNSIGNED: 1 字节，0 ~ 255
+SMALLINT UNSIGNED: 2 字节，0 ~ 65535
+INT UNSIGNED: 4 字节，0 ~ 2^32-1
+BIGINT UNSIGNED: 8 字节，0 ~ 2^64-1
 
 ```sql
 CREATE STABLE sensors (

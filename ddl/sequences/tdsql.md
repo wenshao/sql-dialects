@@ -4,9 +4,9 @@
 > - [TDSQL Documentation - Auto Increment](https://cloud.tencent.com/document/product/557/7706)
 > - [TDSQL Documentation - Sequence](https://cloud.tencent.com/document/product/557/7707)
 > - [TDSQL Documentation - Distributed Transactions](https://cloud.tencent.com/document/product/557)
-> - ============================================
-> - AUTO_INCREMENT（兼容 MySQL）
-> - ============================================
+
+
+## AUTO_INCREMENT（兼容 MySQL）
 
 ```sql
 CREATE TABLE users (

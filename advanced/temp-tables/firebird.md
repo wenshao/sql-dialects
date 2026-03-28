@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [Firebird Documentation - Global Temporary Tables](https://firebirdsql.org/file/documentation/chunk/en/refdocs/fblangref40/fblangref40-ddl-table.html#fblangref40-ddl-tbl-gtt)
-> - ============================================================
-> - 全局临时表（2.1+）
-> - ============================================================
-> - 事务级（事务结束时清空数据）
+
+
+## 全局临时表（2.1+）
+
+
+## 事务级（事务结束时清空数据）
 
 ```sql
 CREATE GLOBAL TEMPORARY TABLE gtt_tx_data (

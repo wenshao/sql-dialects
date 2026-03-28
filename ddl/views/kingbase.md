@@ -3,9 +3,9 @@
 > 参考资料:
 > - [KingbaseES SQL 参考手册 - CREATE VIEW](https://help.kingbase.com.cn/v8/development/sql/sql/SQL_Statements_10.html)
 > - [KingbaseES SQL 参考手册 - CREATE MATERIALIZED VIEW](https://help.kingbase.com.cn/v8/development/sql/sql/SQL_Statements_10.html)
-> - ============================================
-> - 基本视图（兼容 PostgreSQL 语法）
-> - ============================================
+
+
+## 基本视图（兼容 PostgreSQL 语法）
 
 ```sql
 CREATE VIEW active_users AS

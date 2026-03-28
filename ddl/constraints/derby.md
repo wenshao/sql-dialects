@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - Derby 支持标准 SQL 约束
-> - ============================================================
-> - PRIMARY KEY
-> - ============================================================
+
+
+## Derby 支持标准 SQL 约束
+
+## PRIMARY KEY
+
 
 ```sql
 CREATE TABLE users (

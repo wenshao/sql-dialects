@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Hologres Documentation - SELECT](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres Documentation - SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/)
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY（兼容 PostgreSQL 11）
-> - ============================================================
+
+
+## PIVOT: CASE WHEN + GROUP BY（兼容 PostgreSQL 11）
 
 ```sql
 SELECT

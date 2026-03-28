@@ -3,8 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部 CTE 功能
-> - 基本 CTE
+
+
+## TimescaleDB 继承 PostgreSQL 全部 CTE 功能
+
+基本 CTE
 
 ```sql
 WITH recent_data AS (

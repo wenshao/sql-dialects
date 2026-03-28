@@ -3,9 +3,9 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言手册 - 集合操作](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-query.html)
 > - [达梦数据库 SQL 语言手册 - SELECT](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

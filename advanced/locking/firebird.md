@@ -4,10 +4,12 @@
 > - [Firebird Documentation - Concurrency and Locking](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
 > - [Firebird Documentation - Transaction Management](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-transacs)
 > - [Firebird Documentation - WITH LOCK](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-dml-select-withlockclause)
-> - ============================================================
-> - 行级锁
-> - ============================================================
-> - WITH LOCK（类似 SELECT FOR UPDATE）
+
+
+## 行级锁
+
+
+## WITH LOCK（类似 SELECT FOR UPDATE）
 
 ```sql
 SELECT * FROM orders WHERE id = 100 WITH LOCK;

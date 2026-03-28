@@ -5,7 +5,9 @@ PostgreSQL compatible PL/pgSQL with extensions.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 创建函数
+
+
+## 创建函数
 
 ```sql
 CREATE OR REPLACE FUNCTION get_user(p_username VARCHAR)

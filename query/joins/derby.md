@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - INNER JOIN
+
+
+## INNER JOIN
 
 ```sql
 SELECT u.username, o.amount

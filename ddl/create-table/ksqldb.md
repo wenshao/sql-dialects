@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 在 Apache Kafka 上提供 SQL 接口
-> - 两种核心抽象：STREAM（追加流）和 TABLE（变更日志）
-> - ============================================================
-> - CREATE STREAM（追加型，不可变事件流）
-> - ============================================================
-> - 从 Kafka Topic 创建 STREAM
+
+
+## ksqlDB 在 Apache Kafka 上提供 SQL 接口
+
+两种核心抽象：STREAM（追加流）和 TABLE（变更日志）
+
+## CREATE STREAM（追加型，不可变事件流）
+
+
+## 从 Kafka Topic 创建 STREAM
 
 ```sql
 CREATE STREAM pageviews (

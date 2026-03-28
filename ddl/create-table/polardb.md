@@ -6,7 +6,9 @@ PolarDB also has PostgreSQL/Oracle compatible editions on Alibaba Cloud.
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - 基本建表（MySQL 兼容语法）
+
+
+## 基本建表（MySQL 兼容语法）
 
 ```sql
 CREATE TABLE users (

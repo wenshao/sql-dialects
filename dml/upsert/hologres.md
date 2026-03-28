@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Hologres SQL - INSERT ON CONFLICT](https://help.aliyun.com/zh/hologres/user-guide/insert-on-conflict)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 注意: Hologres 支持 PostgreSQL 兼容的 ON CONFLICT 语法
-> - 同时支持 Hologres 特有的整行替换语义
-> - 方式一: INSERT ON CONFLICT（推荐，PostgreSQL 兼容语法）
+
+
+注意: Hologres 支持 PostgreSQL 兼容的 ON CONFLICT 语法
+同时支持 Hologres 特有的整行替换语义
+方式一: INSERT ON CONFLICT（推荐，PostgreSQL 兼容语法）
 
 ```sql
 INSERT INTO users (username, email, age)

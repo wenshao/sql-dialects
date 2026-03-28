@@ -3,19 +3,21 @@
 > 参考资料:
 > - [ksqlDB Documentation - Concepts](https://docs.ksqldb.io/en/latest/concepts/)
 > - [ksqlDB Documentation - Processing Guarantees](https://docs.ksqldb.io/en/latest/operate-and-deploy/exactly-once-semantics/)
-> - ============================================================
-> - ksqlDB 并发模型概述
-> - ============================================================
-> - ksqlDB 是基于 Kafka Streams 的流式 SQL 引擎:
-> - 1. 不支持传统的锁机制
-> - 2. 数据通过 Kafka topics 流入流出
-> - 3. 使用 Kafka Streams 的分区级并行处理
-> - 4. 不支持事务 (BEGIN/COMMIT)
-> - 5. 通过 Kafka 的 exactly-once 语义保证一致性
-> - ============================================================
-> - 流处理中的并发
-> - ============================================================
-> - 创建流（对应 Kafka topic 的分区并行处理）
+
+
+## ksqlDB 并发模型概述
+
+ksqlDB 是基于 Kafka Streams 的流式 SQL 引擎:
+1. 不支持传统的锁机制
+2. 数据通过 Kafka topics 流入流出
+3. 使用 Kafka Streams 的分区级并行处理
+4. 不支持事务 (BEGIN/COMMIT)
+5. 通过 Kafka 的 exactly-once 语义保证一致性
+
+## 流处理中的并发
+
+
+## 创建流（对应 Kafka topic 的分区并行处理）
 
 ```sql
 CREATE STREAM orders_stream (

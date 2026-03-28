@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [Firebird Documentation - Window Functions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(txn_id INTEGER, account_id INTEGER, amount DECIMAL(10,2), txn_date DATE)
-> - ============================================================
-> - 1. 累计求和
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+transactions(txn_id INTEGER, account_id INTEGER, amount DECIMAL(10,2), txn_date DATE)
+
+## 累计求和
+
 
 ```sql
 SELECT txn_id, account_id, amount, txn_date,

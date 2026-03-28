@@ -5,9 +5,10 @@
 > - [Materialize Documentation - PREPARE](https://materialize.com/docs/sql/prepare/)
 > - [Materialize Documentation - EXECUTE](https://materialize.com/docs/sql/execute/)
 > - [Materialize Documentation - PostgreSQL Compatibility](https://materialize.com/docs/connect/)
-> - ============================================================
-> - 1. PREPARE / EXECUTE / DEALLOCATE (PostgreSQL 兼容)
-> - ============================================================
+
+
+## PREPARE / EXECUTE / DEALLOCATE (PostgreSQL 兼容)
+
 
 ```sql
 PREPARE user_by_age(INT) AS SELECT * FROM users WHERE age > $1;

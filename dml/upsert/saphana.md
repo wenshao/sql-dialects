@@ -3,8 +3,11 @@
 > 参考资料:
 > - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
 > - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
-> - UPSERT (SAP HANA native keyword)
-> - Inserts new row or replaces entire row if primary key matches
+
+
+## UPSERT (SAP HANA native keyword)
+
+Inserts new row or replaces entire row if primary key matches
 
 ```sql
 UPSERT users VALUES (1, 'alice', 'alice@example.com', 25, 0.00, NULL,

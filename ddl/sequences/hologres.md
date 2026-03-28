@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Hologres Documentation - CREATE TABLE](https://www.alibabacloud.com/help/en/hologres/developer-reference/create-table)
 > - [Hologres Documentation - Serial Types](https://www.alibabacloud.com/help/en/hologres/developer-reference/serial)
-> - ============================================
-> - SERIAL / BIGSERIAL（兼容 PostgreSQL）
-> - ============================================
+
+
+## SERIAL / BIGSERIAL（兼容 PostgreSQL）
 
 ```sql
 CREATE TABLE users (

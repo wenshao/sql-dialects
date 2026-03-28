@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [PolarDB Documentation](https://www.alibabacloud.com/help/en/polardb/)
-> - ============================================================
-> - PolarDB for PostgreSQL
-> - ============================================================
-> - 基本数学函数
+
+
+## PolarDB for PostgreSQL
+
+
+## 基本数学函数
 
 ```sql
 SELECT ABS(-42);                          -- 42

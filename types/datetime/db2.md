@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - DATE: date only, 4 bytes
-> - TIME: time of day, 3 bytes (second precision)
-> - TIMESTAMP: date + time, 10-12 bytes
-> - TIMESTAMP(p): fractional seconds precision 0-12 (default 6)
+
+
+DATE: date only, 4 bytes
+TIME: time of day, 3 bytes (second precision)
+TIMESTAMP: date + time, 10-12 bytes
+TIMESTAMP(p): fractional seconds precision 0-12 (default 6)
 
 ```sql
 CREATE TABLE events (

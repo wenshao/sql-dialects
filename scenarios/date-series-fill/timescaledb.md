@@ -4,9 +4,10 @@
 > - [TimescaleDB Documentation - time_bucket_gapfill](https://docs.timescale.com/api/latest/hyperfunctions/gapfilling/time_bucket_gapfill/)
 > - [TimescaleDB Documentation - locf / interpolate](https://docs.timescale.com/api/latest/hyperfunctions/gapfilling/locf/)
 > - [PostgreSQL Documentation - generate_series](https://www.postgresql.org/docs/current/functions-srf.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount NUMERIC(10,2));

@@ -5,7 +5,9 @@ Oracle compatible transaction handling.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 达梦与 Oracle 一样，DML 自动开启事务，不需要显式 BEGIN
+
+
+## 达梦与 Oracle 一样，DML 自动开启事务，不需要显式 BEGIN
 
 ```sql
 UPDATE accounts SET balance = balance - 100 WHERE id = 1;

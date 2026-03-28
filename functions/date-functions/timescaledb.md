@@ -1,6 +1,7 @@
 # TimescaleDB: 日期函数
 
-TimescaleDB 继承 PostgreSQL 日期函数 + 时序扩展
+## TimescaleDB 继承 PostgreSQL 日期函数 + 时序扩展
+
 当前时间
 
 ```sql

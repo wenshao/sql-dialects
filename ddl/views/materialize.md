@@ -4,10 +4,11 @@
 > - [Materialize Documentation - CREATE VIEW](https://materialize.com/docs/sql/create-view/)
 > - [Materialize Documentation - CREATE MATERIALIZED VIEW](https://materialize.com/docs/sql/create-materialized-view/)
 > - [Materialize Documentation - CREATE INDEX](https://materialize.com/docs/sql/create-index/)
-> - ============================================
-> - 普通视图（Non-materialized View）
-> - 不持久化数据，每次查询时重新计算
-> - ============================================
+
+
+## 普通视图（Non-materialized View）
+
+不持久化数据，每次查询时重新计算
 
 ```sql
 CREATE VIEW active_users AS

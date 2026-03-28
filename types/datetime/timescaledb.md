@@ -3,12 +3,14 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 日期时间类型 + 时序扩展函数
-> - DATE: 日期
-> - TIME: 时间（无时区）
-> - TIMESTAMP: 日期时间（无时区）
-> - TIMESTAMPTZ: 日期时间（带时区，推荐）
-> - INTERVAL: 时间间隔
+
+
+TimescaleDB 继承 PostgreSQL 日期时间类型 + 时序扩展函数
+DATE: 日期
+TIME: 时间（无时区）
+TIMESTAMP: 日期时间（无时区）
+TIMESTAMPTZ: 日期时间（带时区，推荐）
+INTERVAL: 时间间隔
 
 ```sql
 CREATE TABLE sensor_data (

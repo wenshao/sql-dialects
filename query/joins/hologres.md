@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres SQL - SELECT (JOIN)](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - INNER JOIN
+
+
+## INNER JOIN
 
 ```sql
 SELECT u.username, o.amount

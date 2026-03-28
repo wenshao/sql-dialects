@@ -5,10 +5,12 @@
 > - [ksqlDB Documentation - CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
 > - [ksqlDB Documentation - JOIN Streams and Tables](https://docs.ksqldb.io/en/latest/developer-guide/joins/join-streams-and-tables/)
 > - [ksqlDB Documentation - AS SELECT (Materialized View)](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream-as/)
-> - ============================================================
-> - 1. 维度表定义（TABLE = 最新状态，天然 SCD Type 1）
-> - ============================================================
-> - ksqlDB 的 TABLE 基于 Kafka changelog topic，自动保留每个 key 的最新值
+
+
+## 维度表定义（TABLE = 最新状态，天然 SCD Type 1）
+
+
+## ksqlDB 的 TABLE 基于 Kafka changelog topic，自动保留每个 key 的最新值
 
 ```sql
 CREATE TABLE dim_customer (

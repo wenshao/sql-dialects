@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Firebird Documentation - UPDATE OR INSERT](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
 > - [Firebird Documentation - MERGE (Firebird 3.0+)](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
-> - ============================================================
-> - SCD Type 1: MERGE（Firebird 3.0+）
-> - ============================================================
+
+
+## SCD Type 1: MERGE（Firebird 3.0+）
 
 ```sql
 MERGE INTO dim_customer AS t

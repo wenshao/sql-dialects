@@ -7,10 +7,12 @@ DamengDB is a Chinese enterprise database with Oracle-compatible syntax.
 > - [DamengDB 系统管理员手册](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
 > - [DamengDB SQL 语言手册 - 约束](https://eco.dameng.com/document/dm/zh-cn/sql-dev/chapter08-constraints.html)
 > - [Oracle Database Constraints Documentation](https://docs.oracle.com/en/database/oracle/oracle-database/23/adfns/constraints.html)
-> - ============================================================
-> - 1. PRIMARY KEY（主键约束）
-> - ============================================================
-> - 表级约束（推荐: 命名约束便于管理）
+
+
+## PRIMARY KEY（主键约束）
+
+
+## 表级约束（推荐: 命名约束便于管理）
 
 ```sql
 ALTER TABLE users ADD CONSTRAINT pk_users PRIMARY KEY (id);

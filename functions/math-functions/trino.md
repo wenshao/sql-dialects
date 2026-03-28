@@ -1,0 +1,48 @@
+# Trino: 数学函数
+
+> 参考资料:
+> - [Trino Documentation - Mathematical Functions](https://trino.io/docs/current/functions/math.html)
+
+**引擎定位**: 分布式查询引擎（前身 Presto），不存储数据。通过 Connector 查询异构数据源（Hive/Iceberg/RDBMS）。
+
+```sql
+SELECT ABS(-42); SELECT CEIL(4.3); SELECT CEILING(4.3); SELECT FLOOR(4.7);
+SELECT ROUND(3.14159, 2); SELECT TRUNCATE(3.14159, 2);
+SELECT MOD(17, 5); SELECT 17 % 5;
+SELECT POWER(2, 10); SELECT POW(2, 10); SELECT SQRT(144); SELECT CBRT(27);
+SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG(10, 1000);
+SELECT LOG2(1024); SELECT LOG10(1000);
+SELECT SIGN(-42); SELECT PI(); SELECT E();
+SELECT RAND(); SELECT RANDOM();
+
+SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
+SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1); SELECT ATAN2(1, 1);
+SELECT DEGREES(PI()); SELECT RADIANS(180);
+SELECT SINH(1); SELECT COSH(1); SELECT TANH(1);
+
+SELECT GREATEST(1, 5, 3); SELECT LEAST(1, 5, 3);
+
+SELECT BITWISE_AND(5, 3); SELECT BITWISE_OR(5, 3);
+SELECT BITWISE_XOR(5, 3); SELECT BITWISE_NOT(5);
+SELECT BITWISE_LEFT_SHIFT(1, 4); SELECT BITWISE_RIGHT_SHIFT(16, 2);
+SELECT BIT_COUNT(7, 64);                 -- 第二参数为位宽
+
+```
+
+其他
+```sql
+SELECT INFINITY(); SELECT NAN();
+SELECT IS_FINITE(1.0); SELECT IS_NAN(NAN());
+SELECT WIDTH_BUCKET(42, 0, 100, 10);
+SELECT NORMAL_CDF(0, 0, 1);              -- 正态 CDF
+SELECT INVERSE_NORMAL_CDF(0.5, 0, 1);    -- 逆正态 CDF
+SELECT BETA_CDF(0.5, 2, 5);              -- Beta CDF
+SELECT WILSON_INTERVAL_LOWER(100, 1000, 1.96); -- Wilson 置信区间
+
+```
+
+**注意:** Trino 数学函数非常丰富
+**注意:** 包含统计分布函数 (NORMAL_CDF, BETA_CDF 等)
+**注意:** 位运算使用 BITWISE_* 前缀函数
+**注意:** E() 返回欧拉数
+**注意:** LOG(base, x) 底数在前

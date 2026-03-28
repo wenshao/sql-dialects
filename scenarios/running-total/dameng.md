@@ -2,14 +2,16 @@
 
 > 参考资料:
 > - [达梦数据库 SQL 参考手册](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-query.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(txn_id INT, account_id INT, amount DECIMAL(10,2), txn_date DATE)
-> - ============================================================
-> - 1. 累计求和
-> - ============================================================
+
+
+## 示例数据上下文
+
+## 假设表结构:
+
+transactions(txn_id INT, account_id INT, amount DECIMAL(10,2), txn_date DATE)
+
+## 累计求和
+
 
 ```sql
 SELECT txn_id, account_id, amount, txn_date,

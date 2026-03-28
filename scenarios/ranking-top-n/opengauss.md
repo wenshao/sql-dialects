@@ -3,14 +3,16 @@
 > 参考资料:
 > - [openGauss Documentation - Window Functions](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/window-functions.html)
 > - [openGauss Documentation - SELECT](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/select.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（兼容 PostgreSQL 语法）:
-> - orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+## 假设表结构（兼容 PostgreSQL 语法）:
+
+orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date DATE)
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

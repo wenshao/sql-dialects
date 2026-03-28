@@ -3,9 +3,9 @@
 > 参考资料:
 > - [KingbaseES SQL 参考手册 - CREATE SEQUENCE](https://help.kingbase.com.cn/v8/development/sql/sql/SQL_Statements_7.html)
 > - [KingbaseES SQL 参考手册 - Identity Columns](https://help.kingbase.com.cn/v8/development/sql/sql/SQL_Statements_10.html)
-> - ============================================
-> - SEQUENCE（兼容 PostgreSQL）
-> - ============================================
+
+
+## SEQUENCE（兼容 PostgreSQL）
 
 ```sql
 CREATE SEQUENCE user_id_seq

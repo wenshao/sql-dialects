@@ -3,10 +3,12 @@
 > 参考资料:
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL PL/pgSQL - Dynamic Commands](https://www.postgresql.org/docs/current/plpgsql-statements.html)
-> - ============================================================
-> - TimescaleDB 基于 PostgreSQL，完全兼容其动态 SQL
-> - ============================================================
-> - PREPARE / EXECUTE / DEALLOCATE
+
+
+## TimescaleDB 基于 PostgreSQL，完全兼容其动态 SQL
+
+
+## PREPARE / EXECUTE / DEALLOCATE
 
 ```sql
 PREPARE ts_query(TIMESTAMPTZ) AS

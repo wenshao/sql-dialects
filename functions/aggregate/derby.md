@@ -1,6 +1,6 @@
 # Derby: 聚合函数
 
-基本聚合
+## 基本聚合
 
 ```sql
 SELECT COUNT(*) FROM users;

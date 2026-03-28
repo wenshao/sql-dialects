@@ -3,15 +3,17 @@
 > 参考资料:
 > - [Firebird Documentation - Window Functions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
 > - [Firebird Documentation - FIRST / SKIP / ROWS](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - orders(order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
-> - FIRST 语法（Firebird 经典方式）
+
+
+## 示例数据上下文
+
+假设表结构:
+orders(order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
+
+## FIRST 语法（Firebird 经典方式）
 
 ```sql
 SELECT FIRST 10 order_id, customer_id, amount

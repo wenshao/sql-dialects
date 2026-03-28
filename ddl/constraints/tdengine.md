@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 约束支持非常有限
-> - 主要通过数据模型（超级表/子表/标签）来组织数据
-> - ============================================================
-> - 时间戳列约束（隐式）
-> - ============================================================
-> - 第一列必须是 TIMESTAMP，这是强制约束
+
+
+## TDengine 约束支持非常有限
+
+主要通过数据模型（超级表/子表/标签）来组织数据
+
+## 时间戳列约束（隐式）
+
+
+## 第一列必须是 TIMESTAMP，这是强制约束
 
 ```sql
 CREATE STABLE meters (

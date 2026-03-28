@@ -3,9 +3,9 @@
 > 参考资料:
 > - [openGauss Documentation](https://docs.opengauss.org/)
 > - openGauss 兼容 PostgreSQL 语法
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

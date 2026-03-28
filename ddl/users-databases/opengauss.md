@@ -3,14 +3,15 @@
 > 参考资料:
 > - [openGauss Documentation - CREATE DATABASE](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-DATABASE.html)
 > - [openGauss Documentation - CREATE USER](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-USER.html)
-> - ============================================================
-> - openGauss 基于 PostgreSQL 内核
-> - 命名层级: cluster > database > schema > object
-> - 默认: postgres 数据库, public 模式
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
+
+
+openGauss 基于 PostgreSQL 内核
+命名层级: cluster > database > schema > object
+默认: postgres 数据库, public 模式
+
+
+## 数据库管理
+
 
 ```sql
 CREATE DATABASE myapp;

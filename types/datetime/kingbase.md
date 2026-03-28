@@ -5,12 +5,14 @@ PostgreSQL compatible types.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - DATE: 日期
-> - TIME: 时间
-> - TIME WITH TIME ZONE: 带时区的时间
-> - TIMESTAMP: 日期时间
-> - TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ): 带时区
-> - INTERVAL: 时间间隔
+
+
+DATE: 日期
+TIME: 时间
+TIME WITH TIME ZONE: 带时区的时间
+TIMESTAMP: 日期时间
+TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ): 带时区
+INTERVAL: 时间间隔
 
 ```sql
 CREATE TABLE events (

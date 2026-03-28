@@ -3,9 +3,10 @@
 > 参考资料:
 > - [PolarDB Documentation - SQL Reference](https://www.alibabacloud.com/help/en/polardb/latest/sql-reference)
 > - [PolarDB Documentation - CTE](https://www.alibabacloud.com/help/en/polardb/latest/with)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

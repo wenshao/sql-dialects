@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 的 ON CONFLICT（UPSERT）语法
-> - 超级表要求 UNIQUE 约束包含时间列
-> - ============================================================
-> - ON CONFLICT DO UPDATE（标准 UPSERT）
-> - ============================================================
-> - 先创建唯一约束
+
+
+## TimescaleDB 继承 PostgreSQL 的 ON CONFLICT（UPSERT）语法
+
+超级表要求 UNIQUE 约束包含时间列
+
+## ON CONFLICT DO UPDATE（标准 UPSERT）
+
+
+## 先创建唯一约束
 
 ```sql
 CREATE TABLE sensor_data (

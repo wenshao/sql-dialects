@@ -5,12 +5,14 @@ PolarDB-X (distributed, MySQL compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - 整数
-> - TINYINT:   1 字节，-128 ~ 127
-> - SMALLINT:  2 字节，-32768 ~ 32767
-> - MEDIUMINT: 3 字节
-> - INT:       4 字节
-> - BIGINT:    8 字节
+
+
+整数
+TINYINT:   1 字节，-128 ~ 127
+SMALLINT:  2 字节，-32768 ~ 32767
+MEDIUMINT: 3 字节
+INT:       4 字节
+BIGINT:    8 字节
 
 ```sql
 CREATE TABLE examples (

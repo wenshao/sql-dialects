@@ -1,11 +1,13 @@
 # TDengine: 触发器
 
-TDengine 不支持触发器
+## TDengine 不支持触发器
+
 使用 Stream 计算和订阅替代
-============================================================
-Stream 计算（替代 AFTER INSERT 触发器）
-============================================================
-当数据插入时自动计算聚合
+
+## Stream 计算（替代 AFTER INSERT 触发器）
+
+
+## 当数据插入时自动计算聚合
 
 ```sql
 CREATE STREAM hourly_avg INTO hourly_avg_results AS

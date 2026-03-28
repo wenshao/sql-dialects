@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Firebird Documentation - SELECT](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-dml-select)
 > - [Firebird Documentation - Set Operators](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-dml-select-union)
-> - ============================================================
-> - UNION / UNION ALL（全版本支持）
-> - ============================================================
+
+
+## UNION / UNION ALL（全版本支持）
 
 ```sql
 SELECT id, name FROM employees

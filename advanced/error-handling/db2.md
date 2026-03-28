@@ -4,9 +4,9 @@
 > - [IBM DB2 Documentation - DECLARE HANDLER](https://www.ibm.com/docs/en/db2/11.5?topic=statements-declare-handler)
 > - [IBM DB2 Documentation - SIGNAL](https://www.ibm.com/docs/en/db2/11.5?topic=statements-signal)
 > - [IBM DB2 Documentation - GET DIAGNOSTICS](https://www.ibm.com/docs/en/db2/11.5?topic=statements-get-diagnostics)
-> - ============================================================
-> - DECLARE HANDLER
-> - ============================================================
+
+
+## DECLARE HANDLER
 
 ```sql
 BEGIN

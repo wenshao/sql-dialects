@@ -3,21 +3,24 @@
 > 参考资料:
 > - [ksqlDB Documentation - Window Functions](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/)
 > - [ksqlDB Documentation - Aggregate Functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
-> - ============================================================
-> - ksqlDB 窗口处理与传统 SQL 完全不同
-> - ksqlDB 使用流/表上的时间窗口进行聚合
-> - 不支持传统的 OVER() 窗口函数
-> - 支持三种窗口：TUMBLING, HOPPING, SESSION
-> - ============================================================
-> - 假设:
-> - CREATE STREAM sales_events (
-> - product_id VARCHAR KEY, sale_date VARCHAR, amount DOUBLE,
-> - region VARCHAR
-> - ) WITH (KAFKA_TOPIC='sales', VALUE_FORMAT='JSON');
-> - ============================================================
-> - 1. 移动平均（使用 HOPPING 窗口）
-> - ============================================================
-> - 滑动窗口：每分钟计算过去 7 天的平均值（流处理方式）
+
+
+ksqlDB 窗口处理与传统 SQL 完全不同
+ksqlDB 使用流/表上的时间窗口进行聚合
+不支持传统的 OVER() 窗口函数
+支持三种窗口：TUMBLING, HOPPING, SESSION
+
+
+假设:
+CREATE STREAM sales_events (
+product_id VARCHAR KEY, sale_date VARCHAR, amount DOUBLE,
+region VARCHAR
+) WITH (KAFKA_TOPIC='sales', VALUE_FORMAT='JSON');
+
+## 移动平均（使用 HOPPING 窗口）
+
+
+## 滑动窗口：每分钟计算过去 7 天的平均值（流处理方式）
 
 ```sql
 SELECT product_id,

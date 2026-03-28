@@ -5,11 +5,13 @@ Hologres 兼容 PostgreSQL 类型系统
 > 参考资料:
 > - [Hologres - Data Types](https://help.aliyun.com/zh/hologres/user-guide/data-types)
 > - [Hologres - Date/Time Functions](https://help.aliyun.com/zh/hologres/user-guide/date-time-functions)
-> - DATE: 日期，4713 BC ~ 5874897 AD
-> - TIME: 时间（无时区）
-> - TIMESTAMP: 日期时间（无时区），精度到微秒
-> - TIMESTAMPTZ: 日期时间（带时区），精度到微秒
-> - INTERVAL: 时间间隔
+
+
+DATE: 日期，4713 BC ~ 5874897 AD
+TIME: 时间（无时区）
+TIMESTAMP: 日期时间（无时区），精度到微秒
+TIMESTAMPTZ: 日期时间（带时区），精度到微秒
+INTERVAL: 时间间隔
 
 ```sql
 CREATE TABLE events (

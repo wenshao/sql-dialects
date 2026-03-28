@@ -3,10 +3,11 @@
 > 参考资料:
 > - [PolarDB for MySQL Documentation - CREATE VIEW](https://www.alibabacloud.com/help/en/polardb/polardb-for-mysql/create-view)
 > - [PolarDB for PostgreSQL Documentation - CREATE VIEW](https://www.alibabacloud.com/help/en/polardb/polardb-for-postgresql/create-view)
-> - ============================================
-> - 基本视图（MySQL 兼容模式）
-> - PolarDB for MySQL 完全兼容 MySQL 语法
-> - ============================================
+
+
+## 基本视图（MySQL 兼容模式）
+
+PolarDB for MySQL 完全兼容 MySQL 语法
 
 ```sql
 CREATE VIEW active_users AS

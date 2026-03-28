@@ -5,7 +5,9 @@ PostgreSQL compatible with openGauss extensions.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 普通索引（B-tree，默认）
+
+
+## 普通索引（B-tree，默认）
 
 ```sql
 CREATE INDEX idx_age ON users (age);

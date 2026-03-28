@@ -5,88 +5,93 @@
 > - [Apache Derby Developer's Guide - Dynamic SQL](https://db.apache.org/derby/docs/10.16/devguide/)
 > - [Apache Derby Tools Guide - ij Tool](https://db.apache.org/derby/docs/10.16/tools/)
 > - [JDBC PreparedStatement API](https://docs.oracle.com/javase/8/docs/api/java/sql/PreparedStatement.html)
-> - ============================================================
-> - 1. Derby 的动态 SQL 模型
-> - ============================================================
-> - Derby 是纯 Java 嵌入式数据库，不支持服务端动态 SQL:
-> - 无 EXECUTE IMMEDIATE 或服务端 SQL 字符串执行
-> - 无存储过程语言（PL/SQL、T-SQL 等）
-> - 存储过程使用 Java 类实现
-> - Derby 的动态 SQL 完全通过 JDBC API 实现:
-> - PreparedStatement: 参数化查询（防注入，预编译）
-> - Statement: 动态 SQL 字符串执行（不安全，不推荐）
-> - CallableStatement: 调用 Java 存储过程
-> - ============================================================
-> - 2. JDBC PreparedStatement: 参数化动态查询
-> - ============================================================
-> - PreparedStatement 是 Derby 动态 SQL 的核心机制
-> - 基本参数化查询:
-> - import java.sql.*;
-> - String url = "jdbc:derby:mydb;create=true";
-> - try (Connection conn = DriverManager.getConnection(url)) {
-> - String sql = "SELECT * FROM users WHERE age > ? AND status = ?";
-> - try (PreparedStatement ps = conn.prepareStatement(sql)) {
-> - ps.setInt(1, 18);
-> - ps.setString(2, "active");
-> - try (ResultSet rs = ps.executeQuery()) {
-> - while (rs.next()) {
-> - System.out.println(rs.getString("name"));
-> - }
-> - }
-> - }
-> - }
-> - PreparedStatement 内部机制:
-> - SQL 在 prepareStatement() 时发送到 Derby 引擎。
-> - Derby 解析 SQL、生成查询计划、缓存（同一会话内）。
-> - setXxx() 设置参数值，executeQuery()/executeUpdate() 执行。
-> - 参数占位符 ? 只能用于值位置，不能用于标识符（表名/列名）。
-> - ============================================================
-> - 3. 动态 SQL 字符串构建
-> - ============================================================
-> - 动态表名或列名无法使用 PreparedStatement，需要拼接 SQL 字符串
-> - 动态表名:
-> - String table = "users";
-> - String sql = "SELECT COUNT(*) FROM " + table;
-> - try (Statement stmt = conn.createStatement();
-> - ResultSet rs = stmt.executeQuery(sql)) {
-> - if (rs.next()) System.out.println("Count: " + rs.getInt(1));
-> - }
-> - 动态 WHERE 子句:
-> - List<String> conditions = new ArrayList<>();
-> - if (name != null) conditions.add("name = '" + escapeSql(name) + "'");
-> - if (age != null)  conditions.add("age > " + age);
-> - String where = conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", where);
-> - String sql = "SELECT * FROM users" + where;
-> - SQL 转义工具方法:
-> - public static String escapeSql(String input) {
-> - if (input == null) return "NULL";
-> - return input.replace("'", "''").replace("\\", "\\\\");
-> - }
-> - ============================================================
-> - 4. SQL 注入防护
-> - ============================================================
-> - 策略 1: PreparedStatement 参数化（最佳，用于值参数）
-> - PreparedStatement ps = conn.prepareStatement(
-> - "SELECT * FROM users WHERE username = ? AND password = ?"
-> - );
-> - ps.setString(1, username);   // 自动转义
-> - ps.setString(2, password);   // 自动转义
-> - // Derby 驱动确保参数值不会改变 SQL 语义
-> - 策略 2: 白名单验证（用于标识符: 表名、列名）
-> - import java.util.Set;
-> - Set<String> validTables = Set.of("users", "orders", "products");
-> - public static void validateTable(String table) {
-> - if (!validTables.contains(table.toLowerCase())) {
-> - throw new IllegalArgumentException("Invalid table: " + table);
-> - }
-> - }
-> - 策略 3: 标识符引号（Derby 使用双引号引用标识符）
-> - public static String quoteIdentifier(String id) {
-> - return '"' + id.replace("\"", "\"\"") + '"';
-> - }
-> - String safeSql = "SELECT * FROM " + quoteIdentifier(tableName);
-> - 错误（危险）: 直接拼接用户输入
-> - String sql = "SELECT * FROM users WHERE name = '" + userInput + "'";
+
+
+## Derby 的动态 SQL 模型
+
+
+Derby 是纯 Java 嵌入式数据库，不支持服务端动态 SQL:
+无 EXECUTE IMMEDIATE 或服务端 SQL 字符串执行
+无存储过程语言（PL/SQL、T-SQL 等）
+存储过程使用 Java 类实现
+Derby 的动态 SQL 完全通过 JDBC API 实现:
+PreparedStatement: 参数化查询（防注入，预编译）
+Statement: 动态 SQL 字符串执行（不安全，不推荐）
+CallableStatement: 调用 Java 存储过程
+
+## JDBC PreparedStatement: 参数化动态查询
+
+
+PreparedStatement 是 Derby 动态 SQL 的核心机制
+基本参数化查询:
+import java.sql.*;
+String url = "jdbc:derby:mydb;create=true";
+try (Connection conn = DriverManager.getConnection(url)) {
+String sql = "SELECT * FROM users WHERE age > ? AND status = ?";
+try (PreparedStatement ps = conn.prepareStatement(sql)) {
+ps.setInt(1, 18);
+ps.setString(2, "active");
+try (ResultSet rs = ps.executeQuery()) {
+while (rs.next()) {
+System.out.println(rs.getString("name"));
+}
+}
+}
+}
+PreparedStatement 内部机制:
+SQL 在 prepareStatement() 时发送到 Derby 引擎。
+Derby 解析 SQL、生成查询计划、缓存（同一会话内）。
+setXxx() 设置参数值，executeQuery()/executeUpdate() 执行。
+参数占位符 ? 只能用于值位置，不能用于标识符（表名/列名）。
+
+## 动态 SQL 字符串构建
+
+
+动态表名或列名无法使用 PreparedStatement，需要拼接 SQL 字符串
+动态表名:
+String table = "users";
+String sql = "SELECT COUNT(*) FROM " + table;
+try (Statement stmt = conn.createStatement();
+ResultSet rs = stmt.executeQuery(sql)) {
+if (rs.next()) System.out.println("Count: " + rs.getInt(1));
+}
+动态 WHERE 子句:
+List<String> conditions = new ArrayList<>();
+if (name != null) conditions.add("name = '" + escapeSql(name) + "'");
+if (age != null)  conditions.add("age > " + age);
+String where = conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", where);
+String sql = "SELECT * FROM users" + where;
+SQL 转义工具方法:
+public static String escapeSql(String input) {
+if (input == null) return "NULL";
+return input.replace("'", "''").replace("\\", "\\\\");
+}
+
+## SQL 注入防护
+
+
+策略 1: PreparedStatement 参数化（最佳，用于值参数）
+PreparedStatement ps = conn.prepareStatement(
+"SELECT * FROM users WHERE username = ? AND password = ?"
+);
+ps.setString(1, username);   // 自动转义
+ps.setString(2, password);   // 自动转义
+// Derby 驱动确保参数值不会改变 SQL 语义
+策略 2: 白名单验证（用于标识符: 表名、列名）
+import java.util.Set;
+Set<String> validTables = Set.of("users", "orders", "products");
+public static void validateTable(String table) {
+if (!validTables.contains(table.toLowerCase())) {
+throw new IllegalArgumentException("Invalid table: " + table);
+}
+}
+策略 3: 标识符引号（Derby 使用双引号引用标识符）
+public static String quoteIdentifier(String id) {
+return '"' + id.replace("\"", "\"\"") + '"';
+}
+String safeSql = "SELECT * FROM " + quoteIdentifier(tableName);
+错误（危险）: 直接拼接用户输入
+String sql = "SELECT * FROM users WHERE name = '" + userInput + "'";
 
 ```sql
 // 容易受到 SQL 注入攻击: userInput = "'; DROP TABLE users; --"

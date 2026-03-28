@@ -3,9 +3,10 @@
 > 参考资料:
 > - [DamengDB Documentation - 层次查询](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-dataquery.html)
 > - [DamengDB Documentation - 递归 CTE](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-dataquery.html)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

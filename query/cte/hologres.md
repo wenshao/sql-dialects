@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres SQL - SELECT (CTE)](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 基本 CTE
+
+
+## 基本 CTE
 
 ```sql
 WITH active_users AS (

@@ -7,11 +7,14 @@ PostgreSQL compatible ARRAY, composite types, hstore, and JSONB.
 > - [KingbaseES 文档 - 数组](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/SQL_data_types_8.html)
 > - [KingbaseES Oracle Compatibility Guide](https://help.kingbase.com.cn/v8/development/sql-plsql/oracle-compat.html)
 > - [PostgreSQL Documentation - Arrays](https://www.postgresql.org/docs/current/arrays.html)
-> - ============================================================
-> - 1. ARRAY 类型
-> - ============================================================
-> - KingbaseES 继承 PostgreSQL 的原生数组类型
-> - 任何内置类型都可以创建数组: INT[], TEXT[], VARCHAR(64)[], JSONB[] 等
+
+
+## ARRAY 类型
+
+
+## KingbaseES 继承 PostgreSQL 的原生数组类型
+
+任何内置类型都可以创建数组: INT[], TEXT[], VARCHAR(64)[], JSONB[] 等
 
 ```sql
 CREATE TABLE users (

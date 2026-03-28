@@ -5,10 +5,12 @@
 > - [openGauss Documentation - INSERT ON CONFLICT](https://docs.opengauss.org/en/docs/5.x/docs/Developerguide/insert.html)
 > - [openGauss - PostgreSQL Compatibility](https://docs.opengauss.org/en/docs/5.x/docs/Developerguide/sql-compatibility.html)
 > - [openGauss Documentation - MERGE INTO](https://docs.opengauss.org/en/docs/5.x/docs/Developerguide/merge-into.html)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - openGauss 兼容 PostgreSQL DDL/DML，并扩展了部分特性
+
+
+## 维度表结构
+
+
+## openGauss 兼容 PostgreSQL DDL/DML，并扩展了部分特性
 
 ```sql
 CREATE TABLE dim_customer (

@@ -3,23 +3,25 @@
 > 参考资料:
 > - [IBM Db2 Documentation - CREATE DATABASE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-create-database)
 > - [IBM Db2 Documentation - GRANT / REVOKE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-grant)
-> - ============================================================
-> - DB2 命名层级: instance > database > schema > object
-> - 默认 schema = 用户名（大写）
-> - DB2 使用操作系统用户进行认证
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理（命令行方式）
-> - ============================================================
-> - DB2 的 CREATE DATABASE 是命令行工具，不是 SQL 语句
-> - $ db2 CREATE DATABASE myapp
-> - $ db2 CREATE DATABASE myapp AUTOMATIC STORAGE YES
-> - ON '/data/db2' DBPATH ON '/data/db2'
-> - USING CODESET UTF-8 TERRITORY US COLLATE USING SYSTEM
-> - PAGESIZE 32768
-> - 删除数据库
-> - $ db2 DROP DATABASE myapp
-> - 连接数据库（SQL 方式）
+
+
+DB2 命名层级: instance > database > schema > object
+默认 schema = 用户名（大写）
+DB2 使用操作系统用户进行认证
+
+
+## 数据库管理（命令行方式）
+
+
+DB2 的 CREATE DATABASE 是命令行工具，不是 SQL 语句
+$ db2 CREATE DATABASE myapp
+$ db2 CREATE DATABASE myapp AUTOMATIC STORAGE YES
+ON '/data/db2' DBPATH ON '/data/db2'
+USING CODESET UTF-8 TERRITORY US COLLATE USING SYSTEM
+PAGESIZE 32768
+删除数据库
+$ db2 DROP DATABASE myapp
+连接数据库（SQL 方式）
 
 ```sql
 CONNECT TO myapp USER myuser USING 'secret123';

@@ -5,7 +5,9 @@ PostgreSQL compatible syntax.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 触发器函数（必须先创建）
+
+
+## 触发器函数（必须先创建）
 
 ```sql
 CREATE OR REPLACE FUNCTION trg_update_timestamp()

@@ -4,9 +4,9 @@
 > - [openGauss Documentation - CREATE VIEW](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-VIEW.html)
 > - [openGauss Documentation - CREATE MATERIALIZED VIEW](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-MATERIALIZED-VIEW.html)
 > - [openGauss Documentation - Updatable Views](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-VIEW.html)
-> - ============================================
-> - 基本视图（兼容 PostgreSQL）
-> - ============================================
+
+
+## 基本视图（兼容 PostgreSQL）
 
 ```sql
 CREATE VIEW active_users AS

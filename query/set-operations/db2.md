@@ -3,9 +3,9 @@
 > 参考资料:
 > - [IBM DB2 Documentation - Fullselect](https://www.ibm.com/docs/en/db2/11.5?topic=queries-fullselect)
 > - [IBM DB2 Documentation - UNION, EXCEPT, INTERSECT](https://www.ibm.com/docs/en/db2/11.5?topic=statements-select)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

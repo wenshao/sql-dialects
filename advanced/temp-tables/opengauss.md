@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [openGauss Documentation - CREATE TABLE](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-TABLE.html)
-> - ============================================================
-> - CREATE TEMPORARY TABLE（兼容 PostgreSQL）
-> - ============================================================
+
+
+## CREATE TEMPORARY TABLE（兼容 PostgreSQL）
+
 
 ```sql
 CREATE TEMP TABLE temp_users (

@@ -1,6 +1,7 @@
 # TimescaleDB: 事务
 
-TimescaleDB 继承 PostgreSQL 全部事务功能
+## TimescaleDB 继承 PostgreSQL 全部事务功能
+
 基本事务
 
 ```sql

@@ -5,7 +5,9 @@ Oracle compatible syntax.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 普通索引（B-tree）
+
+
+## 普通索引（B-tree）
 
 ```sql
 CREATE INDEX idx_age ON users (age);

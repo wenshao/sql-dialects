@@ -1,6 +1,6 @@
 # TDengine: 条件函数
 
-CASE WHEN（3.0+）
+## CASE WHEN（3.0+）
 
 ```sql
 SELECT ts, current,

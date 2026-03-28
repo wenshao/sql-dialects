@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - DATE: date only, 4 bytes
-> - TIME: time of day, 4 bytes (default 0 fractional seconds, up to 4)
-> - TIMESTAMP: date + time, 8 bytes (default 0 fractional seconds, up to 4)
-> - 4.0+: TIME WITH TIME ZONE, TIMESTAMP WITH TIME ZONE
+
+
+DATE: date only, 4 bytes
+TIME: time of day, 4 bytes (default 0 fractional seconds, up to 4)
+TIMESTAMP: date + time, 8 bytes (default 0 fractional seconds, up to 4)
+4.0+: TIME WITH TIME ZONE, TIMESTAMP WITH TIME ZONE
 
 ```sql
 CREATE TABLE events (

@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 支持特定类型的 JOIN
-> - 不同组合（Stream-Table, Table-Table, Stream-Stream）有不同规则
-> - ============================================================
-> - Stream-Table JOIN（最常用）
-> - ============================================================
-> - STREAM LEFT JOIN TABLE（丰富流数据）
+
+
+## ksqlDB 支持特定类型的 JOIN
+
+不同组合（Stream-Table, Table-Table, Stream-Stream）有不同规则
+
+## Stream-Table JOIN（最常用）
+
+
+## STREAM LEFT JOIN TABLE（丰富流数据）
 
 ```sql
 CREATE STREAM enriched_orders AS

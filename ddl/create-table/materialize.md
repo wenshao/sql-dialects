@@ -3,12 +3,16 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 是流式 SQL 物化视图引擎，PostgreSQL 协议兼容
-> - 核心概念：SOURCE（数据源）→ VIEW/MATERIALIZED VIEW（增量维护）
-> - ============================================================
-> - CREATE SOURCE（从外部系统摄入数据）
-> - ============================================================
-> - 从 Kafka 创建 SOURCE
+
+
+## Materialize 是流式 SQL 物化视图引擎，PostgreSQL 协议兼容
+
+核心概念：SOURCE（数据源）→ VIEW/MATERIALIZED VIEW（增量维护）
+
+## CREATE SOURCE（从外部系统摄入数据）
+
+
+## 从 Kafka 创建 SOURCE
 
 ```sql
 CREATE SOURCE kafka_orders

@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 内置 UPSERT 语义
-> - 相同时间戳的 INSERT 自动覆盖旧数据
-> - ============================================================
-> - 隐式 UPSERT（通过时间戳覆盖）
-> - ============================================================
-> - 第一次插入
+
+
+## TDengine 内置 UPSERT 语义
+
+相同时间戳的 INSERT 自动覆盖旧数据
+
+## 隐式 UPSERT（通过时间戳覆盖）
+
+
+## 第一次插入
 
 ```sql
 INSERT INTO d1001 VALUES ('2024-01-15 10:00:00.000', 10.3, 219, 0.31);

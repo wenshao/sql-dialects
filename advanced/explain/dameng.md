@@ -3,10 +3,12 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言使用手册](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
 > - [达梦数据库性能优化](https://eco.dameng.com/document/dm/zh-cn/pm/)
-> - ============================================================
-> - EXPLAIN 基本用法
-> - ============================================================
-> - 达梦使用 EXPLAIN 语句
+
+
+## EXPLAIN 基本用法
+
+
+## 达梦使用 EXPLAIN 语句
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE username = 'alice';

@@ -3,11 +3,14 @@
 > 参考资料:
 > - [Hologres SQL - CREATE TABLE](https://help.aliyun.com/zh/hologres/user-guide/create-table)
 > - [Hologres - Data Types](https://help.aliyun.com/zh/hologres/user-guide/data-types)
-> - Hologres 兼容 PostgreSQL 语法，支持多种约束
-> - 与 BigQuery/Snowflake 不同，Hologres 的约束是强制执行的
-> - ============================================================
-> - PRIMARY KEY（强制执行）
-> - ============================================================
+
+
+## Hologres 兼容 PostgreSQL 语法，支持多种约束
+
+与 BigQuery/Snowflake 不同，Hologres 的约束是强制执行的
+
+## PRIMARY KEY（强制执行）
+
 
 ```sql
 CREATE TABLE users (

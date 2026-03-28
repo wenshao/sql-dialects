@@ -4,12 +4,16 @@
 > - [KingbaseES SQL Reference Manual](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation - Data Types](https://help.kingbase.com.cn/v8/developer/sql-reference/data-types/)
 > - [PostgreSQL Documentation - Type Conversion](https://www.postgresql.org/docs/current/typeconv.html)
-> - 说明: KingbaseES 同时支持 PostgreSQL 和 Oracle 类型转换语法。
-> - 兼容模式在数据库初始化时选择，影响转换函数行为。
-> - ============================================================
-> - 1. CAST: SQL 标准类型转换
-> - ============================================================
-> - 数值转换
+
+
+## 说明: KingbaseES 同时支持 PostgreSQL 和 Oracle 类型转换语法。
+
+兼容模式在数据库初始化时选择，影响转换函数行为。
+
+## CAST: SQL 标准类型转换
+
+
+## 数值转换
 
 ```sql
 SELECT CAST(42 AS TEXT);                              -- '42'

@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres SQL - CREATE TABLE](https://help.aliyun.com/zh/hologres/user-guide/create-table)
 > - [Hologres - Data Types](https://help.aliyun.com/zh/hologres/user-guide/data-types)
-> - 行存表（适合点查）
+
+
+## 行存表（适合点查）
 
 ```sql
 CREATE TABLE users (

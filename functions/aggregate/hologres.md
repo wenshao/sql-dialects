@@ -5,7 +5,9 @@ Hologres 兼容 PostgreSQL 聚合函数
 > 参考资料:
 > - [Hologres - Aggregate Functions](https://help.aliyun.com/zh/hologres/user-guide/aggregate-functions)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - 基本聚合
+
+
+## 基本聚合
 
 ```sql
 SELECT COUNT(*) FROM users;

@@ -3,10 +3,12 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - INT / INTEGER: 4 字节，-2^31 ~ 2^31-1
-> - BIGINT: 8 字节，-2^63 ~ 2^63-1
-> - DOUBLE: 8 字节浮点数
-> - DECIMAL(p,s): 精确数值
+
+
+INT / INTEGER: 4 字节，-2^31 ~ 2^31-1
+BIGINT: 8 字节，-2^63 ~ 2^63-1
+DOUBLE: 8 字节浮点数
+DECIMAL(p,s): 精确数值
 
 ```sql
 CREATE STREAM orders (

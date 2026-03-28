@@ -3,17 +3,19 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - 整数
-> - SMALLINT: 2 字节，-32768 ~ 32767
-> - INTEGER / INT: 4 字节，-2^31 ~ 2^31-1
-> - BIGINT: 8 字节，-2^63 ~ 2^63-1
-> - 浮点数
-> - REAL: 4 字节
-> - DOUBLE PRECISION / DOUBLE / FLOAT: 8 字节
-> - 定点数
-> - DECIMAL(p,s) / NUMERIC(p,s): 最大精度 31
-> - 布尔
-> - BOOLEAN
+
+
+整数
+SMALLINT: 2 字节，-32768 ~ 32767
+INTEGER / INT: 4 字节，-2^31 ~ 2^31-1
+BIGINT: 8 字节，-2^63 ~ 2^63-1
+浮点数
+REAL: 4 字节
+DOUBLE PRECISION / DOUBLE / FLOAT: 8 字节
+定点数
+DECIMAL(p,s) / NUMERIC(p,s): 最大精度 31
+布尔
+BOOLEAN
 
 ```sql
 CREATE TABLE products (

@@ -4,10 +4,12 @@
 > - [ksqlDB Documentation - Windowing](https://docs.ksqldb.io/en/latest/concepts/time-and-windows-in-ksqldb-queries/)
 > - [ksqlDB Documentation - Scalar Functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/)
 > - [ksqlDB Documentation - Aggregate Functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
-> - ============================================================
-> - 1. 示例数据（流和表）
-> - ============================================================
-> - 每日销售流: 从 Kafka 持续消费
+
+
+## 示例数据（流和表）
+
+
+## 每日销售流: 从 Kafka 持续消费
 
 ```sql
 CREATE STREAM sales_stream (

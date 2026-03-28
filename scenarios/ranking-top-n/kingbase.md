@@ -3,14 +3,16 @@
 > 参考资料:
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/development/sql/index.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（兼容 PostgreSQL/Oracle 语法）:
-> - orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+## 假设表结构（兼容 PostgreSQL/Oracle 语法）:
+
+orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date DATE)
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

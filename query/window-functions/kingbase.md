@@ -5,7 +5,9 @@ PostgreSQL compatible syntax.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - ROW_NUMBER / RANK / DENSE_RANK
+
+
+## ROW_NUMBER / RANK / DENSE_RANK
 
 ```sql
 SELECT username, age,

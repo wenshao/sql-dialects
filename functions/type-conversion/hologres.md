@@ -3,6 +3,7 @@
 > 参考资料:
 > - [Hologres Documentation](https://www.alibabacloud.com/help/en/hologres/)
 
+
 ```sql
 SELECT CAST(42 AS TEXT); SELECT CAST('42' AS INTEGER); SELECT CAST('2024-01-15' AS DATE);
 SELECT 42::TEXT; SELECT '42'::INTEGER; SELECT '2024-01-15'::DATE;

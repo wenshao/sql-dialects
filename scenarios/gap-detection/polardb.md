@@ -3,9 +3,10 @@
 > 参考资料:
 > - [PolarDB Documentation - Window Functions](https://www.alibabacloud.com/help/en/polardb/latest/window-functions)
 > - [PolarDB Documentation - SQL Reference](https://www.alibabacloud.com/help/en/polardb/latest/sql-reference)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info VARCHAR(100));

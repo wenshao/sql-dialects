@@ -2,11 +2,14 @@
 
 > 参考资料:
 > - [ksqlDB Documentation](https://docs.ksqldb.io/en/latest/)
-> - ksqlDB 使用 Kafka 分区，不是数据库分区
-> - ============================================================
-> - Kafka Topic 分区
-> - ============================================================
-> - 创建流时指定 KEY（影响 Kafka 分区）
+
+
+## ksqlDB 使用 Kafka 分区，不是数据库分区
+
+## Kafka Topic 分区
+
+
+## 创建流时指定 KEY（影响 Kafka 分区）
 
 ```sql
 CREATE STREAM orders (

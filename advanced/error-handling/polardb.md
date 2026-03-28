@@ -3,9 +3,9 @@
 > 参考资料:
 > - [PolarDB for PostgreSQL Documentation](https://www.alibabacloud.com/help/en/polardb/polardb-for-postgresql/)
 > - [PolarDB for MySQL Documentation](https://www.alibabacloud.com/help/en/polardb/polardb-for-mysql/)
-> - ============================================================
-> - PolarDB for PostgreSQL: EXCEPTION WHEN
-> - ============================================================
+
+
+## PolarDB for PostgreSQL: EXCEPTION WHEN
 
 ```sql
 CREATE OR REPLACE FUNCTION safe_op(p_a INT, p_b INT)

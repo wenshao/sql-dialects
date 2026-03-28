@@ -3,14 +3,18 @@
 > 参考资料:
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
 > - [Hologres Documentation](https://help.aliyun.com/zh/hologres/)
-> - Hologres 不支持传统 PostgreSQL 触发器
-> - 虽然兼容 PostgreSQL 语法，但触发器不在兼容范围内
-> - ============================================================
-> - 替代方案 1: Binlog（变更数据捕获）
-> - ============================================================
-> - Hologres 支持 Binlog，可以捕获表的变更
-> - 类似触发器的 AFTER INSERT/UPDATE/DELETE
-> - 启用 Binlog
+
+
+## Hologres 不支持传统 PostgreSQL 触发器
+
+虽然兼容 PostgreSQL 语法，但触发器不在兼容范围内
+
+## 替代方案 1: Binlog（变更数据捕获）
+
+
+Hologres 支持 Binlog，可以捕获表的变更
+类似触发器的 AFTER INSERT/UPDATE/DELETE
+启用 Binlog
 
 ```sql
 CALL set_table_property('users', 'binlog.level', 'replica');

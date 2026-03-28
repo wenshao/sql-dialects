@@ -2,58 +2,60 @@
 
 > 参考资料:
 > - [Apache Derby Documentation](https://db.apache.org/derby/docs/10.16/ref/)
-> - 一、数据类型: 标准SQL子集
-> - INT→INTEGER, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
-> - VARCHAR→VARCHAR(n)(max 32672), TEXT→CLOB, DECIMAL→DECIMAL(p,s),
-> - BOOLEAN→BOOLEAN(10.7+), DATE→DATE, TIMESTAMP→TIMESTAMP,
-> - BLOB→BLOB, AUTO_INCREMENT→GENERATED ALWAYS AS IDENTITY
-> - 二、陷阱: Java嵌入式数据库, 功能有限(无JSON/窗口函数/CTE),
-> - VARCHAR最大32672字节, 不支持MERGE/UPSERT, 不支持FULL OUTER JOIN,
-> - Derby 10.14+支持OFFSET/FETCH, 10.12+支持递归CTE
-> - 三、自增: GENERATED ALWAYS AS IDENTITY
-> - 四、日期: CURRENT_TIMESTAMP; CURRENT_DATE; 日期算术有限
-> - YEAR(d); MONTH(d); DAY(d); HOUR(ts); MINUTE(ts); SECOND(ts)
-> - 日期加减: 需要使用 {fn TIMESTAMPADD(SQL_TSI_DAY, 1, d)}
-> - 五、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE(仅10.14+), LOCATE, ||
-> - ============================================================
-> - 六、数据类型映射（从 MySQL/PostgreSQL/Oracle 到 Derby）
-> - ============================================================
-> - MySQL → Derby:
-> - INT → INTEGER, BIGINT → BIGINT, FLOAT → FLOAT,
-> - VARCHAR(n) → VARCHAR(n) (max 32672),
-> - TEXT → CLOB, MEDIUMTEXT → CLOB, LONGTEXT → CLOB,
-> - DATETIME → TIMESTAMP, DATE → DATE,
-> - AUTO_INCREMENT → GENERATED ALWAYS AS IDENTITY,
-> - TINYINT(1) → BOOLEAN (10.7+), ENUM → VARCHAR + CHECK,
-> - JSON → CLOB (无JSON函数)
-> - PostgreSQL → Derby:
-> - TEXT → CLOB, SERIAL → GENERATED ALWAYS AS IDENTITY,
-> - BOOLEAN → BOOLEAN (10.7+), JSONB → CLOB,
-> - ARRAY → 不支持, BYTEA → BLOB
-> - Oracle → Derby:
-> - NUMBER → DECIMAL, VARCHAR2 → VARCHAR,
-> - CLOB → CLOB, SYSDATE → CURRENT_TIMESTAMP,
-> - SEQUENCE → GENERATED ALWAYS AS IDENTITY
-> - 七、函数等价映射
-> - MySQL → Derby:
-> - IFNULL → COALESCE (10.7+), NOW() → CURRENT_TIMESTAMP,
-> - CONCAT(a,b) → a || b,
-> - DATE_FORMAT → 无(应用层), GROUP_CONCAT → 不支持,
-> - LIMIT → OFFSET/FETCH (10.14+)
-> - 八、常见陷阱补充
-> - Java 嵌入式数据库，适合测试/原型/桌面应用
-> - VARCHAR 最大 32672 字节
-> - 不支持 MERGE/UPSERT
-> - 不支持 FULL OUTER JOIN
-> - 窗口函数不支持（10.16 之前）
-> - CTE (WITH) 需要 10.12+
-> - 无 JSON 支持
-> - 无存储过程参数默认值
-> - 大型生产环境建议迁移到其他数据库
-> - 九、NULL 处理
-> - COALESCE(a, b, c) (10.7+);
-> - NULLIF(a, b);
-> - CASE WHEN a IS NULL THEN b ELSE a END;            -- 替代 IFNULL
-> - 十、分页语法 (10.14+)
-> - SELECT * FROM t ORDER BY id OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
-> - 旧版本: 使用 ROW_NUMBER() 窗口函数（如果支持）
+
+
+一、数据类型: 标准SQL子集
+INT→INTEGER, BIGINT→BIGINT, FLOAT→FLOAT, DOUBLE→DOUBLE,
+VARCHAR→VARCHAR(n)(max 32672), TEXT→CLOB, DECIMAL→DECIMAL(p,s),
+BOOLEAN→BOOLEAN(10.7+), DATE→DATE, TIMESTAMP→TIMESTAMP,
+BLOB→BLOB, AUTO_INCREMENT→GENERATED ALWAYS AS IDENTITY
+二、陷阱: Java嵌入式数据库, 功能有限(无JSON/窗口函数/CTE),
+VARCHAR最大32672字节, 不支持MERGE/UPSERT, 不支持FULL OUTER JOIN,
+Derby 10.14+支持OFFSET/FETCH, 10.12+支持递归CTE
+三、自增: GENERATED ALWAYS AS IDENTITY
+四、日期: CURRENT_TIMESTAMP; CURRENT_DATE; 日期算术有限
+YEAR(d); MONTH(d); DAY(d); HOUR(ts); MINUTE(ts); SECOND(ts)
+日期加减: 需要使用 {fn TIMESTAMPADD(SQL_TSI_DAY, 1, d)}
+五、字符串: LENGTH, UPPER, LOWER, TRIM, SUBSTR, REPLACE(仅10.14+), LOCATE, ||
+
+## 六、数据类型映射（从 MySQL/PostgreSQL/Oracle 到 Derby）
+
+MySQL → Derby:
+INT → INTEGER, BIGINT → BIGINT, FLOAT → FLOAT,
+VARCHAR(n) → VARCHAR(n) (max 32672),
+TEXT → CLOB, MEDIUMTEXT → CLOB, LONGTEXT → CLOB,
+DATETIME → TIMESTAMP, DATE → DATE,
+AUTO_INCREMENT → GENERATED ALWAYS AS IDENTITY,
+TINYINT(1) → BOOLEAN (10.7+), ENUM → VARCHAR + CHECK,
+JSON → CLOB (无JSON函数)
+PostgreSQL → Derby:
+TEXT → CLOB, SERIAL → GENERATED ALWAYS AS IDENTITY,
+BOOLEAN → BOOLEAN (10.7+), JSONB → CLOB,
+ARRAY → 不支持, BYTEA → BLOB
+Oracle → Derby:
+NUMBER → DECIMAL, VARCHAR2 → VARCHAR,
+CLOB → CLOB, SYSDATE → CURRENT_TIMESTAMP,
+SEQUENCE → GENERATED ALWAYS AS IDENTITY
+七、函数等价映射
+MySQL → Derby:
+IFNULL → COALESCE (10.7+), NOW() → CURRENT_TIMESTAMP,
+CONCAT(a,b) → a || b,
+DATE_FORMAT → 无(应用层), GROUP_CONCAT → 不支持,
+LIMIT → OFFSET/FETCH (10.14+)
+八、常见陷阱补充
+Java 嵌入式数据库，适合测试/原型/桌面应用
+VARCHAR 最大 32672 字节
+不支持 MERGE/UPSERT
+不支持 FULL OUTER JOIN
+窗口函数不支持（10.16 之前）
+CTE (WITH) 需要 10.12+
+无 JSON 支持
+无存储过程参数默认值
+大型生产环境建议迁移到其他数据库
+九、NULL 处理
+COALESCE(a, b, c) (10.7+);
+NULLIF(a, b);
+CASE WHEN a IS NULL THEN b ELSE a END;            -- 替代 IFNULL
+十、分页语法 (10.14+)
+SELECT * FROM t ORDER BY id OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
+旧版本: 使用 ROW_NUMBER() 窗口函数（如果支持）

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [DB2 Documentation - OLAP Specifications](https://www.ibm.com/docs/en/db2/11.5?topic=functions-olap-specification)
 > - [DB2 Documentation - Recursive Common Table Expressions](https://www.ibm.com/docs/en/db2/11.5?topic=queries-recursive-common-table-expressions)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INTEGER NOT NULL PRIMARY KEY, info VARCHAR(100));

@@ -3,21 +3,27 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 不支持传统的子查询
-> - 通过创建中间 STREAM/TABLE 实现类似功能
-> - ============================================================
-> - 不支持内联子查询
-> - ============================================================
-> - 以下都不支持：
-> - SELECT * FROM orders WHERE user_id IN (SELECT ...);
-> - SELECT *, (SELECT ...) FROM orders;
-> - SELECT * FROM (SELECT ... FROM orders);
-> - SELECT * FROM orders WHERE EXISTS (SELECT ...);
-> - ============================================================
-> - 替代方案：创建中间 STREAM/TABLE
-> - ============================================================
-> - 场景：过滤高价值用户的订单
-> - 步骤 1：创建中间 TABLE
+
+
+## ksqlDB 不支持传统的子查询
+
+通过创建中间 STREAM/TABLE 实现类似功能
+
+## 不支持内联子查询
+
+
+以下都不支持：
+SELECT * FROM orders WHERE user_id IN (SELECT ...);
+SELECT *, (SELECT ...) FROM orders;
+SELECT * FROM (SELECT ... FROM orders);
+SELECT * FROM orders WHERE EXISTS (SELECT ...);
+
+## 替代方案：创建中间 STREAM/TABLE
+
+
+## 场景：过滤高价值用户的订单
+
+步骤 1：创建中间 TABLE
 
 ```sql
 CREATE TABLE high_value_users AS

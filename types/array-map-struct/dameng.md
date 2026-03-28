@@ -3,10 +3,12 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言参考 - 数据类型](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dm-sql-data-type.html)
 > - [达梦数据库 SQL 语言参考 - 集合类型](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-type.html)
-> - ============================================================
-> - 达梦兼容 Oracle 的集合类型（在 PL/SQL 中使用）
-> - ============================================================
-> - VARRAY 类型
+
+
+## 达梦兼容 Oracle 的集合类型（在 PL/SQL 中使用）
+
+
+## VARRAY 类型
 
 ```sql
 CREATE TYPE tag_array AS VARRAY(20) OF VARCHAR2(50);

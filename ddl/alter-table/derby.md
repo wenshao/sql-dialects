@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - 添加列
+
+
+## 添加列
 
 ```sql
 ALTER TABLE users ADD COLUMN phone VARCHAR(20);

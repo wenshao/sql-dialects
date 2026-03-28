@@ -7,10 +7,12 @@ PostgreSQL compatible syntax.
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
 > - [openGauss MOT (Memory-Optimized Table) Guide](https://docs.opengauss.org/zh/docs/latest/docs/Developerguide/mot.html)
 > - [openGauss Column Store Guide](https://docs.opengauss.org/zh/docs/latest/docs/Developerguide/column-store.html)
-> - ============================================================
-> - 1. 基本 UPDATE
-> - ============================================================
-> - 单列更新
+
+
+## 基本 UPDATE
+
+
+## 单列更新
 
 ```sql
 UPDATE users SET age = 26 WHERE username = 'alice';

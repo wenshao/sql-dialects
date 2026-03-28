@@ -4,9 +4,9 @@
 > - [IBM DB2 Documentation - CREATE SEQUENCE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-create-sequence)
 > - [IBM DB2 Documentation - Identity Columns](https://www.ibm.com/docs/en/db2/11.5?topic=columns-identity)
 > - [IBM DB2 Documentation - NEXT VALUE expression](https://www.ibm.com/docs/en/db2/11.5?topic=expressions-next-value)
-> - ============================================
-> - SEQUENCE
-> - ============================================
+
+
+## SEQUENCE
 
 ```sql
 CREATE SEQUENCE user_id_seq

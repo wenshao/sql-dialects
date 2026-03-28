@@ -6,10 +6,12 @@ PostgreSQL compatible syntax.
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
 > - [openGauss MOT (Memory-Optimized Table) Guide](https://docs.opengauss.org/zh/docs/latest/docs/Developerguide/mot.html)
-> - ============================================================
-> - 1. 基本 DELETE
-> - ============================================================
-> - 单行删除
+
+
+## 基本 DELETE
+
+
+## 单行删除
 
 ```sql
 DELETE FROM users WHERE username = 'alice';

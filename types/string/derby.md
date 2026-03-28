@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - VARCHAR(n): 变长字符串，最大 32672 字节
-> - CHAR(n): 定长字符串，最大 254 字节
-> - LONG VARCHAR: 长变长字符串，最大 32700 字节
-> - CLOB: 大文本对象，最大 2GB
+
+
+VARCHAR(n): 变长字符串，最大 32672 字节
+CHAR(n): 定长字符串，最大 254 字节
+LONG VARCHAR: 长变长字符串，最大 32700 字节
+CLOB: 大文本对象，最大 2GB
 
 ```sql
 CREATE TABLE users (

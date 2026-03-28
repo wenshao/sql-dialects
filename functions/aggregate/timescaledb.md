@@ -1,6 +1,7 @@
 # TimescaleDB: 聚合函数
 
-TimescaleDB 继承 PostgreSQL 聚合函数 + 时序扩展
+## TimescaleDB 继承 PostgreSQL 聚合函数 + 时序扩展
+
 基本聚合
 
 ```sql

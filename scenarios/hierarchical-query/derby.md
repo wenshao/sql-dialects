@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Apache Derby Documentation - WITH clause](https://db.apache.org/derby/docs/10.16/ref/rrefsqljwith.html)
 > - [Apache Derby Documentation - SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

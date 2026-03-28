@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Materialize Documentation - SELECT](https://materialize.com/docs/sql/select/)
 > - [Materialize Documentation - Set Operations](https://materialize.com/docs/sql/select/#set-operations)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

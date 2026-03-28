@@ -3,15 +3,18 @@
 > 参考资料:
 > - [Apache Derby Documentation - ROW_NUMBER](https://db.apache.org/derby/docs/10.15/ref/)
 > - [Apache Derby Documentation - FETCH FIRST](https://db.apache.org/derby/docs/10.15/ref/rrefsqljoffsetfetch.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - orders(order_id INT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
-> - FETCH FIRST（Derby 标准方式）
+
+
+## 示例数据上下文
+
+## 假设表结构:
+
+orders(order_id INT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
+
+## FETCH FIRST（Derby 标准方式）
 
 ```sql
 SELECT order_id, customer_id, amount

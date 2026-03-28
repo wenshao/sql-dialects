@@ -6,10 +6,12 @@
 > - [Hologres SQL - SELECT (LIMIT/OFFSET)](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres 最佳实践 - 数据查询优化](https://help.aliyun.com/zh/hologres/user-guide/query-optimization)
 > - [Hologres 兼容 PostgreSQL 说明](https://help.aliyun.com/zh/hologres/product-overview/compatible-with-postgresql)
-> - ============================================================
-> - 1. LIMIT / OFFSET（传统分页）
-> - ============================================================
-> - 基本分页: 跳过前 20 行，取 10 行
+
+
+## LIMIT / OFFSET（传统分页）
+
+
+## 基本分页: 跳过前 20 行，取 10 行
 
 ```sql
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;

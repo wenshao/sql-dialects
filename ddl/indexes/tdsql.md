@@ -7,10 +7,12 @@ TDSQL distributed MySQL-compatible database (Tencent Cloud).
 > - [TDSQL MySQL 版文档](https://cloud.tencent.com/document/product/557)
 > - [TDSQL 分布式架构指南](https://cloud.tencent.com/document/product/557/43296)
 > - [MySQL 8.0 Reference Manual - CREATE INDEX](https://dev.mysql.com/doc/refman/8.0/en/create-index.html)
-> - ============================================================
-> - 1. 基本索引语法（MySQL 兼容）
-> - ============================================================
-> - 普通索引
+
+
+## 基本索引语法（MySQL 兼容）
+
+
+## 普通索引
 
 ```sql
 CREATE INDEX idx_age ON users (age);

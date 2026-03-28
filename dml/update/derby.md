@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - 基本更新
+
+
+## 基本更新
 
 ```sql
 UPDATE users SET age = 26 WHERE username = 'alice';

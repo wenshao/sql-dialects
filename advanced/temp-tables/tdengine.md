@@ -2,11 +2,14 @@
 
 > 参考资料:
 > - [TDengine Documentation](https://docs.taosdata.com/taos-sql/)
-> - TDengine 不支持 CREATE TEMPORARY TABLE
-> - 作为时序数据库，使用子表和 CTE
-> - ============================================================
-> - 子查询（替代临时表）
-> - ============================================================
+
+
+## TDengine 不支持 CREATE TEMPORARY TABLE
+
+作为时序数据库，使用子表和 CTE
+
+## 子查询（替代临时表）
+
 
 ```sql
 SELECT t.device_id, t.avg_temp

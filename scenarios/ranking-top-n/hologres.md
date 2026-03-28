@@ -3,14 +3,15 @@
 > 参考资料:
 > - [Hologres Documentation - Window Functions](https://help.aliyun.com/document_detail/171889.html)
 > - [Hologres Documentation - SELECT](https://help.aliyun.com/document_detail/160582.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（兼容 PostgreSQL 语法）:
-> - orders(order_id BIGINT, customer_id BIGINT, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构（兼容 PostgreSQL 语法）:
+orders(order_id BIGINT, customer_id BIGINT, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

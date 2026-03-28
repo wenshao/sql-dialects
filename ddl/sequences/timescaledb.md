@@ -3,10 +3,12 @@
 > 参考资料:
 > - [PostgreSQL Documentation - CREATE SEQUENCE](https://www.postgresql.org/docs/current/sql-createsequence.html)
 > - [TimescaleDB Documentation - CREATE TABLE / Hypertable](https://docs.timescale.com/api/latest/hypertable/create_hypertable/)
-> - ============================================
-> - TimescaleDB 完全兼容 PostgreSQL 的序列功能
-> - ============================================
-> - SEQUENCE
+
+
+## TimescaleDB 完全兼容 PostgreSQL 的序列功能
+
+
+## SEQUENCE
 
 ```sql
 CREATE SEQUENCE sensor_id_seq START WITH 1 INCREMENT BY 1 CACHE 20;

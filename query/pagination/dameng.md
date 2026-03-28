@@ -6,10 +6,12 @@ Oracle 兼容语法。
 > - [达梦 SQL 语言使用指南 - SELECT](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [达梦 DBA 管理手册](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
 > - [达梦 SQL 程序设计 - 游标](https://eco.dameng.com/document/dm/zh-cn/plsql/index.html)
-> - ============================================================
-> - 1. FETCH FIRST（SQL 标准语法，推荐）
-> - ============================================================
-> - SQL 标准 OFFSET / FETCH 语法（推荐使用）
+
+
+## FETCH FIRST（SQL 标准语法，推荐）
+
+
+## SQL 标准 OFFSET / FETCH 语法（推荐使用）
 
 ```sql
 SELECT * FROM users ORDER BY id OFFSET 20 ROWS FETCH FIRST 10 ROWS ONLY;

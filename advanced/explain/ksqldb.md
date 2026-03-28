@@ -3,10 +3,12 @@
 > 参考资料:
 > - [ksqlDB Documentation - EXPLAIN](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/explain/)
 > - [ksqlDB Documentation - Processing Log](https://docs.ksqldb.io/en/latest/reference/processing-log/)
-> - ============================================================
-> - EXPLAIN 基本用法
-> - ============================================================
-> - 解释持久查询
+
+
+## EXPLAIN 基本用法
+
+
+## 解释持久查询
 
 ```sql
 EXPLAIN query_id;

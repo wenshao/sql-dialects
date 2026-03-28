@@ -1,6 +1,7 @@
 # TimescaleDB: 存储过程
 
-TimescaleDB 继承 PostgreSQL 的存储过程和函数
+## TimescaleDB 继承 PostgreSQL 的存储过程和函数
+
 创建函数
 
 ```sql

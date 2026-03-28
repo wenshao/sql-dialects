@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TDengine Documentation - INTERVAL/FILL](https://docs.taosdata.com/taos-sql/interval/)
 > - [TDengine Documentation - INTERP](https://docs.taosdata.com/taos-sql/function/#interp)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE STABLE sensors (ts TIMESTAMP, value FLOAT) TAGS (device NCHAR(64));

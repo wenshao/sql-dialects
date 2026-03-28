@@ -3,9 +3,9 @@
 > 参考资料:
 > - [SAP HANA SQL Reference Guide - Numeric Functions](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/ba508d48dbb30d4ce10000000a1553f6.html)
 > - [SAP HANA SQL Reference Guide - Functions Overview](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/665e40e0d567417a9a3b35771b89e4be.html)
-> - ============================================================
-> - 基础算术
-> - ============================================================
+
+
+## 基础算术
 
 ```sql
 SELECT ABS(-42) FROM DUMMY;                  -- 42           绝对值

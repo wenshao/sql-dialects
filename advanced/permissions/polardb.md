@@ -5,7 +5,9 @@ PolarDB-X (distributed, MySQL compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - 创建用户
+
+
+## 创建用户
 
 ```sql
 CREATE USER 'alice'@'localhost' IDENTIFIED BY 'password123';

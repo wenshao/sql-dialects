@@ -3,9 +3,9 @@
 > 参考资料:
 > - [TimescaleDB 基于 PostgreSQL，完全兼容其字符串函数](https://www.postgresql.org/docs/current/functions-string.html)
 > - [PostgreSQL Documentation - UNNEST](https://www.postgresql.org/docs/current/functions-array.html)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

@@ -3,10 +3,11 @@
 > 参考资料:
 > - [Firebird Documentation - EXECUTE STATEMENT](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-psql-coding-exec-stmt)
 > - [Firebird Documentation - PSQL](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-psql)
-> - ============================================================
-> - EXECUTE STATEMENT (PSQL 动态 SQL)
-> - ============================================================
-> - 基本用法
+
+
+## EXECUTE STATEMENT (PSQL 动态 SQL)
+
+## 基本用法
 
 ```sql
 EXECUTE BLOCK AS

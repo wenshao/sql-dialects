@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
 > - [Hologres Documentation](https://help.aliyun.com/zh/hologres/)
-> - Hologres 兼容 PostgreSQL 事务语法
-> - ============================================================
-> - 基本事务
-> - ============================================================
+
+
+## Hologres 兼容 PostgreSQL 事务语法
+
+## 基本事务
+
 
 ```sql
 BEGIN;  -- 或 START TRANSACTION

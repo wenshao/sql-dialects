@@ -5,9 +5,11 @@ Hologres 兼容 PostgreSQL 类型系统
 > 参考资料:
 > - [Hologres - Data Types](https://help.aliyun.com/zh/hologres/user-guide/data-types)
 > - [Hologres - String Functions](https://help.aliyun.com/zh/hologres/user-guide/string-functions)
-> - CHAR(n) / CHARACTER(n): 定长，尾部补空格
-> - VARCHAR(n) / CHARACTER VARYING(n): 变长，有长度限制
-> - TEXT: 变长，无长度限制（推荐）
+
+
+CHAR(n) / CHARACTER(n): 定长，尾部补空格
+VARCHAR(n) / CHARACTER VARYING(n): 变长，有长度限制
+TEXT: 变长，无长度限制（推荐）
 
 ```sql
 CREATE TABLE examples (

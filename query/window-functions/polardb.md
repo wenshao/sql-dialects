@@ -5,7 +5,9 @@ PolarDB-X (distributed, MySQL 8.0 compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - ROW_NUMBER / RANK / DENSE_RANK
+
+
+## ROW_NUMBER / RANK / DENSE_RANK
 
 ```sql
 SELECT username, age,

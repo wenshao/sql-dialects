@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Hologres Documentation - SQL Reference](https://www.alibabacloud.com/help/en/hologres/user-guide/generate-series)
 > - [Hologres Documentation - Window Functions](https://www.alibabacloud.com/help/en/hologres/user-guide/window-functions)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount NUMERIC(10,2));

@@ -1,6 +1,6 @@
 # ksqlDB: 字符串函数
 
-拼接
+## 拼接
 
 ```sql
 SELECT CONCAT(event_type, ':', event_id) FROM events EMIT CHANGES;

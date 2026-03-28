@@ -3,8 +3,11 @@
 > 参考资料:
 > - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
 > - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
-> - JSON stored in NCLOB or NVARCHAR columns
-> - SAP HANA 2.0 SPS 04+: dedicated JSON document store
+
+
+## JSON stored in NCLOB or NVARCHAR columns
+
+SAP HANA 2.0 SPS 04+: dedicated JSON document store
 
 ```sql
 CREATE COLUMN TABLE events (

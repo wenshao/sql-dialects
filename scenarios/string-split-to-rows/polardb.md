@@ -3,9 +3,9 @@
 > 参考资料:
 > - [PolarDB 兼容 MySQL / PostgreSQL / Oracle 语法](https://help.aliyun.com/product/172538.html)
 > - [PolarDB-X 分布式数据库](https://help.aliyun.com/document_detail/313263.html)
-> - ============================================================
-> - 示例数据（MySQL 兼容模式）
-> - ============================================================
+
+
+## 示例数据（MySQL 兼容模式）
 
 ```sql
 CREATE TABLE tags_csv (

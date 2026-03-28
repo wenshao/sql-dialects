@@ -6,10 +6,12 @@ TDSQL distributed MySQL-compatible syntax.
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL Distributed Transaction Guide](https://cloud.tencent.com/document/product/557/10575)
-> - ============================================================
-> - 1. 基本 INSERT
-> - ============================================================
-> - 单行插入
+
+
+## 基本 INSERT
+
+
+## 单行插入
 
 ```sql
 INSERT INTO users (username, email, age) VALUES ('alice', 'alice@example.com', 25);

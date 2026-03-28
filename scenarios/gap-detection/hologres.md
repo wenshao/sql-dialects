@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Hologres Documentation - Window Functions](https://www.alibabacloud.com/help/en/hologres/user-guide/window-functions)
 > - [Hologres Documentation - generate_series](https://www.alibabacloud.com/help/en/hologres/user-guide/generate-series)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info TEXT);

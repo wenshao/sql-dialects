@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
 > - [PostgreSQL Documentation - generate_series](https://www.postgresql.org/docs/current/functions-srf.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info VARCHAR(100));

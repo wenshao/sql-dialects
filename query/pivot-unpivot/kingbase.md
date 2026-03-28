@@ -3,9 +3,9 @@
 > 参考资料:
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/)
 > - [KingbaseES Documentation - SQL Reference](https://help.kingbase.com.cn/v8/)
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY（兼容 PostgreSQL）
-> - ============================================================
+
+
+## PIVOT: CASE WHEN + GROUP BY（兼容 PostgreSQL）
 
 ```sql
 SELECT

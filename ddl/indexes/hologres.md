@@ -3,12 +3,15 @@
 > 参考资料:
 > - [Hologres SQL - CREATE TABLE](https://help.aliyun.com/zh/hologres/user-guide/create-table)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - Hologres 通过表属性设置索引和数据组织方式
-> - 兼容部分 PostgreSQL 索引语法
-> - ============================================================
-> - 聚集索引（Clustering Key）
-> - ============================================================
-> - 决定数据在文件内的排序方式，加速范围查询
+
+
+## Hologres 通过表属性设置索引和数据组织方式
+
+兼容部分 PostgreSQL 索引语法
+
+## 聚集索引（Clustering Key）
+
+## 决定数据在文件内的排序方式，加速范围查询
 
 ```sql
 CREATE TABLE orders (

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [SAP HANA Documentation - Hierarchical Queries](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767)
 > - [SAP HANA Documentation - HIERARCHY function](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/51129989b88c4e4ea9ee0dc54b0e0bb5.html)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

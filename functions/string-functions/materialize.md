@@ -4,12 +4,16 @@
 > - [Materialize Documentation - String Functions](https://materialize.com/docs/sql/functions/)
 > - [Materialize Documentation - Pattern Matching](https://materialize.com/docs/sql/pattern-matching/)
 > - [PostgreSQL Documentation - String Functions](https://www.postgresql.org/docs/current/functions-string.html)
-> - 说明: Materialize 基于 PostgreSQL 语法，字符串函数与 PostgreSQL 高度兼容。
-> - 流式计算场景中，字符串函数在各数据流中独立执行。
-> - ============================================================
-> - 1. 字符串拼接
-> - ============================================================
-> - || 操作符: SQL 标准拼接（推荐）
+
+
+## 说明: Materialize 基于 PostgreSQL 语法，字符串函数与 PostgreSQL 高度兼容。
+
+流式计算场景中，字符串函数在各数据流中独立执行。
+
+## 字符串拼接
+
+
+## || 操作符: SQL 标准拼接（推荐）
 
 ```sql
 SELECT 'hello' || ' ' || 'world';                     -- 'hello world'

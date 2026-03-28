@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - ROW_NUMBER / RANK / DENSE_RANK
+
+
+## ROW_NUMBER / RANK / DENSE_RANK
 
 ```sql
 SELECT username, age,

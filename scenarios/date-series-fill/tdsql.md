@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TDSQL (腾讯云) Documentation - CTE](https://cloud.tencent.com/document/product/557/20042)
 > - [TDSQL (腾讯云) Documentation - Date Functions](https://cloud.tencent.com/document/product/557/19764)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

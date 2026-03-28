@@ -4,9 +4,9 @@
 > - [IBM DB2 Documentation - EXECUTE IMMEDIATE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-execute-immediate)
 > - [IBM DB2 Documentation - PREPARE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-prepare)
 > - [IBM DB2 Documentation - Dynamic SQL](https://www.ibm.com/docs/en/db2/11.5?topic=programming-dynamic-sql)
-> - ============================================================
-> - EXECUTE IMMEDIATE
-> - ============================================================
+
+
+## EXECUTE IMMEDIATE
 
 ```sql
 BEGIN

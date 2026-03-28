@@ -5,12 +5,14 @@ PolarDB-X (distributed, MySQL compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - CHAR(n): 定长，最大 255 字符
-> - VARCHAR(n): 变长，最大 65535 字节
-> - TINYTEXT: 最大 255 字节
-> - TEXT: 最大 65535 字节
-> - MEDIUMTEXT: 最大 16MB
-> - LONGTEXT: 最大 4GB
+
+
+CHAR(n): 定长，最大 255 字符
+VARCHAR(n): 变长，最大 65535 字节
+TINYTEXT: 最大 255 字节
+TEXT: 最大 65535 字节
+MEDIUMTEXT: 最大 16MB
+LONGTEXT: 最大 4GB
 
 ```sql
 CREATE TABLE examples (

@@ -5,11 +5,13 @@ PostgreSQL compatible with extensions.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 整数
-> - SMALLINT:  2 字节，-32768 ~ 32767
-> - INTEGER:   4 字节，-2^31 ~ 2^31-1
-> - BIGINT:    8 字节，-2^63 ~ 2^63-1
-> - TINYINT:   1 字节（openGauss 扩展）
+
+
+整数
+SMALLINT:  2 字节，-32768 ~ 32767
+INTEGER:   4 字节，-2^31 ~ 2^31-1
+BIGINT:    8 字节，-2^63 ~ 2^63-1
+TINYINT:   1 字节（openGauss 扩展）
 
 ```sql
 CREATE TABLE examples (

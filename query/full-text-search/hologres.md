@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres SQL - SELECT](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - LIKE 模糊搜索
+
+
+## LIKE 模糊搜索
 
 ```sql
 SELECT * FROM articles

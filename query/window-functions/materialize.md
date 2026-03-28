@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 支持标准 SQL 窗口函数（兼容 PostgreSQL）
-> - ROW_NUMBER / RANK / DENSE_RANK
+
+
+## Materialize 支持标准 SQL 窗口函数（兼容 PostgreSQL）
+
+ROW_NUMBER / RANK / DENSE_RANK
 
 ```sql
 SELECT username, age,

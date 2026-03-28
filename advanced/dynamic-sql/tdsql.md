@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
-> - ============================================================
-> - PREPARE / EXECUTE / DEALLOCATE PREPARE (MySQL 兼容)
-> - ============================================================
+
+
+## PREPARE / EXECUTE / DEALLOCATE PREPARE (MySQL 兼容)
 
 ```sql
 PREPARE stmt FROM 'SELECT * FROM users WHERE id = ?';

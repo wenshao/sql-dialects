@@ -3,9 +3,9 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言参考手册 - 数学函数](https://eco.dameng.com/document/dm/zh-cn/sql-dev/practice/function/math.html)
 > - [达梦数据库 SQL 语言参考手册 - 内置函数](https://eco.dameng.com/document/dm/zh-cn/pm/sql-reference-function.html)
-> - ============================================================
-> - 基础算术
-> - ============================================================
+
+
+## 基础算术
 
 ```sql
 SELECT ABS(-42) FROM DUAL;                   -- 42           绝对值

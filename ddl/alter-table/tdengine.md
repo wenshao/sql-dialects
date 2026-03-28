@@ -3,10 +3,12 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - ============================================================
-> - 修改超级表（STable）
-> - ============================================================
-> - 添加列（数据列）
+
+
+## 修改超级表（STable）
+
+
+## 添加列（数据列）
 
 ```sql
 ALTER STABLE meters ADD COLUMN power FLOAT;

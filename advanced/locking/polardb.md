@@ -3,15 +3,16 @@
 > 参考资料:
 > - [PolarDB for MySQL 文档 - 锁管理](https://help.aliyun.com/document_detail/316770.html)
 > - [PolarDB for PostgreSQL 文档 - 锁管理](https://help.aliyun.com/document_detail/472096.html)
-> - ============================================================
-> - PolarDB 并发模型
-> - ============================================================
-> - PolarDB 有两个版本:
-> - PolarDB for MySQL: 兼容 MySQL 锁机制
-> - PolarDB for PostgreSQL: 兼容 PostgreSQL 锁机制
-> - ============================================================
-> - PolarDB for MySQL
-> - ============================================================
+
+
+## PolarDB 并发模型
+
+PolarDB 有两个版本:
+PolarDB for MySQL: 兼容 MySQL 锁机制
+PolarDB for PostgreSQL: 兼容 PostgreSQL 锁机制
+
+## PolarDB for MySQL
+
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

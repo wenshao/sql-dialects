@@ -3,7 +3,9 @@
 > 参考资料:
 > - [SAP HANA SQL Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
 > - [SAP HANA SQLScript Reference](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
-> - Current date/time
+
+
+## Current date/time
 
 ```sql
 SELECT CURRENT_DATE FROM DUMMY;

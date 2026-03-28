@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [IBM Db2 Documentation - OLAP Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-olap-window)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(order_id INTEGER, account_id INTEGER, amount DECIMAL(10,2), txn_date DATE)
-> - ============================================================
-> - 1. 累计求和
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+transactions(order_id INTEGER, account_id INTEGER, amount DECIMAL(10,2), txn_date DATE)
+
+## 累计求和
+
 
 ```sql
 SELECT txn_id, account_id, amount, txn_date,

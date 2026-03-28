@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [SAP HANA Documentation - Table Partitioning](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/)
-> - ============================================================
-> - RANGE 分区
-> - ============================================================
+
+
+## RANGE 分区
+
 
 ```sql
 CREATE COLUMN TABLE orders (

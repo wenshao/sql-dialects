@@ -3,9 +3,10 @@
 > 参考资料:
 > - [openGauss Documentation - Window Functions](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/window-functions.html)
 > - [openGauss Documentation - generate_series](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/functions-and-operators.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info VARCHAR(100));

@@ -3,15 +3,19 @@
 > 参考资料:
 > - [TDengine Documentation - SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Documentation - Data Model](https://docs.taosdata.com/concept/)
-> - ============================================================
-> - TDengine 是时序数据库，不适合传统层次查询
-> - 但其超级表/子表的层次结构本身就是一种层次模型
-> - ============================================================
-> - TDengine 的层次结构：Database > STable > SubTable
-> - 这种结构天然支持设备层次管理
-> - ============================================================
-> - 1. 超级表/子表的层次模型
-> - ============================================================
+
+
+## TDengine 是时序数据库，不适合传统层次查询
+
+但其超级表/子表的层次结构本身就是一种层次模型
+
+
+## TDengine 的层次结构：Database > STable > SubTable
+
+这种结构天然支持设备层次管理
+
+## 超级表/子表的层次模型
+
 
 ```sql
 CREATE STABLE device_metrics (

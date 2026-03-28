@@ -1,6 +1,6 @@
 # ksqlDB: 日期函数
 
-字符串转时间戳
+## 字符串转时间戳
 
 ```sql
 SELECT STRINGTOTIMESTAMP('2024-01-15 10:30:00', 'yyyy-MM-dd HH:mm:ss')

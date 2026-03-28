@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 约束支持非常有限
-> - 只有 KEY（STREAM）和 PRIMARY KEY（TABLE）
-> - ============================================================
-> - KEY（STREAM 的分区键）
-> - ============================================================
-> - STREAM 使用 KEY 关键字指定分区键
+
+
+## ksqlDB 约束支持非常有限
+
+只有 KEY（STREAM）和 PRIMARY KEY（TABLE）
+
+## KEY（STREAM 的分区键）
+
+
+## STREAM 使用 KEY 关键字指定分区键
 
 ```sql
 CREATE STREAM pageviews (

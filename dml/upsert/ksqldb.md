@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB TABLE 天然具有 UPSERT 语义
-> - 相同 PRIMARY KEY 的 INSERT 自动覆盖旧值
-> - ============================================================
-> - TABLE 的隐式 UPSERT（通过 PRIMARY KEY 覆盖）
-> - ============================================================
-> - 创建 TABLE
+
+
+## ksqlDB TABLE 天然具有 UPSERT 语义
+
+相同 PRIMARY KEY 的 INSERT 自动覆盖旧值
+
+## TABLE 的隐式 UPSERT（通过 PRIMARY KEY 覆盖）
+
+
+## 创建 TABLE
 
 ```sql
 CREATE TABLE users (

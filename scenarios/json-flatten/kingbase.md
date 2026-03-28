@@ -4,9 +4,10 @@
 > - [KingbaseES SQL 语言参考手册](https://help.kingbase.com.cn/)
 > - [KingbaseES 兼容 PostgreSQL JSON/JSONB 类型](https://help.kingbase.com.cn/document/index.html)
 > - [KingbaseES JSON 函数参考](https://help.kingbase.com.cn/)
-> - ============================================================
-> - 1. 示例数据
-> - ============================================================
+
+
+## 示例数据
+
 
 ```sql
 CREATE TABLE orders_json (

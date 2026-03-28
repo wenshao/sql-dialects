@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Hologres Documentation - SQL Reference](https://www.alibabacloud.com/help/en/hologres/user-guide/overview)
 > - [Hologres Documentation - CTE](https://www.alibabacloud.com/help/en/hologres/user-guide/with-query)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

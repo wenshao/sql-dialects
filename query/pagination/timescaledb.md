@@ -3,8 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部分页语法
-> - LIMIT / OFFSET
+
+
+## TimescaleDB 继承 PostgreSQL 全部分页语法
+
+LIMIT / OFFSET
 
 ```sql
 SELECT * FROM sensor_data ORDER BY time DESC LIMIT 10 OFFSET 20;

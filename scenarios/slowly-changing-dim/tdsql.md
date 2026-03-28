@@ -5,10 +5,12 @@
 > - [TDSQL 文档 - DML 语句](https://cloud.tencent.com/document/product/557/104712)
 > - [TDSQL - MySQL 兼容性](https://cloud.tencent.com/document/product/557/11204)
 > - [Kimball Group - SCD Types](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - TDSQL 兼容 MySQL DDL/DML（Percona 分支）
+
+
+## 维度表结构
+
+
+## TDSQL 兼容 MySQL DDL/DML（Percona 分支）
 
 ```sql
 CREATE TABLE dim_customer (

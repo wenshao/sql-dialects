@@ -4,10 +4,12 @@
 > - [SAP HANA SQL Reference - Transaction Management](https://help.sap.com/docs/HANA_SERVICE_CF/7c78579ce9b14a669c1f3295b0d8ca16/20fdf9cb75191014b85aaa9dec841291.html)
 > - [SAP HANA Administration - Lock Handling](https://help.sap.com/docs/SAP_HANA_PLATFORM/6b94445c94ae495c83a19646e7c3fd56/20ae0ee0751910149561f03db6435cca.html)
 > - [SAP HANA SQL Reference - SELECT FOR UPDATE](https://help.sap.com/docs/HANA_SERVICE_CF/7c78579ce9b14a669c1f3295b0d8ca16/20fcf24075191014a89e9dc7b8408b26.html)
-> - ============================================================
-> - 行级锁
-> - ============================================================
-> - SELECT FOR UPDATE
+
+
+## 行级锁
+
+
+## SELECT FOR UPDATE
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

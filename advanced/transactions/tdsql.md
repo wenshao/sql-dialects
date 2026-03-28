@@ -5,7 +5,9 @@ TDSQL distributed MySQL-compatible syntax.
 > 参考资料:
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
-> - 基本事务
+
+
+## 基本事务
 
 ```sql
 START TRANSACTION;

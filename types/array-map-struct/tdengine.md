@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine Documentation - Data Types](https://docs.tdengine.com/taos-sql/data-type/)
 > - [TDengine Documentation - JSON Type](https://docs.tdengine.com/taos-sql/json/)
-> - ============================================================
-> - TDengine 没有原生 ARRAY / MAP / STRUCT 类型
-> - 使用 JSON 标签（Tag）存储复杂结构
-> - ============================================================
-> - JSON 类型标签（TDengine 3.0+）
-> - 注意：JSON 只能用于超级表的标签，不能用于普通列
+
+
+## TDengine 没有原生 ARRAY / MAP / STRUCT 类型
+
+使用 JSON 标签（Tag）存储复杂结构
+
+
+## JSON 类型标签（TDengine 3.0+）
+
+注意：JSON 只能用于超级表的标签，不能用于普通列
 
 ```sql
 CREATE STABLE sensors (

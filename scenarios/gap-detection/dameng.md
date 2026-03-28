@@ -3,9 +3,10 @@
 > 参考资料:
 > - [DamengDB Documentation - 分析函数](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-dataquery.html)
 > - [DamengDB Documentation - 层次查询](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-dataquery.html#层次查询)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info VARCHAR(100));

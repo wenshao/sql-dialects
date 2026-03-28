@@ -5,7 +5,9 @@ Oracle compatible PL/SQL trigger syntax.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - BEFORE INSERT
+
+
+## BEFORE INSERT
 
 ```sql
 CREATE OR REPLACE TRIGGER trg_users_before_insert

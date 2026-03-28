@@ -3,9 +3,10 @@
 > 参考资料:
 > - [KingbaseES (人大金仓) Documentation - CTE](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/)
 > - [KingbaseES (人大金仓) Documentation - Date Functions](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

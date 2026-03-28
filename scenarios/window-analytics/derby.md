@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [Apache Derby Documentation - Window Functions (Derby 10.12+)](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj31580.html)
-> - ============================================================
-> - 注意：Derby 对窗口函数支持有限
-> - Derby 10.12+ 支持 ROW_NUMBER
-> - Derby 不支持大部分窗口函数（RANK, LAG, LEAD 等）
-> - ============================================================
-> - ============================================================
-> - 1. ROW_NUMBER（Derby 支持的主要窗口函数）
-> - ============================================================
+
+
+注意：Derby 对窗口函数支持有限
+Derby 10.12+ 支持 ROW_NUMBER
+Derby 不支持大部分窗口函数（RANK, LAG, LEAD 等）
+
+
+## ROW_NUMBER（Derby 支持的主要窗口函数）
+
 
 ```sql
 SELECT emp_id, department, salary,

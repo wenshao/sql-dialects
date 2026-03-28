@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [SAP HANA SQLScript Reference - Exception Handling](https://help.sap.com/docs/SAP_HANA_PLATFORM/de2486ee947e43e684d39702027f8a94/)
-> - ============================================================
-> - DECLARE EXIT HANDLER (SQLScript)
-> - ============================================================
+
+
+## DECLARE EXIT HANDLER (SQLScript)
 
 ```sql
 DO BEGIN

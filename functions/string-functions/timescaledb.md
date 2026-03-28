@@ -1,6 +1,7 @@
 # TimescaleDB: 字符串函数
 
-TimescaleDB 继承 PostgreSQL 全部字符串函数
+## TimescaleDB 继承 PostgreSQL 全部字符串函数
+
 拼接
 
 ```sql

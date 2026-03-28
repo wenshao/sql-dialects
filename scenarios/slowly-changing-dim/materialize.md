@@ -5,10 +5,12 @@
 > - [Materialize Documentation - INSERT](https://materialize.com/docs/sql/insert/)
 > - [Materialize Documentation - Subsources and Sources](https://materialize.com/docs/sql/create-source/)
 > - [Materialize - Incremental Computation](https://materialize.com/docs/overview/what-is-materialize/)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - Materialize 兼容 PostgreSQL 语法
+
+
+## 维度表结构
+
+
+## Materialize 兼容 PostgreSQL 语法
 
 ```sql
 CREATE TABLE dim_customer (

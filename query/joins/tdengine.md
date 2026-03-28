@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 的 JOIN 支持非常有限
-> - 主要支持子表之间的 JOIN
-> - ============================================================
-> - 子表 JOIN（基于时间戳对齐）
-> - ============================================================
-> - 两个子表按时间戳 JOIN
+
+
+## TDengine 的 JOIN 支持非常有限
+
+主要支持子表之间的 JOIN
+
+## 子表 JOIN（基于时间戳对齐）
+
+
+## 两个子表按时间戳 JOIN
 
 ```sql
 SELECT a.ts, a.current, b.current

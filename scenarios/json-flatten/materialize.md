@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Materialize Documentation - JSONB Functions](https://materialize.com/docs/sql/functions/#jsonb-functions)
 > - Materialize 兼容 PostgreSQL JSONB 语法
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE orders_json (

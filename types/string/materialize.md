@@ -3,11 +3,13 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 兼容 PostgreSQL 字符串类型
-> - TEXT: 变长字符串，无长度限制（推荐）
-> - VARCHAR(n): 变长字符串，最大 n 个字符
-> - CHAR(n): 定长字符串，自动补空格
-> - BYTEA: 二进制数据
+
+
+Materialize 兼容 PostgreSQL 字符串类型
+TEXT: 变长字符串，无长度限制（推荐）
+VARCHAR(n): 变长字符串，最大 n 个字符
+CHAR(n): 定长字符串，自动补空格
+BYTEA: 二进制数据
 
 ```sql
 CREATE TABLE users (

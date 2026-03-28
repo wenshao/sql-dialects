@@ -3,8 +3,11 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 3.0+ 支持 DELETE 语句（2.x 不支持）
-> - 按时间范围删除
+
+
+## TDengine 3.0+ 支持 DELETE 语句（2.x 不支持）
+
+按时间范围删除
 
 ```sql
 DELETE FROM d1001 WHERE ts < '2024-01-01';

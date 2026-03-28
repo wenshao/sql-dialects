@@ -3,12 +3,16 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - Derby 不支持内置全文搜索
-> - 使用字符串函数和外部工具实现
-> - ============================================================
-> - LIKE 模糊搜索
-> - ============================================================
-> - 基本 LIKE
+
+
+## Derby 不支持内置全文搜索
+
+使用字符串函数和外部工具实现
+
+## LIKE 模糊搜索
+
+
+## 基本 LIKE
 
 ```sql
 SELECT * FROM articles WHERE content LIKE '%database%';

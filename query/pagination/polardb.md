@@ -4,10 +4,12 @@
 > - [PolarDB MySQL 版 - SQL 参考](https://help.aliyun.com/zh/polardb/polardb-for-mysql/developer-reference/sql-reference)
 > - [PolarDB-X SQL 参考 - SELECT](https://help.aliyun.com/zh/polardb/polardb-for-xscale/developer-reference/select)
 > - [PolarDB-X 分布式查询优化](https://help.aliyun.com/zh/polardb/polardb-for-xscale/developer-reference/optimization)
-> - ============================================================
-> - 1. LIMIT / OFFSET（MySQL 兼容语法）
-> - ============================================================
-> - LIMIT count OFFSET offset（推荐写法，语义清晰）
+
+
+## LIMIT / OFFSET（MySQL 兼容语法）
+
+
+## LIMIT count OFFSET offset（推荐写法，语义清晰）
 
 ```sql
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;

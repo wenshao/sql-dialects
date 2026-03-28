@@ -3,10 +3,12 @@
 > 参考资料:
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/document_detail/316280.html)
 > - [PolarDB PostgreSQL Documentation](https://help.aliyun.com/document_detail/172538.html)
-> - ============================================================
-> - PolarDB MySQL 兼容版
-> - ============================================================
-> - EXPLAIN 基本用法（与 MySQL 兼容）
+
+
+## PolarDB MySQL 兼容版
+
+
+## EXPLAIN 基本用法（与 MySQL 兼容）
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE username = 'alice';

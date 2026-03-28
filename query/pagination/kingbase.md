@@ -4,10 +4,12 @@
 > - [KingbaseES V8 SQL 语言参考 - SELECT](https://help.kingbase.com.cn/v8/development-manual/sql-reference/sql-statement/select.html)
 > - [KingbaseES V8 开发者指南 - 游标](https://help.kingbase.com.cn/v8/development-manual/plsql/cursor.html)
 > - [KingbaseES 兼容性说明](https://help.kingbase.com.cn/v8/overview/compatibility.html)
-> - ============================================================
-> - 1. LIMIT / OFFSET（传统分页）
-> - ============================================================
-> - 基本分页: 跳过前 20 行，取 10 行
+
+
+## LIMIT / OFFSET（传统分页）
+
+
+## 基本分页: 跳过前 20 行，取 10 行
 
 ```sql
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;

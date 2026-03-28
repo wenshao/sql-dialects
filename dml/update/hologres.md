@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Hologres SQL - UPDATE](https://help.aliyun.com/zh/hologres/user-guide/update)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 注意: Hologres 兼容 PostgreSQL UPDATE 语法
-> - 行存表和列存表均支持 UPDATE
-> - 基本更新
+
+
+注意: Hologres 兼容 PostgreSQL UPDATE 语法
+行存表和列存表均支持 UPDATE
+基本更新
 
 ```sql
 UPDATE users SET age = 26 WHERE username = 'alice';

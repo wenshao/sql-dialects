@@ -4,11 +4,14 @@
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html)
-> - 说明: TDSQL 是腾讯云分布式数据库，日期函数与 MySQL 完全兼容。
-> - 分布式环境需注意时区一致性和分片间时间同步。
-> - ============================================================
-> - 1. 获取当前日期时间
-> - ============================================================
+
+
+## 说明: TDSQL 是腾讯云分布式数据库，日期函数与 MySQL 完全兼容。
+
+分布式环境需注意时区一致性和分片间时间同步。
+
+## 获取当前日期时间
+
 
 ```sql
 SELECT NOW();                                         -- 当前日期时间 (YYYY-MM-DD hh:mm:ss)

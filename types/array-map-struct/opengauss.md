@@ -7,11 +7,14 @@ PostgreSQL compatible ARRAY, composite types, hstore, and JSONB.
 > - [openGauss 文档 - 复合类型](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-TYPE.html)
 > - [openGauss 文档 - JSON/JSONB 类型](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/JSON-JSONB.html)
 > - [PostgreSQL Documentation - Arrays](https://www.postgresql.org/docs/current/arrays.html)
-> - ============================================================
-> - 1. ARRAY 类型
-> - ============================================================
-> - openGauss 继承 PostgreSQL 的原生数组类型
-> - 任何内置类型都可以创建数组: INT[], TEXT[], VARCHAR(64)[], JSONB[] 等
+
+
+## ARRAY 类型
+
+
+## openGauss 继承 PostgreSQL 的原生数组类型
+
+任何内置类型都可以创建数组: INT[], TEXT[], VARCHAR(64)[], JSONB[] 等
 
 ```sql
 CREATE TABLE users (

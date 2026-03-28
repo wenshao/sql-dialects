@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Materialize Documentation - SQL Reference](https://materialize.com/docs/sql/functions/generate_series/)
 > - [Materialize Documentation - Window Functions](https://materialize.com/docs/sql/select/)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount NUMERIC(10,2));

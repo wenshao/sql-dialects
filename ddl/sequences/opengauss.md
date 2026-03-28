@@ -3,9 +3,9 @@
 > 参考资料:
 > - [openGauss Documentation - CREATE SEQUENCE](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-SEQUENCE.html)
 > - [openGauss Documentation - Serial Types](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-TABLE.html)
-> - ============================================
-> - SEQUENCE（兼容 PostgreSQL）
-> - ============================================
+
+
+## SEQUENCE（兼容 PostgreSQL）
 
 ```sql
 CREATE SEQUENCE user_id_seq

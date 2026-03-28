@@ -4,9 +4,9 @@
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL Documentation - tablefunc](https://www.postgresql.org/docs/current/tablefunc.html)
 > - [PostgreSQL Documentation - FILTER Clause](https://www.postgresql.org/docs/current/sql-expressions.html#SYNTAX-AGGREGATES)
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY（继承 PostgreSQL）
-> - ============================================================
+
+
+## PIVOT: CASE WHEN + GROUP BY（继承 PostgreSQL）
 
 ```sql
 SELECT

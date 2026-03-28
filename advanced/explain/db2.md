@@ -4,10 +4,12 @@
 > - [IBM Documentation - EXPLAIN statement](https://www.ibm.com/docs/en/db2/11.5?topic=statements-explain)
 > - [IBM Documentation - db2expln](https://www.ibm.com/docs/en/db2/11.5?topic=commands-db2expln)
 > - [IBM Documentation - Explain tables](https://www.ibm.com/docs/en/db2/11.5?topic=tools-explain-tables)
-> - ============================================================
-> - EXPLAIN 基本用法
-> - ============================================================
-> - 将执行计划存入 EXPLAIN 表
+
+
+## EXPLAIN 基本用法
+
+
+## 将执行计划存入 EXPLAIN 表
 
 ```sql
 EXPLAIN PLAN FOR

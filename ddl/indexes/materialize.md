@@ -3,12 +3,16 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 的索引用于加速查询物化视图和表
-> - 索引决定数据如何在内存中排列
-> - ============================================================
-> - CREATE INDEX
-> - ============================================================
-> - 在表上创建索引
+
+
+## Materialize 的索引用于加速查询物化视图和表
+
+索引决定数据如何在内存中排列
+
+## CREATE INDEX
+
+
+## 在表上创建索引
 
 ```sql
 CREATE INDEX idx_users_email ON users (email);

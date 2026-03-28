@@ -4,10 +4,12 @@
 > - [Apache Derby Documentation - Locking, Concurrency, and Isolation](https://db.apache.org/derby/docs/10.16/devguide/cdevconcepts15366.html)
 > - [Apache Derby Documentation - Lock Granularity](https://db.apache.org/derby/docs/10.16/devguide/cdevconcepts36402.html)
 > - [Apache Derby Documentation - LOCK TABLE](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj40506.html)
-> - ============================================================
-> - 行级锁
-> - ============================================================
-> - SELECT FOR UPDATE
+
+
+## 行级锁
+
+
+## SELECT FOR UPDATE
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

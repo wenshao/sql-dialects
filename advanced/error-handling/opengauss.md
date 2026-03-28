@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [openGauss Documentation - PL/pgSQL](https://docs.opengauss.org/en/docs/latest/docs/DeveloperGuide/pl-pgsql.html)
-> - ============================================================
-> - EXCEPTION WHEN (PostgreSQL 兼容)
-> - ============================================================
+
+
+## EXCEPTION WHEN (PostgreSQL 兼容)
 
 ```sql
 CREATE OR REPLACE FUNCTION safe_insert(p_name VARCHAR, p_email VARCHAR)

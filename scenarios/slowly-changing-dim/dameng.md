@@ -4,10 +4,12 @@
 > - [达梦数据库 SQL 参考手册 - MERGE INTO](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
 > - [达梦数据库 SQL 参考手册 - 数据类型](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
 > - [达梦数据库 兼容 Oracle 模式 MERGE 语法](https://eco.dameng.com/document/dm/zh-cn/pm/sql-reference/)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - 达梦兼容 Oracle 数据类型: VARCHAR2, NUMBER, DATE, CLOB 等
+
+
+## 维度表结构
+
+
+## 达梦兼容 Oracle 数据类型: VARCHAR2, NUMBER, DATE, CLOB 等
 
 ```sql
 CREATE TABLE dim_customer (

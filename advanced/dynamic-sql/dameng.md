@@ -3,9 +3,9 @@
 > 参考资料:
 > - [达梦数据库 SQL 语言参考手册](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-dynamic.html)
 > - [达梦数据库 PL/SQL 编程](https://eco.dameng.com/document/dm/zh-cn/pm/pl-sql.html)
-> - ============================================================
-> - EXECUTE IMMEDIATE (达梦 PL/SQL)
-> - ============================================================
+
+
+## EXECUTE IMMEDIATE (达梦 PL/SQL)
 
 ```sql
 DECLARE

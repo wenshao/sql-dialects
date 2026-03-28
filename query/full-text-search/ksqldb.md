@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 不支持全文搜索
-> - 仅提供基本的字符串匹配功能
-> - ============================================================
-> - LIKE 模糊搜索
-> - ============================================================
-> - 基本 LIKE
+
+
+## ksqlDB 不支持全文搜索
+
+仅提供基本的字符串匹配功能
+
+## LIKE 模糊搜索
+
+
+## 基本 LIKE
 
 ```sql
 CREATE STREAM error_events AS

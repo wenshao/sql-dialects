@@ -6,9 +6,9 @@ Oracle-compatible database with native Chinese support.
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
 > - [DamengDB Migration Guide (Oracle to DamengDB)](https://eco.dameng.com/document/dm/zh-cn/start/oracle-migration.html)
-> - ============================================================
-> - 1. 字符串类型一览
-> - ============================================================
+
+
+## 字符串类型一览
 
 ```sql
 CREATE TABLE string_examples (

@@ -3,10 +3,12 @@
 > 参考资料:
 > - [TDengine Documentation - SQL Functions](https://docs.taosdata.com/taos-sql/function/)
 > - [TDengine Documentation - INTERVAL/FILL](https://docs.taosdata.com/taos-sql/interval/)
-> - ============================================================
-> - TDengine 是时序数据库，间隙检测主要针对时间序列
-> - ============================================================
-> - 创建超级表
+
+
+## TDengine 是时序数据库，间隙检测主要针对时间序列
+
+
+## 创建超级表
 
 ```sql
 CREATE STABLE IF NOT EXISTS sensors (

@@ -2,12 +2,16 @@
 
 > 参考资料:
 > - [ksqlDB Documentation - CREATE STREAM / TABLE](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
-> - ksqlDB 不支持传统临时表
-> - 使用 STREAM 和 TABLE 作为持久化的数据抽象
-> - ============================================================
-> - 创建派生流/表（替代临时表）
-> - ============================================================
-> - 创建过滤后的流
+
+
+## ksqlDB 不支持传统临时表
+
+使用 STREAM 和 TABLE 作为持久化的数据抽象
+
+## 创建派生流/表（替代临时表）
+
+
+## 创建过滤后的流
 
 ```sql
 CREATE STREAM active_user_events AS

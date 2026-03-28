@@ -3,14 +3,15 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - Window Functions](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767)
 > - [SAP HANA SQL Reference - LIMIT](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - orders(order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+orders(order_id INTEGER, customer_id INTEGER, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

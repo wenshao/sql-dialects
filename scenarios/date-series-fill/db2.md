@@ -3,9 +3,10 @@
 > 参考资料:
 > - [IBM DB2 Documentation](https://www.ibm.com/docs/en/db2/11.5?topic=queries-recursive-common-table-expressions)
 > - [IBM DB2 Documentation](https://www.ibm.com/docs/en/db2/11.5?topic=functions-scalar)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

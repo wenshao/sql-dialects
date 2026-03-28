@@ -3,9 +3,9 @@
 > 参考资料:
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL Documentation - UNION, INTERSECT, EXCEPT](https://www.postgresql.org/docs/current/queries-union.html)
-> - ============================================================
-> - UNION / UNION ALL（继承 PostgreSQL）
-> - ============================================================
+
+
+## UNION / UNION ALL（继承 PostgreSQL）
 
 ```sql
 SELECT time, device_id, temperature FROM sensor_data_2023

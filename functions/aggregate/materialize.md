@@ -4,11 +4,14 @@
 > - [Materialize Documentation - Aggregate Functions](https://materialize.com/docs/sql/functions/)
 > - [Materialize Documentation - CREATE MATERIALIZED VIEW](https://materialize.com/docs/sql/create-materialized-view/)
 > - [PostgreSQL Documentation - Aggregate Functions](https://www.postgresql.org/docs/current/functions-aggregate.html)
-> - 说明: Materialize 基于 PostgreSQL 语法，聚合函数与 PostgreSQL 高度兼容。
-> - 核心差异: 聚合在物化视图中可增量维护，提供实时计算能力。
-> - ============================================================
-> - 1. 基本聚合函数
-> - ============================================================
+
+
+## 说明: Materialize 基于 PostgreSQL 语法，聚合函数与 PostgreSQL 高度兼容。
+
+核心差异: 聚合在物化视图中可增量维护，提供实时计算能力。
+
+## 基本聚合函数
+
 
 ```sql
 SELECT COUNT(*) FROM users;                           -- 总行数

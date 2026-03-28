@@ -1,6 +1,6 @@
 # Derby: 条件函数
 
-CASE WHEN
+## CASE WHEN
 
 ```sql
 SELECT username,

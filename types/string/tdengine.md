@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - BINARY(n): 定长二进制字符串，最大 16374 字节
-> - NCHAR(n): Unicode 字符串，最大 4093 个字符（UTF-8，每字符 4 字节）
-> - VARCHAR(n): 3.0+ 别名，等同于 BINARY(n)
+
+
+BINARY(n): 定长二进制字符串，最大 16374 字节
+NCHAR(n): Unicode 字符串，最大 4093 个字符（UTF-8，每字符 4 字节）
+VARCHAR(n): 3.0+ 别名，等同于 BINARY(n)
 
 ```sql
 CREATE STABLE devices (

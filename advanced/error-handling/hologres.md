@@ -4,64 +4,68 @@
 > - [Hologres Documentation - Error Codes](https://www.alibabacloud.com/help/en/hologres/error-codes)
 > - [Hologres Documentation - SQL Reference](https://www.alibabacloud.com/help/en/hologres/developer-reference/sql-reference)
 > - [Hologres Documentation - Best Practices](https://www.alibabacloud.com/help/en/hologres/best-practices)
-> - ============================================================
-> - 1. Hologres 错误处理概述
-> - ============================================================
-> - Hologres 是阿里云实时数仓，兼容 PostgreSQL 协议和部分语法。
-> - 但存储过程/PL/pgSQL 支持有限，不支持 EXCEPTION WHEN 等服务端错误处理。
-> - 错误处理主要依赖应用层捕获 + SQL 防御性写法。
-> - ============================================================
-> - 2. 应用层错误捕获
-> - ============================================================
-> - Python (psycopg2) 示例: 基本错误捕获
-> - import psycopg2
-> - conn = psycopg2.connect(host='hgprecn-xxx.hologres.aliyuncs.com', port=80, ...)
-> - cursor = conn.cursor()
-> - try:
-> - cursor.execute("INSERT INTO users VALUES(1, 'test')")
-> - conn.commit()
-> - except psycopg2.errors.UniqueViolation as e:
-> - print(f'Unique constraint violation: {e}')
-> - conn.rollback()
-> - except psycopg2.errors.NotNullViolation as e:
-> - print(f'NOT NULL violation: {e}')
-> - conn.rollback()
-> - except psycopg2.errors.ForeignKeyViolation as e:
-> - print(f'Foreign key violation: {e}')
-> - conn.rollback()
-> - except psycopg2.Error as e:
-> - print(f'General error: {e.pgcode} - {e.pgerror}')
-> - conn.rollback()
-> - Java (JDBC) 示例:
-> - try {
-> - stmt.executeUpdate("INSERT INTO users VALUES(1, 'test')");
-> - } catch (java.sql.SQLIntegrityConstraintViolationException e) {
-> - // 约束违反 (SQLSTATE 23xxx)
-> - } catch (java.sql.SQLException e) {
-> - // 通用 SQL 错误
-> - }
-> - ============================================================
-> - 3. Hologres 常见错误码
-> - ================================================================
-> - Hologres 兼容 PostgreSQL SQLSTATE 编码:
-> - 23505 = 唯一约束违反 (Unique Violation)
-> - 23502 = NULL 约束违反 (Not Null Violation)
-> - 23503 = 外键约束违反 (Foreign Key Violation)
-> - 42P01 = 表不存在 (Undefined Table)
-> - 42703 = 列不存在 (Undefined Column)
-> - 42P07 = 表已存在 (Duplicate Table)
-> - 42501 = 权限不足 (Insufficient Privilege)
-> - 08006 = 连接失败 (Connection Failure)
-> - 53200 = 内存不足 (Out of Memory)
-> - HV000 = FDW 错误 (Foreign Data Wrapper Error)
-> - Hologres 特有错误码:
-> - HGERR_code = 内部执行引擎错误
-> - ERPC_ERROR = 分布式 RPC 通信错误
-> - OOM_ERROR = 资源超限（内存/CPU）
-> - ============================================================
-> - 4. SQL 层面的错误避免: 防御性写法
-> - ============================================================
-> - 使用 IF NOT EXISTS 避免建表冲突
+
+
+## Hologres 错误处理概述
+
+Hologres 是阿里云实时数仓，兼容 PostgreSQL 协议和部分语法。
+但存储过程/PL/pgSQL 支持有限，不支持 EXCEPTION WHEN 等服务端错误处理。
+错误处理主要依赖应用层捕获 + SQL 防御性写法。
+
+## 应用层错误捕获
+
+
+Python (psycopg2) 示例: 基本错误捕获
+import psycopg2
+conn = psycopg2.connect(host='hgprecn-xxx.hologres.aliyuncs.com', port=80, ...)
+cursor = conn.cursor()
+try:
+cursor.execute("INSERT INTO users VALUES(1, 'test')")
+conn.commit()
+except psycopg2.errors.UniqueViolation as e:
+print(f'Unique constraint violation: {e}')
+conn.rollback()
+except psycopg2.errors.NotNullViolation as e:
+print(f'NOT NULL violation: {e}')
+conn.rollback()
+except psycopg2.errors.ForeignKeyViolation as e:
+print(f'Foreign key violation: {e}')
+conn.rollback()
+except psycopg2.Error as e:
+print(f'General error: {e.pgcode} - {e.pgerror}')
+conn.rollback()
+Java (JDBC) 示例:
+try {
+stmt.executeUpdate("INSERT INTO users VALUES(1, 'test')");
+} catch (java.sql.SQLIntegrityConstraintViolationException e) {
+// 约束违反 (SQLSTATE 23xxx)
+} catch (java.sql.SQLException e) {
+// 通用 SQL 错误
+}
+
+## Hologres 常见错误码
+
+
+Hologres 兼容 PostgreSQL SQLSTATE 编码:
+23505 = 唯一约束违反 (Unique Violation)
+23502 = NULL 约束违反 (Not Null Violation)
+23503 = 外键约束违反 (Foreign Key Violation)
+42P01 = 表不存在 (Undefined Table)
+42703 = 列不存在 (Undefined Column)
+42P07 = 表已存在 (Duplicate Table)
+42501 = 权限不足 (Insufficient Privilege)
+08006 = 连接失败 (Connection Failure)
+53200 = 内存不足 (Out of Memory)
+HV000 = FDW 错误 (Foreign Data Wrapper Error)
+Hologres 特有错误码:
+HGERR_code = 内部执行引擎错误
+ERPC_ERROR = 分布式 RPC 通信错误
+OOM_ERROR = 资源超限（内存/CPU）
+
+## SQL 层面的错误避免: 防御性写法
+
+
+## 使用 IF NOT EXISTS 避免建表冲突
 
 ```sql
 CREATE TABLE IF NOT EXISTS users (

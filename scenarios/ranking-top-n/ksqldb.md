@@ -3,22 +3,25 @@
 > 参考资料:
 > - [ksqlDB Reference - SELECT](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
 > - [ksqlDB Reference - Aggregate Functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设 STREAM / TABLE:
-> - CREATE STREAM orders (order_id INT KEY, customer_id INT, amount DOUBLE, order_time BIGINT)
-> - WITH (KAFKA_TOPIC='orders', VALUE_FORMAT='JSON');
-> - ============================================================
-> - 注意：ksqlDB 是流处理引擎，不支持传统的 Top-N 查询
-> - ============================================================
-> - ksqlDB 不支持窗口函数（ROW_NUMBER / RANK / DENSE_RANK）
-> - ksqlDB 不支持 ORDER BY + LIMIT 的传统 Top-N 模式
-> - 以下是可实现的近似方案：
-> - ============================================================
-> - 1. 使用 TOPK / TOPKDISTINCT 聚合函数
-> - ============================================================
-> - TOPK：返回每组前 K 个最大值（聚合函数）
+
+
+## 示例数据上下文
+
+假设 STREAM / TABLE:
+CREATE STREAM orders (order_id INT KEY, customer_id INT, amount DOUBLE, order_time BIGINT)
+WITH (KAFKA_TOPIC='orders', VALUE_FORMAT='JSON');
+
+## 注意：ksqlDB 是流处理引擎，不支持传统的 Top-N 查询
+
+
+ksqlDB 不支持窗口函数（ROW_NUMBER / RANK / DENSE_RANK）
+ksqlDB 不支持 ORDER BY + LIMIT 的传统 Top-N 模式
+以下是可实现的近似方案：
+
+## 使用 TOPK / TOPKDISTINCT 聚合函数
+
+
+## TOPK：返回每组前 K 个最大值（聚合函数）
 
 ```sql
 SELECT customer_id,

@@ -3,6 +3,7 @@
 > 参考资料:
 > - [IBM DB2 Documentation - Numeric Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-numeric)
 
+
 ```sql
 SELECT ABS(-42); SELECT CEIL(4.3); SELECT CEILING(4.3); SELECT FLOOR(4.7);
 SELECT ROUND(3.14159, 2); SELECT TRUNCATE(3.14159, 2); SELECT TRUNC(3.14159, 2);

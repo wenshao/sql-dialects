@@ -3,9 +3,10 @@
 > 参考资料:
 > - [SAP HANA Documentation - Window Functions](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20a353327519101495dfd0a87060a0d3.html)
 > - [SAP HANA Documentation - SERIES_GENERATE](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/5f14e09987ef4c638a83e1a015e3bd17.html)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INTEGER PRIMARY KEY, info NVARCHAR(100));

@@ -5,12 +5,14 @@ PostgreSQL compatible with extensions.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - DATE: 日期，'YYYY-MM-DD'
-> - TIME: 时间，'HH:MM:SS'
-> - TIME WITH TIME ZONE: 带时区的时间
-> - TIMESTAMP: 日期时间，无时区
-> - TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ): 带时区
-> - INTERVAL: 时间间隔
+
+
+DATE: 日期，'YYYY-MM-DD'
+TIME: 时间，'HH:MM:SS'
+TIME WITH TIME ZONE: 带时区的时间
+TIMESTAMP: 日期时间，无时区
+TIMESTAMP WITH TIME ZONE (TIMESTAMPTZ): 带时区
+INTERVAL: 时间间隔
 
 ```sql
 CREATE TABLE events (

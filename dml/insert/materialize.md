@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 的 TABLE 支持 INSERT
-> - SOURCE 和 MATERIALIZED VIEW 不支持直接 INSERT
-> - 单行插入
+
+
+Materialize 的 TABLE 支持 INSERT
+SOURCE 和 MATERIALIZED VIEW 不支持直接 INSERT
+单行插入
 
 ```sql
 INSERT INTO users (id, username, email, age) VALUES (1, 'alice', 'alice@example.com', 25);

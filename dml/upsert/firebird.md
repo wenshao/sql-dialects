@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - UPDATE OR INSERT (2.1+, Firebird's native upsert)
-> - Matches on MATCHING columns (or PK/UNIQUE if omitted)
+
+
+## UPDATE OR INSERT (2.1+, Firebird's native upsert)
+
+Matches on MATCHING columns (or PK/UNIQUE if omitted)
 
 ```sql
 UPDATE OR INSERT INTO users (id, username, email, age)

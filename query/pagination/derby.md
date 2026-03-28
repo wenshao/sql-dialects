@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - FETCH FIRST（Derby 推荐语法）
+
+
+## FETCH FIRST（Derby 推荐语法）
 
 ```sql
 SELECT * FROM users ORDER BY id FETCH FIRST 10 ROWS ONLY;

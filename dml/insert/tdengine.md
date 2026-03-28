@@ -3,8 +3,11 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 的 INSERT 针对时序数据优化
-> - 单行插入
+
+
+## TDengine 的 INSERT 针对时序数据优化
+
+单行插入
 
 ```sql
 INSERT INTO d1001 VALUES (NOW, 10.3, 219, 0.31);

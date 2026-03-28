@@ -4,12 +4,16 @@
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - Cast Functions and Operators](https://dev.mysql.com/doc/refman/8.0/en/cast-functions.html)
-> - 说明: TDSQL 是腾讯云分布式数据库，类型转换与 MySQL 完全兼容。
-> - MySQL 的隐式转换规则宽松，需注意避免意外行为。
-> - ============================================================
-> - 1. CAST: 标准类型转换
-> - ============================================================
-> - 基本数值转换
+
+
+## 说明: TDSQL 是腾讯云分布式数据库，类型转换与 MySQL 完全兼容。
+
+MySQL 的隐式转换规则宽松，需注意避免意外行为。
+
+## CAST: 标准类型转换
+
+
+## 基本数值转换
 
 ```sql
 SELECT CAST('42' AS SIGNED);                          -- 42（有符号整数）

@@ -6,9 +6,9 @@ PostgreSQL compatible with Oracle-compatible extensions.
 > - [openGauss SQL Reference - Data Types](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
 > - [openGauss Source Code - data type definitions](https://gitee.com/opengauss/openGauss-server)
-> - ============================================================
-> - 1. 字符串类型一览
-> - ============================================================
+
+
+## 字符串类型一览
 
 ```sql
 CREATE TABLE string_examples (

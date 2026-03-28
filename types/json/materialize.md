@@ -6,12 +6,14 @@ Materialize supports JSONB type (PostgreSQL compatible) for streaming SQL.
 > - [Materialize Documentation - JSONB](https://materialize.com/docs/sql/types/jsonb/)
 > - [Materialize Documentation - Data Types](https://materialize.com/docs/sql/types/)
 > - [PostgreSQL Documentation - JSON Types (reference for compatibility)](https://www.postgresql.org/docs/current/datatype-json.html)
-> - ============================================================
-> - 1. JSONB 类型概述
-> - ============================================================
-> - Materialize 仅支持 JSONB 类型（不支持 JSON 文本类型）
-> - JSONB 是二进制格式的 JSON，插入时验证并解析
-> - 兼容 PostgreSQL 的 JSONB 操作符和函数
+
+
+## JSONB 类型概述
+
+
+Materialize 仅支持 JSONB 类型（不支持 JSON 文本类型）
+JSONB 是二进制格式的 JSON，插入时验证并解析
+兼容 PostgreSQL 的 JSONB 操作符和函数
 
 ```sql
 CREATE TABLE events (

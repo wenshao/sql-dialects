@@ -3,6 +3,7 @@
 > 参考资料:
 > - [Firebird Language Reference - CAST](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/)
 
+
 ```sql
 SELECT CAST(42 AS VARCHAR(10)); SELECT CAST('42' AS INTEGER);
 SELECT CAST('3.14' AS DECIMAL(10,2)); SELECT CAST('2024-01-15' AS DATE);

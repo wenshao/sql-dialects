@@ -3,16 +3,18 @@
 > 参考资料:
 > - [PolarDB for PostgreSQL Documentation](https://www.alibabacloud.com/help/en/polardb-for-postgresql/)
 > - [PolarDB for MySQL Documentation](https://www.alibabacloud.com/help/en/polardb-for-mysql/)
-> - ============================================================
-> - PolarDB 有两个版本：
-> - PolarDB for MySQL: 兼容 MySQL
-> - PolarDB for PostgreSQL: 兼容 PostgreSQL
-> - 以下分别展示两个版本的语法
-> - ============================================================
-> - ============================================================
-> - PolarDB for MySQL
-> - ============================================================
-> - 1. 数据库管理
+
+
+PolarDB 有两个版本：
+PolarDB for MySQL: 兼容 MySQL
+PolarDB for PostgreSQL: 兼容 PostgreSQL
+以下分别展示两个版本的语法
+
+
+## PolarDB for MySQL
+
+
+## 数据库管理
 
 ```sql
 CREATE DATABASE myapp;

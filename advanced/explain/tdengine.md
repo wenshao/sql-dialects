@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TDengine Documentation - EXPLAIN](https://docs.taosdata.com/taos-sql/explain/)
 > - [TDengine Documentation - Performance](https://docs.taosdata.com/operation/optimize/)
-> - ============================================================
-> - EXPLAIN 基本用法（3.0+）
-> - ============================================================
+
+
+## EXPLAIN 基本用法（3.0+）
+
 
 ```sql
 EXPLAIN SELECT * FROM meters WHERE ts > '2024-01-01' AND voltage > 220;

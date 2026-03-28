@@ -3,11 +3,13 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Enable text search on a column
-> - db2ts "ENABLE DATABASE FOR TEXT CONNECT TO mydb"
-> - db2ts "CREATE INDEX ft_content FOR TEXT ON articles(content) CONNECT TO mydb"
-> - db2ts "UPDATE INDEX ft_content FOR TEXT CONNECT TO mydb"
-> - Basic search using CONTAINS
+
+
+Enable text search on a column
+db2ts "ENABLE DATABASE FOR TEXT CONNECT TO mydb"
+db2ts "CREATE INDEX ft_content FOR TEXT ON articles(content) CONNECT TO mydb"
+db2ts "UPDATE INDEX ft_content FOR TEXT CONNECT TO mydb"
+Basic search using CONTAINS
 
 ```sql
 SELECT * FROM articles

@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [openGauss Documentation - CREATE TABLE PARTITION](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/CREATE-TABLE-PARTITION.html)
-> - ============================================================
-> - RANGE 分区
-> - ============================================================
+
+
+## RANGE 分区
+
 
 ```sql
 CREATE TABLE orders (

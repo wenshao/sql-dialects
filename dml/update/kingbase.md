@@ -6,10 +6,12 @@ PostgreSQL compatible syntax.
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Oracle Compatibility Guide](https://help.kingbase.com.cn/v8/develop-guide/oracle-compat.html)
 > - [KingbaseES PL/SQL Reference](https://help.kingbase.com.cn/v8/server-programming/pl-sql.html)
-> - ============================================================
-> - 1. 基本 UPDATE
-> - ============================================================
-> - 单列更新
+
+
+## 基本 UPDATE
+
+
+## 单列更新
 
 ```sql
 UPDATE users SET age = 26 WHERE username = 'alice';

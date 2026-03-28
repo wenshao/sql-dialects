@@ -4,11 +4,14 @@
 > - [KingbaseES SQL Reference Manual](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation - Date/Time Types](https://help.kingbase.com.cn/v8/developer/sql-reference/data-types/datetime.html)
 > - [PostgreSQL Documentation - Date/Time Functions](https://www.postgresql.org/docs/current/functions-datetime.html)
-> - 说明: KingbaseES 是国产数据库，兼容 PostgreSQL 和 Oracle 双语法体系。
-> - 日期函数在 PG 模式和 Oracle 模式下有细微差异。
-> - ============================================================
-> - 1. 获取当前日期时间
-> - ============================================================
+
+
+## 说明: KingbaseES 是国产数据库，兼容 PostgreSQL 和 Oracle 双语法体系。
+
+日期函数在 PG 模式和 Oracle 模式下有细微差异。
+
+## 获取当前日期时间
+
 
 ```sql
 SELECT NOW();                                         -- 当前事务时间戳 (TIMESTAMPTZ)

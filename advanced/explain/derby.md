@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Derby Documentation - Statement execution plan](https://db.apache.org/derby/docs/10.16/tuning/ctuntransform13966.html)
 > - [Derby Documentation - RUNTIMESTATISTICS](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj32268.html)
-> - ============================================================
-> - RUNTIMESTATISTICS（运行时统计）
-> - ============================================================
-> - 启用运行时统计
+
+
+## RUNTIMESTATISTICS（运行时统计）
+
+
+## 启用运行时统计
 
 ```sql
 CALL SYSCS_UTIL.SYSCS_SET_RUNTIMESTATISTICS(1);

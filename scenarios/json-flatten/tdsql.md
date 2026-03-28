@@ -4,9 +4,10 @@
 > - [TDSQL 兼容 MySQL 语法](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - JSON Functions](https://dev.mysql.com/doc/refman/8.0/en/json-functions.html)
 > - [MySQL 8.0 Reference Manual - JSON_TABLE](https://dev.mysql.com/doc/refman/8.0/en/json-table-functions.html)
-> - ============================================================
-> - 1. 示例数据
-> - ============================================================
+
+
+## 示例数据
+
 
 ```sql
 CREATE TABLE orders_json (

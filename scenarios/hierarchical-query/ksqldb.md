@@ -3,10 +3,12 @@
 > 参考资料:
 > - [ksqlDB Documentation - Queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB Documentation - Joins](https://docs.ksqldb.io/en/latest/developer-guide/joins/join-streams-and-tables/)
-> - ============================================================
-> - ksqlDB 是流处理引擎，不支持传统层次查询
-> - ============================================================
-> - 创建组织架构表（物化为 TABLE）
+
+
+## ksqlDB 是流处理引擎，不支持传统层次查询
+
+
+## 创建组织架构表（物化为 TABLE）
 
 ```sql
 CREATE TABLE employees (

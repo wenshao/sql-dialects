@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Materialize Documentation - EXPLAIN](https://materialize.com/docs/sql/explain-plan/)
 > - [Materialize Documentation - Performance](https://materialize.com/docs/ops/troubleshooting/)
-> - ============================================================
-> - EXPLAIN 基本用法
-> - ============================================================
+
+
+## EXPLAIN 基本用法
+
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE age > 25;

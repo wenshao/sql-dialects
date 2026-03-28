@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Firebird Documentation](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/)
 > - [Firebird Documentation](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

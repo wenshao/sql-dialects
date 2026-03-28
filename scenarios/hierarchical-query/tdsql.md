@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TDSQL Documentation - SQL Reference](https://cloud.tencent.com/document/product/557/19764)
 > - [TDSQL Documentation - CTE](https://cloud.tencent.com/document/product/557/20042)
-> - ============================================================
-> - 准备数据：组织架构表（邻接表模型）
-> - ============================================================
+
+
+## 准备数据：组织架构表（邻接表模型）
+
 
 ```sql
 CREATE TABLE employees (

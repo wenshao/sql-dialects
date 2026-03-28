@@ -3,10 +3,12 @@
 > 参考资料:
 > - [openGauss Documentation - 窗口函数](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/Window-Functions.html)
 > - PostgreSQL Documentation (openGauss 基于 PostgreSQL 内核)
-> - openGauss 基于 PostgreSQL 内核，窗口函数语法兼容
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## openGauss 基于 PostgreSQL 内核，窗口函数语法兼容
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

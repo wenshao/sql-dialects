@@ -4,10 +4,12 @@
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
 > - [Derby Tuning Guide](https://db.apache.org/derby/docs/10.16/tuning/)
-> - ============================================================
-> - 1. 基本 DELETE
-> - ============================================================
-> - 单行删除
+
+
+## 基本 DELETE
+
+
+## 单行删除
 
 ```sql
 DELETE FROM users WHERE username = 'alice';

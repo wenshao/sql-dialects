@@ -2,9 +2,9 @@
 
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
-> - ============================================================
-> - DECLARE HANDLER / SIGNAL (MySQL 兼容)
-> - ============================================================
+
+
+## DECLARE HANDLER / SIGNAL (MySQL 兼容)
 
 ```sql
 DELIMITER //

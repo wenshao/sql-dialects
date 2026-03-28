@@ -3,9 +3,10 @@
 > 参考资料:
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/document_detail/316280.html)
 > - [PolarDB PostgreSQL Documentation](https://help.aliyun.com/document_detail/172538.html)
-> - ============================================================
-> - PolarDB MySQL 兼容版
-> - ============================================================
+
+
+## PolarDB MySQL 兼容版
+
 
 ```sql
 CREATE TEMPORARY TABLE temp_users (

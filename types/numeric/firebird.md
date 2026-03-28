@@ -3,10 +3,12 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - Integer types
-> - SMALLINT:  2 bytes, -32768 ~ 32767
-> - INTEGER:   4 bytes, -2^31 ~ 2^31-1
-> - BIGINT:    8 bytes, -2^63 ~ 2^63-1 (1.5+)
+
+
+Integer types
+SMALLINT:  2 bytes, -32768 ~ 32767
+INTEGER:   4 bytes, -2^31 ~ 2^31-1
+BIGINT:    8 bytes, -2^63 ~ 2^63-1 (1.5+)
 
 ```sql
 CREATE TABLE examples (

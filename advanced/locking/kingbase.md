@@ -3,9 +3,10 @@
 > 参考资料:
 > - [KingbaseES 文档 - 并发控制](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/SQL_statements_9.html)
 > - [KingbaseES 文档 - LOCK](https://help.kingbase.com.cn/v8/development/sql-plsql/sql/SQL_statements_10.html)
-> - ============================================================
-> - 行级锁（兼容 PostgreSQL）
-> - ============================================================
+
+
+## 行级锁（兼容 PostgreSQL）
+
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

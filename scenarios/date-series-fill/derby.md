@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Apache Derby Documentation](https://db.apache.org/derby/docs/10.16/ref/rrefsqljwith.html)
 > - [Apache Derby Documentation](https://db.apache.org/derby/docs/10.16/ref/)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE daily_sales (sale_date DATE PRIMARY KEY, amount DECIMAL(10,2));

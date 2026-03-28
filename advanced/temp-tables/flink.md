@@ -1,0 +1,80 @@
+# Flink SQL: 临时表
+
+> 参考资料:
+> - [Flink Documentation - CREATE TABLE](https://nightlies.apache.org/flink/flink-docs-stable/docs/dev/table/sql/create/)
+> - [Flink Documentation - Temporary Tables](https://nightlies.apache.org/flink/flink-docs-stable/docs/dev/table/common/#temporary-vs-permanent-tables)
+
+**引擎定位**: 流批一体计算引擎。表是外部系统的映射，支持 Changelog 语义和 Watermark 机制。
+
+## CREATE TEMPORARY TABLE
+
+
+临时表（会话级别）
+```sql
+CREATE TEMPORARY TABLE temp_users (
+    id BIGINT, username STRING, email STRING
+) WITH (
+    'connector' = 'filesystem',
+    'path' = '/tmp/temp_users',
+    'format' = 'csv'
+);
+
+```
+
+**注意:** Flink 的临时表需要指定 connector
+
+## CREATE TEMPORARY VIEW（更常用）
+
+
+```sql
+CREATE TEMPORARY VIEW temp_active_users AS
+SELECT * FROM users WHERE status = 1;
+
+CREATE TEMPORARY VIEW temp_orders AS
+SELECT user_id, SUM(amount) AS total
+FROM orders
+GROUP BY user_id;
+
+```
+
+## 使用临时视图
+
+
+```sql
+SELECT u.username, t.total
+FROM temp_active_users u
+JOIN temp_orders t ON u.id = t.user_id;
+
+```
+
+删除
+```sql
+DROP TEMPORARY VIEW IF EXISTS temp_active_users;
+
+```
+
+## CTE
+
+
+```sql
+WITH stats AS (
+    SELECT user_id, COUNT(*) AS cnt FROM orders GROUP BY user_id
+)
+SELECT u.username, s.cnt FROM users u JOIN stats s ON u.id = s.user_id;
+
+```
+
+## 内联表（VALUES）
+
+
+```sql
+CREATE TEMPORARY VIEW config AS
+SELECT * FROM (VALUES ('key1', 'val1'), ('key2', 'val2'))
+AS t(key_name, key_value);
+
+```
+
+**注意:** Flink 的临时表需要 connector 配置
+**注意:** 临时视图是更常用和简便的临时数据方式
+**注意:** 临时对象在会话结束时自动删除
+**注意:** CTE 可以组织复杂的流处理逻辑

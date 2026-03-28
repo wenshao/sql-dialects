@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Firebird SQL Reference](https://firebirdsql.org/en/reference-manuals/)
 > - [Firebird Release Notes](https://firebirdsql.org/file/documentation/release_notes/html/en/4_0/rlsnotes40.html)
-> - BEFORE INSERT trigger
+
+
+## BEFORE INSERT trigger
 
 ```sql
 SET TERM !! ;

@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Db2 SQL Reference](https://www.ibm.com/docs/en/db2/11.5?topic=sql)
 > - [Db2 Built-in Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-built-in)
-> - Add column
+
+
+## Add column
 
 ```sql
 ALTER TABLE users ADD COLUMN phone VARCHAR(20);

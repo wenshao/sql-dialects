@@ -3,9 +3,9 @@
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL for MySQL Documentation](https://cloud.tencent.com/document/product/557/7700)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

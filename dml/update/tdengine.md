@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 没有传统的 UPDATE 语句
-> - 通过插入相同时间戳的数据来实现更新（覆盖语义）
-> - ============================================================
-> - 覆盖更新（通过重复时间戳 INSERT）
-> - ============================================================
-> - 原始数据
+
+
+## TDengine 没有传统的 UPDATE 语句
+
+通过插入相同时间戳的数据来实现更新（覆盖语义）
+
+## 覆盖更新（通过重复时间戳 INSERT）
+
+
+## 原始数据
 
 ```sql
 INSERT INTO d1001 VALUES ('2024-01-15 10:00:00.000', 10.3, 219, 0.31);

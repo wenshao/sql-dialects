@@ -4,10 +4,11 @@
 > - [Apache Derby Documentation - IDENTITY Columns](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj37836.html)
 > - [Apache Derby Documentation - CREATE SEQUENCE](https://db.apache.org/derby/docs/10.16/ref/rrefsqljcreatesequence.html)
 > - [Apache Derby Documentation - NEXT VALUE FOR](https://db.apache.org/derby/docs/10.16/ref/rrefsqljnextvaluefor.html)
-> - ============================================
-> - IDENTITY 列
-> - ============================================
-> - GENERATED ALWAYS
+
+
+## IDENTITY 列
+
+## GENERATED ALWAYS
 
 ```sql
 CREATE TABLE users (

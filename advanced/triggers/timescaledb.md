@@ -1,6 +1,7 @@
 # TimescaleDB: 触发器
 
-TimescaleDB 继承 PostgreSQL 全部触发器功能
+## TimescaleDB 继承 PostgreSQL 全部触发器功能
+
 BEFORE INSERT
 
 ```sql

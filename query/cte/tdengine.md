@@ -3,17 +3,21 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TDengine 不支持 CTE（WITH 子句）
-> - 使用子查询和多次查询替代
-> - ============================================================
-> - 子查询替代 CTE
-> - ============================================================
-> - CTE 方式（不支持）：
-> - WITH hourly AS (
-> - SELECT _WSTART AS bucket, AVG(current) AS avg_current FROM d1001 INTERVAL(1h)
-> - )
-> - SELECT * FROM hourly WHERE avg_current > 10;
-> - 子查询替代：
+
+
+## TDengine 不支持 CTE（WITH 子句）
+
+使用子查询和多次查询替代
+
+## 子查询替代 CTE
+
+
+CTE 方式（不支持）：
+WITH hourly AS (
+SELECT _WSTART AS bucket, AVG(current) AS avg_current FROM d1001 INTERVAL(1h)
+)
+SELECT * FROM hourly WHERE avg_current > 10;
+子查询替代：
 
 ```sql
 SELECT * FROM (

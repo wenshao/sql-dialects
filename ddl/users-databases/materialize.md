@@ -3,14 +3,15 @@
 > 参考资料:
 > - [Materialize Documentation - CREATE DATABASE](https://materialize.com/docs/sql/create-database/)
 > - [Materialize Documentation - CREATE ROLE](https://materialize.com/docs/sql/create-role/)
-> - ============================================================
-> - Materialize 兼容 PostgreSQL 协议
-> - 命名层级: cluster > database > schema > object
-> - 默认: materialize 数据库, public 模式
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
+
+
+Materialize 兼容 PostgreSQL 协议
+命名层级: cluster > database > schema > object
+默认: materialize 数据库, public 模式
+
+
+## 数据库管理
+
 
 ```sql
 CREATE DATABASE myapp;

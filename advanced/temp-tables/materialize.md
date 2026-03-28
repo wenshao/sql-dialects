@@ -3,11 +3,14 @@
 > 参考资料:
 > - [Materialize Documentation - CREATE VIEW](https://materialize.com/docs/sql/create-view/)
 > - [Materialize Documentation - CREATE MATERIALIZED VIEW](https://materialize.com/docs/sql/create-materialized-view/)
-> - Materialize 不支持传统临时表
-> - 使用 VIEW 和 MATERIALIZED VIEW
-> - ============================================================
-> - 普通视图（虚拟临时数据）
-> - ============================================================
+
+
+## Materialize 不支持传统临时表
+
+使用 VIEW 和 MATERIALIZED VIEW
+
+## 普通视图（虚拟临时数据）
+
 
 ```sql
 CREATE VIEW active_users AS

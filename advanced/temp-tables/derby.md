@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [Derby Documentation - DECLARE GLOBAL TEMPORARY TABLE](https://db.apache.org/derby/docs/10.16/ref/rrefdeclaretemptable.html)
-> - ============================================================
-> - DECLARE GLOBAL TEMPORARY TABLE
-> - ============================================================
+
+
+## DECLARE GLOBAL TEMPORARY TABLE
+
 
 ```sql
 DECLARE GLOBAL TEMPORARY TABLE temp_users (

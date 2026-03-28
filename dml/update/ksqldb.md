@@ -3,14 +3,18 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 不支持 UPDATE 语句
-> - 数据更新通过其他机制实现
-> - ============================================================
-> - TABLE 更新（通过 INSERT 覆盖）
-> - ============================================================
-> - TABLE 基于 PRIMARY KEY 的 changelog 语义
-> - 插入相同 PRIMARY KEY 的新记录覆盖旧值
-> - 原始数据
+
+
+## ksqlDB 不支持 UPDATE 语句
+
+数据更新通过其他机制实现
+
+## TABLE 更新（通过 INSERT 覆盖）
+
+
+TABLE 基于 PRIMARY KEY 的 changelog 语义
+插入相同 PRIMARY KEY 的新记录覆盖旧值
+原始数据
 
 ```sql
 INSERT INTO users (user_id, username, email, region)

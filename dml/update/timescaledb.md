@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部 UPDATE 语法
-> - 注意：压缩的 chunk 不能直接 UPDATE
-> - 基本更新
+
+
+TimescaleDB 继承 PostgreSQL 全部 UPDATE 语法
+注意：压缩的 chunk 不能直接 UPDATE
+基本更新
 
 ```sql
 UPDATE sensor_data SET temperature = 25.0 WHERE sensor_id = 1 AND time = '2024-01-15 10:00:00+08';

@@ -5,10 +5,12 @@ Hologres 兼容 PostgreSQL 类型系统
 > 参考资料:
 > - [Hologres - Data Types](https://help.aliyun.com/zh/hologres/user-guide/data-types)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - 整数
-> - SMALLINT / INT2:  2 字节，-32768 ~ 32767
-> - INTEGER / INT4:   4 字节，-2^31 ~ 2^31-1
-> - BIGINT / INT8:    8 字节，-2^63 ~ 2^63-1
+
+
+整数
+SMALLINT / INT2:  2 字节，-32768 ~ 32767
+INTEGER / INT4:   4 字节，-2^31 ~ 2^31-1
+BIGINT / INT8:    8 字节，-2^63 ~ 2^63-1
 
 ```sql
 CREATE TABLE examples (

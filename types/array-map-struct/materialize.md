@@ -5,10 +5,12 @@
 > - [Materialize Documentation - Data Types (MAP)](https://materialize.com/docs/sql/types/map/)
 > - [Materialize Documentation - Data Types (RECORD)](https://materialize.com/docs/sql/types/record/)
 > - [Materialize Documentation - JSONB](https://materialize.com/docs/sql/types/jsonb/)
-> - ============================================================
-> - LIST 类型（Materialize 的数组类型）
-> - ============================================================
-> - LIST 类型（类似 PostgreSQL ARRAY，但使用不同的语法）
+
+
+## LIST 类型（Materialize 的数组类型）
+
+
+## LIST 类型（类似 PostgreSQL ARRAY，但使用不同的语法）
 
 ```sql
 SELECT LIST[1, 2, 3];

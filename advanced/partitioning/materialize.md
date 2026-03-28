@@ -2,11 +2,14 @@
 
 > 参考资料:
 > - [Materialize Documentation](https://materialize.com/docs/)
-> - Materialize 不支持传统表分区
-> - 使用索引和物化视图优化
-> - ============================================================
-> - 索引（Arrangement）
-> - ============================================================
+
+
+## Materialize 不支持传统表分区
+
+使用索引和物化视图优化
+
+## 索引（Arrangement）
+
 
 ```sql
 CREATE INDEX idx_orders_date ON orders (order_date);

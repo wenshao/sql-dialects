@@ -1,6 +1,6 @@
 # Firebird: Permissions
 
-Create user (3.0+ uses SQL, earlier versions use gsec utility)
+## Create user (3.0+ uses SQL, earlier versions use gsec utility)
 
 ```sql
 CREATE USER alice PASSWORD 'password123';

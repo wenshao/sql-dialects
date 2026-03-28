@@ -6,12 +6,14 @@ openGauss is PostgreSQL-compatible; GaussDB adds distributed capabilities.
 > - [openGauss SQL Reference - Subqueries](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation - SQL Syntax](https://support.huaweicloud.com/gaussdb/index.html)
 > - [openGauss Source - Optimizer](https://gitee.com/opengauss/openGauss-server/tree/master/src/gausskernel/runtime/executor)
-> - ============================================================
-> - 1. 标量子查询
-> - ============================================================
-> - 示例数据:
-> - users(id, username, age, city)
-> - orders(id, user_id, amount, status)
+
+
+## 标量子查询
+
+
+示例数据:
+users(id, username, age, city)
+orders(id, user_id, amount, status)
 
 ```sql
 SELECT username,

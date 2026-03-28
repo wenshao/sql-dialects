@@ -3,11 +3,14 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部约束功能
-> - 超级表（hypertable）对约束有额外限制
-> - ============================================================
-> - PRIMARY KEY（必须包含时间列）
-> - ============================================================
+
+
+## TimescaleDB 继承 PostgreSQL 全部约束功能
+
+超级表（hypertable）对约束有额外限制
+
+## PRIMARY KEY（必须包含时间列）
+
 
 ```sql
 CREATE TABLE sensor_data (

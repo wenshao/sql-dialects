@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - TIMESTAMP: 唯一的时间类型
-> - 支持毫秒（ms）、微秒（us）、纳秒（ns）精度
-> - 精度在创建数据库时指定
+
+
+TIMESTAMP: 唯一的时间类型
+支持毫秒（ms）、微秒（us）、纳秒（ns）精度
+精度在创建数据库时指定
 
 ```sql
 CREATE DATABASE power PRECISION 'ms';     -- 毫秒（默认）

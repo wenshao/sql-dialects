@@ -3,6 +3,7 @@
 > 参考资料:
 > - [Firebird Language Reference - Built-in Scalar Functions](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/)
 
+
 ```sql
 SELECT ABS(-42); SELECT CEIL(4.3); SELECT CEILING(4.3); SELECT FLOOR(4.7);
 SELECT ROUND(3.14159, 2); SELECT TRUNC(3.14159, 2);

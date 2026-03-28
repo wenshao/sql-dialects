@@ -3,15 +3,16 @@
 > 参考资料:
 > - [TimescaleDB Documentation - Window Functions](https://docs.timescale.com/)
 > - [PostgreSQL Documentation - Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（基于 PostgreSQL + 超表）:
-> - orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date TIMESTAMPTZ)
-> - SELECT create_hypertable('orders', 'order_date');
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构（基于 PostgreSQL + 超表）:
+orders(order_id SERIAL, customer_id INT, amount NUMERIC(10,2), order_date TIMESTAMPTZ)
+SELECT create_hypertable('orders', 'order_date');
+
+## Top-N 整体
+
 
 ```sql
 SELECT order_id, customer_id, amount

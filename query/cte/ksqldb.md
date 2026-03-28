@@ -3,15 +3,19 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 不支持传统的 CTE（WITH 子句）
-> - 通过创建中间 STREAM/TABLE 实现类似功能
-> - ============================================================
-> - 中间 STREAM/TABLE 替代 CTE
-> - ============================================================
-> - CTE 方式（不支持）：
-> - WITH filtered AS (SELECT * FROM events WHERE type = 'click')
-> - SELECT user_id, COUNT(*) FROM filtered GROUP BY user_id;
-> - 替代方案：创建中间 STREAM + 聚合 TABLE
+
+
+## ksqlDB 不支持传统的 CTE（WITH 子句）
+
+通过创建中间 STREAM/TABLE 实现类似功能
+
+## 中间 STREAM/TABLE 替代 CTE
+
+
+CTE 方式（不支持）：
+WITH filtered AS (SELECT * FROM events WHERE type = 'click')
+SELECT user_id, COUNT(*) FROM filtered GROUP BY user_id;
+替代方案：创建中间 STREAM + 聚合 TABLE
 
 ```sql
 CREATE STREAM click_events AS

@@ -8,13 +8,15 @@ Note: Full-text search support is limited in TDSQL distributed mode.
 > - [TDSQL MySQL Documentation - Index Types](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference - Full-Text Search](https://dev.mysql.com/doc/refman/8.0/en/fulltext-search.html)
 > - [MySQL 8.0 Reference - FULLTEXT Indexes](https://dev.mysql.com/doc/refman/8.0/en/create-index.html)
-> - ============================================================
-> - 1. 创建全文索引
-> - ============================================================
-> - 示例数据:
-> - articles(id, title, content, author, created_at, shardkey)
-> - users(id, username, bio, shardkey)
-> - 单列全文索引
+
+
+## 创建全文索引
+
+
+示例数据:
+articles(id, title, content, author, created_at, shardkey)
+users(id, username, bio, shardkey)
+单列全文索引
 
 ```sql
 CREATE FULLTEXT INDEX idx_ft_bio ON users (bio);

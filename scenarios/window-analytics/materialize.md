@@ -3,11 +3,14 @@
 > 参考资料:
 > - [Materialize Documentation - Window Functions](https://materialize.com/docs/sql/functions/#window-functions)
 > - [Materialize Documentation - SQL Reference](https://materialize.com/docs/sql/)
-> - Materialize 兼容 PostgreSQL，支持增量维护的窗口函数
-> - 假设表结构同 PostgreSQL
-> - ============================================================
-> - 1. 移动平均
-> - ============================================================
+
+
+## Materialize 兼容 PostgreSQL，支持增量维护的窗口函数
+
+假设表结构同 PostgreSQL
+
+## 移动平均
+
 
 ```sql
 SELECT sale_date, amount,

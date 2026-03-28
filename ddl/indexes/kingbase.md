@@ -5,7 +5,9 @@ PostgreSQL compatible syntax.
 > 参考资料:
 > - [KingbaseES SQL Reference](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Documentation](https://help.kingbase.com.cn/v8/index.html)
-> - 普通索引（B-tree，默认）
+
+
+## 普通索引（B-tree，默认）
 
 ```sql
 CREATE INDEX idx_age ON users (age);

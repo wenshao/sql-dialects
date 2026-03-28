@@ -3,11 +3,14 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - ARRAY Data Type](https://help.sap.com/docs/HANA_SERVICE_CF/7c78579ce9b14a669c1f3295b0d8ca16/20a1569875191014b507cf392724b7eb.html)
 > - [SAP HANA SQL Reference - JSON Functions](https://help.sap.com/docs/HANA_SERVICE_CF/7c78579ce9b14a669c1f3295b0d8ca16/3918498e41a44cbc9a4f4e5f41b29a23.html)
-> - ============================================================
-> - ARRAY 类型（SAP HANA 2.0 SPS 02+，仅 SQL Script/过程）
-> - ============================================================
-> - 注意: ARRAY 主要用于 SQL Script 过程中，不能作为表列类型
-> - SQL Script 中的数组
+
+
+## ARRAY 类型（SAP HANA 2.0 SPS 02+，仅 SQL Script/过程）
+
+
+## 注意: ARRAY 主要用于 SQL Script 过程中，不能作为表列类型
+
+SQL Script 中的数组
 
 ```sql
 DO BEGIN

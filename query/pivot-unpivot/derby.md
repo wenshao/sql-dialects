@@ -3,14 +3,14 @@
 > 参考资料:
 > - [Apache Derby Reference Manual - SELECT](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj41360.html)
 > - [Apache Derby Reference Manual - CASE Expression](https://db.apache.org/derby/docs/10.16/ref/rrefsqlj31783.html)
-> - ============================================================
-> - 注意：Derby 没有原生 PIVOT / UNPIVOT 语法
-> - 使用 CASE WHEN + GROUP BY 实现 PIVOT
-> - 使用 UNION ALL 实现 UNPIVOT
-> - ============================================================
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY
-> - ============================================================
+
+
+注意：Derby 没有原生 PIVOT / UNPIVOT 语法
+使用 CASE WHEN + GROUP BY 实现 PIVOT
+使用 UNION ALL 实现 UNPIVOT
+
+
+## PIVOT: CASE WHEN + GROUP BY
 
 ```sql
 SELECT

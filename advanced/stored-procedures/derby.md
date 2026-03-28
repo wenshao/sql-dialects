@@ -1,9 +1,10 @@
 # Derby: 存储过程
 
-Derby 通过 Java 方法实现存储过程和函数
-============================================================
-创建存储过程（Java 方法）
-============================================================
+## Derby 通过 Java 方法实现存储过程和函数
+
+## 创建存储过程（Java 方法）
+
+
 步骤 1：编写 Java 类
 public class MyProcedures {
 public static void getUser(String username, ResultSet[] rs)

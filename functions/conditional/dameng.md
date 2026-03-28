@@ -5,7 +5,9 @@ Oracle compatible syntax.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - CASE WHEN
+
+
+## CASE WHEN
 
 ```sql
 SELECT username,

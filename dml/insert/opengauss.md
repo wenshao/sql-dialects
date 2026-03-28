@@ -5,7 +5,9 @@ PostgreSQL compatible syntax.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 单行插入
+
+
+## 单行插入
 
 ```sql
 INSERT INTO users (username, email, age) VALUES ('alice', 'alice@example.com', 25);

@@ -6,7 +6,9 @@ Supports distributed DDL with shardkey, broadcast tables, and strong consistency
 > 参考资料:
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
-> - 基本建表（MySQL 兼容语法）
+
+
+## 基本建表（MySQL 兼容语法）
 
 ```sql
 CREATE TABLE users (

@@ -5,11 +5,13 @@ PolarDB-X (distributed, MySQL compatible).
 > 参考资料:
 > - [PolarDB-X SQL Reference](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
-> - DATE: 'YYYY-MM-DD'
-> - TIME: 'HH:MM:SS'
-> - DATETIME: 'YYYY-MM-DD HH:MM:SS'，范围 1000-01-01 ~ 9999-12-31
-> - TIMESTAMP: 存储为 UTC，自动转时区，范围 1970-01-01 ~ 2038-01-19
-> - YEAR: 1901 ~ 2155
+
+
+DATE: 'YYYY-MM-DD'
+TIME: 'HH:MM:SS'
+DATETIME: 'YYYY-MM-DD HH:MM:SS'，范围 1000-01-01 ~ 9999-12-31
+TIMESTAMP: 存储为 UTC，自动转时区，范围 1970-01-01 ~ 2038-01-19
+YEAR: 1901 ~ 2155
 
 ```sql
 CREATE TABLE events (

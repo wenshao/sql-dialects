@@ -1,6 +1,7 @@
 # Materialize: 事务
 
-Materialize 支持 PostgreSQL 兼容的事务语法（有限制）
+## Materialize 支持 PostgreSQL 兼容的事务语法（有限制）
+
 基本事务
 
 ```sql

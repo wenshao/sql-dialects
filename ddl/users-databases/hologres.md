@@ -3,15 +3,17 @@
 > 参考资料:
 > - [Hologres Documentation - 数据库管理](https://help.aliyun.com/document_detail/171699.html)
 > - [Hologres Documentation - 用户与权限](https://help.aliyun.com/document_detail/172191.html)
-> - ============================================================
-> - Hologres 兼容 PostgreSQL 协议
-> - 命名层级: 实例 > 数据库 > 模式 > 对象
-> - 默认: postgres 数据库, public 模式
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
-> - 通过 SQL 创建数据库
+
+
+Hologres 兼容 PostgreSQL 协议
+命名层级: 实例 > 数据库 > 模式 > 对象
+默认: postgres 数据库, public 模式
+
+
+## 数据库管理
+
+
+## 通过 SQL 创建数据库
 
 ```sql
 CREATE DATABASE myapp;

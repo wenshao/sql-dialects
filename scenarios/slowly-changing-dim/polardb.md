@@ -5,10 +5,12 @@
 > - [PolarDB MySQL 版文档 - DML](https://help.aliyun.com/document_detail/176116.html)
 > - [PolarDB PostgreSQL 版文档 - INSERT ON CONFLICT](https://help.aliyun.com/document_detail/455098.html)
 > - [Kimball Group - SCD Types](https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - PolarDB MySQL 版兼容 MySQL DDL/DML
+
+
+## 维度表结构
+
+
+## PolarDB MySQL 版兼容 MySQL DDL/DML
 
 ```sql
 CREATE TABLE dim_customer (

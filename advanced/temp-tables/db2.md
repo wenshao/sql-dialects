@@ -3,9 +3,10 @@
 > 参考资料:
 > - [IBM Documentation - DECLARE GLOBAL TEMPORARY TABLE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-declare-global-temporary-table)
 > - [IBM Documentation - CREATE GLOBAL TEMPORARY TABLE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-create-global-temporary-table)
-> - ============================================================
-> - DECLARE GLOBAL TEMPORARY TABLE（会话级）
-> - ============================================================
+
+
+## DECLARE GLOBAL TEMPORARY TABLE（会话级）
+
 
 ```sql
 DECLARE GLOBAL TEMPORARY TABLE temp_users (

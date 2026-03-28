@@ -3,9 +3,9 @@
 > 参考资料:
 > - [Firebird Documentation - CREATE VIEW](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-ddl-view)
 > - [Firebird Documentation - Views](https://firebirdsql.org/file/documentation/html/en/refdocs/fblangref40/firebird-40-language-reference.html#fblangref40-ddl-view-create)
-> - ============================================
-> - 基本视图
-> - ============================================
+
+
+## 基本视图
 
 ```sql
 CREATE VIEW active_users AS

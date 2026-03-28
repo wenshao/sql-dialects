@@ -3,9 +3,10 @@
 > 参考资料:
 > - [IBM Documentation - Range-Partitioned Tables](https://www.ibm.com/docs/en/db2/11.5?topic=tables-range-partitioned)
 > - [IBM Documentation - Multidimensional Clustering](https://www.ibm.com/docs/en/db2/11.5?topic=tables-multidimensional-clustering)
-> - ============================================================
-> - RANGE 分区
-> - ============================================================
+
+
+## RANGE 分区
+
 
 ```sql
 CREATE TABLE orders (

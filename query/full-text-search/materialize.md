@@ -3,11 +3,14 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 支持基本的字符串匹配
-> - 不支持 PostgreSQL 的 tsvector/tsquery 全文搜索
-> - ============================================================
-> - LIKE 模糊搜索
-> - ============================================================
+
+
+## Materialize 支持基本的字符串匹配
+
+不支持 PostgreSQL 的 tsvector/tsquery 全文搜索
+
+## LIKE 模糊搜索
+
 
 ```sql
 SELECT * FROM articles WHERE content LIKE '%database%';

@@ -6,14 +6,16 @@ TDSQL distributed MySQL-compatible syntax.
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - Numeric Data Types](https://dev.mysql.com/doc/refman/8.0/en/numeric-types.html)
-> - ============================================================
-> - 1. 整数类型
-> - ============================================================
-> - TINYINT:   1 字节，-128 ~ 127（UNSIGNED: 0 ~ 255）
-> - SMALLINT:  2 字节，-32768 ~ 32767（UNSIGNED: 0 ~ 65535）
-> - MEDIUMINT: 3 字节，-8388608 ~ 8388607（UNSIGNED: 0 ~ 16777215）
-> - INT:       4 字节，-2^31 ~ 2^31-1（UNSIGNED: 0 ~ 2^32-1）
-> - BIGINT:    8 字节，-2^63 ~ 2^63-1（UNSIGNED: 0 ~ 2^64-1）
+
+
+## 整数类型
+
+
+TINYINT:   1 字节，-128 ~ 127（UNSIGNED: 0 ~ 255）
+SMALLINT:  2 字节，-32768 ~ 32767（UNSIGNED: 0 ~ 65535）
+MEDIUMINT: 3 字节，-8388608 ~ 8388607（UNSIGNED: 0 ~ 16777215）
+INT:       4 字节，-2^31 ~ 2^31-1（UNSIGNED: 0 ~ 2^32-1）
+BIGINT:    8 字节，-2^63 ~ 2^63-1（UNSIGNED: 0 ~ 2^64-1）
 
 ```sql
 CREATE TABLE examples (

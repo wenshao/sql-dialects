@@ -2,14 +2,16 @@
 
 > 参考资料:
 > - [Materialize Documentation](https://materialize.com/docs/sql/select/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - users(user_id INT, email VARCHAR, username VARCHAR, created_at TIMESTAMP)
-> - ============================================================
-> - 1. 查找重复数据
-> - ============================================================
+
+
+## 示例数据上下文
+
+## 假设表结构:
+
+users(user_id INT, email VARCHAR, username VARCHAR, created_at TIMESTAMP)
+
+## 查找重复数据
+
 
 ```sql
 SELECT email, COUNT(*) AS cnt

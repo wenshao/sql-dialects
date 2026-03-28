@@ -2,16 +2,17 @@
 
 > 参考资料:
 > - [Apache Derby Documentation](https://db.apache.org/derby/docs/10.15/ref/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(txn_id INT, account_id INT, amount DECIMAL(10,2), txn_date DATE)
-> - 注意：Derby 仅支持 ROW_NUMBER()
-> - Derby 不支持 SUM() OVER / AVG() OVER 等窗口聚合函数
-> - ============================================================
-> - 替代方案：关联子查询
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+transactions(txn_id INT, account_id INT, amount DECIMAL(10,2), txn_date DATE)
+注意：Derby 仅支持 ROW_NUMBER()
+Derby 不支持 SUM() OVER / AVG() OVER 等窗口聚合函数
+
+## 替代方案：关联子查询
+
 
 ```sql
 SELECT t1.txn_id, t1.amount, t1.txn_date,

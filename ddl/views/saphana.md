@@ -4,9 +4,9 @@
 > - [SAP HANA SQL Reference - CREATE VIEW](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d5fa9b75191014b2fe92141b7df228.html)
 > - [SAP HANA Documentation - SQL Views](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d5fa9b75191014b2fe92141b7df228.html)
 > - [SAP HANA Documentation - Calculation Views](https://help.sap.com/docs/SAP_HANA_PLATFORM)
-> - ============================================
-> - 基本视图 (SQL View)
-> - ============================================
+
+
+## 基本视图 (SQL View)
 
 ```sql
 CREATE VIEW active_users AS

@@ -3,11 +3,14 @@
 > 参考资料:
 > - [ksqlDB Documentation - Queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-pull-query/)
 > - [ksqlDB Documentation - CREATE STREAM](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/create-stream/)
-> - ============================================================
-> - 注意：ksqlDB 不直接支持标准的 UNION 语法
-> - 需要通过创建多个流并合并来实现类似效果
-> - ============================================================
-> - 模拟 UNION ALL：使用 INSERT INTO 合并多个流到一个流
+
+
+## 注意：ksqlDB 不直接支持标准的 UNION 语法
+
+需要通过创建多个流并合并来实现类似效果
+
+
+## 模拟 UNION ALL：使用 INSERT INTO 合并多个流到一个流
 
 ```sql
 CREATE STREAM all_events (

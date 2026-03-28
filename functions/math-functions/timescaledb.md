@@ -3,7 +3,9 @@
 > 参考资料:
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
 > - [PostgreSQL Mathematical Functions](https://www.postgresql.org/docs/current/functions-math.html)
-> - 完全兼容 PostgreSQL 数学函数
+
+
+## 完全兼容 PostgreSQL 数学函数
 
 ```sql
 SELECT ABS(-42); SELECT CEIL(4.3); SELECT FLOOR(4.7);

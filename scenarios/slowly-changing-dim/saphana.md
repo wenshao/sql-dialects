@@ -3,9 +3,9 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - MERGE / UPSERT](https://help.sap.com/docs/HANA_CLOUD/c1d3f60099654ecfb3fe36ac93c121bb/)
 > - [SAP HANA - System-Versioned Tables](https://help.sap.com/docs/HANA_CLOUD/c1d3f60099654ecfb3fe36ac93c121bb/)
-> - ============================================================
-> - SCD Type 1: UPSERT / MERGE
-> - ============================================================
+
+
+## SCD Type 1: UPSERT / MERGE
 
 ```sql
 MERGE INTO dim_customer AS t

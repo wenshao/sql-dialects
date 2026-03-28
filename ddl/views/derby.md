@@ -7,9 +7,9 @@ Apache Derby is a lightweight Java embedded relational database.
 > - [Apache Derby 10.16 Developer Guide - Views](https://db.apache.org/derby/docs/10.16/devguide/cdevspecial41021.html)
 > - [Apache Derby 10.16 Reference - System Tables](https://db.apache.org/derby/docs/10.16/ref/rrefsistabs38369.html)
 > - [Apache Derby 10.16 Tools Guide - sysinfo](https://db.apache.org/derby/docs/10.16/tools/ctoolsdblook.html)
-> - ============================================================
-> - 1. 基本视图
-> - ============================================================
+
+
+## 基本视图
 
 ```sql
 CREATE VIEW active_users AS

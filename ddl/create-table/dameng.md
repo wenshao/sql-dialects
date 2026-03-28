@@ -6,7 +6,9 @@ Supports Oracle-style PL/SQL, sequences, packages.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 基本建表（Oracle 兼容语法）
+
+
+## 基本建表（Oracle 兼容语法）
 
 ```sql
 CREATE TABLE users (

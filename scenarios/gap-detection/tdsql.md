@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TDSQL Documentation - Window Functions](https://cloud.tencent.com/document/product/557/20042)
 > - [TDSQL Documentation - SQL Reference](https://cloud.tencent.com/document/product/557/19764)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT PRIMARY KEY, info VARCHAR(100));

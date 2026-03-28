@@ -4,9 +4,10 @@
 > - [openGauss 文档 - 并发控制](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/LOCK.html)
 > - [openGauss 文档 - SELECT FOR UPDATE](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SELECT.html)
 > - [openGauss 文档 - pg_locks](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/PG_LOCKS.html)
-> - ============================================================
-> - 行级锁（基于 PostgreSQL）
-> - ============================================================
+
+
+## 行级锁（基于 PostgreSQL）
+
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

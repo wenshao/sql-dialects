@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 不支持传统索引
-> - 数据组织通过 Kafka 的分区机制实现
-> - ============================================================
-> - KEY 列（类似主键，用于分区）
-> - ============================================================
-> - STREAM 的 KEY
+
+
+## ksqlDB 不支持传统索引
+
+数据组织通过 Kafka 的分区机制实现
+
+## KEY 列（类似主键，用于分区）
+
+
+## STREAM 的 KEY
 
 ```sql
 CREATE STREAM pageviews (

@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 兼容 PostgreSQL 日期时间类型
-> - DATE, TIME, TIMESTAMP, TIMESTAMPTZ, INTERVAL
+
+
+## Materialize 兼容 PostgreSQL 日期时间类型
+
+DATE, TIME, TIMESTAMP, TIMESTAMPTZ, INTERVAL
 
 ```sql
 CREATE TABLE events (

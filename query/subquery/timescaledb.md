@@ -3,8 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部子查询功能
-> - 标量子查询
+
+
+## TimescaleDB 继承 PostgreSQL 全部子查询功能
+
+标量子查询
 
 ```sql
 SELECT sensor_id,

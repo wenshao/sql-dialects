@@ -3,14 +3,14 @@
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL for MySQL Documentation](https://cloud.tencent.com/document/product/557/7700)
-> - ============================================================
-> - 注意：TDSQL 兼容 MySQL，没有原生 PIVOT / UNPIVOT 语法
-> - 使用 CASE WHEN + GROUP BY 实现 PIVOT
-> - 使用 UNION ALL 实现 UNPIVOT
-> - ============================================================
-> - ============================================================
-> - PIVOT: CASE WHEN + GROUP BY
-> - ============================================================
+
+
+注意：TDSQL 兼容 MySQL，没有原生 PIVOT / UNPIVOT 语法
+使用 CASE WHEN + GROUP BY 实现 PIVOT
+使用 UNION ALL 实现 UNPIVOT
+
+
+## PIVOT: CASE WHEN + GROUP BY
 
 ```sql
 SELECT

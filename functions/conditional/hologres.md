@@ -5,7 +5,9 @@ Hologres 兼容 PostgreSQL 条件函数
 > 参考资料:
 > - [Hologres - Conditional Functions](https://help.aliyun.com/zh/hologres/user-guide/conditional-functions)
 > - [Hologres Built-in Functions](https://help.aliyun.com/zh/hologres/user-guide/built-in-functions)
-> - CASE WHEN
+
+
+## CASE WHEN
 
 ```sql
 SELECT username,

@@ -7,12 +7,14 @@ PolarDB-X is a distributed version with sharding support.
 > - [PolarDB-X SQL Reference - Subqueries](https://help.aliyun.com/zh/polardb/polardb-for-xscale/sql-reference/)
 > - [PolarDB MySQL Documentation - SQL Syntax](https://help.aliyun.com/zh/polardb/polardb-for-mysql/)
 > - [PolarDB-X Optimizer Architecture](https://help.aliyun.com/zh/polardb/polardb-for-xscale/optimizer/)
-> - ============================================================
-> - 1. 标量子查询
-> - ============================================================
-> - 示例数据:
-> - users(id, username, age, city)
-> - orders(id, user_id, amount, status, dbpartition_key)
+
+
+## 标量子查询
+
+
+示例数据:
+users(id, username, age, city)
+orders(id, user_id, amount, status, dbpartition_key)
 
 ```sql
 SELECT username,

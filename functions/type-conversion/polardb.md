@@ -2,7 +2,9 @@
 
 > 参考资料:
 > - [PolarDB Documentation](https://www.alibabacloud.com/help/en/polardb/)
-> - PolarDB for PostgreSQL
+
+
+## PolarDB for PostgreSQL
 
 ```sql
 SELECT CAST(42 AS TEXT); SELECT 42::TEXT; SELECT '42'::INTEGER;

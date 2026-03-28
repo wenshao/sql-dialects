@@ -3,9 +3,9 @@
 > 参考资料:
 > - [openGauss Documentation - UNION / INTERSECT / EXCEPT](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/UNION-INTERSECT-EXCEPT-MINUS.html)
 > - [openGauss Documentation - SELECT](https://docs.opengauss.org/en/docs/latest/docs/SQLReference/SELECT.html)
-> - ============================================================
-> - UNION / UNION ALL
-> - ============================================================
+
+
+## UNION / UNION ALL
 
 ```sql
 SELECT id, name FROM employees

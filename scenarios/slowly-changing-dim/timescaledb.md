@@ -5,10 +5,12 @@
 > - [TimescaleDB Documentation - PostgreSQL Compatibility](https://docs.timescale.com/use-timescale/latest/compression/)
 > - [PostgreSQL Documentation - INSERT ON CONFLICT](https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT)
 > - [PostgreSQL Documentation - MERGE (15+)](https://www.postgresql.org/docs/15/sql-merge.html)
-> - ============================================================
-> - 1. 维度表结构
-> - ============================================================
-> - TimescaleDB 完全兼容 PostgreSQL DDL/DML
+
+
+## 维度表结构
+
+
+## TimescaleDB 完全兼容 PostgreSQL DDL/DML
 
 ```sql
 CREATE TABLE dim_customer (

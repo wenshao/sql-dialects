@@ -3,15 +3,18 @@
 > 参考资料:
 > - [达梦数据库 SQL 参考手册](https://eco.dameng.com/document/dm/zh-cn/sql-dev/dmpl-sql-query.html)
 > - [达梦数据库分析函数参考](https://eco.dameng.com/document/dm/zh-cn/sql-dev/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构（兼容 Oracle 语法）:
-> - orders(order_id INT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
-> - ============================================================
-> - 1. Top-N 整体
-> - ============================================================
-> - TOP 语法
+
+
+## 示例数据上下文
+
+## 假设表结构（兼容 Oracle 语法）:
+
+orders(order_id INT, customer_id INT, amount DECIMAL(10,2), order_date DATE)
+
+## Top-N 整体
+
+
+## TOP 语法
 
 ```sql
 SELECT TOP 10 order_id, customer_id, amount

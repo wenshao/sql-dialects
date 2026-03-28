@@ -3,19 +3,23 @@
 > 参考资料:
 > - [Hologres - Account Management](https://help.aliyun.com/zh/hologres/user-guide/user-authorization)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - Hologres 兼容 PostgreSQL 权限语法 + 阿里云 RAM
-> - ============================================================
-> - 阿里云 RAM 集成
-> - ============================================================
-> - Hologres 用户对应阿里云 RAM 用户或 RAM 角色
-> - 需要先在阿里云 RAM 中创建用户
-> - 实例级别权限通过阿里云控制台管理：
-> - 超级管理员（Superuser）
-> - 普通用户
-> - ============================================================
-> - 创建用户（映射 RAM 用户）
-> - ============================================================
-> - 创建用户（使用阿里云 UID）
+
+
+## Hologres 兼容 PostgreSQL 权限语法 + 阿里云 RAM
+
+## 阿里云 RAM 集成
+
+
+Hologres 用户对应阿里云 RAM 用户或 RAM 角色
+需要先在阿里云 RAM 中创建用户
+实例级别权限通过阿里云控制台管理：
+超级管理员（Superuser）
+普通用户
+
+## 创建用户（映射 RAM 用户）
+
+
+## 创建用户（使用阿里云 UID）
 
 ```sql
 CREATE USER "p4_uid";  -- RAM 用户的 UID

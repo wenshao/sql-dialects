@@ -3,6 +3,7 @@
 > 参考资料:
 > - [ksqlDB Function Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/scalar-functions/)
 
+
 ```sql
 SELECT CAST(42 AS VARCHAR); SELECT CAST('42' AS INTEGER);
 SELECT CAST('3.14' AS DOUBLE); SELECT CAST('42' AS BIGINT);

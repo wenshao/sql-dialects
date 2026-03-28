@@ -2,19 +2,21 @@
 
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设 STREAM / TABLE:
-> - CREATE STREAM events (event_id VARCHAR KEY, user_id VARCHAR, event_type VARCHAR)
-> - WITH (KAFKA_TOPIC='events', VALUE_FORMAT='JSON');
-> - ============================================================
-> - 注意：ksqlDB 是流处理引擎，去重方式与传统数据库不同
-> - ============================================================
-> - ============================================================
-> - 1. TABLE 天然去重（基于 KEY）
-> - ============================================================
-> - TABLE 基于 PRIMARY KEY 保留最新值（变更日志语义）
+
+
+## 示例数据上下文
+
+假设 STREAM / TABLE:
+CREATE STREAM events (event_id VARCHAR KEY, user_id VARCHAR, event_type VARCHAR)
+WITH (KAFKA_TOPIC='events', VALUE_FORMAT='JSON');
+
+## 注意：ksqlDB 是流处理引擎，去重方式与传统数据库不同
+
+
+## TABLE 天然去重（基于 KEY）
+
+
+## TABLE 基于 PRIMARY KEY 保留最新值（变更日志语义）
 
 ```sql
 CREATE TABLE users (

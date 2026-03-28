@@ -6,10 +6,12 @@ TDSQL distributed MySQL-compatible syntax.
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL Distributed Transaction Guide](https://cloud.tencent.com/document/product/557/10575)
-> - ============================================================
-> - 1. 基本 UPDATE
-> - ============================================================
-> - 单列更新
+
+
+## 基本 UPDATE
+
+
+## 单列更新
 
 ```sql
 UPDATE users SET age = 26 WHERE username = 'alice';

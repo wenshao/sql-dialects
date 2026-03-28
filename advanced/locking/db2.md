@@ -5,10 +5,12 @@
 > - [IBM Db2 Documentation - LOCK TABLE](https://www.ibm.com/docs/en/db2/11.5?topic=statements-lock-table)
 > - [IBM Db2 Documentation - Isolation Levels](https://www.ibm.com/docs/en/db2/11.5?topic=levels-isolation)
 > - [IBM Db2 Documentation - Lock Monitoring](https://www.ibm.com/docs/en/db2/11.5?topic=monitoring-locks)
-> - ============================================================
-> - 行级锁 (Row-Level Locks)
-> - ============================================================
-> - SELECT FOR UPDATE（Db2 使用 FOR UPDATE OF 语法）
+
+
+## 行级锁 (Row-Level Locks)
+
+
+## SELECT FOR UPDATE（Db2 使用 FOR UPDATE OF 语法）
 
 ```sql
 SELECT * FROM orders WHERE id = 100 FOR UPDATE;

@@ -3,14 +3,17 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - Derby 对 CTE 的支持有限（10.14+ 部分支持）
-> - ============================================================
-> - 子查询替代 CTE（推荐的通用方式）
-> - ============================================================
-> - CTE 方式（可能不支持）：
-> - WITH active_users AS (SELECT * FROM users WHERE status = 1)
-> - SELECT * FROM active_users WHERE age > 25;
-> - 子查询替代：
+
+
+## Derby 对 CTE 的支持有限（10.14+ 部分支持）
+
+## 子查询替代 CTE（推荐的通用方式）
+
+
+CTE 方式（可能不支持）：
+WITH active_users AS (SELECT * FROM users WHERE status = 1)
+SELECT * FROM active_users WHERE age > 25;
+子查询替代：
 
 ```sql
 SELECT * FROM (

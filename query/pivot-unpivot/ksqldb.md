@@ -3,14 +3,16 @@
 > 参考资料:
 > - [ksqlDB Documentation - Aggregate Functions](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/aggregate-functions/)
 > - [ksqlDB Documentation - Queries](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/select-push-query/)
-> - ============================================================
-> - 注意：ksqlDB 是流处理引擎，不支持标准 PIVOT / UNPIVOT
-> - 可通过 CASE WHEN + GROUP BY 在窗口内做有限的行转列
-> - ============================================================
-> - ============================================================
-> - PIVOT: CASE WHEN + 窗口聚合
-> - ============================================================
-> - 在时间窗口内做行转列
+
+
+## 注意：ksqlDB 是流处理引擎，不支持标准 PIVOT / UNPIVOT
+
+可通过 CASE WHEN + GROUP BY 在窗口内做有限的行转列
+
+
+## PIVOT: CASE WHEN + 窗口聚合
+
+## 在时间窗口内做行转列
 
 ```sql
 SELECT

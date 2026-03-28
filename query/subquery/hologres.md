@@ -3,7 +3,9 @@
 > 参考资料:
 > - [Hologres SQL - SELECT](https://help.aliyun.com/zh/hologres/user-guide/select)
 > - [Hologres SQL Reference](https://help.aliyun.com/zh/hologres/user-guide/overview-27)
-> - 标量子查询
+
+
+## 标量子查询
 
 ```sql
 SELECT username, (SELECT COUNT(*) FROM orders WHERE user_id = users.id) AS order_count

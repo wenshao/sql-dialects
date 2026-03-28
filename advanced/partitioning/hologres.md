@@ -2,10 +2,12 @@
 
 > 参考资料:
 > - [Hologres Documentation - Partitioned Tables](https://help.aliyun.com/document_detail/200792.html)
-> - ============================================================
-> - 分区表（兼容 PostgreSQL）
-> - ============================================================
-> - 创建分区父表
+
+
+## 分区表（兼容 PostgreSQL）
+
+
+## 创建分区父表
 
 ```sql
 CREATE TABLE orders (

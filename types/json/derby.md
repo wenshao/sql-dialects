@@ -1,10 +1,11 @@
 # Derby: JSON 类型
 
-Derby 不支持原生 JSON 类型
+## Derby 不支持原生 JSON 类型
+
 使用 VARCHAR/CLOB 存储 JSON 字符串
-============================================================
-VARCHAR/CLOB 存储 JSON
-============================================================
+
+## VARCHAR/CLOB 存储 JSON
+
 
 ```sql
 CREATE TABLE events (

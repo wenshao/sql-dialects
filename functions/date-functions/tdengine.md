@@ -1,6 +1,6 @@
 # TDengine: 日期函数
 
-当前时间
+## 当前时间
 
 ```sql
 SELECT NOW();

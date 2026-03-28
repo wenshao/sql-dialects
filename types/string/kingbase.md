@@ -6,9 +6,9 @@ PostgreSQL compatible with Oracle-compatible extensions.
 > - [KingbaseES SQL Reference - Data Types](https://help.kingbase.com.cn/v8/index.html)
 > - [KingbaseES Oracle Compatibility Guide](https://help.kingbase.com.cn/v8/development/sql-plsql/oracle-compat.html)
 > - [PostgreSQL Documentation - String Types](https://www.postgresql.org/docs/current/datatype-character.html)
-> - ============================================================
-> - 1. 字符串类型一览
-> - ============================================================
+
+
+## 字符串类型一览
 
 ```sql
 CREATE TABLE string_examples (

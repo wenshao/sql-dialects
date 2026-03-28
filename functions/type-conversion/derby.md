@@ -3,6 +3,7 @@
 > 参考资料:
 > - [Apache Derby Reference](https://db.apache.org/derby/docs/10.16/ref/)
 
+
 ```sql
 SELECT CAST(42 AS VARCHAR(10)); SELECT CAST('42' AS INTEGER);
 SELECT CAST('3.14' AS DECIMAL(10,2)); SELECT CAST('2024-01-15' AS DATE);

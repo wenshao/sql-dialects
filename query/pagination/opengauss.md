@@ -5,10 +5,12 @@
 > - [openGauss 开发者指南 - 游标](https://docs.opengauss.org/zh/docs/latest/docs/Developerguide/declaring-a-cursor.html)
 > - [GaussDB 文档中心](https://support.huaweicloud.com/gaussdb/index.html)
 > - [GaussDB SQL Reference](https://support.huaweicloud.com/intl/en-us/gaussdb/index.html)
-> - ============================================================
-> - 1. LIMIT / OFFSET（传统分页）
-> - ============================================================
-> - 基本分页: 跳过前 20 行，取 10 行
+
+
+## LIMIT / OFFSET（传统分页）
+
+
+## 基本分页: 跳过前 20 行，取 10 行
 
 ```sql
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;

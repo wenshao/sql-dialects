@@ -5,7 +5,9 @@ PostgreSQL compatible tsvector/tsquery approach.
 > 参考资料:
 > - [openGauss SQL Reference](https://docs.opengauss.org/zh/docs/latest/docs/SQLReference/SQL-reference.html)
 > - [GaussDB Documentation](https://support.huaweicloud.com/gaussdb/index.html)
-> - 基本搜索：tsvector + tsquery
+
+
+## 基本搜索：tsvector + tsquery
 
 ```sql
 SELECT * FROM articles

@@ -6,10 +6,12 @@ TDSQL 分布式 MySQL 兼容语法。
 > - [TDSQL-C MySQL 版文档](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL 版文档](https://cloud.tencent.com/document/product/557)
 > - [TDSQL SQL 兼容性说明](https://cloud.tencent.com/document/product/557/51107)
-> - ============================================================
-> - 1. LIMIT / OFFSET（MySQL 兼容语法）
-> - ============================================================
-> - LIMIT count OFFSET offset（推荐写法，语义清晰）
+
+
+## LIMIT / OFFSET（MySQL 兼容语法）
+
+
+## LIMIT count OFFSET offset（推荐写法，语义清晰）
 
 ```sql
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;

@@ -3,8 +3,11 @@
 > 参考资料:
 > - [Materialize SQL Reference](https://materialize.com/docs/sql/)
 > - [Materialize SQL Functions](https://materialize.com/docs/sql/functions/)
-> - Materialize 支持标准 SQL 分页语法（兼容 PostgreSQL）
-> - LIMIT / OFFSET
+
+
+## Materialize 支持标准 SQL 分页语法（兼容 PostgreSQL）
+
+LIMIT / OFFSET
 
 ```sql
 SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 20;

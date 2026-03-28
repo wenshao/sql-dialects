@@ -1,10 +1,11 @@
 # ksqlDB: JSON 类型
 
-ksqlDB 原生支持 JSON 作为数据序列化格式
+## ksqlDB 原生支持 JSON 作为数据序列化格式
+
 没有独立的 JSON 列类型，JSON 结构映射为 ksqlDB 类型
-============================================================
-JSON 格式的 STREAM/TABLE
-============================================================
+
+## JSON 格式的 STREAM/TABLE
+
 
 ```sql
 CREATE STREAM events (

@@ -3,15 +3,16 @@
 > 参考资料:
 > - [TDengine Documentation - CREATE DATABASE](https://docs.taosdata.com/reference/sql/database/)
 > - [TDengine Documentation - User Management](https://docs.taosdata.com/reference/sql/user/)
-> - ============================================================
-> - TDengine 是时序数据库
-> - 命名层级: cluster > database > stable(超级表) > table(子表)
-> - 没有 schema 概念
-> - 数据库是最基本的数据组织单元
-> - ============================================================
-> - ============================================================
-> - 1. 数据库管理
-> - ============================================================
+
+
+TDengine 是时序数据库
+命名层级: cluster > database > stable(超级表) > table(子表)
+没有 schema 概念
+数据库是最基本的数据组织单元
+
+
+## 数据库管理
+
 
 ```sql
 CREATE DATABASE myapp;

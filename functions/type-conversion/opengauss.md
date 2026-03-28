@@ -3,6 +3,7 @@
 > 参考资料:
 > - [openGauss Documentation](https://docs.opengauss.org/)
 
+
 ```sql
 SELECT CAST(42 AS TEXT); SELECT CAST('42' AS INTEGER); SELECT CAST('2024-01-15' AS DATE);
 SELECT 42::TEXT; SELECT '42'::INTEGER; SELECT '2024-01-15'::DATE;

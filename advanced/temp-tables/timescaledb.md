@@ -2,9 +2,10 @@
 
 > 参考资料:
 > - [TimescaleDB 基于 PostgreSQL，临时表语法相同](https://www.postgresql.org/docs/current/sql-createtable.html)
-> - ============================================================
-> - CREATE TEMPORARY TABLE（继承自 PostgreSQL）
-> - ============================================================
+
+
+## CREATE TEMPORARY TABLE（继承自 PostgreSQL）
+
 
 ```sql
 CREATE TEMP TABLE temp_sensor_data (

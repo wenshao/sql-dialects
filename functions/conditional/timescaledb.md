@@ -1,6 +1,7 @@
 # TimescaleDB: 条件函数
 
-TimescaleDB 继承 PostgreSQL 全部条件函数
+## TimescaleDB 继承 PostgreSQL 全部条件函数
+
 CASE WHEN
 
 ```sql

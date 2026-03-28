@@ -3,9 +3,10 @@
 > 参考资料:
 > - [TDSQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [TDSQL for MySQL - SQL 优化](https://cloud.tencent.com/document/product/557/10637)
-> - ============================================================
-> - EXPLAIN 基本用法（兼容 MySQL）
-> - ============================================================
+
+
+## EXPLAIN 基本用法（兼容 MySQL）
+
 
 ```sql
 EXPLAIN SELECT * FROM users WHERE username = 'alice';

@@ -3,9 +3,10 @@
 > 参考资料:
 > - [Materialize Documentation - Window Functions](https://materialize.com/docs/sql/functions/#window-functions)
 > - [Materialize Documentation - generate_series](https://materialize.com/docs/sql/functions/generate_series/)
-> - ============================================================
-> - 准备数据
-> - ============================================================
+
+
+## 准备数据
+
 
 ```sql
 CREATE TABLE orders (id INT, info TEXT);

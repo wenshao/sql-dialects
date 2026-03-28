@@ -3,12 +3,16 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部索引功能
-> - 额外自动为超级表的每个 chunk 创建索引
-> - ============================================================
-> - 标准索引（自动在每个 chunk 上创建）
-> - ============================================================
-> - B-tree 索引（默认）
+
+
+## TimescaleDB 继承 PostgreSQL 全部索引功能
+
+额外自动为超级表的每个 chunk 创建索引
+
+## 标准索引（自动在每个 chunk 上创建）
+
+
+## B-tree 索引（默认）
 
 ```sql
 CREATE INDEX idx_sensor_id ON sensor_data (sensor_id);

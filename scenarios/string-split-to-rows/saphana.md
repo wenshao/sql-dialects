@@ -3,9 +3,9 @@
 > 参考资料:
 > - [SAP HANA SQL Reference - SERIES_GENERATE_INTEGER](https://help.sap.com/docs/HANA_CLOUD/c1d3f60099654ecfb3fe36ac93c121bb/f6e0dd0e15814b2f9f47b228fcd20e60.html)
 > - [SAP HANA SQL Reference - String Functions](https://help.sap.com/docs/HANA_CLOUD/c1d3f60099654ecfb3fe36ac93c121bb/20a24d4b75191014b1e3a10c85cc1df1.html)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE tags_csv (

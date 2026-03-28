@@ -3,9 +3,9 @@
 > 参考资料:
 > - [IBM DB2 Documentation - JSON Functions](https://www.ibm.com/docs/en/db2/11.5?topic=functions-json-value)
 > - [IBM DB2 Documentation - JSON_TABLE](https://www.ibm.com/docs/en/db2/11.5?topic=functions-json-table)
-> - ============================================================
-> - 示例数据
-> - ============================================================
+
+
+## 示例数据
 
 ```sql
 CREATE TABLE orders_json (

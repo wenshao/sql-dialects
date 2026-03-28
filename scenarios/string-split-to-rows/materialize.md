@@ -4,9 +4,10 @@
 > - [Materialize Documentation - String Functions](https://materialize.com/docs/sql/functions/#string-functions)
 > - [Materialize Documentation - List and Array Functions](https://materialize.com/docs/sql/functions/#list-and-array)
 > - [Materialize Documentation - UNNEST](https://materialize.com/docs/sql/functions/#unnest)
-> - ============================================================
-> - 1. 示例数据
-> - ============================================================
+
+
+## 示例数据
+
 
 ```sql
 CREATE TABLE tags_csv (

@@ -3,12 +3,16 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - ksqlDB 提供流式窗口聚合（不是传统 SQL 窗口函数）
-> - 三种窗口类型：TUMBLING, HOPPING, SESSION
-> - ============================================================
-> - TUMBLING 窗口（固定大小，不重叠）
-> - ============================================================
-> - 每小时统计
+
+
+## ksqlDB 提供流式窗口聚合（不是传统 SQL 窗口函数）
+
+三种窗口类型：TUMBLING, HOPPING, SESSION
+
+## TUMBLING 窗口（固定大小，不重叠）
+
+
+## 每小时统计
 
 ```sql
 CREATE TABLE hourly_counts AS

@@ -5,12 +5,14 @@ Oracle compatible types.
 > 参考资料:
 > - [DamengDB SQL Reference](https://eco.dameng.com/document/dm/zh-cn/sql-dev/index.html)
 > - [DamengDB System Admin Manual](https://eco.dameng.com/document/dm/zh-cn/pm/index.html)
-> - 整数
-> - TINYINT:   1 字节，0 ~ 255
-> - SMALLINT:  2 字节
-> - INT:       4 字节
-> - BIGINT:    8 字节
-> - NUMBER(p): Oracle 兼容的整数
+
+
+整数
+TINYINT:   1 字节，0 ~ 255
+SMALLINT:  2 字节
+INT:       4 字节
+BIGINT:    8 字节
+NUMBER(p): Oracle 兼容的整数
 
 ```sql
 CREATE TABLE examples (

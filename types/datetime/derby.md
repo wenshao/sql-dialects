@@ -3,9 +3,11 @@
 > 参考资料:
 > - [Derby SQL Reference](https://db.apache.org/derby/docs/10.16/ref/)
 > - [Derby Developer Guide](https://db.apache.org/derby/docs/10.16/devguide/)
-> - DATE: 日期（yyyy-mm-dd）
-> - TIME: 时间（hh:mm:ss）
-> - TIMESTAMP: 日期时间（yyyy-mm-dd hh:mm:ss.fffffffff）
+
+
+DATE: 日期（yyyy-mm-dd）
+TIME: 时间（hh:mm:ss）
+TIMESTAMP: 日期时间（yyyy-mm-dd hh:mm:ss.fffffffff）
 
 ```sql
 CREATE TABLE events (

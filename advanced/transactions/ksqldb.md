@@ -1,10 +1,12 @@
 # ksqlDB: 事务
 
-ksqlDB 不支持传统事务
+## ksqlDB 不支持传统事务
+
 基于 Kafka 的 exactly-once 语义提供一致性保证
-============================================================
-Kafka 事务语义
-============================================================
+
+## Kafka 事务语义
+
+
 ksqlDB 支持 Kafka 的 exactly-once 语义
 配置 processing.guarantee
 ksql.streams.processing.guarantee = exactly_once_v2
@@ -12,10 +14,11 @@ ksql.streams.processing.guarantee = exactly_once_v2
 1. 持久查询的输入/输出原子性
 2. 不会产生重复数据
 3. 状态存储与输出一致
-============================================================
-一致性模型
-============================================================
-Push Query：最终一致（eventually consistent）
+
+## 一致性模型
+
+
+## Push Query：最终一致（eventually consistent）
 
 ```sql
 SELECT * FROM user_totals EMIT CHANGES;

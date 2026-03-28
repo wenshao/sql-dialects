@@ -3,6 +3,7 @@
 > 参考资料:
 > - [IBM DB2 Documentation - CAST](https://www.ibm.com/docs/en/db2/11.5?topic=expressions-cast-specification)
 
+
 ```sql
 SELECT CAST(42 AS VARCHAR(10)); SELECT CAST('42' AS INTEGER);
 SELECT CAST('3.14' AS DECIMAL(10,2)); SELECT CAST('2024-01-15' AS DATE);

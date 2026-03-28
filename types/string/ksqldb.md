@@ -3,7 +3,9 @@
 > 参考资料:
 > - [ksqlDB Reference](https://docs.ksqldb.io/en/latest/developer-guide/ksqldb-reference/)
 > - [ksqlDB API Reference](https://docs.ksqldb.io/en/latest/developer-guide/api/)
-> - VARCHAR / STRING: 唯一的字符串类型
+
+
+## VARCHAR / STRING: 唯一的字符串类型
 
 ```sql
 CREATE STREAM events (

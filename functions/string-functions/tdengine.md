@@ -1,6 +1,7 @@
 # TDengine: 字符串函数
 
-TDengine 字符串函数较为有限
+## TDengine 字符串函数较为有限
+
 CONCAT（拼接）
 
 ```sql

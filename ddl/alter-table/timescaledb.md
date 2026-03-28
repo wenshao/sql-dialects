@@ -3,9 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 继承 PostgreSQL 全部 ALTER TABLE 语法
-> - 额外提供超级表（hypertable）相关配置
-> - 添加列
+
+
+TimescaleDB 继承 PostgreSQL 全部 ALTER TABLE 语法
+额外提供超级表（hypertable）相关配置
+添加列
 
 ```sql
 ALTER TABLE sensor_data ADD COLUMN pressure DOUBLE PRECISION;

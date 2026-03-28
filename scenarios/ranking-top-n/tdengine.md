@@ -3,19 +3,21 @@
 > 参考资料:
 > - [TDengine SQL Reference](https://docs.taosdata.com/taos-sql/)
 > - [TDengine Function Reference](https://docs.taosdata.com/taos-sql/function/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设超级表结构:
-> - CREATE STABLE meters (ts TIMESTAMP, current FLOAT, voltage INT, phase FLOAT)
-> - TAGS (location NCHAR(64), group_id INT);
-> - ============================================================
-> - 注意：TDengine 是时序数据库，SQL 功能有限
-> - ============================================================
-> - ============================================================
-> - 1. Top-N 整体（简单 LIMIT）
-> - ============================================================
-> - 按值排序取前 N
+
+
+## 示例数据上下文
+
+假设超级表结构:
+CREATE STABLE meters (ts TIMESTAMP, current FLOAT, voltage INT, phase FLOAT)
+TAGS (location NCHAR(64), group_id INT);
+
+## 注意：TDengine 是时序数据库，SQL 功能有限
+
+
+## Top-N 整体（简单 LIMIT）
+
+
+## 按值排序取前 N
 
 ```sql
 SELECT ts, current, voltage

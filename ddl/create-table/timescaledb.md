@@ -3,8 +3,11 @@
 > 参考资料:
 > - [TimescaleDB API Reference](https://docs.timescale.com/api/latest/)
 > - [TimescaleDB Hyperfunctions](https://docs.timescale.com/api/latest/hyperfunctions/)
-> - TimescaleDB 是 PostgreSQL 扩展，先创建普通表再转为超级表（hypertable）
-> - 安装扩展
+
+
+## TimescaleDB 是 PostgreSQL 扩展，先创建普通表再转为超级表（hypertable）
+
+安装扩展
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS timescaledb;

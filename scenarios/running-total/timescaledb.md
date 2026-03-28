@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [TimescaleDB Documentation](https://docs.timescale.com/)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(txn_id SERIAL, account_id INT, amount NUMERIC(10,2), txn_date TIMESTAMPTZ)
-> - ============================================================
-> - 1. 累计求和
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+transactions(txn_id SERIAL, account_id INT, amount NUMERIC(10,2), txn_date TIMESTAMPTZ)
+
+## 累计求和
+
 
 ```sql
 SELECT txn_id, account_id, amount, txn_date,

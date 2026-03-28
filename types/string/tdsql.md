@@ -6,9 +6,9 @@ TDSQL distributed MySQL-compatible syntax.
 > - [TDSQL-C MySQL Documentation](https://cloud.tencent.com/document/product/1003)
 > - [TDSQL MySQL Documentation](https://cloud.tencent.com/document/product/557)
 > - [MySQL 8.0 Reference Manual - String Data Types](https://dev.mysql.com/doc/refman/8.0/en/string-types.html)
-> - ============================================================
-> - 1. 字符串类型一览
-> - ============================================================
+
+
+## 字符串类型一览
 
 ```sql
 CREATE TABLE string_examples (

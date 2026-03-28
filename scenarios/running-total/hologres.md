@@ -2,14 +2,15 @@
 
 > 参考资料:
 > - [Hologres Documentation](https://help.aliyun.com/document_detail/171889.html)
-> - ============================================================
-> - 示例数据上下文
-> - ============================================================
-> - 假设表结构:
-> - transactions(txn_id BIGINT, account_id BIGINT, amount DECIMAL(10,2), txn_date DATE)
-> - ============================================================
-> - 1. 累计求和
-> - ============================================================
+
+
+## 示例数据上下文
+
+假设表结构:
+transactions(txn_id BIGINT, account_id BIGINT, amount DECIMAL(10,2), txn_date DATE)
+
+## 累计求和
+
 
 ```sql
 SELECT txn_id, account_id, amount, txn_date,

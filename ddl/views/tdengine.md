@@ -4,9 +4,9 @@
 > - [TDengine Documentation - SQL Manual](https://docs.tdengine.com/reference/sql/)
 > - [TDengine Documentation - Views (3.2.1+)](https://docs.tdengine.com/reference/sql/view/)
 > - [TDengine Documentation - Continuous Query](https://docs.tdengine.com/develop/continuous-query/)
-> - ============================================
-> - 基本视图（TDengine 3.2.1+）
-> - ============================================
+
+
+## 基本视图（TDengine 3.2.1+）
 
 ```sql
 CREATE VIEW active_devices AS
