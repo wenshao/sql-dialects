@@ -1,6 +1,6 @@
 # 字符串比较与排序规则：各 SQL 方言全对比
 
-字符串比较看似简单，实则暗藏无数跨方言陷阱。`'abc' = 'ABC'` 在 MySQL 中为 TRUE，在 PostgreSQL 中却为 FALSE；`'a' = 'a  '` 在 SQL Server 中为 TRUE，在 Oracle 中为 FALSE。本文系统梳理 15+ SQL 方言在大小写敏感、尾部空格、模式匹配、字符串拼接、正则表达式和排序规则六个维度上的行为差异。
+字符串比较看似简单，实则暗藏无数跨方言陷阱。`'abc' = 'ABC'` 在 MySQL 中为 TRUE，在 PostgreSQL 中却为 FALSE；`'a' = 'a  '` 在 SQL Server 中为 TRUE，在 Oracle 中为 FALSE。本文系统梳理 20 个 SQL 方言在大小写敏感、尾部空格、模式匹配、字符串拼接、正则表达式和排序规则六个维度上的行为差异。
 
 ## 大小写敏感默认值
 
@@ -152,7 +152,7 @@ SELECT * FROM users WHERE name ILIKE '%john%'; -- 不敏感匹配
 | MySQL | 不支持 | 不支持 | **CONCAT()** | CONCAT: NULL 传播 | `\|\|` 默认是 `OR`；开启 `PIPES_AS_CONCAT` 可改变 |
 | MariaDB | 不支持 | 不支持 | **CONCAT()** | CONCAT: NULL 传播 | 同 MySQL |
 | PostgreSQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: 跳过 NULL | `CONCAT()` 是 9.1+ 补充的 |
-| Oracle | **支持** | 不支持 | CONCAT(a,b) | `\|\|`: NULL 传播 | CONCAT 只接受 2 个参数 |
+| Oracle | **支持** | 不支持 | CONCAT(a,b) | `\|\|`: **NULL 视为空字符串（不传播）** | CONCAT 只接受 2 个参数；`''=NULL` |
 | SQL Server | 不支持 | **支持** | CONCAT() | `+`: NULL 传播; CONCAT: 跳过 NULL | `CONCAT()` 是 2012+ 引入 |
 | SQLite | **支持** | 不支持 | 不支持 | `\|\|`: NULL 传播 | 无 CONCAT 函数 |
 | DB2 | **支持** | 不支持 | CONCAT(a,b) | `\|\|`: NULL 传播 | CONCAT 只接受 2 个参数 |
