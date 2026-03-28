@@ -71,84 +71,84 @@ Hive SQL 方言是大数据领域的"通用语"。以下引擎高度兼容或直
 
 | 模块 | 简评 |
 |---|---|
-| [建表](../ddl/create-table/hive.sql) | 外部表/管理表，STORED AS ORC/Parquet，PARTITIONED BY 核心概念 |
-| [改表](../ddl/alter-table/hive.sql) | ADD/REPLACE COLUMNS 追加式，分区管理 MSCK REPAIR TABLE |
-| [索引](../ddl/indexes/hive.sql) | 3.0 后废弃索引，依赖 ORC/Parquet 内置过滤(Predicate Pushdown) |
-| [约束](../ddl/constraints/hive.sql) | PK/FK/UNIQUE/NOT NULL 声明(3.0+)，仅元数据不强制执行 |
-| [视图](../ddl/views/hive.sql) | 普通视图支持，物化视图(3.0+) 自动重写 |
-| [序列与自增](../ddl/sequences/hive.sql) | 无 SEQUENCE/AUTO_INCREMENT，ROW_NUMBER 或 UUID 生成 |
-| [数据库/Schema/用户](../ddl/users-databases/hive.sql) | Database=目录，Ranger/Sentry 权限管理，HMS 元数据服务 |
+| [建表](../ddl/create-table/hive.md) | 外部表/管理表，STORED AS ORC/Parquet，PARTITIONED BY 核心概念 |
+| [改表](../ddl/alter-table/hive.md) | ADD/REPLACE COLUMNS 追加式，分区管理 MSCK REPAIR TABLE |
+| [索引](../ddl/indexes/hive.md) | 3.0 后废弃索引，依赖 ORC/Parquet 内置过滤(Predicate Pushdown) |
+| [约束](../ddl/constraints/hive.md) | PK/FK/UNIQUE/NOT NULL 声明(3.0+)，仅元数据不强制执行 |
+| [视图](../ddl/views/hive.md) | 普通视图支持，物化视图(3.0+) 自动重写 |
+| [序列与自增](../ddl/sequences/hive.md) | 无 SEQUENCE/AUTO_INCREMENT，ROW_NUMBER 或 UUID 生成 |
+| [数据库/Schema/用户](../ddl/users-databases/hive.md) | Database=目录，Ranger/Sentry 权限管理，HMS 元数据服务 |
 
 ### Advanced — 高级特性
 
 | 模块 | 简评 |
 |---|---|
-| [动态 SQL](../advanced/dynamic-sql/hive.sql) | 无动态 SQL，HiveQL 编译为 MapReduce/Tez/Spark 作业 |
-| [错误处理](../advanced/error-handling/hive.sql) | 无过程式错误处理，作业级别失败重试 |
-| [执行计划](../advanced/explain/hive.sql) | EXPLAIN 展示 MapReduce/Tez DAG 执行计划 |
-| [锁机制](../advanced/locking/hive.sql) | ACID 表支持行级锁(3.0+)，非 ACID 表无锁 |
-| [分区](../advanced/partitioning/hive.sql) | PARTITIONED BY 是核心概念，动态分区插入，MSCK REPAIR |
-| [权限](../advanced/permissions/hive.sql) | Ranger/Sentry 集成，Storage-Based Authorization |
-| [存储过程](../advanced/stored-procedures/hive.sql) | 无存储过程，UDF/UDAF/UDTF 自定义函数(Java) |
-| [临时表](../advanced/temp-tables/hive.sql) | CREATE TEMPORARY TABLE 会话级，生命周期随会话 |
-| [事务](../advanced/transactions/hive.sql) | ACID 事务(3.0+，仅 ORC 格式)，非 ACID 表追加写入 |
-| [触发器](../advanced/triggers/hive.sql) | 无触发器支持 |
+| [动态 SQL](../advanced/dynamic-sql/hive.md) | 无动态 SQL，HiveQL 编译为 MapReduce/Tez/Spark 作业 |
+| [错误处理](../advanced/error-handling/hive.md) | 无过程式错误处理，作业级别失败重试 |
+| [执行计划](../advanced/explain/hive.md) | EXPLAIN 展示 MapReduce/Tez DAG 执行计划 |
+| [锁机制](../advanced/locking/hive.md) | ACID 表支持行级锁(3.0+)，非 ACID 表无锁 |
+| [分区](../advanced/partitioning/hive.md) | PARTITIONED BY 是核心概念，动态分区插入，MSCK REPAIR |
+| [权限](../advanced/permissions/hive.md) | Ranger/Sentry 集成，Storage-Based Authorization |
+| [存储过程](../advanced/stored-procedures/hive.md) | 无存储过程，UDF/UDAF/UDTF 自定义函数(Java) |
+| [临时表](../advanced/temp-tables/hive.md) | CREATE TEMPORARY TABLE 会话级，生命周期随会话 |
+| [事务](../advanced/transactions/hive.md) | ACID 事务(3.0+，仅 ORC 格式)，非 ACID 表追加写入 |
+| [触发器](../advanced/triggers/hive.md) | 无触发器支持 |
 
 ### DML — 数据操作
 
 | 模块 | 简评 |
 |---|---|
-| [删除](../dml/delete/hive.sql) | DELETE(仅 ACID 表)，非 ACID 表只能 DROP PARTITION |
-| [插入](../dml/insert/hive.sql) | INSERT OVERWRITE 覆盖写入（独有语义），LOAD DATA 加载文件 |
-| [更新](../dml/update/hive.sql) | UPDATE(仅 ACID 表 3.0+)，非 ACID 表不支持行级更新 |
-| [Upsert](../dml/upsert/hive.sql) | MERGE(仅 ACID 表 2.2+)，INSERT OVERWRITE 覆盖替代 |
+| [删除](../dml/delete/hive.md) | DELETE(仅 ACID 表)，非 ACID 表只能 DROP PARTITION |
+| [插入](../dml/insert/hive.md) | INSERT OVERWRITE 覆盖写入（独有语义），LOAD DATA 加载文件 |
+| [更新](../dml/update/hive.md) | UPDATE(仅 ACID 表 3.0+)，非 ACID 表不支持行级更新 |
+| [Upsert](../dml/upsert/hive.md) | MERGE(仅 ACID 表 2.2+)，INSERT OVERWRITE 覆盖替代 |
 
 ### Functions — 内置函数
 
 | 模块 | 简评 |
 |---|---|
-| [聚合函数](../functions/aggregate/hive.sql) | GROUPING SETS/CUBE/ROLLUP 完整，collect_list/collect_set |
-| [条件函数](../functions/conditional/hive.sql) | IF/CASE/COALESCE/NVL，ASSERT_TRUE 数据校验 |
-| [日期函数](../functions/date-functions/hive.sql) | date_format/datediff/add_months，unix_timestamp 互转 |
-| [数学函数](../functions/math-functions/hive.sql) | 基础数学函数完整 |
-| [字符串函数](../functions/string-functions/hive.sql) | concat/concat_ws，regexp_extract/replace，split 返回 ARRAY |
-| [类型转换](../functions/type-conversion/hive.sql) | CAST 标准，隐式转换较宽松 |
+| [聚合函数](../functions/aggregate/hive.md) | GROUPING SETS/CUBE/ROLLUP 完整，collect_list/collect_set |
+| [条件函数](../functions/conditional/hive.md) | IF/CASE/COALESCE/NVL，ASSERT_TRUE 数据校验 |
+| [日期函数](../functions/date-functions/hive.md) | date_format/datediff/add_months，unix_timestamp 互转 |
+| [数学函数](../functions/math-functions/hive.md) | 基础数学函数完整 |
+| [字符串函数](../functions/string-functions/hive.md) | concat/concat_ws，regexp_extract/replace，split 返回 ARRAY |
+| [类型转换](../functions/type-conversion/hive.md) | CAST 标准，隐式转换较宽松 |
 
 ### Query — 查询
 
 | 模块 | 简评 |
 |---|---|
-| [CTE](../query/cte/hive.sql) | WITH 标准+递归 CTE(3.1+)，常用于简化 HiveQL |
-| [全文搜索](../query/full-text-search/hive.sql) | 无全文搜索，依赖 Elasticsearch 等外部系统 |
-| [连接查询](../query/joins/hive.sql) | Map/Reduce Side JOIN，Broadcast JOIN(小表)，SORT MERGE JOIN |
-| [分页](../query/pagination/hive.sql) | LIMIT+ORDER BY，无 OFFSET，分页需 ROW_NUMBER |
-| [行列转换](../query/pivot-unpivot/hive.sql) | LATERAL VIEW EXPLODE 展开(独有语法)，无 PIVOT |
-| [集合操作](../query/set-operations/hive.sql) | UNION ALL/UNION DISTINCT/INTERSECT/EXCEPT(2.0+) |
-| [子查询](../query/subquery/hive.sql) | IN/EXISTS 子查询(0.13+)，关联子查询有限支持 |
-| [窗口函数](../query/window-functions/hive.sql) | 完整窗口函数支持(0.11+)，Hive 是大数据窗口函数先驱 |
+| [CTE](../query/cte/hive.md) | WITH 标准+递归 CTE(3.1+)，常用于简化 HiveQL |
+| [全文搜索](../query/full-text-search/hive.md) | 无全文搜索，依赖 Elasticsearch 等外部系统 |
+| [连接查询](../query/joins/hive.md) | Map/Reduce Side JOIN，Broadcast JOIN(小表)，SORT MERGE JOIN |
+| [分页](../query/pagination/hive.md) | LIMIT+ORDER BY，无 OFFSET，分页需 ROW_NUMBER |
+| [行列转换](../query/pivot-unpivot/hive.md) | LATERAL VIEW EXPLODE 展开(独有语法)，无 PIVOT |
+| [集合操作](../query/set-operations/hive.md) | UNION ALL/UNION DISTINCT/INTERSECT/EXCEPT(2.0+) |
+| [子查询](../query/subquery/hive.md) | IN/EXISTS 子查询(0.13+)，关联子查询有限支持 |
+| [窗口函数](../query/window-functions/hive.md) | 完整窗口函数支持(0.11+)，Hive 是大数据窗口函数先驱 |
 
 ### Scenarios — 实战场景
 
 | 模块 | 简评 |
 |---|---|
-| [日期填充](../scenarios/date-series-fill/hive.sql) | 无 generate_series，LATERAL VIEW+POSEXPLODE 或数字表 |
-| [去重](../scenarios/deduplication/hive.sql) | ROW_NUMBER+分区窗口函数去重 |
-| [区间检测](../scenarios/gap-detection/hive.sql) | 窗口函数 LAG/LEAD 检测 |
-| [层级查询](../scenarios/hierarchical-query/hive.sql) | 递归 CTE(3.1+)，之前需多次自连接 |
-| [JSON 展开](../scenarios/json-flatten/hive.sql) | get_json_object/json_tuple，LATERAL VIEW+EXPLODE 展开 |
-| [迁移速查](../scenarios/migration-cheatsheet/hive.sql) | HiveQL 类 SQL 但差异大，分区/存储格式/ACID 是核心概念 |
-| [TopN 查询](../scenarios/ranking-top-n/hive.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 TopN |
-| [累计求和](../scenarios/running-total/hive.sql) | SUM() OVER(0.11+)，大数据窗口函数先驱 |
-| [缓慢变化维](../scenarios/slowly-changing-dim/hive.sql) | MERGE(ACID 表)，INSERT OVERWRITE 全量覆盖替代 |
-| [字符串拆分](../scenarios/string-split-to-rows/hive.sql) | SPLIT+LATERAL VIEW EXPLODE（独有写法） |
-| [窗口分析](../scenarios/window-analytics/hive.sql) | 完整窗口函数(0.11+)，大数据生态窗口函数先驱 |
+| [日期填充](../scenarios/date-series-fill/hive.md) | 无 generate_series，LATERAL VIEW+POSEXPLODE 或数字表 |
+| [去重](../scenarios/deduplication/hive.md) | ROW_NUMBER+分区窗口函数去重 |
+| [区间检测](../scenarios/gap-detection/hive.md) | 窗口函数 LAG/LEAD 检测 |
+| [层级查询](../scenarios/hierarchical-query/hive.md) | 递归 CTE(3.1+)，之前需多次自连接 |
+| [JSON 展开](../scenarios/json-flatten/hive.md) | get_json_object/json_tuple，LATERAL VIEW+EXPLODE 展开 |
+| [迁移速查](../scenarios/migration-cheatsheet/hive.md) | HiveQL 类 SQL 但差异大，分区/存储格式/ACID 是核心概念 |
+| [TopN 查询](../scenarios/ranking-top-n/hive.md) | ROW_NUMBER+窗口函数，LIMIT 直接 TopN |
+| [累计求和](../scenarios/running-total/hive.md) | SUM() OVER(0.11+)，大数据窗口函数先驱 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/hive.md) | MERGE(ACID 表)，INSERT OVERWRITE 全量覆盖替代 |
+| [字符串拆分](../scenarios/string-split-to-rows/hive.md) | SPLIT+LATERAL VIEW EXPLODE（独有写法） |
+| [窗口分析](../scenarios/window-analytics/hive.md) | 完整窗口函数(0.11+)，大数据生态窗口函数先驱 |
 
 ### Types — 数据类型
 
 | 模块 | 简评 |
 |---|---|
-| [复合类型](../types/array-map-struct/hive.sql) | ARRAY/MAP/STRUCT 原生支持，LATERAL VIEW EXPLODE 展开 |
-| [日期时间](../types/datetime/hive.sql) | DATE/TIMESTAMP 两类型，无 TIME 类型，无时区支持 |
-| [JSON](../types/json/hive.sql) | get_json_object 路径查询，json_tuple 批量提取，无 JSON 类型 |
-| [数值类型](../types/numeric/hive.sql) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准 |
-| [字符串类型](../types/string/hive.sql) | STRING 无长度限制，VARCHAR/CHAR(0.12+)，UTF-8 |
+| [复合类型](../types/array-map-struct/hive.md) | ARRAY/MAP/STRUCT 原生支持，LATERAL VIEW EXPLODE 展开 |
+| [日期时间](../types/datetime/hive.md) | DATE/TIMESTAMP 两类型，无 TIME 类型，无时区支持 |
+| [JSON](../types/json/hive.md) | get_json_object 路径查询，json_tuple 批量提取，无 JSON 类型 |
+| [数值类型](../types/numeric/hive.md) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准 |
+| [字符串类型](../types/string/hive.md) | STRING 无长度限制，VARCHAR/CHAR(0.12+)，UTF-8 |

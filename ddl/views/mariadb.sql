@@ -1,98 +1,61 @@
--- MariaDB: Views
+-- MariaDB: 视图 (Views)
+-- 语法与 MySQL 基本一致, 差异在于与独有特性的交互
 --
 -- 参考资料:
---   [1] MariaDB Documentation - CREATE VIEW
+--   [1] MariaDB Knowledge Base - CREATE VIEW
 --       https://mariadb.com/kb/en/create-view/
---   [2] MariaDB Documentation - Updatable Views
---       https://mariadb.com/kb/en/updatable-views/
---   [3] MariaDB Documentation - WITH CHECK OPTION
---       https://mariadb.com/kb/en/view-algorithms/
 
--- ============================================
--- 基本视图
--- ============================================
+-- ============================================================
+-- 1. 基本语法
+-- ============================================================
 CREATE VIEW active_users AS
 SELECT id, username, email, created_at
 FROM users
 WHERE age >= 18;
 
--- CREATE OR REPLACE VIEW
+-- CREATE OR REPLACE (比 MySQL 更早支持)
 CREATE OR REPLACE VIEW active_users AS
-SELECT id, username, email, created_at
+SELECT id, username, email, created_at, age
 FROM users
 WHERE age >= 18;
 
--- IF NOT EXISTS
-CREATE VIEW IF NOT EXISTS active_users AS
-SELECT id, username, email, created_at
-FROM users
-WHERE age >= 18;
+-- ============================================================
+-- 2. 可更新视图
+-- ============================================================
+CREATE VIEW young_users AS
+SELECT id, username, email, age FROM users WHERE age < 30
+WITH CHECK OPTION;
+-- WITH CHECK OPTION: INSERT/UPDATE 必须满足 WHERE 条件
+-- WITH LOCAL CHECK OPTION: 只检查当前视图条件
+-- WITH CASCADED CHECK OPTION: 检查所有嵌套视图条件 (默认)
 
--- 指定算法和安全性
-CREATE
-    ALGORITHM = MERGE                        -- MERGE | TEMPTABLE | UNDEFINED
-    DEFINER = 'admin'@'localhost'
-    SQL SECURITY DEFINER                     -- DEFINER | INVOKER
-VIEW active_users AS
-SELECT id, username, email, created_at
-FROM users
-WHERE age >= 18;
+-- ============================================================
+-- 3. 视图算法
+-- ============================================================
+CREATE ALGORITHM=MERGE VIEW v_users AS SELECT * FROM users WHERE age > 18;
+-- MERGE: 视图定义合并到外部查询 (性能最佳, 等价于内联展开)
+-- TEMPTABLE: 先物化视图结果到临时表 (不可更新, 但避免锁竞争)
+-- UNDEFINED: 优化器自动选择 (默认)
+--
+-- MariaDB 与 MySQL 的 ALGORITHM 选择逻辑相同:
+--   包含聚合/DISTINCT/GROUP BY/UNION 的视图强制使用 TEMPTABLE
 
--- ============================================
--- 可更新视图 + WITH CHECK OPTION
--- ============================================
-CREATE VIEW adult_users AS
-SELECT id, username, email, age
-FROM users
-WHERE age >= 18
-WITH CHECK OPTION;                           -- 默认 CASCADED
+-- ============================================================
+-- 4. 与系统版本表交互 (MariaDB 独有)
+-- ============================================================
+-- 可以在视图中使用 FOR SYSTEM_TIME
+CREATE VIEW products_history AS
+SELECT * FROM products FOR SYSTEM_TIME ALL;
+-- 但不能在视图定义中使用时间参数 (只能查询时指定)
+-- SELECT * FROM products FOR SYSTEM_TIME AS OF '2024-01-01';
 
--- WITH LOCAL CHECK OPTION
-CREATE VIEW premium_users AS
-SELECT id, username, email, age
-FROM adult_users
-WHERE balance > 1000
-WITH LOCAL CHECK OPTION;
-
--- 通过视图进行 DML
-INSERT INTO adult_users (username, email, age) VALUES ('alice', 'alice@b.com', 25);
-UPDATE adult_users SET email = 'new@b.com' WHERE id = 1;
-DELETE FROM adult_users WHERE id = 1;
-
--- ============================================
--- 物化视图
--- MariaDB 不支持原生物化视图
--- ============================================
--- 替代方案 1：表 + 定时事件（EVENT）
-CREATE TABLE mv_order_summary (
-    user_id     BIGINT PRIMARY KEY,
-    order_count INT,
-    total_amount DECIMAL(18,2)
-) ENGINE=InnoDB;
-
-DELIMITER //
-CREATE EVENT refresh_mv_order_summary
-ON SCHEDULE EVERY 1 HOUR
-DO
-BEGIN
-    TRUNCATE TABLE mv_order_summary;
-    INSERT INTO mv_order_summary
-    SELECT user_id, COUNT(*), SUM(amount)
-    FROM orders
-    GROUP BY user_id;
-END //
-DELIMITER ;
-
--- 替代方案 2：使用触发器维护汇总表
-
--- ============================================
--- 删除视图
--- ============================================
-DROP VIEW active_users;
-DROP VIEW IF EXISTS active_users;
-
--- 限制：
--- 不支持物化视图（使用 EVENT + 表替代）
--- TEMPTABLE 算法的视图不可更新
--- 带聚合、DISTINCT、GROUP BY、UNION 的视图不可更新
--- 多表 JOIN 视图的可更新性有限
+-- ============================================================
+-- 5. 对引擎开发者: 视图的实现策略
+-- ============================================================
+-- MERGE 策略实现:
+--   解析视图 SQL → 将 WHERE/SELECT 合并到外部查询的 AST → 统一优化
+--   难点: 列名冲突解析, 子查询展开, 表达式替换
+-- TEMPTABLE 策略实现:
+--   执行视图查询 → 结果存入内部临时表 → 外部查询读取临时表
+--   难点: 临时表大小控制, 内存/磁盘切换, 统计信息缺失
+-- 优化器选择依据: 视图是否可合并 (无聚合/DISTINCT/LIMIT等)

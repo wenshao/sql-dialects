@@ -1,70 +1,51 @@
 -- MariaDB: DELETE
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- 核心差异: RETURNING 子句, DELETE HISTORY, 截断差异
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - DELETE
+--       https://mariadb.com/kb/en/delete/
 
--- Basic delete (same as MySQL)
-DELETE FROM users WHERE username = 'alice';
+-- ============================================================
+-- 1. 基本语法 (与 MySQL 相同)
+-- ============================================================
+DELETE FROM users WHERE age < 18;
+DELETE FROM users ORDER BY created_at ASC LIMIT 100;
 
--- DELETE with LIMIT / ORDER BY (same as MySQL)
-DELETE FROM users WHERE status = 0 ORDER BY created_at LIMIT 100;
+-- 多表删除
+DELETE u FROM users u JOIN blacklist b ON u.email = b.email;
 
--- Multi-table delete (same as MySQL)
-DELETE u FROM users u
-JOIN blacklist b ON u.email = b.email;
+-- TRUNCATE
+TRUNCATE TABLE temp_data;
 
--- DELETE ... RETURNING (10.0+): return data from deleted rows
--- Not available in MySQL
-DELETE FROM users WHERE status = 0
+-- ============================================================
+-- 2. DELETE ... RETURNING (10.5+) -- MariaDB 独有
+-- ============================================================
+DELETE FROM users WHERE age < 18
 RETURNING id, username, email;
+-- 返回被删除的行, 可用于审计日志或归档
+-- 对比 PostgreSQL: DELETE ... RETURNING (8.2+)
+-- 对比 MySQL: 不支持
 
--- RETURNING with expressions
-DELETE FROM users WHERE last_login < '2023-01-01'
-RETURNING id, username, CONCAT('removed: ', email) AS note;
+-- ============================================================
+-- 3. DELETE HISTORY (10.3.4+) -- 系统版本表
+-- ============================================================
+-- 清理系统版本表的历史数据 (当前数据不受影响)
+DELETE HISTORY FROM products;                              -- 删除所有历史
+DELETE HISTORY FROM products BEFORE SYSTEM_TIME '2024-01-01';  -- 删除指定时间前的历史
+-- 这是维护系统版本表的关键操作, 防止历史数据无限膨胀
+-- 其他数据库的等价操作:
+--   SQL Server: 需要先关闭版本控制, 手动删除历史表数据, 再重新启用
+--   MariaDB 的方案更优雅: 一条 DDL 即可
 
--- RETURNING * for all columns
-DELETE FROM users WHERE id = 1
-RETURNING *;
-
--- DELETE with CTE (10.2.1+, earlier than MySQL 8.0)
-WITH inactive AS (
-    SELECT id FROM users WHERE last_login < '2023-01-01'
-)
-DELETE u FROM users u JOIN inactive i ON u.id = i.id;
-
--- DELETE FOR PORTION OF (10.5+): delete part of a time period
--- For tables with application-time periods
-DELETE FROM contracts FOR PORTION OF valid_period
-    FROM '2024-01-01' TO '2024-06-01'
-WHERE client = 'Acme Corp';
--- This narrows the existing row's period instead of fully deleting it
-
--- System-versioned table delete considerations:
--- DELETE on a system-versioned table does not truly remove old data
--- Old versions are kept in the history partition
-DELETE FROM products WHERE id = 1;
--- Old versions still visible via:
--- SELECT * FROM products FOR SYSTEM_TIME ALL WHERE id = 1;
-
--- Purge history from system-versioned tables
-DELETE HISTORY FROM products;
-DELETE HISTORY FROM products BEFORE SYSTEM_TIME '2024-01-01';
-
--- TRUNCATE (same as MySQL)
-TRUNCATE TABLE users;
-
--- DELETE IGNORE (same as MySQL)
-DELETE IGNORE FROM users WHERE id = 1;
-
--- Subquery delete (same as MySQL)
-DELETE FROM users WHERE id IN (SELECT user_id FROM blacklist);
-
--- Differences from MySQL 8.0:
--- RETURNING clause is MariaDB-specific (10.0+ for DELETE)
--- FOR PORTION OF temporal delete is MariaDB-specific (10.5+)
--- DELETE HISTORY for system-versioned tables is MariaDB-specific
--- CTEs available from 10.2.1 (earlier than MySQL 8.0)
+-- ============================================================
+-- 4. 对引擎开发者的启示
+-- ============================================================
+-- DELETE RETURNING 的实现:
+--   在 DELETE 扫描到行并标记删除前, 先读取需要返回的列值
+--   多行删除: 返回所有被删除行的结果集
+--   注意: 外键级联删除的行不在 RETURNING 中 (只返回直接删除的行)
+--
+-- DELETE HISTORY 的实现:
+--   历史数据通常存在单独的分区或段中
+--   DELETE HISTORY 等价于 DROP 历史分区 (而非逐行删除), 速度很快
+--   需要在存储层区分"当前行"和"历史行"

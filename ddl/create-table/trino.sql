@@ -1,12 +1,16 @@
--- Trino (formerly PrestoSQL): CREATE TABLE
+-- Trino: CREATE TABLE
 --
 -- 参考资料:
---   [1] Trino - CREATE TABLE
+--   [1] Trino Documentation - CREATE TABLE
 --       https://trino.io/docs/current/sql/create-table.html
---   [2] Trino - Data Types
+--   [2] Trino Documentation - Data Types
 --       https://trino.io/docs/current/language/types.html
+--   [3] Trino Documentation - Connectors
+--       https://trino.io/docs/current/connector.html
 
--- 基本建表（取决于底层 Connector）
+-- ============================================================
+-- 1. 基本语法（取决于底层 Connector）
+-- ============================================================
 CREATE TABLE users (
     id         BIGINT,
     username   VARCHAR,
@@ -18,25 +22,72 @@ CREATE TABLE users (
     updated_at TIMESTAMP
 );
 
--- 使用 Hive Connector（最常见）
+-- ============================================================
+-- 2. 语法设计分析（对 SQL 引擎开发者）
+-- ============================================================
+
+-- 2.1 Connector 架构: Trino 的核心设计哲学
+-- Trino（前身 PrestoSQL/PrestoDB）是纯查询引擎，不存储任何数据。
+-- 所有 DDL 操作的能力取决于底层 Connector 的实现。
+--
+-- 三级命名空间: catalog.schema.table
+--   catalog = 一个 Connector 实例（对应一个数据源）
+--   schema  = 数据源中的 schema/database
+--   table   = 具体的表
+--
+-- 核心 Connector:
+--   - Hive:     HDFS/S3 上的 Parquet/ORC/CSV/JSON 文件（最早最成熟）
+--   - Iceberg:  Apache Iceberg 表格式（推荐，功能最完善）
+--   - Delta:    Delta Lake 表格式
+--   - Hudi:     Apache Hudi 表格式
+--   - MySQL:    读写 MySQL 数据库
+--   - PostgreSQL: 读写 PostgreSQL 数据库
+--   - Memory:   内存表（测试用，重启丢失）
+--   - Kafka:    读取 Kafka Topic
+--   - MongoDB:  读写 MongoDB
+--   - Elasticsearch: 读取 Elasticsearch 索引
+--
+-- 设计 trade-off:
+--   优点: 一个引擎查询所有数据源，支持跨源 JOIN（联邦查询）
+--   缺点: DDL 能力参差不齐（Memory 支持建表，Kafka 不支持建表）；
+--         性能取决于 Connector 的 pushdown 能力；无法控制底层存储布局
+--
+-- 对比:
+--   Flink:      也有 Connector 架构，但配置在 DDL 的 WITH 子句中
+--   Spark SQL:  DataSource API（类似，但 Spark 有自己的存储层）
+--   DuckDB:     通过 Extensions 支持多数据源（但主要是嵌入式本地查询）
+--   Databricks: 主要面向 Delta Lake，外部数据通过 Unity Catalog 联邦访问
+--   传统 RDBMS:  只能访问本地存储，外部数据需要 ETL
+--
+-- 对引擎开发者的启示:
+--   Connector 架构是构建联邦查询引擎的基础模式。
+--   关键设计决策: Connector 提供的是全量数据还是支持下推（filter/project pushdown）？
+--   下推越多，性能越好，但 Connector 实现复杂度越高。
+--   Trino 的 SPI（Service Provider Interface）设计值得学习。
+
+-- 2.2 Hive Connector 建表（传统方式）
 CREATE TABLE hive.mydb.users (
     id         BIGINT,
     username   VARCHAR,
     email      VARCHAR,
     age        INTEGER,
     created_at TIMESTAMP,
-    dt         VARCHAR                      -- 分区列必须在列定义中声明
+    dt         VARCHAR                         -- 分区列在列定义中声明
 )
 WITH (
-    format = 'ORC',                         -- PARQUET, ORC, AVRO, JSON, CSV
-    partitioned_by = ARRAY['dt'],           -- 分区列在 WITH 中引用已声明的列
+    format = 'ORC',                            -- PARQUET, ORC, AVRO, JSON, CSV
+    partitioned_by = ARRAY['dt'],              -- 引用已声明的列作为分区
     bucketed_by = ARRAY['id'],
     bucket_count = 256
 );
 
--- 注意：Trino Hive Connector 分区列必须先在列定义中声明，再在 WITH 中引用
+-- Hive Connector 的 WITH 子句设计:
+-- 使用 key = value 语法（不是 'key' = 'value'，注意 Flink 是字符串键值对）
+-- 分区列必须先在列定义中声明，再在 WITH 中引用（Trino 特有约束）
+-- 对比 Hive DDL: PARTITIONED BY (dt STRING) 是在单独的子句中定义新列
+-- Trino 的做法更接近 SQL 标准（所有列统一定义）
 
--- 使用 Iceberg Connector（推荐，支持更多特性）
+-- 2.3 Iceberg Connector 建表（推荐，功能最完善）
 CREATE TABLE iceberg.mydb.orders (
     id         BIGINT,
     user_id    BIGINT,
@@ -45,54 +96,134 @@ CREATE TABLE iceberg.mydb.orders (
 )
 WITH (
     format = 'PARQUET',
-    partitioning = ARRAY['month(order_date)'],  -- Iceberg 支持转换分区
+    partitioning = ARRAY['month(order_date)'],   -- Iceberg 分区转换
     sorted_by = ARRAY['user_id']
 );
 
--- Iceberg 分区转换：
--- year(col), month(col), day(col), hour(col)
--- bucket(N, col)
--- truncate(N, col)
+-- Iceberg 分区转换（Hidden Partitioning，Iceberg 的创新）:
+--   year(col)           → 按年分区
+--   month(col)          → 按月分区
+--   day(col)            → 按天分区
+--   hour(col)           → 按小时分区
+--   bucket(N, col)      → Hash 分桶
+--   truncate(N, col)    → 截断值分区
+--
+-- 设计分析:
+--   传统分区（Hive）: 用户必须显式管理分区列，查询时必须指定分区值
+--   Iceberg Hidden Partitioning: 分区对用户透明，查询引擎自动推导
+--   例: WHERE order_date = DATE '2024-03-15' → 自动定位 month=2024-03 分区
+--
+-- 对比:
+--   Hive:       PARTITIONED BY (year INT, month INT)（用户管理，易出错）
+--   Databricks: PARTITIONED BY (order_date) 或 CLUSTER BY（Liquid Clustering）
+--   Flink:      PARTITIONED BY (dt, hr)（类似 Hive）
+--   DuckDB:     无分区概念（单机嵌入式，不需要分区）
 
--- CTAS
+-- ============================================================
+-- 3. 无约束、无索引、无自增: 查询引擎的取舍
+-- ============================================================
+-- Trino 不支持:
+--   - PRIMARY KEY / UNIQUE / FOREIGN KEY / CHECK（无约束语法）
+--   - CREATE INDEX（无索引）
+--   - AUTO_INCREMENT / SEQUENCE / IDENTITY（无自增）
+--   - TRIGGER（无触发器）
+--   - STORED PROCEDURE（无存储过程）
+--
+-- 设计哲理:
+--   Trino 是"查询引擎"而非"存储引擎"。约束、索引、触发器都是存储层的职责。
+--   Trino 只负责将 SQL 查询翻译为对底层存储的高效读写操作。
+--
+-- 对比:
+--   Flink: 类似（不存储数据），但有 PRIMARY KEY NOT ENFORCED（语义提示）
+--   DuckDB: 全面支持约束和索引（因为它自己管理存储）
+--   Databricks: PRIMARY KEY 信息性，索引用 Liquid Clustering/Z-ORDER 替代
+--   BigQuery: PRIMARY KEY/FOREIGN KEY 信息性，无索引
+--
+-- 对引擎开发者的启示:
+--   "查询引擎"和"存储引擎"的职责边界决定了 DDL 的支持范围。
+--   如果引擎不管理存储，约束和索引语法是不必要的。
+--   但 Flink 的 PRIMARY KEY NOT ENFORCED 模式证明: 即使不强制，
+--   语义信息对优化器也有价值。
+
+-- ============================================================
+-- 4. CTAS 与结构复制
+-- ============================================================
+-- CTAS（最常用的建表方式之一）
 CREATE TABLE users_backup AS
 SELECT * FROM users WHERE created_at > TIMESTAMP '2024-01-01 00:00:00';
 
--- CREATE TABLE ... WITH NO DATA（只复制结构）
-CREATE TABLE users_empty AS
-SELECT * FROM users WITH NO DATA;
+-- WITH NO DATA（只复制结构，不复制数据）
+CREATE TABLE users_empty AS SELECT * FROM users WITH NO DATA;
+-- 对比:
+--   MySQL: CREATE TABLE LIKE（复制结构+索引）
+--   PostgreSQL: CREATE TABLE ... (LIKE source INCLUDING ALL)
+--   DuckDB: CREATE TABLE LIKE 或 CTAS
+--   Databricks: CREATE TABLE LIKE 或 DEEP CLONE / SHALLOW CLONE
 
--- CREATE OR REPLACE（Iceberg Connector）
-CREATE OR REPLACE TABLE users (id BIGINT, username VARCHAR);
+-- CREATE OR REPLACE（Iceberg Connector 支持）
+CREATE OR REPLACE TABLE iceberg.mydb.users (id BIGINT, username VARCHAR);
 
--- Delta Lake Connector
+-- 其他 Connector
 CREATE TABLE delta.mydb.events (
     id         BIGINT,
     event_type VARCHAR,
     event_time TIMESTAMP
-)
-WITH (
+) WITH (
     location = 's3://bucket/delta/events/',
     partitioned_by = ARRAY['event_type']
 );
 
--- Memory Connector（测试用）
 CREATE TABLE memory.default.temp (id BIGINT, name VARCHAR);
 
--- 数据类型：
--- BOOLEAN: 布尔
--- TINYINT / SMALLINT / INTEGER / BIGINT: 整数
--- REAL / DOUBLE: 浮点
--- DECIMAL(P,S): 定点
--- VARCHAR / CHAR(N): 字符串
--- VARBINARY: 二进制
--- DATE / TIME / TIMESTAMP / TIMESTAMP WITH TIME ZONE: 时间
--- ARRAY(T) / MAP(K,V) / ROW(name T, ...): 复合类型
--- JSON: JSON
--- UUID: UUID
--- IPADDRESS: IP 地址
+-- ============================================================
+-- 5. 类型系统: ROW 而非 STRUCT
+-- ============================================================
+-- Trino 使用 ROW 类型（SQL 标准），而非 STRUCT（Spark/Databricks/DuckDB）
+-- 这是一个重要的术语差异:
+--   Trino: ROW(street VARCHAR, city VARCHAR)
+--   Spark:  STRUCT<street: STRING, city: STRING>
+--   DuckDB: STRUCT(street VARCHAR, city VARCHAR)
+--   Flink:  ROW<street STRING, city STRING>（也用 ROW）
+--
+-- ROW 类型的其他特点:
+--   - 字段访问: row_col.field_name（点号访问，与 STRUCT 相同）
+--   - 匿名 ROW: ROW(VARCHAR, INTEGER)（按位置访问，不推荐）
+--   - 嵌套: ROW(name VARCHAR, address ROW(city VARCHAR, zip VARCHAR))
 
--- 注意：Trino 本身是查询引擎，不存储数据
--- 注意：DDL 能力取决于底层 Connector
--- 注意：没有主键、索引、约束等概念
--- 注意：UPDATE/DELETE 支持取决于 Connector（Iceberg/Delta/Hive ACID/RDBMS 等支持）
+-- 完整类型列表:
+-- BOOLEAN, TINYINT, SMALLINT, INTEGER, BIGINT
+-- REAL, DOUBLE, DECIMAL(P,S)
+-- VARCHAR, CHAR(N), VARBINARY
+-- DATE, TIME, TIMESTAMP, TIMESTAMP WITH TIME ZONE
+-- ARRAY(T), MAP(K,V), ROW(name T, ...)
+-- JSON, UUID, IPADDRESS
+
+-- ============================================================
+-- 6. 联邦查询: 跨 Connector 建表
+-- ============================================================
+-- Trino 独有能力: 跨 Connector CTAS（联邦数据移动）
+CREATE TABLE iceberg.analytics.user_orders AS
+SELECT u.username, o.amount, o.order_date
+FROM mysql.production.users u
+JOIN hive.warehouse.orders o ON u.id = o.user_id
+WHERE o.order_date > DATE '2024-01-01';
+
+-- 一条 SQL 实现: MySQL → Hive JOIN → 写入 Iceberg
+-- 这是 Trino 作为联邦查询引擎的核心价值
+
+-- ============================================================
+-- 7. 版本演进
+-- ============================================================
+-- PrestoDB 0.69 (2014): Facebook 开源 Presto
+-- PrestoSQL (2019-01): Presto 创始人 fork → 独立项目
+-- Trino 351 (2020-12): PrestoSQL 更名为 Trino（商标原因）
+-- Trino 390+ (2022):   Iceberg Connector 成熟，支持 MERGE/UPDATE/DELETE
+-- Trino 400+ (2023):   Fault-tolerant execution（失败重试）、Polymorphic Table Functions
+-- Trino 430+ (2024):   JSON_TABLE、增强 Iceberg 支持、OpenTelemetry 集成
+-- Trino 450+ (2025):   改进的动态过滤、增强的 Task 级调度
+--
+-- 对引擎开发者的参考:
+--   Trino 的成功证明了"不存储数据的查询引擎"是一个可行的架构。
+--   关键是 SPI（Service Provider Interface）设计足够灵活，让第三方可以实现 Connector。
+--   Presto → PrestoSQL → Trino 的分裂也警示:
+--   开源项目的治理结构（谁拥有商标？）比技术架构更重要。

@@ -58,84 +58,84 @@ Apache Doris 是一款开源的 MPP 分析数据库，源自百度内部的 Palo
 
 | 模块 | 简评 |
 |---|---|
-| [建表](../ddl/create-table/doris.sql) | MPP 列式存储，数据模型=Duplicate/Unique/Aggregate(核心选择) |
-| [改表](../ddl/alter-table/doris.sql) | Light Schema Change(1.2+) 轻量变更，Rollup 物化索引 |
-| [索引](../ddl/indexes/doris.sql) | Short Key 前缀索引+Bloom Filter+Bitmap+倒排索引(2.0+) |
-| [约束](../ddl/constraints/doris.sql) | 无传统约束，数据模型替代(Unique 去重/Aggregate 聚合) |
-| [视图](../ddl/views/doris.sql) | 物化视图(Rollup) 自动路由，同步物化视图 |
-| [序列与自增](../ddl/sequences/doris.sql) | AUTO_INCREMENT(2.1+)，UUID 替代 |
-| [数据库/Schema/用户](../ddl/users-databases/doris.sql) | MySQL 协议兼容，RBAC 权限，WorkloadGroup 资源隔离 |
+| [建表](../ddl/create-table/doris.md) | MPP 列式存储，数据模型=Duplicate/Unique/Aggregate(核心选择) |
+| [改表](../ddl/alter-table/doris.md) | Light Schema Change(1.2+) 轻量变更，Rollup 物化索引 |
+| [索引](../ddl/indexes/doris.md) | Short Key 前缀索引+Bloom Filter+Bitmap+倒排索引(2.0+) |
+| [约束](../ddl/constraints/doris.md) | 无传统约束，数据模型替代(Unique 去重/Aggregate 聚合) |
+| [视图](../ddl/views/doris.md) | 物化视图(Rollup) 自动路由，同步物化视图 |
+| [序列与自增](../ddl/sequences/doris.md) | AUTO_INCREMENT(2.1+)，UUID 替代 |
+| [数据库/Schema/用户](../ddl/users-databases/doris.md) | MySQL 协议兼容，RBAC 权限，WorkloadGroup 资源隔离 |
 
 ### Advanced — 高级特性
 
 | 模块 | 简评 |
 |---|---|
-| [动态 SQL](../advanced/dynamic-sql/doris.sql) | 无存储过程/动态 SQL(MySQL 协议查询入口) |
-| [错误处理](../advanced/error-handling/doris.sql) | 无过程式错误处理 |
-| [执行计划](../advanced/explain/doris.sql) | EXPLAIN 带 Fragment/Exchange 分布式信息 |
-| [锁机制](../advanced/locking/doris.sql) | 无行级锁，MVCC 版本管理(Unique 模型) |
-| [分区](../advanced/partitioning/doris.sql) | PARTITION BY RANGE+DISTRIBUTED BY HASH 双层数据管理 |
-| [权限](../advanced/permissions/doris.sql) | MySQL 兼容权限，RBAC 角色 |
-| [存储过程](../advanced/stored-procedures/doris.sql) | 无存储过程(OLAP 引擎定位) |
-| [临时表](../advanced/temp-tables/doris.sql) | 无临时表(OLAP 引擎) |
-| [事务](../advanced/transactions/doris.sql) | Import 事务(Stream Load 原子性)，非传统 OLTP 事务 |
-| [触发器](../advanced/triggers/doris.sql) | 无触发器 |
+| [动态 SQL](../advanced/dynamic-sql/doris.md) | 无存储过程/动态 SQL(MySQL 协议查询入口) |
+| [错误处理](../advanced/error-handling/doris.md) | 无过程式错误处理 |
+| [执行计划](../advanced/explain/doris.md) | EXPLAIN 带 Fragment/Exchange 分布式信息 |
+| [锁机制](../advanced/locking/doris.md) | 无行级锁，MVCC 版本管理(Unique 模型) |
+| [分区](../advanced/partitioning/doris.md) | PARTITION BY RANGE+DISTRIBUTED BY HASH 双层数据管理 |
+| [权限](../advanced/permissions/doris.md) | MySQL 兼容权限，RBAC 角色 |
+| [存储过程](../advanced/stored-procedures/doris.md) | 无存储过程(OLAP 引擎定位) |
+| [临时表](../advanced/temp-tables/doris.md) | 无临时表(OLAP 引擎) |
+| [事务](../advanced/transactions/doris.md) | Import 事务(Stream Load 原子性)，非传统 OLTP 事务 |
+| [触发器](../advanced/triggers/doris.md) | 无触发器 |
 
 ### DML — 数据操作
 
 | 模块 | 简评 |
 |---|---|
-| [删除](../dml/delete/doris.sql) | DELETE 标准(Unique 模型)，Batch Delete 批量 |
-| [插入](../dml/insert/doris.sql) | INSERT INTO+Stream Load/Broker Load 批量导入(推荐) |
-| [更新](../dml/update/doris.sql) | UPDATE(Unique 模型)，Partial Column Update(2.0+) |
-| [Upsert](../dml/upsert/doris.sql) | Unique 模型天然 Upsert(按 Key 替换)，INSERT INTO |
+| [删除](../dml/delete/doris.md) | DELETE 标准(Unique 模型)，Batch Delete 批量 |
+| [插入](../dml/insert/doris.md) | INSERT INTO+Stream Load/Broker Load 批量导入(推荐) |
+| [更新](../dml/update/doris.md) | UPDATE(Unique 模型)，Partial Column Update(2.0+) |
+| [Upsert](../dml/upsert/doris.md) | Unique 模型天然 Upsert(按 Key 替换)，INSERT INTO |
 
 ### Functions — 内置函数
 
 | 模块 | 简评 |
 |---|---|
-| [聚合函数](../functions/aggregate/doris.sql) | GROUPING SETS/CUBE/ROLLUP，BITMAP_UNION 精确去重 |
-| [条件函数](../functions/conditional/doris.sql) | IF/CASE/COALESCE/NVL(MySQL 兼容) |
-| [日期函数](../functions/date-functions/doris.sql) | DATE_FORMAT/DATE_ADD/DATEDIFF(MySQL 兼容) |
-| [数学函数](../functions/math-functions/doris.sql) | 完整数学函数 |
-| [字符串函数](../functions/string-functions/doris.sql) | CONCAT/SUBSTR/REGEXP(MySQL 兼容) |
-| [类型转换](../functions/type-conversion/doris.sql) | CAST 标准(MySQL 兼容) |
+| [聚合函数](../functions/aggregate/doris.md) | GROUPING SETS/CUBE/ROLLUP，BITMAP_UNION 精确去重 |
+| [条件函数](../functions/conditional/doris.md) | IF/CASE/COALESCE/NVL(MySQL 兼容) |
+| [日期函数](../functions/date-functions/doris.md) | DATE_FORMAT/DATE_ADD/DATEDIFF(MySQL 兼容) |
+| [数学函数](../functions/math-functions/doris.md) | 完整数学函数 |
+| [字符串函数](../functions/string-functions/doris.md) | CONCAT/SUBSTR/REGEXP(MySQL 兼容) |
+| [类型转换](../functions/type-conversion/doris.md) | CAST 标准(MySQL 兼容) |
 
 ### Query — 查询
 
 | 模块 | 简评 |
 |---|---|
-| [CTE](../query/cte/doris.sql) | WITH 标准+递归 CTE(2.1+) |
-| [全文搜索](../query/full-text-search/doris.sql) | 倒排索引(2.0+) 全文搜索，MATCH_ANY/MATCH_ALL |
-| [连接查询](../query/joins/doris.sql) | Broadcast/Shuffle/Bucket Shuffle JOIN，Colocate Join 优化 |
-| [分页](../query/pagination/doris.sql) | LIMIT/OFFSET(MySQL 兼容) |
-| [行列转换](../query/pivot-unpivot/doris.sql) | 无原生 PIVOT，CASE+GROUP BY |
-| [集合操作](../query/set-operations/doris.sql) | UNION/INTERSECT/EXCEPT 完整 |
-| [子查询](../query/subquery/doris.sql) | IN/EXISTS 子查询，关联子查询支持 |
-| [窗口函数](../query/window-functions/doris.sql) | 完整窗口函数支持 |
+| [CTE](../query/cte/doris.md) | WITH 标准+递归 CTE(2.1+) |
+| [全文搜索](../query/full-text-search/doris.md) | 倒排索引(2.0+) 全文搜索，MATCH_ANY/MATCH_ALL |
+| [连接查询](../query/joins/doris.md) | Broadcast/Shuffle/Bucket Shuffle JOIN，Colocate Join 优化 |
+| [分页](../query/pagination/doris.md) | LIMIT/OFFSET(MySQL 兼容) |
+| [行列转换](../query/pivot-unpivot/doris.md) | 无原生 PIVOT，CASE+GROUP BY |
+| [集合操作](../query/set-operations/doris.md) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/doris.md) | IN/EXISTS 子查询，关联子查询支持 |
+| [窗口函数](../query/window-functions/doris.md) | 完整窗口函数支持 |
 
 ### Scenarios — 实战场景
 
 | 模块 | 简评 |
 |---|---|
-| [日期填充](../scenarios/date-series-fill/doris.sql) | 无 generate_series，需辅助表或应用层 |
-| [去重](../scenarios/deduplication/doris.sql) | Unique 模型天然去重，ROW_NUMBER+CTE 亦可 |
-| [区间检测](../scenarios/gap-detection/doris.sql) | 窗口函数检测 |
-| [层级查询](../scenarios/hierarchical-query/doris.sql) | 递归 CTE(2.1+) |
-| [JSON 展开](../scenarios/json-flatten/doris.sql) | JSON_EXTRACT/JSONB 类型，LATERAL VIEW EXPLODE(1.2+) |
-| [迁移速查](../scenarios/migration-cheatsheet/doris.sql) | MySQL 协议兼容，数据模型选择+分区分桶是核心概念 |
-| [TopN 查询](../scenarios/ranking-top-n/doris.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 |
-| [累计求和](../scenarios/running-total/doris.sql) | SUM() OVER 标准，MPP 并行 |
-| [缓慢变化维](../scenarios/slowly-changing-dim/doris.sql) | Unique 模型 Upsert 替代 MERGE |
-| [字符串拆分](../scenarios/string-split-to-rows/doris.sql) | EXPLODE_SPLIT+LATERAL VIEW(1.2+) |
-| [窗口分析](../scenarios/window-analytics/doris.sql) | 完整窗口函数，MPP 并行分析 |
+| [日期填充](../scenarios/date-series-fill/doris.md) | 无 generate_series，需辅助表或应用层 |
+| [去重](../scenarios/deduplication/doris.md) | Unique 模型天然去重，ROW_NUMBER+CTE 亦可 |
+| [区间检测](../scenarios/gap-detection/doris.md) | 窗口函数检测 |
+| [层级查询](../scenarios/hierarchical-query/doris.md) | 递归 CTE(2.1+) |
+| [JSON 展开](../scenarios/json-flatten/doris.md) | JSON_EXTRACT/JSONB 类型，LATERAL VIEW EXPLODE(1.2+) |
+| [迁移速查](../scenarios/migration-cheatsheet/doris.md) | MySQL 协议兼容，数据模型选择+分区分桶是核心概念 |
+| [TopN 查询](../scenarios/ranking-top-n/doris.md) | ROW_NUMBER+窗口函数，LIMIT 直接 |
+| [累计求和](../scenarios/running-total/doris.md) | SUM() OVER 标准，MPP 并行 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/doris.md) | Unique 模型 Upsert 替代 MERGE |
+| [字符串拆分](../scenarios/string-split-to-rows/doris.md) | EXPLODE_SPLIT+LATERAL VIEW(1.2+) |
+| [窗口分析](../scenarios/window-analytics/doris.md) | 完整窗口函数，MPP 并行分析 |
 
 ### Types — 数据类型
 
 | 模块 | 简评 |
 |---|---|
-| [复合类型](../types/array-map-struct/doris.sql) | ARRAY/MAP/STRUCT(2.0+)，EXPLODE+LATERAL VIEW |
-| [日期时间](../types/datetime/doris.sql) | DATE/DATETIME(微秒)/DATEV2(推荐)，无 TIME/INTERVAL |
-| [JSON](../types/json/doris.sql) | JSON/JSONB(2.1+) 二进制，倒排索引加速 JSON 查询 |
-| [数值类型](../types/numeric/doris.sql) | TINYINT-LARGEINT(128位)/FLOAT/DOUBLE/DECIMAL(27/9) |
-| [字符串类型](../types/string/doris.sql) | VARCHAR(65533)/CHAR/STRING(2.1+)，UTF-8 |
+| [复合类型](../types/array-map-struct/doris.md) | ARRAY/MAP/STRUCT(2.0+)，EXPLODE+LATERAL VIEW |
+| [日期时间](../types/datetime/doris.md) | DATE/DATETIME(微秒)/DATEV2(推荐)，无 TIME/INTERVAL |
+| [JSON](../types/json/doris.md) | JSON/JSONB(2.1+) 二进制，倒排索引加速 JSON 查询 |
+| [数值类型](../types/numeric/doris.md) | TINYINT-LARGEINT(128位)/FLOAT/DOUBLE/DECIMAL(27/9) |
+| [字符串类型](../types/string/doris.md) | VARCHAR(65533)/CHAR/STRING(2.1+)，UTF-8 |

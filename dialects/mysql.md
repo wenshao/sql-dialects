@@ -93,84 +93,84 @@ MySQL 协议和 SQL 方言是数据库行业被兼容最多的目标：
 
 | 模块 | 简评 |
 |---|---|
-| [建表](../ddl/create-table/mysql.sql) | ENGINE 可插拔架构，AUTO_INCREMENT 自增，utf8≠UTF-8 教训 |
-| [改表](../ddl/alter-table/mysql.sql) | Online DDL (INSTANT/INPLACE/COPY)，pt-osc/gh-ost 生态 |
-| [索引](../ddl/indexes/mysql.sql) | InnoDB 聚集索引+回表，8.0 函数索引/不可见索引 |
-| [约束](../ddl/constraints/mysql.sql) | CHECK 约束 8.0.16 才执行（之前静默忽略），外键影响性能 |
-| [视图](../ddl/views/mysql.sql) | MERGE/TEMPTABLE 算法，无物化视图 |
-| [序列与自增](../ddl/sequences/mysql.sql) | AUTO_INCREMENT lock_mode 三种模式，无 SEQUENCE 对象 |
-| [数据库/Schema/用户](../ddl/users-databases/mysql.sql) | user@host 独特权限模型 |
+| [建表](../ddl/create-table/mysql.md) | **ENGINE 可插拔架构是 MySQL 独有设计**——InnoDB 已成为唯一合理选择（8.0 系统表迁入 InnoDB），但 ENGINE 子句仍是全行业独此一家的 DDL 语法。AUTO_INCREMENT 自增最简实现（对比 PG 的 SERIAL/IDENTITY、Oracle 的 SEQUENCE）。`utf8` 只支持 3 字节不含 emoji 是历史最大坑，必须用 `utf8mb4`。 |
+| [改表](../ddl/alter-table/mysql.md) | **Online DDL 三种算法（INSTANT/INPLACE/COPY）是 8.0 的核心改进**——INSTANT ADD COLUMN 毫秒级完成（对比 PG 11 前需重写全表）。但部分 ALTER 仍需 COPY 表，生产环境常用 pt-osc/gh-ost 第三方工具规避锁。DDL 隐式提交事务——不可回滚（对比 PG 的 DDL 事务性可回滚）。 |
+| [索引](../ddl/indexes/mysql.md) | **InnoDB 聚簇索引是核心设计**——数据按主键物理排序存储（对比 PG 的堆表组织），主键查询极快但二级索引需"回表"读取完整行。8.0 新增函数索引和不可见索引（INVISIBLE INDEX 用于安全测试删除索引的影响）。无 GiST/GIN/BRIN 等高级索引框架（PG 独有）。 |
+| [约束](../ddl/constraints/mysql.md) | **CHECK 约束 8.0.16 前是历史笑话**——语法接受但完全不执行，静默忽略。8.0.16+ 才真正生效（对比 PG/Oracle 始终强制执行）。外键在 InnoDB 中完整支持但有性能开销，高并发互联网场景常在应用层保证参照完整性而非依赖 FK。 |
+| [视图](../ddl/views/mysql.md) | **MERGE/TEMPTABLE 两种算法决定性能**——MERGE 将视图条件合并到外层查询（高效），TEMPTABLE 先物化视图结果再查询（慢）。无物化视图（对比 PG REFRESH MATERIALIZED VIEW、Oracle Fast Refresh+Query Rewrite），需手工维护汇总表或用第三方方案。 |
+| [序列与自增](../ddl/sequences/mysql.md) | **AUTO_INCREMENT 是最简自增实现**——无需单独的 SEQUENCE 对象（对比 PG/Oracle/MariaDB 均有独立 SEQUENCE）。innodb_autoinc_lock_mode 三种模式影响高并发插入性能：0=传统锁、1=连续（默认）、2=交错（binlog 安全需 ROW 格式）。8.0 修复了重启后自增值回退的经典 Bug。 |
+| [数据库/Schema/用户](../ddl/users-databases/mysql.md) | **user@host 双维度权限模型是 MySQL 独有设计**——同一用户名从不同主机连接可有不同权限，比其他数据库的纯用户模型概念更复杂。8.0 引入角色（ROLE）简化权限管理（对比 PG/Oracle 早已支持）。Database=Schema 一级命名空间（对比 PG 的 Database.Schema 二级、BigQuery 的 Project.Dataset 三级）。 |
 
 ### Advanced — 高级特性
 
 | 模块 | 简评 |
 |---|---|
-| [动态 SQL](../advanced/dynamic-sql/mysql.sql) | PREPARE/EXECUTE，存储过程内可用 |
-| [错误处理](../advanced/error-handling/mysql.sql) | DECLARE HANDLER (CONTINUE/EXIT)，弱于 PL/SQL 异常 |
-| [执行计划](../advanced/explain/mysql.sql) | EXPLAIN ANALYZE (8.0.18+)，JSON/TREE 格式 |
-| [锁机制](../advanced/locking/mysql.sql) | InnoDB 行锁+间隙锁+Next-Key Lock，RR 默认有间隙锁 |
-| [分区](../advanced/partitioning/mysql.sql) | 分区键必须在主键中（最大限制），RANGE/LIST/HASH |
-| [权限](../advanced/permissions/mysql.sql) | user@host 模型，8.0 角色，Partial Revokes |
-| [存储过程](../advanced/stored-procedures/mysql.sql) | DELIMITER 尴尬，无 Package/匿名块/BULK COLLECT |
-| [临时表](../advanced/temp-tables/mysql.sql) | CREATE TEMPORARY TABLE，MEMORY/InnoDB 引擎 |
-| [事务](../advanced/transactions/mysql.sql) | InnoDB MVCC (Read View)，默认 RR（历史原因），DDL 隐式提交 |
-| [触发器](../advanced/triggers/mysql.sql) | 只有行级 FOR EACH ROW，无 INSTEAD OF/DDL 触发器 |
+| [动态 SQL](../advanced/dynamic-sql/mysql.md) | **PREPARE/EXECUTE 是 MySQL 动态 SQL 的唯一方式**——存储过程内可用但语法冗长（对比 Oracle 的 EXECUTE IMMEDIATE 更简洁）。无匿名块（对比 PG 的 DO $$ ... $$、Oracle 的 DECLARE/BEGIN）。动态 SQL 的绑定变量通过 `?` 占位符实现（对比 PG 的 `$1`）。 |
+| [错误处理](../advanced/error-handling/mysql.md) | **DECLARE HANDLER (CONTINUE/EXIT) 是 MySQL 的过程式错误处理**——CONTINUE 处理后继续执行、EXIT 处理后退出块。功能远弱于 Oracle 的命名异常/RAISE_APPLICATION_ERROR 和 PG 的 EXCEPTION WHEN 块。无 SQLSTATE 精细分类（对比 PG 的标准错误码体系和 GET STACKED DIAGNOSTICS）。 |
+| [执行计划](../advanced/explain/mysql.md) | **EXPLAIN ANALYZE（8.0.18+）是里程碑改进**——实际执行查询并显示真实行数和耗时（之前只有估算行数）。支持 JSON 和 TREE 格式输出。对比 PG 的 EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) 功能接近，但 MySQL 缺少 pg_stat_statements 级别的历史查询统计。 |
+| [锁机制](../advanced/locking/mysql.md) | **InnoDB 的间隙锁（Gap Lock）是 RR 隔离级别下防幻读的独特方案**——锁定索引记录之间的"间隙"，这带来了 MySQL 特有的死锁模式。Next-Key Lock = 行锁 + 间隙锁。对比 PG 使用 SSI（Serializable Snapshot Isolation）无锁防幻读，MySQL 的方案锁冲突更频繁但实现更成熟。 |
+| [分区](../advanced/partitioning/mysql.md) | **分区键必须包含在主键/唯一索引中是 MySQL 最大的分区限制**——无法按日期分区同时保持 ID 唯一（对比 PG/Oracle 无此限制）。支持 RANGE/LIST/HASH/KEY 四种分区方式。分区数上限约 8192。对比 BigQuery/Snowflake 的自动分区裁剪，MySQL 需手动管理分区。 |
+| [权限](../advanced/permissions/mysql.md) | **user@host 模型是 MySQL 独有的双维度权限体系**——同一用户名从 localhost 和远程有不同权限。8.0 引入 ROLE 简化管理（对比 PG/Oracle 早已支持），Partial Revokes 允许在全局 GRANT 基础上撤销特定数据库权限。无行级安全策略 RLS（对比 PG 的 ROW LEVEL SECURITY 和 BigQuery 的 Row Access Policy）。 |
+| [存储过程](../advanced/stored-procedures/mysql.md) | **DELIMITER 变更是 MySQL 存储过程的最大尴尬**——因为 SQL 层不识别过程体内的分号。无 Package（对比 Oracle PL/SQL 的包封装）、无匿名块（对比 PG 的 DO 块）、无 BULK COLLECT/FORALL 批量绑定。过程化能力在主流数据库中最弱，调试困难，复杂逻辑建议放在应用层。 |
+| [临时表](../advanced/temp-tables/mysql.md) | **CREATE TEMPORARY TABLE 会话级可见**——可选 MEMORY 或 InnoDB 引擎。MEMORY 引擎表存在内存中速度快但不支持 BLOB/TEXT 且受 max_heap_table_size 限制。对比 PG 的 ON COMMIT DROP/DELETE ROWS 选项和 Oracle 的 GTT（全局临时表需预定义结构），MySQL 临时表使用简单但功能较少。 |
+| [事务](../advanced/transactions/mysql.md) | **InnoDB MVCC 基于 Read View 实现快照读**——与 PG 的元组版本化形成鲜明对比（MySQL 用 Undo Log 存旧版本，无需 VACUUM）。默认 REPEATABLE READ（历史原因，PG/Oracle 默认 READ COMMITTED）。DDL 隐式提交事务——CREATE/ALTER/DROP 无法回滚（对比 PG 的 DDL 事务性是最大优势之一）。 |
+| [触发器](../advanced/triggers/mysql.md) | **只支持行级 FOR EACH ROW 触发器**——无语句级触发器（对比 PG/Oracle 支持 FOR EACH STATEMENT），无 INSTEAD OF 触发器（对比 SQL Server/PG），无 DDL 触发器/事件触发器（对比 PG 9.3+ 的 Event Trigger 和 Oracle 的 DDL Trigger）。每个表每个事件只能有一个触发器（8.0 前限制，8.0 允许多个）。 |
 
 ### DML — 数据操作
 
 | 模块 | 简评 |
 |---|---|
-| [删除](../dml/delete/mysql.sql) | DELETE+LIMIT（独有），TRUNCATE 不可回滚 |
-| [插入](../dml/insert/mysql.sql) | INSERT...SET 独有语法，LOAD DATA 批量，multi-row VALUES |
-| [更新](../dml/update/mysql.sql) | 多表 UPDATE JOIN 语法，SET 左到右求值 |
-| [Upsert](../dml/upsert/mysql.sql) | ON DUPLICATE KEY UPDATE 推荐，REPLACE INTO 有隐患 |
+| [删除](../dml/delete/mysql.md) | **DELETE + LIMIT 是 MySQL 独有的安全删除方式**——可分批删除避免长事务锁表。TRUNCATE 不可回滚（DDL 隐式提交）且不触发触发器。对比 PG 的 DELETE...RETURNING（返回被删行）和 Oracle 的 Flashback Table（误删恢复），MySQL 缺少这些安全网。 |
+| [插入](../dml/insert/mysql.md) | **INSERT...SET col=val 是 MySQL 独有的赋值式插入语法**——比 VALUES 列表可读性更好。LOAD DATA INFILE 是批量导入的最快方式（比 INSERT 快 20 倍以上）。Multi-row VALUES 早期即支持。对比 PG 的 COPY 和 Oracle 的 INSERT ALL 多表插入（独有），MySQL 的批量加载方案较单一。 |
+| [更新](../dml/update/mysql.md) | **多表 UPDATE JOIN 是 MySQL 的直觉式更新语法**——`UPDATE t1 JOIN t2 ON... SET t1.col=t2.col`（对比 PG 的 UPDATE...FROM 语法）。SET 子句从左到右求值，后面的列可引用前面刚赋的值。对比 PG 的 UPDATE...RETURNING（返回更新后行），MySQL 无法在一条语句中获取更新结果。 |
+| [Upsert](../dml/upsert/mysql.md) | **ON DUPLICATE KEY UPDATE 是 MySQL 的推荐 UPSERT 方案**——基于唯一索引冲突触发更新（对比 PG 的 ON CONFLICT 更灵活可指定约束名）。REPLACE INTO 先删后插——会触发 DELETE 触发器、重置自增 ID、级联删除 FK，生产环境慎用。不支持标准 MERGE 语句（对比 Oracle/SQL Server/PG 15+）。 |
 
 ### Functions — 内置函数
 
 | 模块 | 简评 |
 |---|---|
-| [聚合函数](../functions/aggregate/mysql.sql) | GROUP_CONCAT 默认1024截断，无 GROUPING SETS/FILTER |
-| [条件函数](../functions/conditional/mysql.sql) | IF() 函数，\|\| 是逻辑 OR 不是拼接 |
-| [日期函数](../functions/date-functions/mysql.sql) | DATE_FORMAT %格式，NOW()=语句时间 |
-| [数学函数](../functions/math-functions/mysql.sql) | 完整，UNSIGNED 废弃中 |
-| [字符串函数](../functions/string-functions/mysql.sql) | CONCAT NULL 传播，\|\| 不是拼接（最大方言差异之一） |
-| [类型转换](../functions/type-conversion/mysql.sql) | 隐式转换极宽松，可能导致索引失效 |
+| [聚合函数](../functions/aggregate/mysql.md) | **GROUP_CONCAT 默认 1024 字节截断是常见陷阱**——需 `SET group_concat_max_len` 调大。无 GROUPING SETS/CUBE/ROLLUP（8.0+ 有限支持）、无 FILTER 子句（对比 PG 的 `COUNT(*) FILTER(WHERE...)` 优雅条件聚合）。不支持 LISTAGG（标准函数，Oracle/Snowflake 支持）。 |
+| [条件函数](../functions/conditional/mysql.md) | **IF(cond, true_val, false_val) 是 MySQL 独有的函数式条件**——比 CASE WHEN 简洁但非标准。`\|\|` 是逻辑 OR 而非字符串拼接（对比 PG/Oracle/SQLite 中 `\|\|` 是拼接），这是**最大的方言陷阱之一**——从 PG 迁移到 MySQL 的 SQL 经常因此出错。需用 CONCAT() 替代。 |
+| [日期函数](../functions/date-functions/mysql.md) | **DATE_FORMAT 使用 % 格式符**——`DATE_FORMAT(dt, '%Y-%m-%d')`（对比 PG 的 to_char、Oracle 的 TO_DATE 格式串各不相同）。NOW() 返回语句开始时间（非事务开始时间）。无 INTERVAL 类型（对比 PG 的丰富 INTERVAL 运算），日期加减用 DATE_ADD/DATE_SUB 函数而非运算符。 |
+| [数学函数](../functions/math-functions/mysql.md) | **数学函数库完整**，GREATEST/LEAST 内置（对比 SQL Server 2022 才引入）。除零返回 NULL 而非报错（对比 PG/Oracle 报错）。UNSIGNED 整数类型正在废弃中——8.0 不推荐 UNSIGNED BIGINT 的运算，因为减法结果可能溢出。 |
+| [字符串函数](../functions/string-functions/mysql.md) | **CONCAT 中任何参数为 NULL 则整体返回 NULL**——这是 MySQL 的标准行为但极易踩坑（对比 Oracle 中 NULL 在拼接中被忽略）。`\|\|` 不是拼接运算符是逻辑 OR（对比 PG/Oracle/SQLite 中 `\|\|` 是拼接），这是跨方言迁移最大的差异之一。CONCAT_WS 可安全跳过 NULL（独有语法糖）。 |
+| [类型转换](../functions/type-conversion/mysql.md) | **隐式类型转换极宽松是 MySQL 的双刃剑**——`WHERE varchar_col = 123` 会将 varchar_col 隐式转为数字导致全表扫描（索引失效），这是最常见的性能陷阱。无 TRY_CAST 安全转换（对比 SQL Server 的 TRY_CAST、Snowflake 的 TRY_CAST、BigQuery 的 SAFE_CAST）。8.0 严格模式缩小了隐式转换范围。 |
 
 ### Query — 查询
 
 | 模块 | 简评 |
 |---|---|
-| [CTE](../query/cte/mysql.sql) | 8.0+，早期总是物化，递归只支持 UNION ALL |
-| [全文搜索](../query/full-text-search/mysql.sql) | InnoDB FULLTEXT (5.6+)，ngram 中文分词 |
-| [连接查询](../query/joins/mysql.sql) | 无 FULL OUTER JOIN，Hash Join (8.0.18+) |
-| [分页](../query/pagination/mysql.sql) | LIMIT/OFFSET，深分页 O(offset) 问题 |
-| [行列转换](../query/pivot-unpivot/mysql.sql) | 无原生 PIVOT，用 CASE+GROUP BY |
-| [集合操作](../query/set-operations/mysql.sql) | INTERSECT/EXCEPT 8.0.31 才加入 |
-| [子查询](../query/subquery/mysql.sql) | 5.x 性能噩梦已修复，8.0 semijoin 优化 |
-| [窗口函数](../query/window-functions/mysql.sql) | 8.0+ 才支持（晚了15年），无 QUALIFY |
+| [CTE](../query/cte/mysql.md) | **8.0 才引入 CTE（比 PG/Oracle/SQL Server 晚了多年）**。早期版本 CTE 总是物化（无法优化为内联），8.0.14+ 优化器可选择内联。递归 CTE 仅支持 UNION ALL（不支持 UNION DISTINCT，对比 PG 两者都支持）。无 PG 的可写 CTE（INSERT/UPDATE/DELETE in WITH）。 |
+| [全文搜索](../query/full-text-search/mysql.md) | **InnoDB FULLTEXT（5.6+）内置全文搜索**——支持 BOOLEAN MODE（AND/OR/NOT）和 NATURAL LANGUAGE MODE。ngram 解析器支持中文/日文/韩文分词（对比 PG 的 tsvector+GIN 更灵活可扩展）。无 BM25 排序（对比 DuckDB FTS5、SQLite FTS5），相关性排序算法较基础。 |
+| [连接查询](../query/joins/mysql.md) | **不支持 FULL OUTER JOIN 是 MySQL 至今的缺陷**——需用 LEFT JOIN + RIGHT JOIN + UNION 模拟。8.0.18+ 引入 Hash Join（之前仅 Nested Loop）大幅改善大表连接性能。无 LATERAL JOIN（对比 PG 9.3+、SQL Server 的 CROSS APPLY）。无 NATURAL FULL OUTER JOIN（对比 MariaDB 支持）。 |
+| [分页](../query/pagination/mysql.md) | **LIMIT/OFFSET 是 MySQL 最早普及的分页语法**（PG 也支持，Oracle 12c 前需 ROWNUM 嵌套）。深分页 O(offset) 性能问题严重——LIMIT 100000, 10 仍需扫描前 10 万行。优化方案：Keyset 分页（WHERE id > last_id ORDER BY id LIMIT 10）或延迟关联（先查主键再回表）。 |
+| [行列转换](../query/pivot-unpivot/mysql.md) | **无原生 PIVOT/UNPIVOT 语法**——必须手写 CASE + GROUP BY 模拟（对比 Oracle 11g/SQL Server/BigQuery/Snowflake/DuckDB 均有原生 PIVOT）。动态 PIVOT 更复杂，需用 PREPARE/EXECUTE 拼接动态 SQL。这是 MySQL 在分析查询上的明显短板。 |
+| [集合操作](../query/set-operations/mysql.md) | **INTERSECT/EXCEPT 直到 8.0.31 才加入**——此前 MySQL 是唯一不支持 INTERSECT 的主流数据库（对比 PG/Oracle/SQL Server/MariaDB 10.3+ 早已支持）。UNION ALL/DISTINCT 完整。对比 Oracle 使用 MINUS 而非 EXCEPT（非标准命名）。 |
+| [子查询](../query/subquery/mysql.md) | **5.x 子查询性能噩梦已在 8.0 修复**——早期 MySQL 将 IN 子查询转为 EXISTS 关联子查询导致灾难性性能。8.0 的 semijoin 优化（FirstMatch/LooseScan/Materialization/DuplicateWeedout）彻底解决了这一历史问题。对比 PG 的子查询优化器成熟度一直领先。 |
+| [窗口函数](../query/window-functions/mysql.md) | **8.0 才支持窗口函数（比 PG 8.4 晚 9 年，比 Oracle 8i 晚 15 年）**——ROW_NUMBER/RANK/DENSE_RANK/NTILE/LAG/LEAD/FIRST_VALUE/LAST_VALUE 完整。无 QUALIFY 子句（对比 BigQuery/Snowflake/DuckDB 的 QUALIFY 无需子查询包装）。无 GROUPS 帧类型（对比 PG 11+）。 |
 
 ### Scenarios — 实战场景
 
 | 模块 | 简评 |
 |---|---|
-| [日期填充](../scenarios/date-series-fill/mysql.sql) | 无 generate_series，需递归 CTE 或辅助表 |
-| [去重](../scenarios/deduplication/mysql.sql) | DELETE+JOIN 或 ROW_NUMBER(8.0+) |
-| [区间检测](../scenarios/gap-detection/mysql.sql) | LAG/LEAD(8.0+)，5.x 需变量模拟 |
-| [层级查询](../scenarios/hierarchical-query/mysql.sql) | 递归 CTE(8.0+)，无 CONNECT BY |
-| [JSON 展开](../scenarios/json-flatten/mysql.sql) | JSON_TABLE(8.0.4+) 功能完整 |
-| [迁移速查](../scenarios/migration-cheatsheet/mysql.sql) | 重点关注隐式转换、utf8mb4、GROUP BY 语义 |
-| [TopN](../scenarios/ranking-top-n/mysql.sql) | ROW_NUMBER(8.0+)，5.x 用变量模拟 |
-| [累计求和](../scenarios/running-total/mysql.sql) | SUM() OVER(8.0+)，5.x 靠用户变量 |
-| [缓慢变化维](../scenarios/slowly-changing-dim/mysql.sql) | 无 MERGE，用 ON DUPLICATE KEY UPDATE |
-| [字符串拆分](../scenarios/string-split-to-rows/mysql.sql) | 无原生拆分，递归 CTE+SUBSTRING_INDEX |
-| [窗口分析](../scenarios/window-analytics/mysql.sql) | 8.0 全窗口函数，frame 子句完整 |
+| [日期填充](../scenarios/date-series-fill/mysql.md) | **无 generate_series 是 MySQL 日期填充的最大障碍**——需递归 CTE（8.0+）或预建数字辅助表模拟。对比 PG 的 `generate_series(date,date,interval)` 原生支持和 BigQuery 的 GENERATE_DATE_ARRAY，MySQL 方案最冗长。MariaDB 的 seq_1_to_N 序列引擎是更优替代。 |
+| [去重](../scenarios/deduplication/mysql.md) | **ROW_NUMBER()+CTE 是 8.0+ 的标准去重写法**——`DELETE FROM t WHERE id IN (SELECT id FROM (SELECT id, ROW_NUMBER() OVER(PARTITION BY key ORDER BY ts DESC) rn FROM t) WHERE rn > 1)`。5.x 需用 DELETE+JOIN 自连接。对比 PG 的 DISTINCT ON 一行搞定去重、BigQuery/DuckDB 的 QUALIFY 无需嵌套。 |
+| [区间检测](../scenarios/gap-detection/mysql.md) | **LAG/LEAD 窗口函数（8.0+）是间隙检测的标准方案**——比较相邻行时间差即可。5.x 时代需用用户变量 `@prev` 模拟窗口函数（可读性极差且有不确定行为风险）。对比 PG 的 generate_series 填充+LEFT JOIN 方案更直观。 |
+| [层级查询](../scenarios/hierarchical-query/mysql.md) | **递归 CTE（8.0+）是 MySQL 层级查询的唯一方案**——无 Oracle 的 CONNECT BY（更简洁的原创语法）。5.x 时代只能用多次自连接（深度固定）或应用层迭代。对比 PG 的 ltree 扩展提供路径运算、SAP HANA 的 HIERARCHY 函数原生层级导航。 |
+| [JSON 展开](../scenarios/json-flatten/mysql.md) | **JSON_TABLE（8.0.4+）是 MySQL JSON 处理的亮点**——将 JSON 数据转为关系表，功能接近 SQL 标准（对比 Oracle 12c 最早支持 JSON_TABLE）。对比 PG 的 JSONB+GIN 索引（最强 JSON 实现）和 Snowflake 的 LATERAL FLATTEN（独有语法），MySQL 的 JSON_TABLE 功能完整但 JSON 索引支持较弱。 |
+| [迁移速查](../scenarios/migration-cheatsheet/mysql.md) | **迁移核心陷阱：隐式类型转换（索引失效）、utf8mb4 字符集、GROUP BY 语义差异（ONLY_FULL_GROUP_BY）、`\|\|` 是 OR 非拼接、DDL 隐式提交不可回滚、无 FULL OUTER JOIN**。从 PG 迁入需注意类型严格度差异；从 Oracle 迁入注意 ''=NULL 差异和 PL/SQL 到存储过程的重写。 |
+| [TopN](../scenarios/ranking-top-n/mysql.md) | **ROW_NUMBER()+子查询是 8.0+ 的 TopN 标准写法**——5.x 需用用户变量 `@rank` 模拟排名（有不确定性）。无 QUALIFY 子句（对比 BigQuery/Snowflake/DuckDB 一行搞定分组 TopN）。无 FETCH FIRST WITH TIES（对比 PG 13+/Oracle 12c+ 包含并列行）。 |
+| [累计求和](../scenarios/running-total/mysql.md) | **SUM() OVER(ORDER BY ...) 是 8.0+ 的标准累计求和**——默认帧 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW。5.x 时代靠用户变量 `@running := @running + amount` 模拟（有不确定求值顺序风险）。对比 PG 8.4 起即支持窗口函数，MySQL 在此领域晚到十年。 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/mysql.md) | **无 MERGE 语句是 MySQL 处理 SCD 的最大短板**——需用 ON DUPLICATE KEY UPDATE 模拟 Type 1 SCD、INSERT...ON DUPLICATE KEY+触发器模拟 Type 2 SCD。对比 Oracle 的 MERGE 多分支（首创 9i）、BigQuery/Snowflake 的 MERGE WHEN NOT MATCHED BY SOURCE 功能更完善。 |
+| [字符串拆分](../scenarios/string-split-to-rows/mysql.md) | **无原生字符串拆分为行的函数**——需递归 CTE+SUBSTRING_INDEX 逐段提取（8.0+ 方案），或 JSON_TABLE 将逗号分隔转 JSON 数组再展开。对比 PG 14 的 string_to_table 一行搞定、SQL Server 的 STRING_SPLIT、ClickHouse 的 splitByChar+arrayJoin，MySQL 方案最繁琐。 |
+| [窗口分析](../scenarios/window-analytics/mysql.md) | **8.0 提供完整窗口函数集**——ROW_NUMBER/RANK/DENSE_RANK/NTILE/LAG/LEAD/FIRST_VALUE/LAST_VALUE/NTH_VALUE 以及完整的 ROWS/RANGE 帧子句。无 GROUPS 帧类型（PG 11+ 独有）。无 QUALIFY 子句。无 FILTER 子句（PG 独有的条件聚合语法）。 |
 
 ### Types — 数据类型
 
 | 模块 | 简评 |
 |---|---|
-| [复合类型](../types/array-map-struct/mysql.sql) | 无 ARRAY/MAP/STRUCT，用 JSON 替代 |
-| [日期时间](../types/datetime/mysql.sql) | DATETIME vs TIMESTAMP（2038问题），微秒精度 |
-| [JSON](../types/json/mysql.sql) | 二进制存储，多值索引(8.0.17+)，partial update |
-| [数值类型](../types/numeric/mysql.sql) | UNSIGNED 废弃趋势，DECIMAL BCD 精确 |
-| [字符串类型](../types/string/mysql.sql) | utf8≠UTF-8（历史最大坑），TEXT 有诸多限制 |
+| [复合类型](../types/array-map-struct/mysql.md) | **无原生 ARRAY/MAP/STRUCT 类型**——只能用 JSON 类型模拟复合结构（对比 PG 的原生 ARRAY+运算符、ClickHouse 的 Array/Map/Tuple、BigQuery 的 STRUCT/ARRAY 一等公民）。JSON 列上可建多值索引（8.0.17+），但查询语法不如原生复合类型直观。 |
+| [日期时间](../types/datetime/mysql.md) | **DATETIME vs TIMESTAMP 的选择是经典困惑**——TIMESTAMP 有 2038 年溢出问题（32 位 Unix 时间戳）且存储为 UTC 自动转换时区，DATETIME 无时区转换且范围到 9999 年。微秒精度需显式指定 `DATETIME(6)`（默认秒级）。对比 PG 的 TIMESTAMPTZ（无 2038 问题）和 BigQuery 的四种时间类型严格区分。 |
+| [JSON](../types/json/mysql.md) | **JSON 类型内部以二进制格式存储（非文本）**——查询时无需重新解析，性能优于 MariaDB 的 LONGTEXT 别名。8.0.17+ 引入多值索引（Multi-Valued Index）可索引 JSON 数组元素。Partial Update 优化避免全量重写 JSON 文档。对比 PG 的 JSONB+GIN 索引（最强 JSON 实现）和 BigQuery 的 JSON 类型（2022+）。 |
+| [数值类型](../types/numeric/mysql.md) | **UNSIGNED 整数类型正在废弃趋势中**——UNSIGNED BIGINT 减法可能溢出，8.0 不推荐使用。DECIMAL 使用 BCD（Binary-Coded Decimal）存储保证精确计算（对比 Oracle 的 NUMBER 万能类型、PG 的 NUMERIC 任意精度）。TINYINT-BIGINT 五种整数类型选择多（对比 BigQuery 只有 INT64 一种）。 |
+| [字符串类型](../types/string/mysql.md) | **utf8 不是 UTF-8 是 MySQL 历史最大坑**——`utf8` 只支持 3 字节（BMP 平面），存不了 emoji/生僻字，必须用 `utf8mb4`（真正的 UTF-8）。TEXT 类型有索引限制（需指定前缀长度）且不能设默认值（5.7 前）。对比 PG 的 TEXT=VARCHAR 无性能差异、BigQuery 的 STRING 无长度限制极简设计。 |

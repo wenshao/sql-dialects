@@ -64,84 +64,84 @@ Spark SQL 高度兼容 Hive SQL 语法，是 Hive 的事实上的继任执行引
 
 | 模块 | 简评 |
 |---|---|
-| [建表](../ddl/create-table/spark.sql) | DataFrame+SQL 双接口，USING 指定数据源(Parquet/Delta/Iceberg) |
-| [改表](../ddl/alter-table/spark.sql) | Delta Lake 支持 Schema Evolution，原生 Spark 表 ALTER 有限 |
-| [索引](../ddl/indexes/spark.sql) | 无传统索引，Data Skipping(Delta Lake)+Z-ORDER 优化 |
-| [约束](../ddl/constraints/spark.sql) | CHECK/NOT NULL(Delta Lake 3.0+)，PK/FK 不强制 |
-| [视图](../ddl/views/spark.sql) | TEMPORARY VIEW(会话级)，GLOBAL TEMPORARY VIEW(应用级) |
-| [序列与自增](../ddl/sequences/spark.sql) | 无 SEQUENCE，monotonically_increasing_id() 非连续 |
-| [数据库/Schema/用户](../ddl/users-databases/spark.sql) | Catalog.Database.Table 三级命名空间，Unity Catalog(Databricks) |
+| [建表](../ddl/create-table/spark.md) | DataFrame+SQL 双接口，USING 指定数据源(Parquet/Delta/Iceberg) |
+| [改表](../ddl/alter-table/spark.md) | Delta Lake 支持 Schema Evolution，原生 Spark 表 ALTER 有限 |
+| [索引](../ddl/indexes/spark.md) | 无传统索引，Data Skipping(Delta Lake)+Z-ORDER 优化 |
+| [约束](../ddl/constraints/spark.md) | CHECK/NOT NULL(Delta Lake 3.0+)，PK/FK 不强制 |
+| [视图](../ddl/views/spark.md) | TEMPORARY VIEW(会话级)，GLOBAL TEMPORARY VIEW(应用级) |
+| [序列与自增](../ddl/sequences/spark.md) | 无 SEQUENCE，monotonically_increasing_id() 非连续 |
+| [数据库/Schema/用户](../ddl/users-databases/spark.md) | Catalog.Database.Table 三级命名空间，Unity Catalog(Databricks) |
 
 ### Advanced — 高级特性
 
 | 模块 | 简评 |
 |---|---|
-| [动态 SQL](../advanced/dynamic-sql/spark.sql) | 无动态 SQL，用 DataFrame API 构建动态查询 |
-| [错误处理](../advanced/error-handling/spark.sql) | 无过程式错误处理，应用层(Scala/Python) 处理异常 |
-| [执行计划](../advanced/explain/spark.sql) | EXPLAIN EXTENDED/FORMATTED，Spark UI DAG 可视化 |
-| [锁机制](../advanced/locking/spark.sql) | 无行级锁，Delta Lake 提供乐观并发+冲突检测 |
-| [分区](../advanced/partitioning/spark.sql) | PARTITIONED BY 文件目录分区，Bucket 分桶优化 JOIN |
-| [权限](../advanced/permissions/spark.sql) | Ranger 集成，Unity Catalog(Databricks)，Storage-Based |
-| [存储过程](../advanced/stored-procedures/spark.sql) | 无存储过程，UDF(Scala/Python/Java) 替代 |
-| [临时表](../advanced/temp-tables/spark.sql) | CREATE TEMP VIEW 会话级，cache TABLE 缓存 |
-| [事务](../advanced/transactions/spark.sql) | Delta Lake ACID 事务，原生 Spark 无事务保证 |
-| [触发器](../advanced/triggers/spark.sql) | 无触发器，Structured Streaming 流式处理替代 |
+| [动态 SQL](../advanced/dynamic-sql/spark.md) | 无动态 SQL，用 DataFrame API 构建动态查询 |
+| [错误处理](../advanced/error-handling/spark.md) | 无过程式错误处理，应用层(Scala/Python) 处理异常 |
+| [执行计划](../advanced/explain/spark.md) | EXPLAIN EXTENDED/FORMATTED，Spark UI DAG 可视化 |
+| [锁机制](../advanced/locking/spark.md) | 无行级锁，Delta Lake 提供乐观并发+冲突检测 |
+| [分区](../advanced/partitioning/spark.md) | PARTITIONED BY 文件目录分区，Bucket 分桶优化 JOIN |
+| [权限](../advanced/permissions/spark.md) | Ranger 集成，Unity Catalog(Databricks)，Storage-Based |
+| [存储过程](../advanced/stored-procedures/spark.md) | 无存储过程，UDF(Scala/Python/Java) 替代 |
+| [临时表](../advanced/temp-tables/spark.md) | CREATE TEMP VIEW 会话级，cache TABLE 缓存 |
+| [事务](../advanced/transactions/spark.md) | Delta Lake ACID 事务，原生 Spark 无事务保证 |
+| [触发器](../advanced/triggers/spark.md) | 无触发器，Structured Streaming 流式处理替代 |
 
 ### DML — 数据操作
 
 | 模块 | 简评 |
 |---|---|
-| [删除](../dml/delete/spark.sql) | DELETE(Delta Lake)，原生 Spark 表不支持行级删除 |
-| [插入](../dml/insert/spark.sql) | INSERT INTO/OVERWRITE，DataFrame write 模式更常用 |
-| [更新](../dml/update/spark.sql) | UPDATE(Delta Lake)，原生 Spark 表不支持行级更新 |
-| [Upsert](../dml/upsert/spark.sql) | MERGE INTO(Delta Lake)，功能完整 |
+| [删除](../dml/delete/spark.md) | DELETE(Delta Lake)，原生 Spark 表不支持行级删除 |
+| [插入](../dml/insert/spark.md) | INSERT INTO/OVERWRITE，DataFrame write 模式更常用 |
+| [更新](../dml/update/spark.md) | UPDATE(Delta Lake)，原生 Spark 表不支持行级更新 |
+| [Upsert](../dml/upsert/spark.md) | MERGE INTO(Delta Lake)，功能完整 |
 
 ### Functions — 内置函数
 
 | 模块 | 简评 |
 |---|---|
-| [聚合函数](../functions/aggregate/spark.sql) | GROUPING SETS/CUBE/ROLLUP，collect_list/collect_set |
-| [条件函数](../functions/conditional/spark.sql) | IF/CASE/COALESCE/NVL/NVL2，与 Hive 兼容 |
-| [日期函数](../functions/date-functions/spark.sql) | date_format/date_add/datediff，与 Hive 兼容 |
-| [数学函数](../functions/math-functions/spark.sql) | 完整数学函数，与 Hive 兼容 |
-| [字符串函数](../functions/string-functions/spark.sql) | concat/concat_ws，regexp_extract/replace，split |
-| [类型转换](../functions/type-conversion/spark.sql) | CAST 标准，try_cast(3.4+) 安全转换 |
+| [聚合函数](../functions/aggregate/spark.md) | GROUPING SETS/CUBE/ROLLUP，collect_list/collect_set |
+| [条件函数](../functions/conditional/spark.md) | IF/CASE/COALESCE/NVL/NVL2，与 Hive 兼容 |
+| [日期函数](../functions/date-functions/spark.md) | date_format/date_add/datediff，与 Hive 兼容 |
+| [数学函数](../functions/math-functions/spark.md) | 完整数学函数，与 Hive 兼容 |
+| [字符串函数](../functions/string-functions/spark.md) | concat/concat_ws，regexp_extract/replace，split |
+| [类型转换](../functions/type-conversion/spark.md) | CAST 标准，try_cast(3.4+) 安全转换 |
 
 ### Query — 查询
 
 | 模块 | 简评 |
 |---|---|
-| [CTE](../query/cte/spark.sql) | WITH 标准+递归 CTE(3.4+)，常用于简化查询 |
-| [全文搜索](../query/full-text-search/spark.sql) | 无全文搜索，依赖外部系统 |
-| [连接查询](../query/joins/spark.sql) | Broadcast/Sort-Merge/Shuffle Hash JOIN，自动选择策略 |
-| [分页](../query/pagination/spark.sql) | LIMIT+ORDER BY，无 OFFSET，DataFrame API take/head |
-| [行列转换](../query/pivot-unpivot/spark.sql) | PIVOT/UNPIVOT(3.4+) 原生支持，stack() 函数 |
-| [集合操作](../query/set-operations/spark.sql) | UNION/INTERSECT/EXCEPT 完整 |
-| [子查询](../query/subquery/spark.sql) | 关联子查询支持(2.0+)，IN/EXISTS 标准 |
-| [窗口函数](../query/window-functions/spark.sql) | 完整窗口函数，与 Hive 兼容 |
+| [CTE](../query/cte/spark.md) | WITH 标准+递归 CTE(3.4+)，常用于简化查询 |
+| [全文搜索](../query/full-text-search/spark.md) | 无全文搜索，依赖外部系统 |
+| [连接查询](../query/joins/spark.md) | Broadcast/Sort-Merge/Shuffle Hash JOIN，自动选择策略 |
+| [分页](../query/pagination/spark.md) | LIMIT+ORDER BY，无 OFFSET，DataFrame API take/head |
+| [行列转换](../query/pivot-unpivot/spark.md) | PIVOT/UNPIVOT(3.4+) 原生支持，stack() 函数 |
+| [集合操作](../query/set-operations/spark.md) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/spark.md) | 关联子查询支持(2.0+)，IN/EXISTS 标准 |
+| [窗口函数](../query/window-functions/spark.md) | 完整窗口函数，与 Hive 兼容 |
 
 ### Scenarios — 实战场景
 
 | 模块 | 简评 |
 |---|---|
-| [日期填充](../scenarios/date-series-fill/spark.sql) | sequence() 函数(2.4+) 生成日期序列+explode |
-| [去重](../scenarios/deduplication/spark.sql) | ROW_NUMBER+窗口函数，dropDuplicates(DataFrame API) |
-| [区间检测](../scenarios/gap-detection/spark.sql) | sequence()+窗口函数检测 |
-| [层级查询](../scenarios/hierarchical-query/spark.sql) | 递归 CTE(3.4+)，之前需 DataFrame 迭代 |
-| [JSON 展开](../scenarios/json-flatten/spark.sql) | from_json/json_tuple，explode 展开 JSON 数组 |
-| [迁移速查](../scenarios/migration-cheatsheet/spark.sql) | Hive 兼容语法但 Delta Lake 是推荐路径，DataFrame API 更强大 |
-| [TopN 查询](../scenarios/ranking-top-n/spark.sql) | ROW_NUMBER+窗口函数，LIMIT 直接 TopN |
-| [累计求和](../scenarios/running-total/spark.sql) | SUM() OVER 标准，分布式并行计算 |
-| [缓慢变化维](../scenarios/slowly-changing-dim/spark.sql) | MERGE INTO(Delta Lake)，功能完整 |
-| [字符串拆分](../scenarios/string-split-to-rows/spark.sql) | split()+explode()/posexplode() 展开 |
-| [窗口分析](../scenarios/window-analytics/spark.sql) | 完整窗口函数，ROWS/RANGE 帧支持 |
+| [日期填充](../scenarios/date-series-fill/spark.md) | sequence() 函数(2.4+) 生成日期序列+explode |
+| [去重](../scenarios/deduplication/spark.md) | ROW_NUMBER+窗口函数，dropDuplicates(DataFrame API) |
+| [区间检测](../scenarios/gap-detection/spark.md) | sequence()+窗口函数检测 |
+| [层级查询](../scenarios/hierarchical-query/spark.md) | 递归 CTE(3.4+)，之前需 DataFrame 迭代 |
+| [JSON 展开](../scenarios/json-flatten/spark.md) | from_json/json_tuple，explode 展开 JSON 数组 |
+| [迁移速查](../scenarios/migration-cheatsheet/spark.md) | Hive 兼容语法但 Delta Lake 是推荐路径，DataFrame API 更强大 |
+| [TopN 查询](../scenarios/ranking-top-n/spark.md) | ROW_NUMBER+窗口函数，LIMIT 直接 TopN |
+| [累计求和](../scenarios/running-total/spark.md) | SUM() OVER 标准，分布式并行计算 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/spark.md) | MERGE INTO(Delta Lake)，功能完整 |
+| [字符串拆分](../scenarios/string-split-to-rows/spark.md) | split()+explode()/posexplode() 展开 |
+| [窗口分析](../scenarios/window-analytics/spark.md) | 完整窗口函数，ROWS/RANGE 帧支持 |
 
 ### Types — 数据类型
 
 | 模块 | 简评 |
 |---|---|
-| [复合类型](../types/array-map-struct/spark.sql) | ARRAY/MAP/STRUCT 原生支持，explode/posexplode 展开 |
-| [日期时间](../types/datetime/spark.sql) | DATE/TIMESTAMP/TIMESTAMP_NTZ(3.4+)，无 TIME 类型 |
-| [JSON](../types/json/spark.sql) | from_json/to_json 序列化，schema_of_json 推断，无 JSON 类型 |
-| [数值类型](../types/numeric/spark.sql) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准(同 Hive) |
-| [字符串类型](../types/string/spark.sql) | STRING 无长度限制，VARCHAR/CHAR(3.1+)，UTF-8 |
+| [复合类型](../types/array-map-struct/spark.md) | ARRAY/MAP/STRUCT 原生支持，explode/posexplode 展开 |
+| [日期时间](../types/datetime/spark.md) | DATE/TIMESTAMP/TIMESTAMP_NTZ(3.4+)，无 TIME 类型 |
+| [JSON](../types/json/spark.md) | from_json/to_json 序列化，schema_of_json 推断，无 JSON 类型 |
+| [数值类型](../types/numeric/spark.md) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准(同 Hive) |
+| [字符串类型](../types/string/spark.md) | STRING 无长度限制，VARCHAR/CHAR(3.1+)，UTF-8 |

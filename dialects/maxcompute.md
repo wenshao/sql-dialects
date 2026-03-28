@@ -167,84 +167,84 @@ MaxCompute 的分区不只是查询优化手段，还是数据治理的核心单
 
 | 模块 | 简评 |
 |---|---|
-| [建表](../ddl/create-table/maxcompute.sql) | 阿里云大数据平台(原 ODPS)，STORED AS ALIORC，项目级隔离 |
-| [改表](../ddl/alter-table/maxcompute.sql) | ALTER ADD COLUMNS/PARTITION，Schema 变更有限 |
-| [索引](../ddl/indexes/maxcompute.sql) | 无索引(批处理引擎)，依赖分区裁剪 |
-| [约束](../ddl/constraints/maxcompute.sql) | PK(2.0+) 声明不强制，无 FK/CHECK |
-| [视图](../ddl/views/maxcompute.sql) | VIEW 支持，物化视图(2.0+) |
-| [序列与自增](../ddl/sequences/maxcompute.sql) | 无 SEQUENCE/自增，UUID 或 ROW_NUMBER 生成 |
-| [数据库/Schema/用户](../ddl/users-databases/maxcompute.sql) | Project→Schema(3.0+)→Table，RAM 权限 |
+| [建表](../ddl/create-table/maxcompute.md) | 阿里云大数据平台(原 ODPS)，STORED AS ALIORC，项目级隔离 |
+| [改表](../ddl/alter-table/maxcompute.md) | ALTER ADD COLUMNS/PARTITION，Schema 变更有限 |
+| [索引](../ddl/indexes/maxcompute.md) | 无索引(批处理引擎)，依赖分区裁剪 |
+| [约束](../ddl/constraints/maxcompute.md) | PK(2.0+) 声明不强制，无 FK/CHECK |
+| [视图](../ddl/views/maxcompute.md) | VIEW 支持，物化视图(2.0+) |
+| [序列与自增](../ddl/sequences/maxcompute.md) | 无 SEQUENCE/自增，UUID 或 ROW_NUMBER 生成 |
+| [数据库/Schema/用户](../ddl/users-databases/maxcompute.md) | Project→Schema(3.0+)→Table，RAM 权限 |
 
 ### Advanced — 高级特性
 
 | 模块 | 简评 |
 |---|---|
-| [动态 SQL](../advanced/dynamic-sql/maxcompute.sql) | Script Mode(2.0+) 多语句脚本 |
-| [错误处理](../advanced/error-handling/maxcompute.sql) | 无过程式错误处理，作业级失败 |
-| [执行计划](../advanced/explain/maxcompute.sql) | EXPLAIN 展示 Fuxi DAG 执行计划 |
-| [锁机制](../advanced/locking/maxcompute.sql) | 无行级锁(批处理引擎)，表/分区级并发 |
-| [分区](../advanced/partitioning/maxcompute.sql) | PARTITIONED BY(同 Hive)，分区是成本控制核心 |
-| [权限](../advanced/permissions/maxcompute.sql) | RAM+ACL+Policy 三层权限，Label Security 列级 |
-| [存储过程](../advanced/stored-procedures/maxcompute.sql) | Script Mode 脚本(非传统存储过程) |
-| [临时表](../advanced/temp-tables/maxcompute.sql) | TEMPORARY TABLE(会话级)，VOLATILE TABLE |
-| [事务](../advanced/transactions/maxcompute.sql) | ACID 事务(2.0+)，TimeTravel 时间旅行查询 |
-| [触发器](../advanced/triggers/maxcompute.sql) | 无触发器 |
+| [动态 SQL](../advanced/dynamic-sql/maxcompute.md) | Script Mode(2.0+) 多语句脚本 |
+| [错误处理](../advanced/error-handling/maxcompute.md) | 无过程式错误处理，作业级失败 |
+| [执行计划](../advanced/explain/maxcompute.md) | EXPLAIN 展示 Fuxi DAG 执行计划 |
+| [锁机制](../advanced/locking/maxcompute.md) | 无行级锁(批处理引擎)，表/分区级并发 |
+| [分区](../advanced/partitioning/maxcompute.md) | PARTITIONED BY(同 Hive)，分区是成本控制核心 |
+| [权限](../advanced/permissions/maxcompute.md) | RAM+ACL+Policy 三层权限，Label Security 列级 |
+| [存储过程](../advanced/stored-procedures/maxcompute.md) | Script Mode 脚本(非传统存储过程) |
+| [临时表](../advanced/temp-tables/maxcompute.md) | TEMPORARY TABLE(会话级)，VOLATILE TABLE |
+| [事务](../advanced/transactions/maxcompute.md) | ACID 事务(2.0+)，TimeTravel 时间旅行查询 |
+| [触发器](../advanced/triggers/maxcompute.md) | 无触发器 |
 
 ### DML — 数据操作
 
 | 模块 | 简评 |
 |---|---|
-| [删除](../dml/delete/maxcompute.sql) | DELETE(ACID 表 2.0+)，非 ACID 表 DROP PARTITION |
-| [插入](../dml/insert/maxcompute.sql) | INSERT INTO/OVERWRITE(同 Hive)，Tunnel 批量上传 |
-| [更新](../dml/update/maxcompute.sql) | UPDATE(ACID 表 2.0+)，非 ACID 表不支持 |
-| [Upsert](../dml/upsert/maxcompute.sql) | MERGE(ACID 表 2.0+)，INSERT OVERWRITE 替代 |
+| [删除](../dml/delete/maxcompute.md) | DELETE(ACID 表 2.0+)，非 ACID 表 DROP PARTITION |
+| [插入](../dml/insert/maxcompute.md) | INSERT INTO/OVERWRITE(同 Hive)，Tunnel 批量上传 |
+| [更新](../dml/update/maxcompute.md) | UPDATE(ACID 表 2.0+)，非 ACID 表不支持 |
+| [Upsert](../dml/upsert/maxcompute.md) | MERGE(ACID 表 2.0+)，INSERT OVERWRITE 替代 |
 
 ### Functions — 内置函数
 
 | 模块 | 简评 |
 |---|---|
-| [聚合函数](../functions/aggregate/maxcompute.sql) | GROUPING SETS/CUBE/ROLLUP，COLLECT_LIST/COLLECT_SET |
-| [条件函数](../functions/conditional/maxcompute.sql) | IF/CASE/COALESCE/NVL(Hive 兼容) |
-| [日期函数](../functions/date-functions/maxcompute.sql) | DATEADD/DATEDIFF/DATE_FORMAT(Hive 兼容+扩展) |
-| [数学函数](../functions/math-functions/maxcompute.sql) | 完整数学函数 |
-| [字符串函数](../functions/string-functions/maxcompute.sql) | CONCAT/SUBSTR/REGEXP(Hive 兼容) |
-| [类型转换](../functions/type-conversion/maxcompute.sql) | CAST/TRY_CAST(2.0+) 安全转换 |
+| [聚合函数](../functions/aggregate/maxcompute.md) | GROUPING SETS/CUBE/ROLLUP，COLLECT_LIST/COLLECT_SET |
+| [条件函数](../functions/conditional/maxcompute.md) | IF/CASE/COALESCE/NVL(Hive 兼容) |
+| [日期函数](../functions/date-functions/maxcompute.md) | DATEADD/DATEDIFF/DATE_FORMAT(Hive 兼容+扩展) |
+| [数学函数](../functions/math-functions/maxcompute.md) | 完整数学函数 |
+| [字符串函数](../functions/string-functions/maxcompute.md) | CONCAT/SUBSTR/REGEXP(Hive 兼容) |
+| [类型转换](../functions/type-conversion/maxcompute.md) | CAST/TRY_CAST(2.0+) 安全转换 |
 
 ### Query — 查询
 
 | 模块 | 简评 |
 |---|---|
-| [CTE](../query/cte/maxcompute.sql) | WITH+递归 CTE 支持 |
-| [全文搜索](../query/full-text-search/maxcompute.sql) | 无全文搜索 |
-| [连接查询](../query/joins/maxcompute.sql) | Map/Reduce/Broadcast JOIN(同 Hive)，MAPJOIN 提示 |
-| [分页](../query/pagination/maxcompute.sql) | LIMIT+ORDER BY，无 OFFSET |
-| [行列转换](../query/pivot-unpivot/maxcompute.sql) | LATERAL VIEW EXPLODE(Hive 兼容)，无 PIVOT |
-| [集合操作](../query/set-operations/maxcompute.sql) | UNION/INTERSECT/EXCEPT 完整 |
-| [子查询](../query/subquery/maxcompute.sql) | IN/EXISTS 子查询支持 |
-| [窗口函数](../query/window-functions/maxcompute.sql) | 完整窗口函数(Hive 兼容) |
+| [CTE](../query/cte/maxcompute.md) | WITH+递归 CTE 支持 |
+| [全文搜索](../query/full-text-search/maxcompute.md) | 无全文搜索 |
+| [连接查询](../query/joins/maxcompute.md) | Map/Reduce/Broadcast JOIN(同 Hive)，MAPJOIN 提示 |
+| [分页](../query/pagination/maxcompute.md) | LIMIT+ORDER BY，无 OFFSET |
+| [行列转换](../query/pivot-unpivot/maxcompute.md) | LATERAL VIEW EXPLODE(Hive 兼容)，无 PIVOT |
+| [集合操作](../query/set-operations/maxcompute.md) | UNION/INTERSECT/EXCEPT 完整 |
+| [子查询](../query/subquery/maxcompute.md) | IN/EXISTS 子查询支持 |
+| [窗口函数](../query/window-functions/maxcompute.md) | 完整窗口函数(Hive 兼容) |
 
 ### Scenarios — 实战场景
 
 | 模块 | 简评 |
 |---|---|
-| [日期填充](../scenarios/date-series-fill/maxcompute.sql) | 无 generate_series，辅助表或 LATERAL VIEW |
-| [去重](../scenarios/deduplication/maxcompute.sql) | ROW_NUMBER+窗口函数去重 |
-| [区间检测](../scenarios/gap-detection/maxcompute.sql) | 窗口函数检测 |
-| [层级查询](../scenarios/hierarchical-query/maxcompute.sql) | 递归 CTE 支持 |
-| [JSON 展开](../scenarios/json-flatten/maxcompute.sql) | GET_JSON_OBJECT/JSON_EXTRACT(Hive 兼容) |
-| [迁移速查](../scenarios/migration-cheatsheet/maxcompute.sql) | Hive 兼容+阿里云生态+ACID 2.0 是核心特色 |
-| [TopN 查询](../scenarios/ranking-top-n/maxcompute.sql) | ROW_NUMBER+LIMIT |
-| [累计求和](../scenarios/running-total/maxcompute.sql) | SUM() OVER 标准 |
-| [缓慢变化维](../scenarios/slowly-changing-dim/maxcompute.sql) | MERGE(ACID 表)+INSERT OVERWRITE |
-| [字符串拆分](../scenarios/string-split-to-rows/maxcompute.sql) | SPLIT+LATERAL VIEW EXPLODE(Hive 兼容) |
-| [窗口分析](../scenarios/window-analytics/maxcompute.sql) | 完整窗口函数(Hive 兼容) |
+| [日期填充](../scenarios/date-series-fill/maxcompute.md) | 无 generate_series，辅助表或 LATERAL VIEW |
+| [去重](../scenarios/deduplication/maxcompute.md) | ROW_NUMBER+窗口函数去重 |
+| [区间检测](../scenarios/gap-detection/maxcompute.md) | 窗口函数检测 |
+| [层级查询](../scenarios/hierarchical-query/maxcompute.md) | 递归 CTE 支持 |
+| [JSON 展开](../scenarios/json-flatten/maxcompute.md) | GET_JSON_OBJECT/JSON_EXTRACT(Hive 兼容) |
+| [迁移速查](../scenarios/migration-cheatsheet/maxcompute.md) | Hive 兼容+阿里云生态+ACID 2.0 是核心特色 |
+| [TopN 查询](../scenarios/ranking-top-n/maxcompute.md) | ROW_NUMBER+LIMIT |
+| [累计求和](../scenarios/running-total/maxcompute.md) | SUM() OVER 标准 |
+| [缓慢变化维](../scenarios/slowly-changing-dim/maxcompute.md) | MERGE(ACID 表)+INSERT OVERWRITE |
+| [字符串拆分](../scenarios/string-split-to-rows/maxcompute.md) | SPLIT+LATERAL VIEW EXPLODE(Hive 兼容) |
+| [窗口分析](../scenarios/window-analytics/maxcompute.md) | 完整窗口函数(Hive 兼容) |
 
 ### Types — 数据类型
 
 | 模块 | 简评 |
 |---|---|
-| [复合类型](../types/array-map-struct/maxcompute.sql) | ARRAY/MAP/STRUCT 原生(Hive 兼容)，LATERAL VIEW |
-| [日期时间](../types/datetime/maxcompute.sql) | DATE/DATETIME/TIMESTAMP(Hive 兼容+扩展) |
-| [JSON](../types/json/maxcompute.sql) | GET_JSON_OBJECT 路径查询，无 JSON 类型 |
-| [数值类型](../types/numeric/maxcompute.sql) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准 |
-| [字符串类型](../types/string/maxcompute.sql) | STRING/VARCHAR(Hive 兼容)，UTF-8 |
+| [复合类型](../types/array-map-struct/maxcompute.md) | ARRAY/MAP/STRUCT 原生(Hive 兼容)，LATERAL VIEW |
+| [日期时间](../types/datetime/maxcompute.md) | DATE/DATETIME/TIMESTAMP(Hive 兼容+扩展) |
+| [JSON](../types/json/maxcompute.md) | GET_JSON_OBJECT 路径查询，无 JSON 类型 |
+| [数值类型](../types/numeric/maxcompute.md) | TINYINT-BIGINT/FLOAT/DOUBLE/DECIMAL 标准 |
+| [字符串类型](../types/string/maxcompute.md) | STRING/VARCHAR(Hive 兼容)，UTF-8 |

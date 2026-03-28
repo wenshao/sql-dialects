@@ -1,70 +1,45 @@
 -- MariaDB: UPDATE
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- 核心差异: RETURNING 子句, 历史版本跟踪
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - UPDATE
+--       https://mariadb.com/kb/en/update/
 
--- Basic update (same as MySQL)
+-- ============================================================
+-- 1. 基本语法 (与 MySQL 相同)
+-- ============================================================
 UPDATE users SET age = 26 WHERE username = 'alice';
+UPDATE users SET age = age + 1, updated_at = NOW() WHERE age < 30;
+UPDATE users SET balance = balance * 1.1 ORDER BY balance ASC LIMIT 100;
 
--- Multi-column update (same as MySQL)
-UPDATE users SET email = 'new@example.com', age = 26 WHERE username = 'alice';
+-- 多表更新
+UPDATE users u JOIN orders o ON u.id = o.user_id
+SET u.balance = u.balance + o.amount
+WHERE o.status = 'completed';
 
--- UPDATE with LIMIT (same as MySQL)
-UPDATE users SET status = 0 WHERE status = 1 ORDER BY created_at LIMIT 100;
+-- ============================================================
+-- 2. UPDATE ... RETURNING (10.5+) -- MariaDB 独有
+-- ============================================================
+UPDATE users SET age = age + 1 WHERE username = 'alice'
+RETURNING id, username, age AS new_age;
+-- 返回更新后的值, 避免额外的 SELECT 查询
+-- 对比 PostgreSQL: UPDATE ... RETURNING (8.2+)
+-- 对比 MySQL: 不支持, 需要 UPDATE + SELECT 两步
 
--- Multi-table update (same as MySQL)
-UPDATE users u
-JOIN orders o ON u.id = o.user_id
-SET u.status = 1
-WHERE o.amount > 1000;
+-- ============================================================
+-- 3. 系统版本表的 UPDATE 行为
+-- ============================================================
+-- 对启用了 SYSTEM VERSIONING 的表:
+-- UPDATE 不会覆盖旧行, 而是插入新版本, 旧版本移入历史
+UPDATE products SET price = 29.99 WHERE id = 1;
+-- 之后可以查询更新前的数据:
+-- SELECT * FROM products FOR SYSTEM_TIME ALL WHERE id = 1;
 
--- UPDATE ... RETURNING (10.5+): return data from updated rows
--- Not available in MySQL
-UPDATE users SET age = 26 WHERE username = 'alice'
-RETURNING id, username, age;
-
--- RETURNING with expressions
-UPDATE users SET status = 0 WHERE last_login < '2023-01-01'
-RETURNING id, username, CONCAT('deactivated: ', email) AS note;
-
--- RETURNING * for all columns
-UPDATE users SET age = age + 1 WHERE id = 1
-RETURNING *;
-
--- WITH CTE (10.2.1+, earlier than MySQL 8.0)
-WITH vip AS (
-    SELECT user_id FROM orders GROUP BY user_id HAVING SUM(amount) > 10000
-)
-UPDATE users u JOIN vip v ON u.id = v.user_id SET u.status = 2;
-
--- UPDATE for temporal tables (10.5+): update a portion of a period
--- For tables with application-time periods
-UPDATE contracts FOR PORTION OF valid_period
-    FROM '2024-01-01' TO '2024-06-01'
-SET amount = 5000.00
-WHERE client = 'Acme Corp';
--- This splits the original row and updates only the specified time portion
-
--- Subquery update (same as MySQL)
-UPDATE users SET age = (SELECT AVG(age) FROM users) WHERE age IS NULL;
-
--- CASE expression (same as MySQL)
-UPDATE users SET status = CASE
-    WHEN age < 18 THEN 0
-    WHEN age >= 65 THEN 2
-    ELSE 1
-END;
-
--- Histogram-based optimizer (10.0+)
--- MariaDB uses histogram statistics for better UPDATE query plans
-ANALYZE TABLE users PERSISTENT FOR COLUMNS (age, city) INDEXES (idx_age);
-
--- Differences from MySQL 8.0:
--- RETURNING clause is MariaDB-specific (10.5+)
--- FOR PORTION OF temporal update is MariaDB-specific (10.5+)
--- CTEs available from 10.2.1 (earlier than MySQL 8.0)
--- Different optimizer behavior, often faster for complex updates
+-- ============================================================
+-- 4. 对引擎开发者的启示
+-- ============================================================
+-- UPDATE + RETURNING 的实现需要在更新操作完成后读取新值
+-- 与 INSERT RETURNING 不同, UPDATE RETURNING 还需要处理:
+--   - 部分列更新: 未被 SET 的列从原行继承
+--   - 触发器修改: AFTER UPDATE 触发器可能修改了值
+--   - MVCC 版本: 返回的必须是事务内最新版本

@@ -1,73 +1,71 @@
--- MariaDB: Indexes
--- MariaDB is a MySQL fork; only differences from MySQL are shown here.
+-- MariaDB: 索引 (Indexes)
+-- 与 MySQL 语法基本一致, 关键差异在 IGNORED 索引和特有索引类型
 --
 -- 参考资料:
---   [1] MariaDB Knowledge Base
---       https://mariadb.com/kb/en/documentation/
---   [2] MariaDB vs MySQL Compatibility
---       https://mariadb.com/kb/en/mariadb-vs-mysql-compatibility/
+--   [1] MariaDB Knowledge Base - CREATE INDEX
+--       https://mariadb.com/kb/en/create-index/
 
--- Basic indexes (same as MySQL)
+-- ============================================================
+-- 1. 基本索引类型
+-- ============================================================
 CREATE INDEX idx_age ON users (age);
-CREATE UNIQUE INDEX uk_email ON users (email);
-CREATE INDEX idx_city_age ON users (city, age);
-CREATE INDEX idx_email_prefix ON users (email(20));
+CREATE UNIQUE INDEX idx_email ON users (email);
+CREATE INDEX idx_name_age ON users (username, age);    -- 复合索引
+CREATE INDEX idx_bio ON users (bio(100));               -- 前缀索引
 
--- Fulltext index (same as MySQL, InnoDB + MyISAM + Mroonga)
-CREATE FULLTEXT INDEX idx_ft_bio ON users (bio);
+-- ============================================================
+-- 2. IGNORED 索引 (10.6+) -- 对比 MySQL 的 INVISIBLE INDEX
+-- ============================================================
+CREATE INDEX idx_test ON users (age) IGNORED;
+ALTER TABLE users ALTER INDEX idx_test NOT IGNORED;
+-- 功能: 优化器忽略该索引, 但 DML 仍然维护
+-- 用途: 安全测试删除索引的影响 (先 IGNORED, 观察, 再 DROP)
+-- 关键词差异: MySQL 用 INVISIBLE/VISIBLE, MariaDB 用 IGNORED/NOT IGNORED
+-- 这是 fork 后设计分歧的典型案例: 同一功能不同语法
 
--- Spatial index (same as MySQL)
-CREATE SPATIAL INDEX idx_location ON places (geo_point);
+-- ============================================================
+-- 3. 全文索引
+-- ============================================================
+CREATE FULLTEXT INDEX ft_bio ON users (bio);
+-- MariaDB 默认使用 Mroonga 引擎的全文索引 (如果安装)
+-- Mroonga 是基于 Groonga 的全文搜索引擎, 支持 CJK 分词
+-- 对比 MySQL: InnoDB 全文索引 (5.6+) 对中日韩支持较差 (需要 ngram parser)
 
--- Descending index (10.8+)
--- Before 10.8, DESC was parsed but ignored (like MySQL 5.7)
-CREATE INDEX idx_age_desc ON users (age DESC);
+-- ============================================================
+-- 4. 空间索引
+-- ============================================================
+CREATE TABLE locations (
+    id   INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    pos  POINT NOT NULL SRID 4326,
+    SPATIAL INDEX idx_pos (pos)
+);
+-- MariaDB 与 MySQL 空间索引语法相同, 基于 R-Tree
 
--- IGNORED indexes (10.6+, MariaDB's version of MySQL's INVISIBLE)
--- Different keyword than MySQL: IGNORED instead of INVISIBLE
-CREATE INDEX idx_age ON users (age) IGNORED;
-ALTER TABLE users ALTER INDEX idx_age NOT IGNORED;
--- Note: MySQL uses INVISIBLE/VISIBLE; MariaDB uses IGNORED/NOT IGNORED
+-- ============================================================
+-- 5. Hash 索引 (MEMORY/Aria 引擎)
+-- ============================================================
+CREATE TABLE cache_data (
+    cache_key VARCHAR(255) NOT NULL,
+    cache_val TEXT,
+    INDEX USING HASH (cache_key)
+) ENGINE=MEMORY;
+-- MEMORY 引擎默认 HASH 索引, InnoDB 只支持 B-Tree (自适应 Hash 是内部优化)
 
--- Expression index (virtual/persistent computed columns, 10.2+)
--- MariaDB uses virtual columns instead of direct expression indexes
-ALTER TABLE users ADD COLUMN upper_name VARCHAR(64) AS (UPPER(username)) PERSISTENT;
-CREATE INDEX idx_upper_name ON users (upper_name);
--- 10.5.3+: direct expression indexes (like MySQL 8.0)
-CREATE INDEX idx_upper_name ON users ((UPPER(username)));
+-- ============================================================
+-- 6. 降序索引
+-- ============================================================
+-- MariaDB 10.8+: 真正的降序索引
+CREATE INDEX idx_created_desc ON users (created_at DESC);
+-- 10.8 之前: DESC 被解析但忽略 (与 MySQL 5.7 行为相同)
+-- MySQL 8.0: 也支持降序索引
 
--- Hash index (MEMORY/HEAP engine only, same as MySQL)
-CREATE INDEX idx_hash ON users (username) USING HASH;
-
--- DROP INDEX with IF EXISTS (available earlier than MySQL)
-DROP INDEX IF EXISTS idx_age ON users;
-
--- Index hints (same as MySQL)
-SELECT * FROM users USE INDEX (idx_age) WHERE age > 25;
-SELECT * FROM users FORCE INDEX (idx_city_age) WHERE city = 'Beijing';
-SELECT * FROM users IGNORE INDEX (idx_age) WHERE age > 25;
-
--- Optimizer hints for indexes (10.1+)
--- MariaDB has its own optimizer hint syntax
-SELECT * FROM users FORCE INDEX FOR JOIN (idx_age) WHERE age > 25;
-SELECT * FROM users FORCE INDEX FOR ORDER BY (idx_age) ORDER BY age;
-
--- Mroonga engine fulltext (CJK-optimized, bundled with MariaDB)
-CREATE TABLE articles (
-    id      BIGINT NOT NULL AUTO_INCREMENT,
-    title   VARCHAR(255),
-    content TEXT,
-    PRIMARY KEY (id),
-    FULLTEXT INDEX idx_ft (title, content)
-) ENGINE=Mroonga DEFAULT CHARSET=utf8mb4;
-
--- View indexes
-SHOW INDEX FROM users;
-SHOW CREATE TABLE users;
-
--- Differences from MySQL 8.0:
--- IGNORED/NOT IGNORED instead of INVISIBLE/VISIBLE
--- No multi-valued index (JSON ARRAY index) until later versions
--- Mroonga fulltext engine bundled (not in MySQL)
--- Direct expression indexes added later (10.5.3+)
--- Different optimizer decisions for index usage
+-- ============================================================
+-- 7. 对引擎开发者: 索引实现差异
+-- ============================================================
+-- MariaDB InnoDB 与 MySQL InnoDB 的索引实现已有差异:
+--   1. MariaDB 的 InnoDB 由 MariaDB 团队独立维护 (从 10.2 开始)
+--   2. 压缩页面格式: MariaDB 10.1+ 独有的页面压缩 (innodb_compression_algorithm)
+--   3. 加密: MariaDB 10.1+ 的表空间加密实现与 MySQL 不同
+--   4. 即时 DDL: 索引元数据的 INSTANT 变更路径不同
+-- 两者虽然都叫 InnoDB, 但代码已经显著分叉
