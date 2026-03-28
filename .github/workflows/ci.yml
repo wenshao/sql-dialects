@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate repository structure
+        run: python tools/cli.py check
+
+      - name: Validate SQL file headers
+        run: python tools/cli.py check-headers
+
+      - name: Validate comparison tables
+        run: python tools/cli.py check-comparisons
+
+      - name: Check for empty/short files
+        run: python tools/cli.py check-quality
+
+      - name: Generate coverage report
+        run: python tools/cli.py report
