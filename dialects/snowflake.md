@@ -38,6 +38,11 @@ Snowflake 的定位已从纯数仓演化为"Data Cloud"平台，通过 Secure Da
 - **三种 TIMESTAMP 类型**：TIMESTAMP_NTZ（无时区）、TIMESTAMP_LTZ（本地时区）、TIMESTAMP_TZ（带时区偏移量）。虽然语义精确，但增加了认知负担——新用户经常混淆三者。
 - **Virtual Warehouse 弹性计算**：计算资源按 T-Shirt 尺寸（XS 到 6XL）配置，可以随时启停和扩缩，不同团队使用不同 Warehouse 实现资源隔离和成本分摊。
 - **Secure Data Sharing**：无需复制数据即可跨账户共享表和视图，消费方直接查询提供方的数据，解决了传统 ETL 数据交换的延迟和成本问题。
+- **Dynamic Tables（2024 GA）**：声明式数据管道——`CREATE DYNAMIC TABLE ... AS SELECT ...`，系统自动增量刷新。替代了传统的 Task + Stream 组合，大幅简化 ETL 管道。支持从 Iceberg 表读取和写入。
+- **Hybrid Tables（2024 GA Azure）**：在 Snowflake 中支持 OLTP 式操作——行级 INSERT/UPDATE/DELETE 低延迟。Hybrid Tables 既能高并发点操作，又能与普通分析表 JOIN。打破了"数仓不能做 OLTP"的边界。
+- **Cortex AI SQL（2025 预览）**：将生成式 AI 直接嵌入 SQL——`CORTEX.COMPLETE()`（LLM 调用）、`CORTEX.EMBED()`（向量化）、`CORTEX.SENTIMENT()`（情感分析）。对标 BigQuery AI Functions。
+- **Iceberg Tables**：原生 Snowflake-managed Iceberg 表，数据以 Parquet 格式存储在用户的对象存储中（S3/Azure/GCS）。支持 Spark/Trino 等外部引擎直接读取——消除供应商锁定。
+- **Snowpark**：DataFrame API（Python/Java/Scala），在 Snowflake 计算层执行代码。对标 Spark DataFrame，但运行在 Snowflake 基础设施上。
 
 ## 已知的设计不足与历史包袱
 

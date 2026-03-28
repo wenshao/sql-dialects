@@ -37,6 +37,10 @@ ClickHouse 是一款开源的列式 OLAP 数据库，以**极致的查询性能*
 - **FINAL 关键字**：`SELECT ... FROM t FINAL` 在查询时强制应用 Merge 逻辑（如 ReplacingMergeTree 去重），保证看到最终一致的数据。代价是查询变慢。
 - **物化视图 = INSERT 触发器**：ClickHouse 的物化视图在 INSERT 时自动触发，将增量数据写入目标表。它本质上是一个"INSERT 触发器 + 目标表"的组合，用于实时预聚合。
 - **WITH FILL / LIMIT BY**：`ORDER BY date WITH FILL FROM ... TO ...` 自动填充缺失的日期行；`LIMIT N BY col` 每组最多返回 N 行——这些是 ClickHouse 独有的 SQL 扩展，简化了常见分析查询。
+- **Projections（21.6+）**：预计算的物化聚合——在表定义中声明 `PROJECTION p (SELECT a, SUM(b) GROUP BY a)`，写入时自动维护。查询时优化器自动选择 Projection 或原始数据。对比 Oracle 物化视图 Query Rewrite、StarRocks Rollup。
+- **标准 SQL UPDATE（25.7+）**：支持标准 `UPDATE t SET col=val WHERE ...` 语法，基于 lightweight patch-part 机制，比传统 mutation 快数千倍。这是 ClickHouse 历史上最大的 DML 改进。
+- **SharedMergeTree（Cloud）**：存算分离版的 MergeTree，数据持久化在对象存储（S3），计算节点无状态。ClickHouse Cloud 的核心架构，对标 Snowflake 的三层分离。
+- **向量化执行引擎**：列批处理（column-at-a-time），利用 SIMD 指令（SSE4.2/AVX2/AVX-512）加速计算。这是 ClickHouse 查询性能的核心技术基础。
 
 ## 已知的设计不足与历史包袱
 
