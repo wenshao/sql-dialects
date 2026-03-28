@@ -30,10 +30,10 @@
 | **Hive** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **Spark SQL** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **MaxCompute** | `2.5` | DOUBLE | 无标准整数除法运算符 |
-| **StarRocks** | `2.5` | DOUBLE | 无内置整数除运算符（用 `FLOOR(5/2)`） |
+| **StarRocks** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **Doris** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **Trino** | `2` | INTEGER | `/` 对整数是整数除 |
-| **DuckDB** | `2` | INTEGER | `//` 整数除法运算符（`5 // 2 = 2`） |
+| **DuckDB** | `2` | INTEGER | `/` 对整数是整数除；`//` 整数除法运算符（`5 // 2 = 2`） |
 | **Flink SQL** | `2` | INT | `/` 对整数是整数除 |
 | **Redshift** | `2` | INTEGER | `/` 对整数是整数除（PG 兼容） |
 | **Databricks** | `2.5` | DOUBLE | `DIV`（同 Spark） |
