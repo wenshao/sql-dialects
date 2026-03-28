@@ -29,11 +29,11 @@ INSERT INTO users (username, email) VALUES ('alice', 'alice@example.com');
 ```
 
  特点:
-### 1. 唯一但不连续(跨 BE 有间隙)
+1. 唯一但不连续(跨 BE 有间隙)
 
-### 2. 段分配: 每个 BE 预分配一批 ID
+2. 段分配: 每个 BE 预分配一批 ID
 
-### 3. 仅 Primary Key / Unique Key 模型支持
+3. 仅 Primary Key / Unique Key 模型支持
 
 
  对比:

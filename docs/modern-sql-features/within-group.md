@@ -364,7 +364,7 @@ FROM (
 
 ## 对引擎开发者的实现分析
 
-### 1. 有序集合聚合框架
+1. 有序集合聚合框架
 
 有序集合聚合与普通聚合的核心区别：普通聚合可以增量计算（每来一行更新一次），有序集合聚合必须**先收集所有值，再排序，最后计算**。
 
@@ -383,7 +383,7 @@ FROM (
   accumulator.result(0.5)   → 20
 ```
 
-### 2. 内存压力
+2. 内存压力
 
 有序集合聚合需要在内存中保存**当前分组的所有值**：
 
@@ -403,7 +403,7 @@ PERCENTILE_CONT 需要缓存 1 亿个值
 - 支持 spill to disk（当内存不足时）
 - 提供近似替代函数（APPROX_PERCENTILE）
 
-### 3. PERCENTILE_CONT 的精确计算
+3. PERCENTILE_CONT 的精确计算
 
 ```
 算法: 线性插值
@@ -417,7 +417,7 @@ PERCENTILE_CONT 需要缓存 1 亿个值
 结果 = V[下标_低] * (1 - 权重) + V[下标_高] * 权重
 ```
 
-### 4. 分布式执行的挑战
+4. 分布式执行的挑战
 
 有序集合聚合**不能做两阶段聚合**——部分排序无法合并为全局排序后的分位数：
 
@@ -433,7 +433,7 @@ PERCENTILE_CONT 需要缓存 1 亿个值
 - 使用近似算法（t-digest、KLL 可以合并）
 - 对于 LISTAGG，可以分段拼接后二次合并
 
-### 5. LISTAGG 的溢出处理
+5. LISTAGG 的溢出处理
 
 LISTAGG 的结果长度不可预测——如果拼接 100 万行的文本，结果可能超出 VARCHAR 最大长度。
 
@@ -452,7 +452,7 @@ LISTAGG(name, ','
 - 提供 ON OVERFLOW TRUNCATE / ERROR 选项
 - 流式拼接，到达长度限制时停止
 
-### 6. WITHIN GROUP vs 函数内 ORDER BY
+6. WITHIN GROUP vs 函数内 ORDER BY
 
 ```sql
 -- 方式 1: WITHIN GROUP (SQL:2003 标准)

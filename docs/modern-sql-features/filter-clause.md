@@ -252,7 +252,7 @@ WINDOW w AS (
 
 ## 对引擎开发者的实现分析
 
-### 1. 极低的实现成本
+1. 极低的实现成本
 
 FILTER 子句的实现非常简单——本质上是在聚合累加器（accumulator）的 update 方法中加一个条件判断：
 
@@ -275,7 +275,7 @@ accumulator.update(value, filter_result):
 
 这使得不支持 FILTER 的引擎（如 MySQL）更令人费解——实现成本几乎为零。
 
-### 2. 优化器处理
+2. 优化器处理
 
 FILTER 对优化器有明确好处：
 
@@ -295,7 +295,7 @@ COUNT(*) FILTER (WHERE status = 'active')
 - FILTER 条件可以与 WHERE 条件合并做谓词推导
 - 在向量化引擎中，FILTER 可以用位图（bitmap）高效实现
 
-### 3. CASE WHEN 到 FILTER 的自动改写
+3. CASE WHEN 到 FILTER 的自动改写
 
 优化器可以在 planner 阶段将 CASE WHEN 模式自动改写为 FILTER，从而统一后续优化：
 
@@ -311,7 +311,7 @@ SUM(CASE WHEN cond THEN x END)   → SUM(x) FILTER (WHERE cond)
 AVG(CASE WHEN cond THEN x END)   → AVG(x) FILTER (WHERE cond)
 ```
 
-### 4. 向量化执行
+4. 向量化执行
 
 在向量化引擎中，FILTER 子句天然适合批量处理：
 
@@ -324,7 +324,7 @@ AVG(CASE WHEN cond THEN x END)   → AVG(x) FILTER (WHERE cond)
 FILTER 的选择向量方式避免了中间值的物化。
 ```
 
-### 5. NULL 语义
+5. NULL 语义
 
 FILTER 与 CASE WHEN 在 NULL 处理上等价：
 

@@ -81,24 +81,24 @@ TRUNCATE TABLE users;
 
 
  Copy-on-Write（传统方式）:
-### 1. 找到包含目标行的 Parquet 文件
+1. 找到包含目标行的 Parquet 文件
 
-### 2. 读取文件，过滤掉目标行
+2. 读取文件，过滤掉目标行
 
-### 3. 写入新的 Parquet 文件
+3. 写入新的 Parquet 文件
 
-### 4. 在事务日志中记录: 删除旧文件，添加新文件
+4. 在事务日志中记录: 删除旧文件，添加新文件
 
    成本: 即使只删一行，也要重写整个文件
 
  Deletion Vectors（Delta Lake 2.0+）:
-### 1. 找到包含目标行的 Parquet 文件
+1. 找到包含目标行的 Parquet 文件
 
-### 2. 创建一个位图（Deletion Vector），标记被删除行的位置
+2. 创建一个位图（Deletion Vector），标记被删除行的位置
 
-### 3. 读取时跳过被标记的行（不重写文件）
+3. 读取时跳过被标记的行（不重写文件）
 
-### 4. 后续 OPTIMIZE 时合并 Deletion Vectors 并重写文件
+4. 后续 OPTIMIZE 时合并 Deletion Vectors 并重写文件
 
    成本: DELETE 速度大幅提升，但读取时有额外的位图检查开销
 

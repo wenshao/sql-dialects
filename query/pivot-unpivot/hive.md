@@ -134,24 +134,24 @@ SELECT product, 'Q4' AS quarter, Q4 AS amount FROM quarterly_sales;
 
 ## 7. 已知限制
 
-### 1. 无原生 PIVOT/UNPIVOT 语法
+1. 无原生 PIVOT/UNPIVOT 语法
 
-### 2. 动态 PIVOT（列数不固定）需要在客户端生成 SQL
+2. 动态 PIVOT（列数不固定）需要在客户端生成 SQL
 
-### 3. stack() 的列数必须在 SQL 中硬编码
+3. stack() 的列数必须在 SQL 中硬编码
 
-### 4. 多个 LATERAL VIEW 是笛卡尔积（注意性能）
+4. 多个 LATERAL VIEW 是笛卡尔积（注意性能）
 
 
 ## 8. 对引擎开发者的启示
 
-### 1. stack() UDTF 是 UNPIVOT 的高效实现:
+1. stack() UDTF 是 UNPIVOT 的高效实现:
 
     单次扫描 + 行扩展，比 UNION ALL 的多次扫描高效得多
-### 2. PIVOT/UNPIVOT 语法糖值得支持:
+2. PIVOT/UNPIVOT 语法糖值得支持:
 
     CASE WHEN 写法冗长且容易出错，原生语法大幅提升可读性
-### 3. 动态 PIVOT 是所有引擎的难题:
+3. 动态 PIVOT 是所有引擎的难题:
 
 列数在编译时必须确定，动态列需要两阶段（先查值再拼 SQL）
 

@@ -184,17 +184,17 @@ MaxCompute: CTE + INSERT INTO/OVERWRITE | PostgreSQL: CTE + INSERT/UPDATE/DELETE
 ## 8. 对引擎开发者的启示
 
 
-### 1. CTE 是 SQL 可读性的核心工具 — 必须支持
+1. CTE 是 SQL 可读性的核心工具 — 必须支持
 
-### 2. 递归 CTE 在分布式引擎中实现困难，但用户需求强烈
+2. 递归 CTE 在分布式引擎中实现困难，但用户需求强烈
 
     BigQuery 的有限递归（最大迭代次数）是可参考的折中方案
-### 3. CTE 的内联/物化策略对性能影响巨大:
+3. CTE 的内联/物化策略对性能影响巨大:
 
     多次引用的高代价 CTE 应物化，单次引用的应内联
-### 4. PostgreSQL 12 之前的"CTE 强制物化"是性能陷阱的典型案例
+4. PostgreSQL 12 之前的"CTE 强制物化"是性能陷阱的典型案例
 
-### 5. CTE + INSERT 是 ETL 管道中最常用的模式 — 优先支持
+5. CTE + INSERT 是 ETL 管道中最常用的模式 — 优先支持
 
-### 6. CTE 嵌套限制应有清晰的错误信息和文档指引
+6. CTE 嵌套限制应有清晰的错误信息和文档指引
 

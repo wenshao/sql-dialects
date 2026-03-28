@@ -131,13 +131,13 @@ RANGE CLUSTERED BY (user_id) SORTED BY (id) INTO 1024 BUCKETS;
 
  谓词下推流程:
    WHERE amount > 1000
-### 1. 检查 File Footer: 如果 max(amount) < 1000，跳过整个文件
+1. 检查 File Footer: 如果 max(amount) < 1000，跳过整个文件
 
-### 2. 检查 Stripe Footer: 跳过 max(amount) < 1000 的 Stripe
+2. 检查 Stripe Footer: 跳过 max(amount) < 1000 的 Stripe
 
-### 3. 检查 Row Index: 跳过 max(amount) < 1000 的行组
+3. 检查 Row Index: 跳过 max(amount) < 1000 的行组
 
-### 4. 向量化读取: 批量解码 + SIMD 过滤
+4. 向量化读取: 批量解码 + SIMD 过滤
 
 
 对比:
@@ -195,15 +195,15 @@ GROUP BY dt;
 ## 7. 对引擎开发者的启示
 
 
-### 1. OLAP 引擎不需要传统索引 —— 分区裁剪 + 列式统计信息是更好的选择
+1. OLAP 引擎不需要传统索引 —— 分区裁剪 + 列式统计信息是更好的选择
 
-### 2. 分区是最有效的"索引": 设计时应让分区裁剪尽可能高效
+2. 分区是最有效的"索引": 设计时应让分区裁剪尽可能高效
 
-### 3. Clustering 是第二层优化: 数据物理排列直接影响 JOIN 和范围查询性能
+3. Clustering 是第二层优化: 数据物理排列直接影响 JOIN 和范围查询性能
 
-### 4. 列式存储的内置统计信息（min/max）提供了免维护的过滤能力
+4. 列式存储的内置统计信息（min/max）提供了免维护的过滤能力
 
-### 5. 物化视图是预计算的"索引": 适合固定查询模式的加速
+5. 物化视图是预计算的"索引": 适合固定查询模式的加速
 
-### 6. BigQuery/Snowflake 的搜索索引表明 OLAP 引擎开始补充有限的精确索引
+6. BigQuery/Snowflake 的搜索索引表明 OLAP 引擎开始补充有限的精确索引
 

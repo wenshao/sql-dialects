@@ -48,13 +48,13 @@ INSERT INTO users (username, email) VALUES ('alice', 'alice@example.com');
 ```
 
  特点:
-### 1. 保证唯一但不保证连续(跨 BE 有间隙)
+1. 保证唯一但不保证连续(跨 BE 有间隙)
 
-### 2. 每个 BE 预分配 100000 个 ID(可配置)
+2. 每个 BE 预分配 100000 个 ID(可配置)
 
-### 3. AUTO_INCREMENT 列必须是 Key 列
+3. AUTO_INCREMENT 列必须是 Key 列
 
-### 4. 仅 Unique Key 的 Merge-on-Write 模型支持
+4. 仅 Unique Key 的 Merge-on-Write 模型支持
 
 
 ## 3. SEQUENCE 列 (Doris 特有，版本控制)

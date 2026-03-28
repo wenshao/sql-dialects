@@ -10,7 +10,7 @@
 ## 从 MySQL/PostgreSQL 迁移到 BigQuery 的常见问题
 
 
-### 1. 数据类型映射
+1. 数据类型映射
 
  MySQL INT/BIGINT       → INT64（唯一整数类型）
  MySQL FLOAT/DOUBLE     → FLOAT64
@@ -26,13 +26,13 @@
  PostgreSQL ARRAY        → ARRAY<Type>（原生支持）
  PostgreSQL JSONB        → JSON 类型
 
-### 2. 命名空间
+2. 命名空间
 
  MySQL:      database.table
  PostgreSQL: database.schema.table
  BigQuery:   project.dataset.table
 
-### 3. DML 差异
+3. DML 差异
 
  MySQL:      AUTO_INCREMENT     → GENERATE_UUID() 或 ROW_NUMBER()
  MySQL:      INSERT IGNORE      → MERGE ... WHEN NOT MATCHED
@@ -40,7 +40,7 @@
  MySQL:      ON DUPLICATE KEY   → MERGE
  MySQL:      TRUNCATE TABLE     → TRUNCATE TABLE（BigQuery 也支持）
 
-### 4. 不支持的特性
+4. 不支持的特性
 
  无传统索引（B-Tree/Hash）→ 使用分区 + 聚集
  无存储过程（MySQL 风格）→ 使用 BEGIN...END 脚本 + UDF
@@ -48,7 +48,7 @@
  约束是 NOT ENFORCED → 数据质量在 ETL 层保证
  DML 配额限制 → 批量加载用 LOAD 作业（免费）
 
-### 5. 函数差异
+5. 函数差异
 
  MySQL NOW()              → CURRENT_TIMESTAMP()
  MySQL IFNULL(a, b)       → IFNULL(a, b) 或 COALESCE(a, b)
@@ -61,16 +61,16 @@
 ## 批量迁移方案
 
 
-### 1. BigQuery Data Transfer Service（从其他云数仓）
+1. BigQuery Data Transfer Service（从其他云数仓）
 
  支持: Amazon S3, Amazon Redshift, Teradata
 
-### 2. LOAD 作业（从 Cloud Storage）
+2. LOAD 作业（从 Cloud Storage）
 
  bq load --source_format=CSV mydataset.t gs://bucket/data.csv
  bq load --source_format=PARQUET mydataset.t gs://bucket/data.parquet
 
-### 3. SQL 翻译器（BigQuery Migration Service）
+3. SQL 翻译器（BigQuery Migration Service）
 
  自动将 MySQL/PostgreSQL/Oracle SQL 翻译为 BigQuery SQL
  https://cloud.google.com/bigquery/docs/interactive-sql-translator

@@ -276,7 +276,7 @@ CROSS APPLY STRING_SPLIT(u.tags_csv, ',') s;
 
 ## 为什么语法差异如此之大
 
-### 1. 历史路径不同
+1. 历史路径不同
 
 | 引擎 | 背景 | 结果 |
 |------|------|------|
@@ -286,7 +286,7 @@ CROSS APPLY STRING_SPLIT(u.tags_csv, ',') s;
 | ClickHouse | 列式存储，数组是原生类型 | arrayJoin 作为行乘法器 |
 | MySQL/SQL Server | 传统 RDBMS，没有数组类型 | 依赖 JSON 函数 |
 
-### 2. 语法位置不同
+2. 语法位置不同
 
 | 语法位置 | 代表 | 特点 |
 |---------|------|------|
@@ -295,13 +295,13 @@ CROSS APPLY STRING_SPLIT(u.tags_csv, ',') s;
 | 专用子句 | LATERAL VIEW | Hive 生态特有，独立于标准 SQL |
 | 函数调用 | JSON_TABLE, OPENJSON | 不是真正的数组展开，是 JSON 解析 |
 
-### 3. 类型系统差异
+3. 类型系统差异
 
 有原生数组类型的引擎（PostgreSQL、ClickHouse、DuckDB）可以直接 UNNEST。没有数组类型的引擎（MySQL、SQL Server）只能通过 JSON 函数间接实现。
 
 ## 对引擎开发者的实现建议
 
-### 1. UNNEST 的执行模型
+1. UNNEST 的执行模型
 
 UNNEST 在执行计划中是一个特殊的 table function scan：
 
@@ -314,7 +314,7 @@ CrossJoin (or LeftJoin if LEFT JOIN UNNEST)
 
 本质上是一个 correlated nested loop，其中内部"查询"是对数组的遍历。
 
-### 2. 空数组 / NULL 处理
+2. 空数组 / NULL 处理
 
 | 情况 | CROSS JOIN UNNEST | LEFT JOIN UNNEST |
 |------|-------------------|------------------|
@@ -324,7 +324,7 @@ CrossJoin (or LeftJoin if LEFT JOIN UNNEST)
 
 建议同时支持 CROSS JOIN 和 LEFT JOIN 语义——LEFT JOIN UNNEST 是非常常见的需求。
 
-### 3. WITH ORDINALITY 的实现
+3. WITH ORDINALITY 的实现
 
 UNNEST WITH ORDINALITY 需要在展开时生成一个递增的序号列：
 
@@ -335,7 +335,7 @@ UNNEST(['a', 'b', 'c']) WITH ORDINALITY
 
 实现: 在 UNNEST 的 table function scan 中维护一个计数器，每输出一行递增。
 
-### 4. 多数组同时展开
+4. 多数组同时展开
 
 PostgreSQL 支持多数组同时展开——按位置配对，短数组用 NULL 补齐：
 
@@ -346,7 +346,7 @@ SELECT * FROM UNNEST(ARRAY[1,2,3], ARRAY['a','b']);
 
 实现: zip 语义，取最长数组的长度为行数。
 
-### 5. 嵌套展开优化
+5. 嵌套展开优化
 
 多层展开（如 `LATERAL VIEW explode(a) LATERAL VIEW explode(b)`）可能产生笛卡尔积般的行数膨胀。优化器应该：
 

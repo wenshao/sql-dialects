@@ -121,21 +121,21 @@ SELECT date_format(current_timestamp(), 'yyyy-MM-dd HH:mm:ss'); -- DATE_FORMAT
 ## 8. 推荐迁移路径
 
  OLTP 数据库 (MySQL/PG) -> Spark SQL:
-### 1. 数据通过 JDBC Source 或 CDC 同步到数据湖
+1. 数据通过 JDBC Source 或 CDC 同步到数据湖
 
-### 2. 使用 Delta Lake 格式存储 (ACID + Time Travel)
+2. 使用 Delta Lake 格式存储 (ACID + Time Travel)
 
-### 3. 存储过程逻辑迁移到 PySpark/Scala 应用
+3. 存储过程逻辑迁移到 PySpark/Scala 应用
 
-### 4. 定时任务迁移到 Spark 作业调度 (Airflow/Databricks Workflows)
+4. 定时任务迁移到 Spark 作业调度 (Airflow/Databricks Workflows)
 
 
  Hive -> Spark SQL:
-### 1. 语法高度兼容，大部分 HiveQL 可直接运行
+1. 语法高度兼容，大部分 HiveQL 可直接运行
 
-### 2. 将 Hive STORED AS ORC/PARQUET 表升级为 Delta Lake
+2. 将 Hive STORED AS ORC/PARQUET 表升级为 Delta Lake
 
-### 3. Hive UDF (Java) 可直接在 Spark 中使用
+3. Hive UDF (Java) 可直接在 Spark 中使用
 
-### 4. Hive Metastore 可直接被 Spark 使用
+4. Hive Metastore 可直接被 Spark 使用
 

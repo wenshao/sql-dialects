@@ -34,11 +34,11 @@ ALTER TABLE users_text REPLACE COLUMNS (
  设计分析: ADD vs REPLACE 的 Schema-on-Read 影响
  Hive 的 ALTER TABLE ADD/REPLACE COLUMNS 只修改 Metastore 元数据，不重写数据文件。
  这意味着:
-### 1. ADD COLUMNS 后，旧文件中不存在的列返回 NULL（Schema Evolution）
+1. ADD COLUMNS 后，旧文件中不存在的列返回 NULL（Schema Evolution）
 
-### 2. REPLACE COLUMNS 后，若新 schema 与数据文件不匹配，查询可能返回错误数据
+2. REPLACE COLUMNS 后，若新 schema 与数据文件不匹配，查询可能返回错误数据
 
-### 3. ORC/Parquet 支持按列名匹配（安全），TextFile 按位置匹配（不安全）
+3. ORC/Parquet 支持按列名匹配（安全），TextFile 按位置匹配（不安全）
 
 
  对比其他引擎:
@@ -150,11 +150,11 @@ MSCK REPAIR TABLE orders;
  MSCK REPAIR TABLE 是"事后同步"机制。
 
  局限性:
-### 1. 分区数量极大时（数万级），MSCK REPAIR TABLE 非常慢
+1. 分区数量极大时（数万级），MSCK REPAIR TABLE 非常慢
 
-### 2. 只能发现新分区，不能检测已删除的分区
+2. 只能发现新分区，不能检测已删除的分区
 
-### 3. 分区目录格式必须严格遵循 key=value 模式
+3. 分区目录格式必须严格遵循 key=value 模式
 
 
  对比:
@@ -220,21 +220,21 @@ ALTER TABLE users PARTITION (dt='2024-01-01') COMPACT 'major';
 
 ## 6. 已知限制
 
-### 1. 不支持 DROP COLUMN: Hive 无法删除列（REPLACE COLUMNS 是替代方案但很危险）
+1. 不支持 DROP COLUMN: Hive 无法删除列（REPLACE COLUMNS 是替代方案但很危险）
 
     对比: MySQL 8.0+ ALTER TABLE DROP COLUMN 可 INSTANT; BigQuery 支持 DROP COLUMN
-### 2. 不支持任意位置插入列: ADD COLUMNS 只能追加末尾
+2. 不支持任意位置插入列: ADD COLUMNS 只能追加末尾
 
-### 3. 不支持修改分区列: 分区列是目录结构的一部分，无法修改类型或名称
+3. 不支持修改分区列: 分区列是目录结构的一部分，无法修改类型或名称
 
-### 4. ALTER TABLE SET FILEFORMAT 不重写数据: 只影响新写入的数据，旧数据仍是原格式
+4. ALTER TABLE SET FILEFORMAT 不重写数据: 只影响新写入的数据，旧数据仍是原格式
 
     这可能导致同一表中混合多种格式（TextFile + ORC），查询时需要兼容处理
-### 5. REPLACE COLUMNS 在 ORC/Parquet 中安全（按列名匹配），在 TextFile 中危险（按位置匹配）
+5. REPLACE COLUMNS 在 ORC/Parquet 中安全（按列名匹配），在 TextFile 中危险（按位置匹配）
 
-### 6. Metastore 是瓶颈: 大量分区的 ADD/DROP 操作对 Metastore 后端数据库压力大
+6. Metastore 是瓶颈: 大量分区的 ADD/DROP 操作对 Metastore 后端数据库压力大
 
-### 7. ALTER TABLE 不是事务性的: DDL 操作不受 ACID 事务保护
+7. ALTER TABLE 不是事务性的: DDL 操作不受 ACID 事务保护
 
 
 ## 7. 跨引擎对比: ALTER TABLE 能力矩阵

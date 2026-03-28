@@ -174,7 +174,7 @@ SELECT id, arrayJoin(tags) AS tag FROM articles;
 
 ## 对引擎开发者的实现建议
 
-### 1. SRF 在执行计划中的位置
+1. SRF 在执行计划中的位置
 
 SRF 在执行计划中的处理有两种模式：
 
@@ -212,7 +212,7 @@ ProjectWithSRF
 
 **推荐**: 优先支持 FROM 子句中的 SRF（标准方式）。SELECT 中的 SRF 语义复杂（多个 SRF 在 SELECT 中如何交互？PostgreSQL 在不同版本中改变过行为）。
 
-### 2. 与 LATERAL 的交互
+2. 与 LATERAL 的交互
 
 SRF 最常见的使用模式是与外部表做 LATERAL JOIN。逗号连接的 SRF 如果引用了前面表的列，应自动推断为 LATERAL 语义：
 
@@ -222,7 +222,7 @@ FROM my_table t, generate_series(1, t.count) AS s(n);
 -- 等效于: FROM my_table t CROSS JOIN LATERAL generate_series(1, t.count) AS s(n)
 ```
 
-### 3. 空结果与高效实现
+3. 空结果与高效实现
 
 SRF 返回零行时：CROSS JOIN 语义下外部行被过滤掉；LEFT JOIN LATERAL 下外部行保留、SRF 列为 NULL。
 

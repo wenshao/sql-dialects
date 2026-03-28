@@ -226,7 +226,7 @@ SQL Server 的 `OUTPUT $action` 解决了这个问题，但其他引擎大多没
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 ```
 -- PostgreSQL 风格
@@ -244,7 +244,7 @@ delete_statement:
     DELETE FROM table OUTPUT expr_list WHERE ...
 ```
 
-### 2. 在 DML 执行器中返回行的投影
+2. 在 DML 执行器中返回行的投影
 
 核心实现思路：在 DML 执行器中增加一个投影步骤。
 
@@ -266,13 +266,13 @@ DML 执行流程（有 RETURNING）:
     return result_set
 ```
 
-### 3. 旧值访问与触发器交互
+3. 旧值访问与触发器交互
 
 支持 SQL Server 风格新旧值同时访问: 更新前复制行数据（`deleted.*`），更新后取新行（`inserted.*`），或利用 MVCC 旧版本。
 
 触发器交互需要注意: PostgreSQL 的 RETURNING 返回 BEFORE 触发器修改后的值（AFTER 触发器尚未执行）; SQL Server 的 OUTPUT 返回触发器执行前的值。时机差异需明确文档化。
 
-### 4. RETURNING 结果作为表表达式
+4. RETURNING 结果作为表表达式
 
 PostgreSQL 允许 DML RETURNING 在 CTE 中使用（`WITH ins AS (INSERT ... RETURNING *) SELECT * FROM ins`），执行计划中 CTE 子计划是 DML 节点而非 SELECT 节点。
 

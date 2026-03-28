@@ -197,7 +197,7 @@ SELECT product_id FROM store_b_inventory;
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 集合操作的语法需要支持可选的 ALL/DISTINCT 修饰符：
 
@@ -208,7 +208,7 @@ set_operation:
 
 默认行为（无修饰符时）按 SQL 标准应为 DISTINCT。
 
-### 2. 实现策略
+2. 实现策略
 
 #### 策略 A: 排序合并（Sort-Merge）
 
@@ -239,7 +239,7 @@ set_operation:
 | 排序合并 | O(n log n) | O(1) 额外 | 两侧数据量都大 |
 | 哈希计数 | O(n) | O(右侧大小) | 右侧数据量较小 |
 
-### 3. NULL 处理
+3. NULL 处理
 
 集合操作中 NULL 的比较遵循特殊规则——两个 NULL 被视为相等（与 WHERE 中的行为不同）：
 
@@ -254,7 +254,7 @@ WHERE NULL = NULL  -- 返回 UNKNOWN (false)
 
 实现时，集合操作的比较函数需要使用 "NULL-safe equals"（即 IS NOT DISTINCT FROM 语义）。
 
-### 4. 优先级
+4. 优先级
 
 SQL 标准定义 INTERSECT 的优先级高于 UNION 和 EXCEPT：
 
@@ -266,7 +266,7 @@ A UNION ALL B INTERSECT ALL C
 
 Parser 需要正确处理优先级，或要求用户用括号显式指定。
 
-### 5. 与现有 DISTINCT 优化的复用
+5. 与现有 DISTINCT 优化的复用
 
 INTERSECT/EXCEPT（不带 ALL）本质上是先做 ALL 操作再去重。引擎可以复用已有的 DISTINCT 算子：
 

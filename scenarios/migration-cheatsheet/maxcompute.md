@@ -141,15 +141,15 @@ SELECT NVL2(a, b, c);                       -- a 非 NULL 返回 b，否则 c
 
 
  从 MySQL 迁移:
-### 1. 开启 2.0 类型系统: SET odps.sql.type.system.odps2 = true;
+1. 开启 2.0 类型系统: SET odps.sql.type.system.odps2 = true;
 
-### 2. UPDATE/DELETE → MERGE(事务表) 或 INSERT OVERWRITE
+2. UPDATE/DELETE → MERGE(事务表) 或 INSERT OVERWRITE
 
-### 3. AUTO_INCREMENT → ROW_NUMBER/UUID
+3. AUTO_INCREMENT → ROW_NUMBER/UUID
 
-### 4. 触发器 → DataWorks 调度
+4. 触发器 → DataWorks 调度
 
-### 5. 存储过程 → Script Mode + UDF
+5. 存储过程 → Script Mode + UDF
 
 
 从 Hive 迁移:

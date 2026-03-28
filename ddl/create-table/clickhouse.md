@@ -35,14 +35,14 @@ ORDER BY id;
 ```
 
  设计要点:
-### 1. Nullable 有代价: 内部额外维护一列 UInt8 标记 null/non-null，查询时多一次 check
+1. Nullable 有代价: 内部额外维护一列 UInt8 标记 null/non-null，查询时多一次 check
 
       如果业务允许，用默认值代替 Nullable (空字符串、0、'1970-01-01' 等)
-### 2. String 没有长度限制 (不是 VARCHAR)，内部存储为 length + bytes
+2. String 没有长度限制 (不是 VARCHAR)，内部存储为 length + bytes
 
-### 3. LowCardinality(String) 比 String 快 2-10x (当基数 < 10000 时)，见下文
+3. LowCardinality(String) 比 String 快 2-10x (当基数 < 10000 时)，见下文
 
-### 4. 没有主键约束、唯一约束、外键 — ClickHouse 不是用来做 OLTP 的
+4. 没有主键约束、唯一约束、外键 — ClickHouse 不是用来做 OLTP 的
 
 
 ## MergeTree 引擎家族: 决策树
@@ -73,14 +73,14 @@ ORDER BY id;
  相当于 MySQL 的聚簇索引 + PostgreSQL 的 CLUSTER
 
  选择 ORDER BY 的原则:
-### 1. 把查询中最常出现在 WHERE/GROUP BY 的列放进来
+1. 把查询中最常出现在 WHERE/GROUP BY 的列放进来
 
-### 2. 低基数列在前，高基数列在后（和 MySQL 索引相反!）
+2. 低基数列在前，高基数列在后（和 MySQL 索引相反!）
 
       原因: ClickHouse 用稀疏索引，低基数列在前可以跳过更多 granule
-### 3. 不要放太多列 (3-5 个为宜)，每多一列增加 INSERT 时排序开销
+3. 不要放太多列 (3-5 个为宜)，每多一列增加 INSERT 时排序开销
 
-### 4. 列顺序 = 索引列顺序，决定哪些查询能利用索引
+4. 列顺序 = 索引列顺序，决定哪些查询能利用索引
 
 
 ```sql
@@ -153,13 +153,13 @@ PARTITION BY toYYYYMM(event_date)            -- 按月: 一年 12 个分区
  PARTITION BY (toYYYYMM(date), region)     -- 月 × 地区: 分区数爆炸
 
  过度分区的危害:
-### 1. 每个分区至少一个 data part → 文件数暴增 → 文件系统压力
+1. 每个分区至少一个 data part → 文件数暴增 → 文件系统压力
 
-### 2. INSERT 时每个分区生成一个 part → 小文件合并风暴
+2. INSERT 时每个分区生成一个 part → 小文件合并风暴
 
-### 3. SELECT 时打开大量文件描述符 → 慢
+3. SELECT 时打开大量文件描述符 → 慢
 
-### 4. 官方建议: 分区数不超过 1000，理想情况下 < 100
+4. 官方建议: 分区数不超过 1000，理想情况下 < 100
 
 
  经验法则: PARTITION BY toYYYYMM() 是大多数场景的最佳选择
@@ -295,15 +295,15 @@ ORDER BY user_id;                            -- 按 ORDER BY 键判断"同一行
 ```
 
  关键理解:
-### 1. 去重是"最终一致"的: 后台合并时才去重，查询时可能看到重复
+1. 去重是"最终一致"的: 后台合并时才去重，查询时可能看到重复
 
-### 2. FINAL 关键字: SELECT * FROM user_profiles FINAL 强制去重
+2. FINAL 关键字: SELECT * FROM user_profiles FINAL 强制去重
 
       代价: 单线程执行 + 额外 CPU，大表上可能慢 2-10x
       23.2+: do_not_merge_across_partitions_select_final=1 优化了跨分区 FINAL
-### 3. 只在同一分区内去重! 不同分区的相同 ORDER BY 键不会合并
+3. 只在同一分区内去重! 不同分区的相同 ORDER BY 键不会合并
 
-### 4. 替代方案: 查询时用 GROUP BY + argMax 手动去重，可以利用多线程
+4. 替代方案: 查询时用 GROUP BY + argMax 手动去重，可以利用多线程
 
       SELECT user_id, argMax(username, updated_at), argMax(email, updated_at)
       FROM user_profiles GROUP BY user_id

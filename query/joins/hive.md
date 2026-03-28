@@ -60,11 +60,11 @@ FROM users u JOIN roles r ON u.role_id = r.id;
 ```
 
  MAPJOIN 的工作原理:
-### 1. 小表(roles)加载到每个 Mapper 的内存中（HashMap）
+1. 小表(roles)加载到每个 Mapper 的内存中（HashMap）
 
-### 2. 大表(users)的每行在 Mapper 端直接查找 HashMap 完成 JOIN
+2. 大表(users)的每行在 Mapper 端直接查找 HashMap 完成 JOIN
 
-### 3. 不需要 Shuffle 和 Reduce 阶段 → 性能大幅提升
+3. 不需要 Shuffle 和 Reduce 阶段 → 性能大幅提升
 
 
 自动 Map Join（推荐）:
@@ -78,11 +78,11 @@ SET hive.auto.convert.join.noconditionaltask.size = 10000000;  -- 小表阈值(1
 ### 2.2 Reduce-side JOIN: 默认的 Shuffle JOIN
 
  当两个表都很大时，Hive 使用 Shuffle JOIN:
-### 1. Map 阶段: 两个表按 JOIN 键分区输出
+1. Map 阶段: 两个表按 JOIN 键分区输出
 
-### 2. Shuffle 阶段: 相同 JOIN 键的数据发送到同一个 Reducer
+2. Shuffle 阶段: 相同 JOIN 键的数据发送到同一个 Reducer
 
-### 3. Reduce 阶段: 在 Reducer 中完成 JOIN
+3. Reduce 阶段: 在 Reducer 中完成 JOIN
 
 这是最通用但也是最慢的 JOIN 方式（全量 Shuffle）
 
@@ -167,24 +167,24 @@ SET hive.skewjoin.key = 100000;  -- 阈值
  数据倾斜: 某个 JOIN 键的值特别多（如 user_id=null 或热门用户）
  导致一个 Reducer 处理大量数据，其他 Reducer 空闲
  Skew Join 的解决方案:
-### 1. 检测倾斜键
+1. 检测倾斜键
 
-### 2. 倾斜键的数据用 Map Join 处理（广播小表端对应数据）
+2. 倾斜键的数据用 Map Join 处理（广播小表端对应数据）
 
-### 3. 非倾斜键的数据用普通 Reduce Join
+3. 非倾斜键的数据用普通 Reduce Join
 
 
 ## 5. 已知限制
 
-### 1. 不支持 USING 子句: JOIN ... USING (col) 不可用
+1. 不支持 USING 子句: JOIN ... USING (col) 不可用
 
-### 2. 不支持 NATURAL JOIN
+2. 不支持 NATURAL JOIN
 
-### 3. 早期版本只支持等值 JOIN: ON a.id = b.id（0.13+ 支持不等值）
+3. 早期版本只支持等值 JOIN: ON a.id = b.id（0.13+ 支持不等值）
 
-### 4. LATERAL VIEW 是 CROSS JOIN 语义: 多个 LATERAL VIEW 是笛卡尔积
+4. LATERAL VIEW 是 CROSS JOIN 语义: 多个 LATERAL VIEW 是笛卡尔积
 
-### 5. Map Join 受内存限制: 小表必须能完全加载到内存中
+5. Map Join 受内存限制: 小表必须能完全加载到内存中
 
 
 ## 6. 跨引擎对比: JOIN 策略
@@ -200,16 +200,16 @@ SET hive.skewjoin.key = 100000;  -- 阈值
 
 ## 7. 对引擎开发者的启示
 
-### 1. Map Join (Broadcast) 是小表 JOIN 的最佳策略:
+1. Map Join (Broadcast) 是小表 JOIN 的最佳策略:
 
     避免 Shuffle 是分布式 JOIN 优化的第一原则
-### 2. 数据倾斜是分布式 JOIN 的核心挑战:
+2. 数据倾斜是分布式 JOIN 的核心挑战:
 
     Hive 的 Skew Join 和 Spark 的 AQE 都是解决此问题的方案
-### 3. LATERAL VIEW 是嵌套数据处理的关键:
+3. LATERAL VIEW 是嵌套数据处理的关键:
 
     SQL 标准的 UNNEST 更简洁，但 Hive 的 LATERAL VIEW 语义更显式
-### 4. LEFT SEMI JOIN 是 EXISTS 的高效替代:
+4. LEFT SEMI JOIN 是 EXISTS 的高效替代:
 
 只需找到第一个匹配行即可终止，比 INNER JOIN + DISTINCT 更高效
 

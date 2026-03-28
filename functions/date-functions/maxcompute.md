@@ -208,15 +208,15 @@ BigQuery:   TIMESTAMP 函数支持时区   | Snowflake: CONVERT_TIMEZONE
 ## 10. 对引擎开发者的启示
 
 
-### 1. DATEADD/DATEDIFF 参数顺序应与生态主流一致（减少迁移陷阱）
+1. DATEADD/DATEDIFF 参数顺序应与生态主流一致（减少迁移陷阱）
 
-### 2. 格式化函数应统一格式码体系（两套格式码是维护负担）
+2. 格式化函数应统一格式码体系（两套格式码是维护负担）
 
-### 3. INTERVAL 类型比函数式 DATEADD 更灵活（PostgreSQL 的方案更优）
+3. INTERVAL 类型比函数式 DATEADD 更灵活（PostgreSQL 的方案更优）
 
-### 4. 分区日期处理（STRING↔DATE 转换）在数仓引擎中使用频率极高
+4. 分区日期处理（STRING↔DATE 转换）在数仓引擎中使用频率极高
 
-### 5. 时区支持是国际化数据分析的刚需 — 不应缺席
+5. 时区支持是国际化数据分析的刚需 — 不应缺席
 
-### 6. DATE_TRUNC/TRUNC 在聚合分析中使用频率极高 — 性能值得优化
+6. DATE_TRUNC/TRUNC 在聚合分析中使用频率极高 — 性能值得优化
 

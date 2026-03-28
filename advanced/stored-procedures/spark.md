@@ -124,11 +124,11 @@ CREATE FUNCTION mydb.classify_age AS
  spark.udf.register('multiply', multiply)
 
  Pandas UDF 的性能优势来自:
-### 1. Apache Arrow 列式内存格式: 零拷贝数据共享（JVM -> Python）
+1. Apache Arrow 列式内存格式: 零拷贝数据共享（JVM -> Python）
 
-### 2. 向量化操作: Pandas/NumPy 在批量数据上比逐行 Python 快几个数量级
+2. 向量化操作: Pandas/NumPy 在批量数据上比逐行 Python 快几个数量级
 
-### 3. 减少序列化开销: Arrow 的列式布局天然适合批量传输
+3. 减少序列化开销: Arrow 的列式布局天然适合批量传输
 
 
  对引擎开发者的启示:

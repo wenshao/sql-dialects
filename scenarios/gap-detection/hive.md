@@ -81,9 +81,9 @@ WHERE pos + 1 NOT IN (SELECT id FROM orders)
 
 ## 7. 对引擎开发者的启示
 
-### 1. LAG/LEAD 是间隙检测的基础: 窗口函数的偏移函数是必备能力
+1. LAG/LEAD 是间隙检测的基础: 窗口函数的偏移函数是必备能力
 
-### 2. id - ROW_NUMBER 是岛屿问题的经典解法: 利用了连续值的数学特性
+2. id - ROW_NUMBER 是岛屿问题的经典解法: 利用了连续值的数学特性
 
-### 3. generate_series 是序列生成的基本需求: Hive 的 POSEXPLODE 技巧证明了用户需要此功能
+3. generate_series 是序列生成的基本需求: Hive 的 POSEXPLODE 技巧证明了用户需要此功能
 

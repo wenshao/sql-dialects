@@ -161,11 +161,11 @@ FROM daily_sales;
 
 
  窗口函数的执行机制:
-### 1. PARTITION BY 决定数据如何 Shuffle（每个分区在一个 Executor 上计算）
+1. PARTITION BY 决定数据如何 Shuffle（每个分区在一个 Executor 上计算）
 
-### 2. ORDER BY 在每个分区内排序
+2. ORDER BY 在每个分区内排序
 
-### 3. 窗口帧在排序后的数据上滑动计算
+3. 窗口帧在排序后的数据上滑动计算
 
 
  无 PARTITION BY 的窗口函数（如 OVER (ORDER BY id)）:

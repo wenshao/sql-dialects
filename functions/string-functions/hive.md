@@ -137,27 +137,27 @@ SELECT LEVENSHTEIN('kitten', 'sitting');               -- 编辑距离: 3
 
 ## 11. 已知限制
 
-### 1. 不支持 || 运算符: 必须用 CONCAT
+1. 不支持 || 运算符: 必须用 CONCAT
 
-### 2. 正则使用 Java 语法: 与 PostgreSQL POSIX 正则不兼容
+2. 正则使用 Java 语法: 与 PostgreSQL POSIX 正则不兼容
 
-### 3. ARRAY 索引 0-based 但字符串位置 1-based: 容易混淆
+3. ARRAY 索引 0-based 但字符串位置 1-based: 容易混淆
 
-### 4. 无 LIKE_REGEX: Hive 的 LIKE 只支持 % 和 _ 通配符
+4. 无 LIKE_REGEX: Hive 的 LIKE 只支持 % 和 _ 通配符
 
-### 5. REPLACE 函数 1.3 才引入: 旧版用 REGEXP_REPLACE 替代
+5. REPLACE 函数 1.3 才引入: 旧版用 REGEXP_REPLACE 替代
 
 
 ## 12. 对引擎开发者的启示
 
-### 1. SPLIT 返回 ARRAY 是好的设计: 与嵌套类型系统集成，而非返回虚拟表
+1. SPLIT 返回 ARRAY 是好的设计: 与嵌套类型系统集成，而非返回虚拟表
 
-### 2. PARSE_URL 和 SENTENCES 是大数据场景的实用函数:
+2. PARSE_URL 和 SENTENCES 是大数据场景的实用函数:
 
     RDBMS 很少内置这些，但大数据引擎的文本分析需求更多
-### 3. || 运算符 vs CONCAT 函数: 支持两者是最好的，Hive 只支持后者是不便之处
+3. || 运算符 vs CONCAT 函数: 支持两者是最好的，Hive 只支持后者是不便之处
 
-### 4. 正则引擎的选择: Java 正则 vs POSIX 正则 vs ICU 正则
+4. 正则引擎的选择: Java 正则 vs POSIX 正则 vs ICU 正则
 
 影响跨引擎迁移，应该在文档中明确说明语法差异
 

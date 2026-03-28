@@ -234,7 +234,7 @@ DELETE FROM users WHERE id IN (
 
 ## 高危迁移点（最容易出 bug 的地方）
 
-### 1. 隐式类型转换消失
+1. 隐式类型转换消失
 
 ```sql
 -- MySQL: 正常运行
@@ -248,7 +248,7 @@ SELECT * FROM users WHERE age > 18;         -- 显式整数
 SELECT 1 + CAST('2' AS INTEGER);            -- 或 1 + '2'::INTEGER
 ```
 
-### 2. GROUP BY 严格度
+2. GROUP BY 严格度
 
 ```sql
 -- MySQL 5.7-(ONLY_FULL_GROUP_BY=OFF): 合法
@@ -261,7 +261,7 @@ SELECT name, city, COUNT(*) FROM users GROUP BY name, city;
 SELECT MIN(name), city, COUNT(*) FROM users GROUP BY city;
 ```
 
-### 3. LIMIT 参数顺序
+3. LIMIT 参数顺序
 
 ```sql
 -- MySQL: LIMIT offset, count
@@ -271,7 +271,7 @@ SELECT * FROM users LIMIT 20, 10;  -- 跳过 20 条，取 10 条
 SELECT * FROM users LIMIT 10 OFFSET 20;
 ```
 
-### 4. 日期格式字符串
+4. 日期格式字符串
 
 ```sql
 -- MySQL
@@ -281,7 +281,7 @@ SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s');
 SELECT TO_CHAR(NOW(), 'YYYY-MM-DD HH24:MI:SS');
 ```
 
-### 5. 布尔值
+5. 布尔值
 
 ```sql
 -- MySQL: 0/1 就是布尔

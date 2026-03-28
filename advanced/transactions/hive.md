@@ -100,11 +100,11 @@ SELECT * FROM staging_orders WHERE dt='2024-01-15';
 ```
 
  INSERT OVERWRITE 的原子性机制:
-### 1. 将数据写入临时目录
+1. 将数据写入临时目录
 
-### 2. 原子地将临时目录 rename 为目标分区目录
+2. 原子地将临时目录 rename 为目标分区目录
 
-### 3. 删除旧的分区目录
+3. 删除旧的分区目录
 
 
 关键特性: 幂等性
@@ -180,33 +180,33 @@ SHOW COMPACTIONS;
 
 ## 10. 已知限制
 
-### 1. 仅 ORC 格式支持 ACID（Parquet 不支持）
+1. 仅 ORC 格式支持 ACID（Parquet 不支持）
 
-### 2. 仅托管(Managed)表支持 ACID（外部表不支持）
+2. 仅托管(Managed)表支持 ACID（外部表不支持）
 
-### 3. 无显式事务控制（每条语句是一个事务）
+3. 无显式事务控制（每条语句是一个事务）
 
-### 4. ACID 表读取性能开销: 需要合并 base + delta 文件
+4. ACID 表读取性能开销: 需要合并 base + delta 文件
 
-### 5. Compaction 开销: Major compaction 需要重写整个表/分区
+5. Compaction 开销: Major compaction 需要重写整个表/分区
 
-### 6. DDL 不在事务范围内
+6. DDL 不在事务范围内
 
-### 7. 并发写入冲突: 两个 UPDATE 修改同一行时，后者可能失败
+7. 并发写入冲突: 两个 UPDATE 修改同一行时，后者可能失败
 
 
 ## 11. 对引擎开发者的启示
 
-### 1. Base + Delta 是大数据 ACID 的标准范式:
+1. Base + Delta 是大数据 ACID 的标准范式:
 
     Hive/Delta Lake/Iceberg/Hudi 都采用了类似的机制
-### 2. Compaction 是 ACID 的运维代价:
+2. Compaction 是 ACID 的运维代价:
 
     任何基于不可变文件的 ACID 实现都需要 compaction
-### 3. INSERT OVERWRITE 比 ACID 更高效:
+3. INSERT OVERWRITE 比 ACID 更高效:
 
     对于批处理 ETL，INSERT OVERWRITE 的幂等性 > ACID 的行级操作
-### 4. 隐式事务是分布式引擎的务实选择:
+4. 隐式事务是分布式引擎的务实选择:
 
 不支持 BEGIN/COMMIT 简化了实现，且覆盖了 99% 的大数据使用场景
 

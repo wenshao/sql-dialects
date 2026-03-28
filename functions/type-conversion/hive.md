@@ -139,29 +139,29 @@ SELECT CAST(GET_JSON_OBJECT('{"a":1}', '$.a') AS INT); -- 1
 
 ## 6. 已知限制
 
-### 1. 无 TRY_CAST / SAFE_CAST: Hive 的 CAST 已经是"安全"的（返回 NULL）
+1. 无 TRY_CAST / SAFE_CAST: Hive 的 CAST 已经是"安全"的（返回 NULL）
 
-### 2. 无 :: 语法: 必须使用 CAST() 函数
+2. 无 :: 语法: 必须使用 CAST() 函数
 
-### 3. 无 CONVERT / TO_NUMBER / TO_CHAR: PostgreSQL/Oracle 的转换函数不可用
+3. 无 CONVERT / TO_NUMBER / TO_CHAR: PostgreSQL/Oracle 的转换函数不可用
 
-### 4. CAST(DECIMAL) 可能丢失精度: CAST(9999999999.99 AS DECIMAL(10,2)) 溢出返回 NULL
+4. CAST(DECIMAL) 可能丢失精度: CAST(9999999999.99 AS DECIMAL(10,2)) 溢出返回 NULL
 
-### 5. STRING → TIMESTAMP 只支持特定格式: 'yyyy-MM-dd HH:mm:ss[.fffffffff]'
+5. STRING → TIMESTAMP 只支持特定格式: 'yyyy-MM-dd HH:mm:ss[.fffffffff]'
 
-### 6. 不支持数值格式化: 无法直接将数值格式化为带千分位的字符串
+6. 不支持数值格式化: 无法直接将数值格式化为带千分位的字符串
 
 
 ## 7. 对引擎开发者的启示
 
-### 1. CAST 失败行为需要明确设计策略:
+1. CAST 失败行为需要明确设计策略:
 
     Hive(默认安全/NULL) vs PostgreSQL(默认报错) vs BigQuery(两种选择)
     BigQuery 的 CAST + SAFE_CAST 组合是最灵活的方案
-### 2. 隐式转换的宽松程度是 trade-off:
+2. 隐式转换的宽松程度是 trade-off:
 
     宽松降低用户门槛但增加错误风险; 严格保证正确性但增加 SQL 复杂度
-### 3. 日期格式化字符串不统一是跨引擎迁移的痛点:
+3. 日期格式化字符串不统一是跨引擎迁移的痛点:
 
 Java(yyyy-MM-dd) vs PostgreSQL(YYYY-MM-DD) vs MySQL(%Y-%m-%d)
 如果设计新引擎，考虑同时支持多种格式模式

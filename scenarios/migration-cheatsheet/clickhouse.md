@@ -10,7 +10,7 @@
 ## 从 MySQL/PostgreSQL 迁移到 ClickHouse 的常见问题
 
 
-### 1. 数据类型映射
+1. 数据类型映射
 
  MySQL INT              → Int32 或 UInt32
  MySQL BIGINT           → Int64 或 UInt64
@@ -26,14 +26,14 @@
  PostgreSQL ARRAY       → Array(Type)（原生支持）
  PostgreSQL JSONB       → String 或 Map/Tuple
 
-### 2. DDL 差异
+2. DDL 差异
 
  MySQL:      CREATE TABLE t (...) ENGINE=InnoDB;
  ClickHouse: CREATE TABLE t (...) ENGINE = MergeTree() ORDER BY (col);
  → ORDER BY 是必须的（定义排序键和主键）
  → ENGINE 是必须的（MergeTree 是最常用的引擎）
 
-### 3. DML 差异（最大的迁移挑战!）
+3. DML 差异（最大的迁移挑战!）
 
  MySQL:      UPDATE t SET col=val WHERE id=1;        → 即时生效
  ClickHouse: ALTER TABLE t UPDATE col=val WHERE id=1; → 异步 mutation
@@ -42,12 +42,12 @@
  MySQL:      INSERT ON DUPLICATE KEY UPDATE          → 即时 UPSERT
  ClickHouse: 无 UPSERT（用 ReplacingMergeTree + INSERT 新版本）
 
-### 4. NULL 行为
+4. NULL 行为
 
  MySQL/PostgreSQL: 默认允许 NULL
  ClickHouse:       默认 NOT NULL! 需要 Nullable(Type) 显式声明
 
-### 5. 事务
+5. 事务
 
  MySQL: BEGIN; UPDATE...; UPDATE...; COMMIT;  → 完整 ACID
  ClickHouse: 无多语句事务（单语句原子性 + 分区替换）

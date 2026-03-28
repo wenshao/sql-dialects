@@ -48,11 +48,11 @@ SELECT * FROM users u LEFT ANTI JOIN orders o ON u.id = o.user_id;
  设计分析:
    SEMI/ANTI JOIN 作为 SQL 关键字是 Spark/Hive 特色——大多数数据库只支持 EXISTS 子查询。
    Spark 选择将其提升为一等语法，原因:
-### 1. 语义更清晰: LEFT SEMI JOIN 比 WHERE EXISTS (...) 更直观
+1. 语义更清晰: LEFT SEMI JOIN 比 WHERE EXISTS (...) 更直观
 
-### 2. 优化更直接: 优化器不需要将 EXISTS 子查询解关联（de-correlate）
+2. 优化更直接: 优化器不需要将 EXISTS 子查询解关联（de-correlate）
 
-### 3. 与 DataFrame API 对齐: df.join(other, "id", "left_semi") 有直接对应
+3. 与 DataFrame API 对齐: df.join(other, "id", "left_semi") 有直接对应
 
 
  对比:

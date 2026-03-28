@@ -274,15 +274,15 @@ GROUP BY dept_id;
 
 ## 对引擎开发者的实现建议
 
-### 1. 全量刷新
+1. 全量刷新
 
 最简单方案: 创建临时表 → INSERT AS SELECT → 原子性 RENAME 交换 → DROP 旧表。CONCURRENTLY 变体需要 diff: 执行查询得新结果集 → 与现有数据 diff (需 UNIQUE INDEX) → 应用增量变更。
 
-### 2. 增量刷新
+2. 增量刷新
 
 增量刷新需要捕获基表变更: (A) 变更日志——基表维护 INSERT/UPDATE/DELETE 日志; (B) 时间戳过滤——处理 `updated_at > 上次刷新时间` 的行; (C) WAL 位点——重放 WAL 中后续变更。
 
-### 3. 查询改写
+3. 查询改写
 
 查询改写在优化器中作为规则: 对每个 MV 做 subsumption test，判断 MV 是否能回答用户查询 Q（FROM 表覆盖、WHERE 条件不强于、GROUP BY 粒度不粗于、SELECT 列覆盖），然后比较代价选择最优方案。
 

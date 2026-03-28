@@ -121,11 +121,11 @@ ALTER TABLE users DROP CONSTRAINT chk_age;
      FOREIGN KEY (user_id) REFERENCES users(id);
 
  信息性约束的价值:
-### 1. 查询优化: 优化器知道 PK 列唯一，可以优化 JOIN 和聚合
+1. 查询优化: 优化器知道 PK 列唯一，可以优化 JOIN 和聚合
 
-### 2. BI 工具集成: Tableau/Power BI 可以读取 PK/FK 关系自动建立星型模型
+2. BI 工具集成: Tableau/Power BI 可以读取 PK/FK 关系自动建立星型模型
 
-### 3. 数据文档: 作为 Schema 的自描述元数据
+3. 数据文档: 作为 Schema 的自描述元数据
 
 
  设计争议:
@@ -167,13 +167,13 @@ SELECT * FROM (
    - Lakehouse 引擎（Delta Lake）: 折中——CHECK 强制执行（低成本），PK/FK 信息性
 
    如果你在设计引擎，建议:
-### 1. NOT NULL 必须强制执行（成本低，价值大）
+1. NOT NULL 必须强制执行（成本低，价值大）
 
-### 2. CHECK 约束可选强制执行（行级检查，不需要全局协调）
+2. CHECK 约束可选强制执行（行级检查，不需要全局协调）
 
-### 3. PK/UNIQUE/FK 在分布式环境中至少提供信息性支持（用于优化器和工具集成）
+3. PK/UNIQUE/FK 在分布式环境中至少提供信息性支持（用于优化器和工具集成）
 
-### 4. 不要接受语法但不执行——这是 MySQL CHECK 约束的历史教训
+4. 不要接受语法但不执行——这是 MySQL CHECK 约束的历史教训
 
 
 ## 7. 查看约束元数据

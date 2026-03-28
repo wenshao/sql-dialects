@@ -32,7 +32,7 @@
 
 ## 设计动机
 
-### 1. 部署脚本的幂等性
+1. 部署脚本的幂等性
 
 CI/CD 流水线中，DDL 脚本经常需要重复执行：
 
@@ -51,7 +51,7 @@ CREATE OR REPLACE VIEW v_active_users AS SELECT * FROM users WHERE status = 'act
 -- 幂等、原子、安全
 ```
 
-### 2. 函数/存储过程的迭代开发
+2. 函数/存储过程的迭代开发
 
 ```sql
 -- PostgreSQL: 函数开发中频繁修改
@@ -63,7 +63,7 @@ END;
 $$ LANGUAGE plpgsql;
 ```
 
-### 3. 简化 Migration 工具
+3. 简化 Migration 工具
 
 ORM 的 migration 工具（Flyway、Liquibase）需要生成幂等 SQL。有 `OR REPLACE` 时，视图和函数的 migration 变得简单——直接用完整定义覆盖。
 
@@ -190,7 +190,7 @@ CREATE TABLE metrics (metric_date DATE, value FLOAT);
 
 ## 对引擎开发者的实现建议
 
-### 1. OR REPLACE 的语义选择
+1. OR REPLACE 的语义选择
 
 实现 `CREATE OR REPLACE` 时需要决定核心语义：
 
@@ -205,7 +205,7 @@ CREATE TABLE metrics (metric_date DATE, value FLOAT);
 - **TABLE**: 谨慎！DROP + CREATE 会丢数据。建议像 Snowflake 一样仅替换结构
 - **PROCEDURE/TRIGGER**: Replace metadata
 
-### 2. 权限保留
+2. 权限保留
 
 `DROP + CREATE` 的最大问题是权限丢失：
 
@@ -225,7 +225,7 @@ CREATE OR REPLACE VIEW v_report AS ...;
 
 引擎实现时，`OR REPLACE` 应该保留已有的 GRANT，这是比 `DROP + CREATE` 更优的核心原因。
 
-### 3. 依赖关系处理
+3. 依赖关系处理
 
 当被 REPLACE 的对象有下游依赖时：
 
@@ -242,14 +242,14 @@ CREATE OR REPLACE VIEW v_base AS SELECT id, name FROM users;
 
 建议: 采用 PostgreSQL 的保守策略——不兼容时报错，要求用户显式 `DROP CASCADE`。
 
-### 4. 事务性
+4. 事务性
 
 `CREATE OR REPLACE` 应该是原子操作。实现方式：
 
 1. 在同一事务中：获取元数据锁 → 删除旧定义 → 创建新定义 → 提交
 2. 如果中间步骤失败，整个操作回滚，旧对象不受影响
 
-### 5. DDL 日志
+5. DDL 日志
 
 ```
 -- 需要在 DDL 审计日志中区分操作类型

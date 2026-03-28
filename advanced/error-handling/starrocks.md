@@ -79,9 +79,9 @@ SET query_timeout = 600;
 
  对引擎开发者的启示:
    OLAP 引擎的错误处理重点不是 SQL 层面，而是:
-### 1. 导入容错(max_filter_ratio): 允许部分数据错误
+1. 导入容错(max_filter_ratio): 允许部分数据错误
 
-### 2. 副本修复(自动/手动): 保证数据一致性
+2. 副本修复(自动/手动): 保证数据一致性
 
-### 3. 查询超时控制: 避免 unbounded query 耗尽资源
+3. 查询超时控制: 避免 unbounded query 耗尽资源
 

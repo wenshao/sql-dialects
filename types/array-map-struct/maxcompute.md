@@ -267,15 +267,15 @@ Snowflake:  FLATTEN(array)           | Presto: CROSS JOIN UNNEST
 ## 8. 对引擎开发者的启示
 
 
-### 1. 列式存储下复合类型应支持子列裁剪（STRUCT.field 只读一个子列）
+1. 列式存储下复合类型应支持子列裁剪（STRUCT.field 只读一个子列）
 
-### 2. ARRAY/MAP/STRUCT 是大数据引擎的必备特性（替代行存的 JSON 依赖）
+2. ARRAY/MAP/STRUCT 是大数据引擎的必备特性（替代行存的 JSON 依赖）
 
-### 3. LATERAL VIEW 是 Hive 遗产，UNNEST 是更通用的标准 — 新引擎应支持后者
+3. LATERAL VIEW 是 Hive 遗产，UNNEST 是更通用的标准 — 新引擎应支持后者
 
-### 4. 数组下标从 0 开始（Hive/MaxCompute）还是 1 开始（SQL 标准）需要统一
+4. 数组下标从 0 开始（Hive/MaxCompute）还是 1 开始（SQL 标准）需要统一
 
-### 5. COLLECT_LIST/COLLECT_SET 聚合函数是 EXPLODE 的逆操作 — 成对提供
+5. COLLECT_LIST/COLLECT_SET 聚合函数是 EXPLODE 的逆操作 — 成对提供
 
-### 6. 嵌套类型的深度应有上限（防止极深嵌套导致元数据膨胀）
+6. 嵌套类型的深度应有上限（防止极深嵌套导致元数据膨胀）
 

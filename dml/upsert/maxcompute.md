@@ -54,15 +54,15 @@ WHEN NOT MATCHED AND s.is_deleted = FALSE THEN
 ```
 
  设计分析: MERGE INTO 的底层实现
-### 1. 读取 target 表和 source 表
+1. 读取 target 表和 source 表
 
-### 2. 按 ON 条件做 JOIN（决定哪些行 MATCHED/NOT MATCHED）
+2. 按 ON 条件做 JOIN（决定哪些行 MATCHED/NOT MATCHED）
 
-### 3. 对 MATCHED 行: 写入 update delta 文件
+3. 对 MATCHED 行: 写入 update delta 文件
 
-### 4. 对 NOT MATCHED 行: 写入 insert 文件
+4. 对 NOT MATCHED 行: 写入 insert 文件
 
-### 5. 提交事务: 原子性地将所有 delta 文件注册到元数据
+5. 提交事务: 原子性地将所有 delta 文件注册到元数据
 
 
    MERGE 是原子操作: 所有 UPDATE/INSERT/DELETE 在一个事务中完成
@@ -125,20 +125,20 @@ SELECT id, username, email, age FROM (
 
  设计分析: INSERT OVERWRITE UPSERT 的权衡
    优点:
-### 1. 所有表都支持（不需要事务表）
+1. 所有表都支持（不需要事务表）
 
-### 2. 幂等（重跑结果相同）
+2. 幂等（重跑结果相同）
 
-### 3. 无碎片（重写生成完整文件）
+3. 无碎片（重写生成完整文件）
 
    缺点:
-### 1. 必须读写全量数据（即使只更新几行）
+1. 必须读写全量数据（即使只更新几行）
 
-### 2. SQL 复杂（FULL OUTER JOIN / UNION ALL 逻辑不直观）
+2. SQL 复杂（FULL OUTER JOIN / UNION ALL 逻辑不直观）
 
-### 3. 大表性能差
+3. 大表性能差
 
-### 4. 并发不安全（两个 INSERT OVERWRITE 竞争）
+4. 并发不安全（两个 INSERT OVERWRITE 竞争）
 
 
 ## 3. 分区表的 UPSERT（只重写受影响分区）
@@ -200,15 +200,15 @@ MaxCompute: 核心方案               | Hive: 相同方案
 ## 6. 对引擎开发者的启示
 
 
-### 1. MERGE 是最强大的数据整合语句 — 新引擎应优先支持
+1. MERGE 是最强大的数据整合语句 — 新引擎应优先支持
 
-### 2. INSERT OVERWRITE 模拟 UPSERT 虽然笨拙但通用 — 作为兜底方案
+2. INSERT OVERWRITE 模拟 UPSERT 虽然笨拙但通用 — 作为兜底方案
 
-### 3. 分区级 UPSERT 是大数据场景的最佳实践（避免全表重写）
+3. 分区级 UPSERT 是大数据场景的最佳实践（避免全表重写）
 
-### 4. MERGE 的原子性比 DELETE + INSERT 的非原子方案更安全
+4. MERGE 的原子性比 DELETE + INSERT 的非原子方案更安全
 
-### 5. ClickHouse ReplacingMergeTree 的异步去重是有趣的第三种方案
+5. ClickHouse ReplacingMergeTree 的异步去重是有趣的第三种方案
 
-### 6. LEFT ANTI JOIN 模拟 UPSERT 通常比 FULL OUTER JOIN 性能更好
+6. LEFT ANTI JOIN 模拟 UPSERT 通常比 FULL OUTER JOIN 性能更好
 

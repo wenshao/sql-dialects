@@ -398,7 +398,7 @@ fn process_row(row, parent_path):
 
 ## 对引擎开发者的实现建议
 
-### 1. 递归深度保护
+1. 递归深度保护
 
 必须有默认的递归深度限制，防止数据中的环或用户错误导致无限循环：
 
@@ -407,7 +407,7 @@ fn process_row(row, parent_path):
 超过限制时报错，错误信息包含当前深度和建议
 ```
 
-### 2. 内存管理
+2. 内存管理
 
 递归 CTE 的 WorkTable 需要在内存中维护。如果某层产出大量行，内存会快速增长：
 
@@ -418,7 +418,7 @@ fn process_row(row, parent_path):
 - 限制: 设置 WorkTable 的最大内存使用量
 ```
 
-### 3. SEARCH/CYCLE 作为语法糖
+3. SEARCH/CYCLE 作为语法糖
 
 SEARCH 和 CYCLE 可以在 planner 阶段改写为等价的手动实现：
 

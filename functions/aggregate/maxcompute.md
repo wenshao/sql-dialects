@@ -224,15 +224,15 @@ PostgreSQL: 支持                  | SQL Server: 支持
 ## 9. 对引擎开发者的启示
 
 
-### 1. GROUPING SETS 是 OLAP 引擎的核心能力 — 一次扫描多维聚合
+1. GROUPING SETS 是 OLAP 引擎的核心能力 — 一次扫描多维聚合
 
-### 2. 字符串聚合应支持 ORDER BY（WM_CONCAT 的无序是重大缺陷）
+2. 字符串聚合应支持 ORDER BY（WM_CONCAT 的无序是重大缺陷）
 
-### 3. 近似聚合（HLL/APPROX）在大数据场景中是必需品而非可选
+3. 近似聚合（HLL/APPROX）在大数据场景中是必需品而非可选
 
-### 4. FILTER 子句简化条件聚合 — 值得支持（替代 CASE WHEN 样板代码）
+4. FILTER 子句简化条件聚合 — 值得支持（替代 CASE WHEN 样板代码）
 
-### 5. MAX_BY/MIN_BY 是非常实用的函数 — 避免了子查询或窗口函数
+5. MAX_BY/MIN_BY 是非常实用的函数 — 避免了子查询或窗口函数
 
-### 6. COLLECT_LIST + SORT_ARRAY + CONCAT_WS 是有序字符串聚合的通用方案
+6. COLLECT_LIST + SORT_ARRAY + CONCAT_WS 是有序字符串聚合的通用方案
 

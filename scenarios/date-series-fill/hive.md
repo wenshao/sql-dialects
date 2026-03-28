@@ -105,9 +105,9 @@ LEFT JOIN daily_sales s ON ds.dt = s.sale_date;
 
 ## 6. 对引擎开发者的启示
 
-### 1. generate_series 是基本的用户需求: Hive 缺少此功能导致用户使用 hack 方法
+1. generate_series 是基本的用户需求: Hive 缺少此功能导致用户使用 hack 方法
 
-### 2. POSEXPLODE + SPACE 技巧说明了 UDTF 的灵活性: 用现有原语组合出新能力
+2. POSEXPLODE + SPACE 技巧说明了 UDTF 的灵活性: 用现有原语组合出新能力
 
-### 3. IGNORE NULLS 窗口函数选项应该被支持: 缺少此功能导致 forward fill 需要复杂的变通
+3. IGNORE NULLS 窗口函数选项应该被支持: 缺少此功能导致 forward fill 需要复杂的变通
 

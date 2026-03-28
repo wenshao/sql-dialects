@@ -54,7 +54,7 @@ Hive 不是传统数据库——它是"SQL on Hadoop"的先驱，很多设计源
 
 ## Hive 最大的 10 个坑
 
-### 1. INSERT OVERWRITE 不是 DELETE + INSERT
+1. INSERT OVERWRITE 不是 DELETE + INSERT
 
 详见 [dml/insert/hive.sql](../dml/insert/hive.sql)
 
@@ -69,7 +69,7 @@ SELECT * FROM staging_orders WHERE dt = '2024-01-15';
 - 没有行级粒度，只有分区级粒度
 - **对引擎开发者**: 如果你的引擎基于文件存储，INSERT OVERWRITE 比实现行级 UPDATE 简单得多
 
-### 2. 分区列不是普通数据列
+2. 分区列不是普通数据列
 
 详见 [advanced/partitioning/hive.sql](../advanced/partitioning/hive.sql)
 
@@ -85,7 +85,7 @@ CREATE TABLE orders (
 - 分区列的类型通常是 STRING（即使逻辑上是 DATE）
 - **对引擎开发者**: 分区列的存储和普通列完全不同，查询时需要从文件路径解析
 
-### 3. STRING 是万能类型
+3. STRING 是万能类型
 
 详见 [types/string/hive.sql](../types/string/hive.sql)
 
@@ -94,7 +94,7 @@ CREATE TABLE orders (
 - VARCHAR(n) 和 CHAR(n) 在 0.12+ 才加入，使用率低
 - **对引擎开发者**: 如果兼容 Hive 表，要做好处理全 STRING schema 的准备
 
-### 4. NULL 处理差异
+4. NULL 处理差异
 
 ```sql
 -- Hive 的 NULL 处理有几个独特行为:
@@ -104,7 +104,7 @@ CREATE TABLE orders (
 -- 4. NULL 在 ORDER BY 中排在最前面（默认 NULLS FIRST，和 PG 相同，和 MySQL 相反）
 ```
 
-### 5. JOIN 的历史限制
+5. JOIN 的历史限制
 
 详见 [query/joins/hive.sql](../query/joins/hive.sql)
 
@@ -115,7 +115,7 @@ CREATE TABLE orders (
 - 不支持 LATERAL JOIN（用 LATERAL VIEW 代替）
 - **对引擎开发者**: Hive 的 JOIN 限制源于 MapReduce 的 shuffle 阶段设计
 
-### 6. SORT BY vs ORDER BY vs DISTRIBUTE BY vs CLUSTER BY
+6. SORT BY vs ORDER BY vs DISTRIBUTE BY vs CLUSTER BY
 
 详见 [dml/insert/hive.sql](../dml/insert/hive.sql)
 
@@ -130,7 +130,7 @@ CREATE TABLE orders (
 - 现代引擎（Spark、Flink）通常只保留 ORDER BY，其余用内部优化替代
 - **对引擎开发者**: 如果你的引擎不是 MapReduce，SORT BY/DISTRIBUTE BY 可以映射到内部的 partition + sort
 
-### 7. STORED AS 和 SerDe
+7. STORED AS 和 SerDe
 
 详见 [ddl/create-table/hive.sql](../ddl/create-table/hive.sql)
 
@@ -148,7 +148,7 @@ STORED AS TEXTFILE;
 - SerDe: 可插拔的序列化/反序列化器
 - **对引擎开发者**: 不需要实现 SerDe 架构，但需要支持读取 ORC/Parquet 格式
 
-### 8. ACID 表的限制
+8. ACID 表的限制
 
 详见 [advanced/transactions/hive.sql](../advanced/transactions/hive.sql)
 
@@ -159,7 +159,7 @@ STORED AS TEXTFILE;
 - Hive 4.x 大幅改善 ACID 性能：优化了 Compaction 调度、减少小文件数量、提升并发写入吞吐量
 - **对引擎开发者**: 如果你的引擎需要 UPDATE/DELETE，考虑 Delta Lake/Iceberg 的方案而非 Hive ACID
 
-### 9. 类型转换的宽松性
+9. 类型转换的宽松性
 
 ```sql
 -- Hive 允许很多隐式转换:
@@ -171,7 +171,7 @@ SELECT '2024-01-15' > '2024-01-14';  -- TRUE（STRING 比较）
 - 但某些转换会静默失败返回 NULL: `CAST('abc' AS INT)` → NULL（不报错）
 - **对引擎开发者**: 需要决定兼容 Hive 的宽松转换还是采用严格模式
 
-### 10. UDF/UDAF/UDTF 接口
+10. UDF/UDAF/UDTF 接口
 
 详见 [advanced/stored-procedures/hive.sql](../advanced/stored-procedures/hive.sql)
 

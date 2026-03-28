@@ -344,7 +344,7 @@ SELECT * FROM stl_load_errors ORDER BY starttime DESC LIMIT 10;
 
 ## 对引擎开发者的实现建议
 
-### 1. 批量导入接口设计
+1. 批量导入接口设计
 
 ```
 BulkLoader {
@@ -377,7 +377,7 @@ BulkLoader {
 }
 ```
 
-### 2. 旁路 WAL 的权衡
+2. 旁路 WAL 的权衡
 
 ```
 正常写入路径:
@@ -396,7 +396,7 @@ Oracle: Direct Path Load (APPEND hint)
 MySQL: 无法旁路 InnoDB redo log
 ```
 
-### 3. 错误处理策略
+3. 错误处理策略
 
 ```
 三种策略:
@@ -408,7 +408,7 @@ MySQL: 无法旁路 InnoDB redo log
 错误行应写入 reject 表/文件，包含行号、原始数据、错误原因
 ```
 
-### 4. 并行加载设计
+4. 并行加载设计
 
 ```
 -- 分布式引擎的并行加载:

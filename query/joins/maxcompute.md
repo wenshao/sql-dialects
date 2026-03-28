@@ -104,11 +104,11 @@ JOIN roles r ON u.role_id = r.id;
 ```
 
  MAPJOIN 的实现机制:
-### 1. 将小表（roles）完整加载到每个 Map 任务的内存中
+1. 将小表（roles）完整加载到每个 Map 任务的内存中
 
-### 2. Map 阶段直接在内存中做 Hash JOIN（无需 Shuffle/Reduce）
+2. Map 阶段直接在内存中做 Hash JOIN（无需 Shuffle/Reduce）
 
-### 3. 避免了大表的网络传输（Shuffle 是分布式 JOIN 的主要开销）
+3. 避免了大表的网络传输（Shuffle 是分布式 JOIN 的主要开销）
 
 
 限制:
@@ -241,15 +241,15 @@ MaxCompute: SKEWJOIN hint          | Hive: MAPJOIN + 手动拆分
 ## 8. 对引擎开发者的启示
 
 
-### 1. JOIN 策略选择（Broadcast vs Shuffle vs Sort-Merge）是优化器的核心
+1. JOIN 策略选择（Broadcast vs Shuffle vs Sort-Merge）是优化器的核心
 
-### 2. SEMI/ANTI JOIN 作为一等语法简化了用户和优化器的工作
+2. SEMI/ANTI JOIN 作为一等语法简化了用户和优化器的工作
 
-### 3. HBO 利用历史执行信息优化 JOIN 策略 — 在 ETL 场景中效果显著
+3. HBO 利用历史执行信息优化 JOIN 策略 — 在 ETL 场景中效果显著
 
-### 4. Adaptive JOIN（运行时动态切换策略）是现代查询引擎的标配
+4. Adaptive JOIN（运行时动态切换策略）是现代查询引擎的标配
 
-### 5. LATERAL VIEW 是 Hive 遗产，标准 LATERAL 更通用 — 新引擎应支持后者
+5. LATERAL VIEW 是 Hive 遗产，标准 LATERAL 更通用 — 新引擎应支持后者
 
-### 6. 数据倾斜是分布式 JOIN 的最大性能杀手 — 自动化处理值得投资
+6. 数据倾斜是分布式 JOIN 的最大性能杀手 — 自动化处理值得投资
 

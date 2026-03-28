@@ -27,11 +27,11 @@
      Hive:       不支持存储过程（与 MaxCompute 相同）
 
  MaxCompute 的替代方案:
-### 1. Script Mode（脚本模式）—— 多语句 SQL
+1. Script Mode（脚本模式）—— 多语句 SQL
 
-### 2. UDF（用户定义函数）—— 行级逻辑扩展
+2. UDF（用户定义函数）—— 行级逻辑扩展
 
-### 3. DataWorks 调度 —— 工作流编排
+3. DataWorks 调度 —— 工作流编排
 
 
 ## 2. Script Mode（脚本模式，2.0+）
@@ -136,13 +136,13 @@ FROM users;
 ```
 
  TRANSFORM 的工作原理:
-### 1. 将输入行序列化为 TSV 格式
+1. 将输入行序列化为 TSV 格式
 
-### 2. 通过 stdin 传递给外部脚本
+2. 通过 stdin 传递给外部脚本
 
-### 3. 脚本处理后通过 stdout 输出
+3. 脚本处理后通过 stdout 输出
 
-### 4. MaxCompute 读取输出并反序列化
+4. MaxCompute 读取输出并反序列化
 
 
    适用: 复杂的数据处理逻辑（NLP、ML 推理等）
@@ -188,15 +188,15 @@ PostgreSQL: C/Python/Perl/TCL/PL/pgSQL   | ClickHouse: C++
 ## 7. 对引擎开发者的启示
 
 
-### 1. Script Mode 是批处理引擎的务实折中 — 不需要完整存储过程
+1. Script Mode 是批处理引擎的务实折中 — 不需要完整存储过程
 
-### 2. UDF（Java/Python）是最灵活的扩展方式 — 应优先投资
+2. UDF（Java/Python）是最灵活的扩展方式 — 应优先投资
 
-### 3. BigQuery Scripting 证明了批处理引擎可以支持控制流（IF/WHILE）
+3. BigQuery Scripting 证明了批处理引擎可以支持控制流（IF/WHILE）
 
-### 4. DataWorks 类调度平台替代了存储过程的编排功能
+4. DataWorks 类调度平台替代了存储过程的编排功能
 
-### 5. TRANSFORM 类外部脚本调用是重要的逃生通道（当 SQL 无法表达时）
+5. TRANSFORM 类外部脚本调用是重要的逃生通道（当 SQL 无法表达时）
 
-### 6. UDF 的沙箱安全（内存限制、CPU 限制、网络隔离）是必须的
+6. UDF 的沙箱安全（内存限制、CPU 限制、网络隔离）是必须的
 

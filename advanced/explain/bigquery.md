@@ -13,11 +13,11 @@
 ## Web UI 查看执行计划
 
 
-### 1. 在 BigQuery Console 中执行查询
+1. 在 BigQuery Console 中执行查询
 
-### 2. 点击 "Execution details" 选项卡
+2. 点击 "Execution details" 选项卡
 
-### 3. 查看执行阶段图
+3. 查看执行阶段图
 
 
  执行计划显示：
@@ -132,19 +132,19 @@ ORDER BY period_start;
 ## 关键优化指标
 
 
-### 1. total_bytes_processed: 扫描的数据量（直接影响费用）
+1. total_bytes_processed: 扫描的数据量（直接影响费用）
 
     优化：分区裁剪、列裁剪、聚簇表
 
-### 2. total_slot_ms: Slot 使用量
+2. total_slot_ms: Slot 使用量
 
     优化：减少 Shuffle、避免数据倾斜
 
-### 3. cache_hit: 是否命中缓存
+3. cache_hit: 是否命中缓存
 
     24 小时内相同查询可命中缓存
 
-### 4. shuffle_output_bytes: 各阶段间数据传输量
+4. shuffle_output_bytes: 各阶段间数据传输量
 
 优化：提前过滤、减少 JOIN 数据量
 

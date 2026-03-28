@@ -173,7 +173,7 @@ CROSS APPLY (
 
 ## 对引擎开发者的实现建议
 
-### 1. LIMIT BY 的语法实现
+1. LIMIT BY 的语法实现
 
 如果要实现 ClickHouse 风格的 LIMIT BY：
 
@@ -189,7 +189,7 @@ select_statement:
     [LIMIT m [OFFSET k]]
 ```
 
-### 2. 执行计划
+2. 执行计划
 
 #### 方案 A: 哈希分组 + 计数器
 
@@ -220,7 +220,7 @@ HashLimitBy (limit=3, by=[dept_id])
 
 如果 ORDER BY 已经包含分组列（或输入已按分组列排序），方案 B 更优。否则方案 A 更优。
 
-### 3. DISTINCT ON 的优化
+3. DISTINCT ON 的优化
 
 `DISTINCT ON (cols) ... ORDER BY cols, ...` 可以被优化为：
 
@@ -232,7 +232,7 @@ HashLimitBy (limit=3, by=[dept_id])
 
 这可以利用索引有序性跳过排序步骤。
 
-### 4. ROW_NUMBER + WHERE rn <= N 的优化（最重要）
+4. ROW_NUMBER + WHERE rn <= N 的优化（最重要）
 
 这是最通用的模式，优化器应该识别并优化：
 

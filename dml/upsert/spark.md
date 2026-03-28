@@ -137,15 +137,15 @@ WHEN NOT MATCHED BY SOURCE THEN DELETE;
 
 
  MERGE 的执行过程:
-### 1. 扫描源表和目标表，做 JOIN（ON 条件）
+1. 扫描源表和目标表，做 JOIN（ON 条件）
 
-### 2. 对 JOIN 结果评估 WHEN 条件，确定每行是 UPDATE/DELETE/INSERT
+2. 对 JOIN 结果评估 WHEN 条件，确定每行是 UPDATE/DELETE/INSERT
 
-### 3. 读取需要修改的目标文件
+3. 读取需要修改的目标文件
 
-### 4. 写入新的文件（Copy-on-Write）
+4. 写入新的文件（Copy-on-Write）
 
-### 5. 更新事务日志
+5. 更新事务日志
 
 
  性能优化关键:

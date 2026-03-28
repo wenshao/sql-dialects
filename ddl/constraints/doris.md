@@ -128,13 +128,13 @@ DISTRIBUTED BY HASH(id) BUCKETS 16;
 
 ## 7. 数据完整性替代方案
 
-### 1. UNIQUE KEY + MoW 模型: 保证主键唯一(通过覆盖)
+1. UNIQUE KEY + MoW 模型: 保证主键唯一(通过覆盖)
 
-### 2. ETL/应用层: 写入前验证数据质量
+2. ETL/应用层: 写入前验证数据质量
 
-### 3. INSERT INTO ... SELECT: 写入时做数据清洗
+3. INSERT INTO ... SELECT: 写入时做数据清洗
 
-### 4. Stream Load max_filter_ratio: 允许一定比例的错误行
+4. Stream Load max_filter_ratio: 允许一定比例的错误行
 
 
 ```sql

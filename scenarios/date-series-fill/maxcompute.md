@@ -180,11 +180,11 @@ ORDER BY dd.d;
    Snowflake:  GENERATOR + ROW_NUMBER
 
  对引擎开发者:
-### 1. generate_series 类的序列生成函数是高频需求 — 应内置
+1. generate_series 类的序列生成函数是高频需求 — 应内置
 
-### 2. IGNORE NULLS 窗口选项简化了 Forward Fill — 值得支持
+2. IGNORE NULLS 窗口选项简化了 Forward Fill — 值得支持
 
-### 3. 日期维度表是数据仓库的标准实践 — 引擎应优化小表 JOIN
+3. 日期维度表是数据仓库的标准实践 — 引擎应优化小表 JOIN
 
-### 4. posexplode + split(space(n)) 是聪明但不直观的 hack — 证明了内置方案的必要
+4. posexplode + split(space(n)) 是聪明但不直观的 hack — 证明了内置方案的必要
 

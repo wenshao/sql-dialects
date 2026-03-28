@@ -305,7 +305,7 @@ function resolveCommonType(left: Type, right: Type): Type {
 
 ## 类型系统对优化器的影响
 
-### 1. 谓词下推的类型约束
+1. 谓词下推的类型约束
 
 ```sql
 -- 表: orders(order_date DATE, amount DECIMAL(10,2))
@@ -323,7 +323,7 @@ SELECT * FROM orders WHERE order_date = '2024-01-15';
 --   优化器需要判断是先转换再比较还是直接用 DATE 索引
 ```
 
-### 2. JOIN 条件的类型不一致
+2. JOIN 条件的类型不一致
 
 ```sql
 -- 表 A: users(id INT), 表 B: orders(user_id BIGINT)
@@ -339,7 +339,7 @@ SELECT * FROM users u JOIN orders o ON u.id = o.user_id;
 -- 导致全表扫描 (索引失效)!
 ```
 
-### 3. 聚合函数的返回类型推导
+3. 聚合函数的返回类型推导
 
 ```sql
 -- SUM(INT) 应该返回什么类型？
@@ -354,7 +354,7 @@ SELECT * FROM users u JOIN orders o ON u.id = o.user_id;
 -- 这个选择影响计算结果的精度
 ```
 
-### 4. 表达式折叠的安全性
+4. 表达式折叠的安全性
 
 ```sql
 -- 常量折叠: 编译期计算常量表达式

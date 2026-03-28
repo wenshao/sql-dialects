@@ -122,24 +122,24 @@ SELECT TO_UTC_TIMESTAMP('2024-01-15 18:00:00', 'Asia/Shanghai');
 
 ## 5. 已知限制
 
-### 1. 无 TIME 类型: 不能表示纯时间（只有 DATE 和 TIMESTAMP）
+1. 无 TIME 类型: 不能表示纯时间（只有 DATE 和 TIMESTAMP）
 
-### 2. TIMESTAMP 不含时区: 解释为服务器本地时区（容易出错）
+2. TIMESTAMP 不含时区: 解释为服务器本地时区（容易出错）
 
-### 3. DATEDIFF 只返回天数: 不能直接计算小时/分钟差
+3. DATEDIFF 只返回天数: 不能直接计算小时/分钟差
 
-### 4. 格式字符串是 Java 风格: yyyy-MM-dd（与 MySQL % 和 PG YYYY 不同）
+4. 格式字符串是 Java 风格: yyyy-MM-dd（与 MySQL % 和 PG YYYY 不同）
 
-### 5. INTERVAL 仅用于表达式: 不能作为列类型
+5. INTERVAL 仅用于表达式: 不能作为列类型
 
 
 ## 6. 对引擎开发者的启示
 
-### 1. TIMESTAMP 应该默认带时区: Hive 的无时区 TIMESTAMP 是常见的错误来源
+1. TIMESTAMP 应该默认带时区: Hive 的无时区 TIMESTAMP 是常见的错误来源
 
-### 2. DATE 类型晚于 TIMESTAMP 引入说明了演进路径: 先解决"有日期"的问题，再细化类型
+2. DATE 类型晚于 TIMESTAMP 引入说明了演进路径: 先解决"有日期"的问题，再细化类型
 
-### 3. INTERVAL 作为列类型有实际需求: Hive 只在表达式中支持 INTERVAL 是不足的
+3. INTERVAL 作为列类型有实际需求: Hive 只在表达式中支持 INTERVAL 是不足的
 
-### 4. 日期格式化字符串应该标准化: 不同引擎的格式模式差异是迁移的主要痛点
+4. 日期格式化字符串应该标准化: 不同引擎的格式模式差异是迁移的主要痛点
 

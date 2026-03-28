@@ -180,7 +180,7 @@ SELECT * FROM (
 
 ## 高危迁移点
 
-### 1. Oracle DATE 包含时间
+1. Oracle DATE 包含时间
 
 ```sql
 -- MySQL: DATE 只有日期
@@ -192,7 +192,7 @@ SELECT CAST(TIMESTAMP '2024-01-15 10:30:00' AS DATE) FROM DUAL;  -- 保留时间
 -- 修复: WHERE TRUNC(order_date) = DATE '2024-01-15'
 ```
 
-### 2. CONCAT 参数个数
+2. CONCAT 参数个数
 
 ```sql
 -- MySQL: CONCAT 接受任意个参数
@@ -203,7 +203,7 @@ SELECT first_name || ' ' || last_name FROM DUAL;   -- 推荐
 SELECT CONCAT(CONCAT(first_name, ' '), last_name) FROM DUAL;  -- 嵌套
 ```
 
-### 3. FROM DUAL
+3. FROM DUAL
 
 ```sql
 -- MySQL: FROM 可选
@@ -216,7 +216,7 @@ SELECT SYSDATE FROM DUAL;
 -- 23ai+: Oracle 也支持省略 FROM DUAL 了
 ```
 
-### 4. 标识符大小写
+4. 标识符大小写
 
 ```sql
 -- MySQL (Linux): 表名区分大小写（取决于文件系统）

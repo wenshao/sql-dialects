@@ -215,7 +215,7 @@ WHERE (
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 在 FROM 子句的 table_ref 产生式中支持 `LATERAL` 关键字：
 
@@ -229,7 +229,7 @@ table_ref:
   | table_ref OUTER APPLY '(' subquery ')' AS alias   -- 可选: SQL Server 兼容
 ```
 
-### 2. 作用域管理
+2. 作用域管理
 
 LATERAL 的核心实现挑战是**作用域规则**：
 
@@ -243,7 +243,7 @@ FROM a, LATERAL (... a.col ...) b, LATERAL (... a.col, b.col ...) c
 
 实现: 在解析 FROM 子句时，维护一个"已解析表"列表。遇到 LATERAL 标记时，将已解析表列表注入到子查询的作用域。
 
-### 3. 执行计划: Correlated Nested Loop
+3. 执行计划: Correlated Nested Loop
 
 LATERAL 在执行计划中自然映射为 correlated nested loop join：
 
@@ -258,7 +258,7 @@ NestedLoopJoin (lateral = true)
 
 对外部表的每一行，重新计算内部子查询。
 
-### 4. 优化器策略
+4. 优化器策略
 
 #### 去关联化 (Decorrelation)
 
@@ -286,7 +286,7 @@ FROM departments d JOIN (
 - 收集外部表的多行参数，批量发送给内部查询
 - 减少内部查询的执行次数（用 IN 代替逐行相关查询）
 
-### 5. CROSS APPLY 兼容
+5. CROSS APPLY 兼容
 
 如果引擎想同时支持标准 `LATERAL` 和 SQL Server 的 `CROSS/OUTER APPLY`：
 

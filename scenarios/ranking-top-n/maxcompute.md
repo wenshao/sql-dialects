@@ -127,11 +127,11 @@ Snowflake:  QUALIFY（最简洁）      | PostgreSQL: ROW_NUMBER + 子查询
 MySQL 8.0:  ROW_NUMBER + 子查询    | Oracle: ROW_NUMBER 或 FETCH FIRST
 
  对引擎开发者:
-### 1. QUALIFY 语法将 Top-N 从 3 层嵌套简化为 1 层 — 强烈推荐实现
+1. QUALIFY 语法将 Top-N 从 3 层嵌套简化为 1 层 — 强烈推荐实现
 
-### 2. Top-K 优化（堆排序）是 ORDER BY + LIMIT 的基础优化
+2. Top-K 优化（堆排序）是 ORDER BY + LIMIT 的基础优化
 
-### 3. 分组 Top-N 是数据分析中使用频率最高的模式之一
+3. 分组 Top-N 是数据分析中使用频率最高的模式之一
 
-### 4. 窗口函数的 PARTITION BY 自然实现了分布式并行
+4. 窗口函数的 PARTITION BY 自然实现了分布式并行
 

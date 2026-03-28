@@ -46,11 +46,11 @@ FROM (
 ```
 
  from_json 的优势:
-### 1. 一次解析，多次使用字段（get_json_object 每次调用都重新解析 JSON）
+1. 一次解析，多次使用字段（get_json_object 每次调用都重新解析 JSON）
 
-### 2. 返回类型化的 STRUCT——可以直接用 dot notation 访问嵌套字段
+2. 返回类型化的 STRUCT——可以直接用 dot notation 访问嵌套字段
 
-### 3. 数组字段返回 ARRAY 类型——可以直接 EXPLODE
+3. 数组字段返回 ARRAY 类型——可以直接 EXPLODE
 
 
 ## 3. from_json + EXPLODE: 展开 JSON 数组

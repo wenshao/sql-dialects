@@ -206,7 +206,7 @@ COMMIT;
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 ```
 insert_statement:
@@ -220,7 +220,7 @@ partition_spec:
   | 混合: partition_column '=' value ',' partition_column           -- 半动态
 ```
 
-### 2. 文件级替换 vs 行级替换
+2. 文件级替换 vs 行级替换
 
 大数据引擎和传统数据库对"覆盖"的实现完全不同：
 
@@ -260,7 +260,7 @@ partition_spec:
 
 这是最优方案: 既有文件级效率，又有事务保证。
 
-### 3. REPLACE INTO 不是 INSERT OVERWRITE
+3. REPLACE INTO 不是 INSERT OVERWRITE
 
 MySQL 的 `REPLACE INTO` 和 INSERT OVERWRITE 语义完全不同：
 

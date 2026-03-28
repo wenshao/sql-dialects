@@ -46,7 +46,7 @@ CDC 方式: 增量实时同步
 
 ## 三种 CDC 实现方式
 
-### 1. 基于日志 (Log-based)
+1. 基于日志 (Log-based)
 
 ```
 数据库写入操作
@@ -62,7 +62,7 @@ CDC 工具解析日志
 代表: MySQL binlog, PostgreSQL WAL, Oracle LogMiner
 ```
 
-### 2. 基于触发器 (Trigger-based)
+2. 基于触发器 (Trigger-based)
 
 ```
 数据库写入操作
@@ -78,7 +78,7 @@ CDC 工具轮询影子表
 代表: Debezium 的 SQL Server 早期方案
 ```
 
-### 3. 基于快照差异 (Snapshot-based)
+3. 基于快照差异 (Snapshot-based)
 
 ```
 定时拍摄数据快照

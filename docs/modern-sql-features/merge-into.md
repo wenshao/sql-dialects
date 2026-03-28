@@ -211,7 +211,7 @@ WHEN NOT MATCHED THEN INSERT *;            -- INSERT * 自动匹配所有列
 
 SQL Server 的 MERGE 语句有一系列**已知但长期未修复**的 bug，这在数据库引擎中极为罕见：
 
-### 1. 竞态条件 (Race Condition)
+1. 竞态条件 (Race Condition)
 
 ```sql
 -- 并发 MERGE 可能导致违反唯一约束
@@ -221,15 +221,15 @@ MERGE INTO t WITH (HOLDLOCK) ...  -- 微软建议加 HOLDLOCK 提示
 
 没有 HOLDLOCK 时，两个并发 MERGE 可能同时判断"不存在"然后都尝试 INSERT，导致唯一键冲突。
 
-### 2. 外键约束违反
+2. 外键约束违反
 
 MERGE 在某些情况下不正确地检查外键约束，可能产生孤儿行。
 
-### 3. 触发器问题
+3. 触发器问题
 
 MERGE 触发的 INSTEAD OF 触发器在某些边界情况下行为异常。
 
-### 4. 社区反应
+4. 社区反应
 
 由于这些 bug，许多 SQL Server 专家（包括 Aaron Bertrand、Paul White）建议**避免使用 MERGE**，改用显式的 INSERT + UPDATE + DELETE：
 
@@ -249,7 +249,7 @@ COMMIT;
 
 ## 对引擎开发者的实现建议
 
-### 1. 执行计划
+1. 执行计划
 
 MERGE 的执行计划核心是一个 JOIN + 条件路由：
 
@@ -261,7 +261,7 @@ MergeJoin / HashJoin (target, source, ON condition)
     - NOT MATCHED → InsertExecutor
 ```
 
-### 2. 匹配语义
+2. 匹配语义
 
 关键设计决策：当 source 中多行匹配 target 中的同一行时怎么处理？
 
@@ -275,7 +275,7 @@ MergeJoin / HashJoin (target, source, ON condition)
 
 建议: 检测到 1:N 匹配时报错，这是最安全的行为。
 
-### 3. 并发控制
+3. 并发控制
 
 MERGE 涉及读和写同一张表，需要特殊的锁策略：
 
@@ -283,7 +283,7 @@ MERGE 涉及读和写同一张表，需要特殊的锁策略：
 - **锁引擎（SQL Server）**: 需要适当的锁提示确保隔离（如 HOLDLOCK）
 - **OLAP 引擎**: 通常不需要担心并发，但需要保证原子性
 
-### 4. 分布式 MERGE
+4. 分布式 MERGE
 
 在分布式引擎中，MERGE 特别复杂：
 
@@ -296,7 +296,7 @@ Databricks Delta Lake 的做法：
 2. 对每个 partition，执行本地 MERGE
 3. 用 copy-on-write 或 merge-on-read 策略写回
 
-### 5. MERGE 的优化
+5. MERGE 的优化
 
 - **索引利用**: ON 条件中的列应利用 target 的索引
 - **谓词下推**: WHEN 子句中的条件可以下推到 scan 阶段

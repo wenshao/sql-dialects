@@ -111,7 +111,7 @@ SELECT * FROM UNNEST([
 
 ## 典型用例
 
-### 1. 内联测试数据
+1. 内联测试数据
 
 ```sql
 -- 快速构造测试数据，无需创建临时表
@@ -125,7 +125,7 @@ FROM (VALUES
 ) AS t(id, name, score);
 ```
 
-### 2. 小型查找表（替代 CASE WHEN）
+2. 小型查找表（替代 CASE WHEN）
 
 ```sql
 -- 传统: CASE WHEN 映射
@@ -144,7 +144,7 @@ JOIN (VALUES (1, 'Pending'), (2, 'Shipped'), (3, 'Delivered'))
     AS m(code, label) ON o.status = m.code;
 ```
 
-### 3. 参数化批量操作
+3. 参数化批量操作
 
 ```sql
 -- 批量 UPDATE: 用 VALUES 构造参数，JOIN 更新
@@ -163,7 +163,7 @@ VALUES ('timeout', '30'), ('retries', '3'), ('debug', 'false')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 ```
 
-### 4. 生成序列（简易方式）
+4. 生成序列（简易方式）
 
 ```sql
 -- 当 generate_series 不可用时，用 VALUES 构造小序列
@@ -173,7 +173,7 @@ FROM (VALUES (0), (1), (2), (3), (4), (5), (6)) AS d(day_offset);
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 VALUES 子句在语法中的位置需要同时支持两种场景：
 
@@ -204,7 +204,7 @@ row_constructor:
   | ROW '(' expr (',' expr)* ')'     -- MySQL 兼容
 ```
 
-### 2. 类型推导
+2. 类型推导
 
 VALUES 的列类型需要从所有行的对应位置推导。规则：
 
@@ -219,7 +219,7 @@ VALUES (1, 'hello'),       -- INT, VARCHAR
 -- 结果类型: DECIMAL, VARCHAR
 ```
 
-### 3. 执行计划
+3. 执行计划
 
 VALUES 在执行计划中映射为一个 `ValuesNode`（常量表扫描）：
 
@@ -231,7 +231,7 @@ ValuesScan
 
 这是最简单的执行节点之一——不需要磁盘 IO，直接从内存中产出行。
 
-### 4. 优化器考量
+4. 优化器考量
 
 - **常量折叠**: VALUES 中的表达式可以在编译期求值
 - **行数估计**: 行数是确定的，有利于优化器选择 JOIN 策略

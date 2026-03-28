@@ -107,13 +107,13 @@ ORDER BY o.customer_id, o.amount DESC;
 
 
  窗口函数 Top-N 的 Spark 执行:
-### 1. PARTITION BY customer_id 触发 Shuffle（按 customer_id 分区）
+1. PARTITION BY customer_id 触发 Shuffle（按 customer_id 分区）
 
-### 2. 每个分区内 ORDER BY amount DESC 排序
+2. 每个分区内 ORDER BY amount DESC 排序
 
-### 3. ROW_NUMBER 分配序号
+3. ROW_NUMBER 分配序号
 
-### 4. WHERE rn <= N 过滤
+4. WHERE rn <= N 过滤
 
 
  优化建议:

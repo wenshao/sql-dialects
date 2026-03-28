@@ -308,7 +308,7 @@ SELECT id, username, email FROM users WHERE age >= 18;
 ## 横向对比: Snowflake vs 其他云数仓的 CREATE TABLE
 
 
-### 1. 物理存储控制:
+1. 物理存储控制:
 
    Snowflake: 完全自动（零配置）
    BigQuery:  完全自动（与 Snowflake 最相似）
@@ -316,14 +316,14 @@ SELECT id, username, email FROM users WHERE age >= 18;
    Databricks: LOCATION + PARTITIONED BY + TBLPROPERTIES
    MaxCompute: LIFECYCLE + CLUSTERED BY + RANGE/HASH 分布
 
-### 2. 半结构化数据:
+2. 半结构化数据:
 
    Snowflake: VARIANT 列（最灵活，Schema-on-Read）
    BigQuery:  STRUCT + ARRAY（强类型，Schema-on-Write）
    Redshift:  SUPER 类型（借鉴 Snowflake，但查询性能较弱）
    Databricks: MAP/STRUCT/ARRAY + JSON 路径函数
 
-### 3. 表克隆:
+3. 表克隆:
 
 Snowflake: CLONE（零拷贝 COW，秒级）
 BigQuery:  TABLE CLONE（类似语义）

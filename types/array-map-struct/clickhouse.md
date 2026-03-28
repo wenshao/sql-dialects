@@ -349,17 +349,17 @@ SELECT JSONExtractArrayRaw('{"tags":["a","b"]}', 'tags');
 ## 注意事项
 
 
-### 1. ClickHouse 原生支持 Array、Map、Tuple、Nested
+1. ClickHouse 原生支持 Array、Map、Tuple、Nested
 
-### 2. 数组函数非常丰富（50+函数）
+2. 数组函数非常丰富（50+函数）
 
-### 3. ARRAY JOIN 是展开数组的主要方式
+3. ARRAY JOIN 是展开数组的主要方式
 
-### 4. Map 类型从 21.1 版本开始支持
+4. Map 类型从 21.1 版本开始支持
 
-### 5. Nested 实际是多个并行数组的语法糖
+5. Nested 实际是多个并行数组的语法糖
 
-### 6. 支持嵌套数组 Array(Array(...))
+6. 支持嵌套数组 Array(Array(...))
 
-### 7. JSON 类型仍在实验阶段
+7. JSON 类型仍在实验阶段
 

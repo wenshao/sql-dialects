@@ -144,11 +144,11 @@ WHERE city IN (
 
 
  Spark 的 Catalyst 优化器对子查询的处理:
-### 1. 解关联（De-correlation）: 将相关子查询转换为 JOIN
+1. 解关联（De-correlation）: 将相关子查询转换为 JOIN
 
-### 2. 子查询展平（Flattening）: 将嵌套子查询提升为同级 JOIN
+2. 子查询展平（Flattening）: 将嵌套子查询提升为同级 JOIN
 
-### 3. 广播优化: 小的子查询结果可以被广播到所有 Executor
+3. 广播优化: 小的子查询结果可以被广播到所有 Executor
 
 
  深层嵌套的相关子查询可能导致性能问题:

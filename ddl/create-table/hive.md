@@ -98,13 +98,13 @@ STORED AS ORC;
  设计分析: Hive 的分区模型
  Hive 分区列不存在于数据文件中，而是编码在目录路径里。
  这一设计有深远影响:
-### 1. 分区裁剪 = 目录跳过（无需打开文件即可过滤分区）
+1. 分区裁剪 = 目录跳过（无需打开文件即可过滤分区）
 
-### 2. 添加/删除分区 = 创建/删除目录（元数据操作 + 文件系统操作）
+2. 添加/删除分区 = 创建/删除目录（元数据操作 + 文件系统操作）
 
-### 3. 分区列的值是目录名的一部分，因此分区列的值域受文件系统路径限制
+3. 分区列的值是目录名的一部分，因此分区列的值域受文件系统路径限制
 
-### 4. 分区过多 → 小文件问题（每个分区至少一个文件）
+4. 分区过多 → 小文件问题（每个分区至少一个文件）
 
 
  对比其他引擎:
@@ -131,11 +131,11 @@ STORED AS ORC;
  设计分析: 分桶 = 分区内的 hash 分布
  分桶将数据按 hash(列值) % 桶数分配到固定数量的文件中。
  核心用途:
-### 1. Bucket Map Join: 两表按相同列分桶 → JOIN 时只需对齐桶号，无需全量 shuffle
+1. Bucket Map Join: 两表按相同列分桶 → JOIN 时只需对齐桶号，无需全量 shuffle
 
-### 2. 采样查询: TABLESAMPLE(BUCKET x OUT OF y) 只读取特定桶
+2. 采样查询: TABLESAMPLE(BUCKET x OUT OF y) 只读取特定桶
 
-### 3. 数据均匀分布: 避免分区内的数据倾斜
+3. 数据均匀分布: 避免分区内的数据倾斜
 
 
  Hive 2.x vs 3.0 的重大变化:
@@ -185,11 +185,11 @@ STORED AS TEXTFILE;
  SerDe 是 Hive 架构中最独特的抽象层:
  查询引擎不直接理解数据格式，而是通过 SerDe 接口将字节流转换为行对象。
  这意味着:
-### 1. 添加新格式只需实现 SerDe 接口（无需修改引擎核心）
+1. 添加新格式只需实现 SerDe 接口（无需修改引擎核心）
 
-### 2. 同一份文件可以用不同 SerDe 解读（Schema-on-Read 的基础）
+2. 同一份文件可以用不同 SerDe 解读（Schema-on-Read 的基础）
 
-### 3. 用户可以编写自定义 SerDe 处理私有格式（如自定义日志格式）
+3. 用户可以编写自定义 SerDe 处理私有格式（如自定义日志格式）
 
 
  常用 SerDe:
@@ -221,13 +221,13 @@ TBLPROPERTIES ('transactional' = 'true');
 ```
 
  ACID 表的限制:
-### 1. 仅 ORC 格式支持（Parquet 不支持 ACID）
+1. 仅 ORC 格式支持（Parquet 不支持 ACID）
 
-### 2. 必须是管理表（外部表不支持）
+2. 必须是管理表（外部表不支持）
 
-### 3. 需要 delta 文件 + compaction 机制（读写放大）
+3. 需要 delta 文件 + compaction 机制（读写放大）
 
-### 4. Hive 3.0+ 默认所有管理表为 ACID → 不想要 ACID 就用外部表
+4. Hive 3.0+ 默认所有管理表为 ACID → 不想要 ACID 就用外部表
 
 
 ## 8. CTAS 与 LIKE
@@ -261,21 +261,21 @@ TBLPROPERTIES (
 
 ## 10. 已知限制与设计不足
 
-### 1. 无 AUTO_INCREMENT / SEQUENCE: Hive 面向批量分析，不需要行级自增;
+1. 无 AUTO_INCREMENT / SEQUENCE: Hive 面向批量分析，不需要行级自增;
 
     生成唯一 ID 用 ROW_NUMBER() 或 UUID()
-### 2. 无主键/唯一约束的强制执行: 3.0+ 支持声明 PK/FK/UNIQUE 但仅信息性（类似 BigQuery/Snowflake）
+2. 无主键/唯一约束的强制执行: 3.0+ 支持声明 PK/FK/UNIQUE 但仅信息性（类似 BigQuery/Snowflake）
 
-### 3. 无索引: 3.0 正式废弃索引功能，替代方案是 ORC/Parquet 的内置 bloom filter 和 min/max 统计
+3. 无索引: 3.0 正式废弃索引功能，替代方案是 ORC/Parquet 的内置 bloom filter 和 min/max 统计
 
-### 4. STORED AS 绑定格式: 建表后不能更改存储格式（需要 CTAS 重建）
+4. STORED AS 绑定格式: 建表后不能更改存储格式（需要 CTAS 重建）
 
-### 5. 分区列不能出现在数据列中: 分区列是目录路径的一部分，这一约束是目录分区模型的必然结果
+5. 分区列不能出现在数据列中: 分区列是目录路径的一部分，这一约束是目录分区模型的必然结果
 
-### 6. STRING 类型无长度约束: 与 MySQL VARCHAR(n) 不同，STRING 是无限长度的，
+6. STRING 类型无长度约束: 与 MySQL VARCHAR(n) 不同，STRING 是无限长度的，
 
     这简化了 DDL 但丧失了存储优化机会（VARCHAR/CHAR 在 0.12+ 加入但很少使用）
-### 7. 数据类型有限: 无 TIME 类型，无带时区的 TIMESTAMP（3.0+ 有 TIMESTAMPLOCALTZ 但不通用）
+7. 数据类型有限: 无 TIME 类型，无带时区的 TIMESTAMP（3.0+ 有 TIMESTAMPLOCALTZ 但不通用）
 
 
 ## 11. 版本演进

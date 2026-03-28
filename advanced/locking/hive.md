@@ -172,11 +172,11 @@ SELECT * FROM staging_orders WHERE dt = '2024-01-15';
 ```
 
  INSERT OVERWRITE 的原子性实现:
-### 1. 写入临时目录
+1. 写入临时目录
 
-### 2. 原子性地将临时目录重命名为目标分区目录（HDFS rename 是原子操作）
+2. 原子性地将临时目录重命名为目标分区目录（HDFS rename 是原子操作）
 
-### 3. 删除旧的分区目录
+3. 删除旧的分区目录
 
  这个模式不需要锁就能保证数据一致性（任一时刻读到的都是完整的旧数据或新数据）
 
@@ -193,31 +193,31 @@ SELECT * FROM staging_orders WHERE dt = '2024-01-15';
 
 ## 9. 已知限制
 
-### 1. 不支持 SELECT FOR UPDATE / FOR SHARE
+1. 不支持 SELECT FOR UPDATE / FOR SHARE
 
-### 2. 不支持 BEGIN/COMMIT/ROLLBACK 显式事务
+2. 不支持 BEGIN/COMMIT/ROLLBACK 显式事务
 
-### 3. 每个 SQL 语句是一个隐式事务
+3. 每个 SQL 语句是一个隐式事务
 
-### 4. ACID 需要 ORC 格式（Parquet 不支持）
+4. ACID 需要 ORC 格式（Parquet 不支持）
 
-### 5. 高并发场景下 Compaction 可能成为瓶颈
+5. 高并发场景下 Compaction 可能成为瓶颈
 
-### 6. 锁信息存储在 Metastore 后端数据库中，HMS 是单点
+6. 锁信息存储在 Metastore 后端数据库中，HMS 是单点
 
 
 ## 10. 对引擎开发者的启示
 
-### 1. Delta 文件 + Compaction 是大数据 ACID 的标准范式:
+1. Delta 文件 + Compaction 是大数据 ACID 的标准范式:
 
     Hive/Delta Lake/Iceberg 都采用了这种 Copy-on-Write 或 Merge-on-Read 模式
-### 2. INSERT OVERWRITE 的原子性来自文件系统 rename:
+2. INSERT OVERWRITE 的原子性来自文件系统 rename:
 
     这是一个巧妙的设计——利用文件系统原语实现事务语义
-### 3. 快照隔离是大数据引擎的最佳选择:
+3. 快照隔离是大数据引擎的最佳选择:
 
     读不阻塞写、写不阻塞读，代价是需要 compaction
-### 4. 行级锁在分布式环境中代价过高:
+4. 行级锁在分布式环境中代价过高:
 
 Hive 的"行级操作"本质上是文件级别的 delta，不是真正的行锁
 

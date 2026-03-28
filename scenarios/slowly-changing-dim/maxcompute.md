@@ -160,11 +160,11 @@ LEFT ANTI JOIN dim_customer d
    Delta Lake:         MERGE INTO + Change Data Feed
 
  对引擎开发者:
-### 1. SCD Type 2 是数据仓库的核心操作 — MERGE 是最佳工具
+1. SCD Type 2 是数据仓库的核心操作 — MERGE 是最佳工具
 
-### 2. 普通表的 INSERT OVERWRITE SCD 非常复杂 — 事务表简化了 10 倍
+2. 普通表的 INSERT OVERWRITE SCD 非常复杂 — 事务表简化了 10 倍
 
-### 3. Snowflake STREAMS 的变更捕获思路值得借鉴 — 自动识别变化记录
+3. Snowflake STREAMS 的变更捕获思路值得借鉴 — 自动识别变化记录
 
-### 4. SCD 操作应优化为增量处理 — 避免每天全量重写大维度表
+4. SCD 操作应优化为增量处理 — 避免每天全量重写大维度表
 

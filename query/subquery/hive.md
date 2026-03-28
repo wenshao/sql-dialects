@@ -113,17 +113,17 @@ LEFT SEMI JOIN orders o ON u.id = o.user_id;
 
 ## 5. 已知限制
 
-### 1. 不支持 ALL / ANY / SOME 运算符:
+1. 不支持 ALL / ANY / SOME 运算符:
 
     WHERE col > ALL (SELECT ...) 不可用
-### 2. 不支持标准 LATERAL 子查询:
+2. 不支持标准 LATERAL 子查询:
 
     SELECT * FROM t, LATERAL (SELECT ...) 不可用（用 LATERAL VIEW 替代）
-### 3. WHERE 子查询 0.13 之前不支持: 必须改写为 JOIN
+3. WHERE 子查询 0.13 之前不支持: 必须改写为 JOIN
 
-### 4. 关联标量子查询 2.0 之前不支持
+4. 关联标量子查询 2.0 之前不支持
 
-### 5. NOT IN + NULL 陷阱: 如果子查询结果包含 NULL，NOT IN 可能返回空集
+5. NOT IN + NULL 陷阱: 如果子查询结果包含 NULL，NOT IN 可能返回空集
 
     （SQL 标准行为，但经常导致困惑）
 
@@ -140,14 +140,14 @@ LEFT SEMI JOIN orders o ON u.id = o.user_id;
 
 ## 7. 对引擎开发者的启示
 
-### 1. 子查询去关联化是优化器的核心能力:
+1. 子查询去关联化是优化器的核心能力:
 
     关联子查询性能差（逐行执行子查询），优化器应将其转换为 JOIN
-### 2. LEFT SEMI JOIN 应该是一等公民:
+2. LEFT SEMI JOIN 应该是一等公民:
 
     EXISTS 语义在大数据引擎中比 INNER JOIN 更高效（提前终止）
-### 3. NOT IN + NULL 的语义需要在文档中明确:
+3. NOT IN + NULL 的语义需要在文档中明确:
 
     这是 SQL 中最常见的陷阱之一，引擎应该提供友好的警告
-### 4. FROM 子查询是最基础的: 它的实现只需要在查询计划中嵌套子树
+4. FROM 子查询是最基础的: 它的实现只需要在查询计划中嵌套子树
 

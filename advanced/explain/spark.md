@@ -61,13 +61,13 @@ ORDER BY order_count DESC;
 ```
 
  EXPLAIN EXTENDED 输出四个计划:
-### 1. Parsed Logical Plan:     SQL 解析后的原始逻辑计划（AST -> 逻辑计划）
+1. Parsed Logical Plan:     SQL 解析后的原始逻辑计划（AST -> 逻辑计划）
 
-### 2. Analyzed Logical Plan:   绑定元数据后的逻辑计划（解析表名、列名、类型）
+2. Analyzed Logical Plan:   绑定元数据后的逻辑计划（解析表名、列名、类型）
 
-### 3. Optimized Logical Plan:  规则优化后的逻辑计划（谓词下推、常量折叠等）
+3. Optimized Logical Plan:  规则优化后的逻辑计划（谓词下推、常量折叠等）
 
-### 4. Physical Plan:           物理执行计划（具体的 JOIN 策略、扫描方式等）
+4. Physical Plan:           物理执行计划（具体的 JOIN 策略、扫描方式等）
 
 
  设计分析: Catalyst 优化器的分层架构

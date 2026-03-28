@@ -172,15 +172,15 @@ Snowflake:  TRY_CAST                 | SQL Server: TRY_CAST
 ## 9. 对引擎开发者的启示
 
 
-### 1. TRY_CAST/SAFE_CAST 是最高优先级的容错功能 — 批处理作业不应因一行坏数据失败
+1. TRY_CAST/SAFE_CAST 是最高优先级的容错功能 — 批处理作业不应因一行坏数据失败
 
-### 2. IF EXISTS/IF NOT EXISTS 是最基本的错误预防 — 必须支持
+2. IF EXISTS/IF NOT EXISTS 是最基本的错误预防 — 必须支持
 
-### 3. 错误码体系应该结构化（ODPS-0120006 比"syntax error"更可定位）
+3. 错误码体系应该结构化（ODPS-0120006 比"syntax error"更可定位）
 
-### 4. BigQuery 的 BEGIN...EXCEPTION 证明批处理引擎可以支持异常处理
+4. BigQuery 的 BEGIN...EXCEPTION 证明批处理引擎可以支持异常处理
 
-### 5. Staging → Validate → Publish 模式是批处理的"应用层事务"
+5. Staging → Validate → Publish 模式是批处理的"应用层事务"
 
-### 6. 详细的错误信息（含行号、列名、数据值）极大加速调试
+6. 详细的错误信息（含行号、列名、数据值）极大加速调试
 

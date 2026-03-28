@@ -130,15 +130,15 @@ ORDER BY keyword_count DESC;
 
 
  阿里云生态中的全文搜索方案:
-### 1. Elasticsearch (阿里云 ES): 最通用的全文搜索引擎
+1. Elasticsearch (阿里云 ES): 最通用的全文搜索引擎
 
       MaxCompute → DataWorks 同步 → Elasticsearch → 搜索 API
 
-### 2. OpenSearch (阿里云开放搜索): 托管搜索服务
+2. OpenSearch (阿里云开放搜索): 托管搜索服务
 
       MaxCompute → Tunnel/DataWorks → OpenSearch → 搜索 API
 
-### 3. Hologres: 阿里云实时分析引擎，支持全文搜索
+3. Hologres: 阿里云实时分析引擎，支持全文搜索
 
       MaxCompute → Hologres 外部表 → 在 Hologres 中搜索
 
@@ -164,15 +164,15 @@ MaxCompute: 不支持    | Hive: 不支持
 ## 8. 对引擎开发者的启示
 
 
-### 1. 全文搜索与 OLAP 分析是不同的问题域 — 不应勉强合并
+1. 全文搜索与 OLAP 分析是不同的问题域 — 不应勉强合并
 
-### 2. BigQuery 的搜索索引是有限但实用的折中: 不是全功能搜索，但加速 LIKE
+2. BigQuery 的搜索索引是有限但实用的折中: 不是全功能搜索，但加速 LIKE
 
-### 3. ClickHouse 的 ngram bloom filter 是另一种折中: 低成本过滤明确不匹配的数据块
+3. ClickHouse 的 ngram bloom filter 是另一种折中: 低成本过滤明确不匹配的数据块
 
-### 4. 如果引擎有列式存储: 字符串列的 min/max 统计可以优化前缀搜索
+4. 如果引擎有列式存储: 字符串列的 min/max 统计可以优化前缀搜索
 
-### 5. 正确的架构是: OLAP 引擎做分析 + 外部搜索引擎做搜索（各司其职）
+5. 正确的架构是: OLAP 引擎做分析 + 外部搜索引擎做搜索（各司其职）
 
-### 6. 如果必须内置: 分区级的倒排索引是可行的折中（限制在分区范围内）
+6. 如果必须内置: 分区级的倒排索引是可行的折中（限制在分区范围内）
 

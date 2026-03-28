@@ -284,7 +284,7 @@ FETCH NEXT 20 ROWS WITH TIES;
 
 ## 对引擎开发者的实现分析
 
-### 1. 排序后的 Peek-Ahead 逻辑
+1. 排序后的 Peek-Ahead 逻辑
 
 WITH TIES 的核心实现是在达到 N 行限制后，继续"偷看"后续行是否与第 N 行的 ORDER BY 值相同：
 
@@ -313,7 +313,7 @@ while (row = next_row()):
 - 如果 ORDER BY 有多个列，所有列都必须相同才算并列
 - NULL 的比较行为遵循 ORDER BY 的 NULLS FIRST/LAST 规则
 
-### 2. 执行计划
+2. 执行计划
 
 ```
 TableScan → Sort(ORDER BY score DESC) → LimitWithTies(N=3) → Project
@@ -324,7 +324,7 @@ LimitWithTies 算子:
 - 下游算子（如 OFFSET）需要在 LimitWithTies 之后
 ```
 
-### 3. OFFSET + WITH TIES 的语义
+3. OFFSET + WITH TIES 的语义
 
 ```sql
 OFFSET 5 ROWS FETCH NEXT 3 ROWS WITH TIES
@@ -337,7 +337,7 @@ OFFSET 5 ROWS FETCH NEXT 3 ROWS WITH TIES
 
 注意：OFFSET 跳过时**不考虑并列**——如果第 5 行和第 6 行同分，第 5 行仍被跳过。
 
-### 4. PERCENT 的实现
+4. PERCENT 的实现
 
 ```sql
 FETCH FIRST 10 PERCENT ROWS ONLY
@@ -363,7 +363,7 @@ FETCH FIRST 10 PERCENT ROWS ONLY
 
 多数引擎使用方案 2，因为排序本身就需要物化。
 
-### 5. WITH TIES + PERCENT 组合
+5. WITH TIES + PERCENT 组合
 
 ```sql
 FETCH FIRST 10 PERCENT ROWS WITH TIES
@@ -374,7 +374,7 @@ SQL Server 支持这种组合。语义是：
 2. 取前 N 行
 3. 如果第 N 行有并列，继续输出
 
-### 6. 优化机会
+6. 优化机会
 
 ```
 普通 LIMIT N: 排序算法可以使用 Top-N 排序（堆排序），O(N) 空间

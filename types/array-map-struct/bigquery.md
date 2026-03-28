@@ -354,15 +354,15 @@ SELECT JSON_VALUE_ARRAY(data, '$.tags') FROM logs;    -- 转为 STRING ARRAY
 ## 注意事项
 
 
-### 1. BigQuery 原生支持 ARRAY 和 STRUCT
+1. BigQuery 原生支持 ARRAY 和 STRUCT
 
-### 2. 不支持原生 MAP 类型（用 ARRAY<STRUCT<key,value>> 替代）
+2. 不支持原生 MAP 类型（用 ARRAY<STRUCT<key,value>> 替代）
 
-### 3. 不支持 ARRAY<ARRAY<...>>（嵌套数组）
+3. 不支持 ARRAY<ARRAY<...>>（嵌套数组）
 
-### 4. ARRAY 下标从 0 开始 (OFFSET) 或从 1 开始 (ORDINAL)
+4. ARRAY 下标从 0 开始 (OFFSET) 或从 1 开始 (ORDINAL)
 
-### 5. UNNEST 是处理数组的核心操作
+5. UNNEST 是处理数组的核心操作
 
-### 6. JSON 类型提供额外的灵活性
+6. JSON 类型提供额外的灵活性
 

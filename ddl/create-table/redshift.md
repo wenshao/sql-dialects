@@ -224,16 +224,16 @@ VARCHAR 最大 65535 字节（不是字符）— 无 TEXT 类型
 
 ## 6. 版本演进
 
-2012:    Redshift 发布（基于 ParAccel / PostgreSQL 8.0.2）
-2017:    Redshift Spectrum (S3 外部表)
-2018:    弹性扩缩容(Elastic Resize)，自动 WLM
-2019:    AQUA（高级查询加速器），自动物化视图
-2020:    SUPER 类型，联邦查询(Federated Query)
-2021:    RA3 节点（存算分离），数据共享(Data Sharing)
-2022:    Redshift Serverless GA，流式摄入(Streaming Ingestion)
-2023:    零 ETL 集成（Aurora→Redshift），多数据仓库写入
-2024:    AI 驱动的自动优化，零 ETL 扩展到 DynamoDB
-2025:    多集群自动扩缩，增强的半结构化数据处理
+- **2012**: Redshift 发布（基于 ParAccel / PostgreSQL 8.0.2）
+- **2017**: Redshift Spectrum (S3 外部表)
+- **2018**: 弹性扩缩容(Elastic Resize)，自动 WLM
+- **2019**: AQUA（高级查询加速器），自动物化视图
+- **2020**: SUPER 类型，联邦查询(Federated Query)
+- **2021**: RA3 节点（存算分离），数据共享(Data Sharing)
+- **2022**: Redshift Serverless GA，流式摄入(Streaming Ingestion)
+- **2023**: 零 ETL 集成（Aurora→Redshift），多数据仓库写入
+- **2024**: AI 驱动的自动优化，零 ETL 扩展到 DynamoDB
+- **2025**: 多集群自动扩缩，增强的半结构化数据处理
 
 ## 7. 横向对比: Redshift vs 其他 OLAP 引擎
 

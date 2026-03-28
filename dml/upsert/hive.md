@@ -64,9 +64,9 @@ WHEN NOT MATCHED THEN INSERT VALUES (s.id, s.username, s.email);
 
  MERGE 的内部实现:
  MERGE 被编译为一个 FULL OUTER JOIN + 条件路由:
-### 1. 匹配的行 → WHEN MATCHED 分支 → UPDATE (delete delta + insert delta) 或 DELETE
+1. 匹配的行 → WHEN MATCHED 分支 → UPDATE (delete delta + insert delta) 或 DELETE
 
-### 2. 不匹配的行 → WHEN NOT MATCHED → INSERT (insert delta)
+2. 不匹配的行 → WHEN NOT MATCHED → INSERT (insert delta)
 
  整个 MERGE 是一个原子操作（一个隐式事务）
 
@@ -160,14 +160,14 @@ WHEN NOT MATCHED THEN
 
 ## 5. 对引擎开发者的启示
 
-### 1. MERGE 是最通用的 UPSERT 语法: SQL 标准兼容，支持 UPDATE+DELETE+INSERT
+1. MERGE 是最通用的 UPSERT 语法: SQL 标准兼容，支持 UPDATE+DELETE+INSERT
 
-### 2. MERGE 的实现本质是 JOIN + 条件路由: 优化器需要高效处理大表 JOIN
+2. MERGE 的实现本质是 JOIN + 条件路由: 优化器需要高效处理大表 JOIN
 
-### 3. 非 ACID UPSERT 的 INSERT OVERWRITE 模式仍然有效:
+3. 非 ACID UPSERT 的 INSERT OVERWRITE 模式仍然有效:
 
     对于批处理 ETL，全量重写的幂等性比行级 MERGE 更可靠
-### 4. UPSERT 需要"匹配键": MERGE 的 ON 条件 / ON CONFLICT 的约束列
+4. UPSERT 需要"匹配键": MERGE 的 ON 条件 / ON CONFLICT 的约束列
 
 Hive 没有主键强制执行，用户需要自行保证匹配键的唯一性
 

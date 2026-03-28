@@ -218,15 +218,15 @@ SQL Server: TRY_CAST         | PostgreSQL: 不支持
 ## 9. 对引擎开发者的启示
 
 
-### 1. TRY_CAST/SAFE_CAST 是数据工程的刚需 — 一条脏数据不应杀死整个作业
+1. TRY_CAST/SAFE_CAST 是数据工程的刚需 — 一条脏数据不应杀死整个作业
 
-### 2. IF 函数虽非标准但使用率极高 — 值得作为 CASE WHEN 的语法糖支持
+2. IF 函数虽非标准但使用率极高 — 值得作为 CASE WHEN 的语法糖支持
 
-### 3. NVL/DECODE 等 Oracle 兼容函数降低了迁移成本 — 值得投资
+3. NVL/DECODE 等 Oracle 兼容函数降低了迁移成本 — 值得投资
 
-### 4. GREATEST/LEAST 的 NULL 处理语义应该与生态主流保持一致
+4. GREATEST/LEAST 的 NULL 处理语义应该与生态主流保持一致
 
-### 5. 条件函数是 SQL 中使用频率最高的函数族 — 性能优化优先级高
+5. 条件函数是 SQL 中使用频率最高的函数族 — 性能优化优先级高
 
-### 6. CASE WHEN 的短路求值（短路评估）行为应明确文档化
+6. CASE WHEN 的短路求值（短路评估）行为应明确文档化
 

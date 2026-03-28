@@ -295,7 +295,7 @@ SELECT flatten(ARRAY[ARRAY[1,2], ARRAY[3,4]]);
 
 ## 对引擎开发者的实现分析
 
-### 1. Parser 扩展: 箭头函数语法
+1. Parser 扩展: 箭头函数语法
 
 需要在 SQL parser 中识别 Lambda 表达式：
 
@@ -312,7 +312,7 @@ Lambda 语法:
 需要 lookahead: 遇到 identifier 后检查下一个 token 是否是 ->
 ```
 
-### 2. 类型推断
+2. 类型推断
 
 Lambda 表达式的参数类型来自调用上下文：
 
@@ -333,7 +333,7 @@ arrayFilter(x -> length(x) > 3, ['hello', 'hi'])
 - 支持泛型高阶函数签名: `transform(ARRAY<T>, T -> U) -> ARRAY<U>`
 - 错误消息要友好: "Lambda 参数 x 的类型无法推断"
 
-### 3. 闭包作用域
+3. 闭包作用域
 
 Lambda 表达式可以引用外部作用域的变量：
 
@@ -347,7 +347,7 @@ SELECT arrayMap(x -> x * factor, values) FROM config;
 - Lambda 体中的标识符解析优先级: Lambda 参数 > 外部列引用 > 函数名
 - 禁止 Lambda 参数遮蔽（shadowing）外部列名（或至少给出警告）
 
-### 4. 执行模型
+4. 执行模型
 
 ```
 高阶函数执行流程（以 arrayMap 为例）:
@@ -365,7 +365,7 @@ SELECT arrayMap(x -> x * factor, values) FROM config;
 - 对于简单 Lambda（如 `x -> x * 2`），可以编译为向量化操作
 - 避免每次调用创建新的表达式求值上下文
 
-### 5. reduce/aggregate 的特殊性
+5. reduce/aggregate 的特殊性
 
 `reduce` 是最强大也最复杂的高阶函数：
 
@@ -378,7 +378,7 @@ reduce(array, initial_state, (state, element) -> new_state, state -> result)
 - 终结函数可选（有些引擎不支持）
 - 不能并行化（有数据依赖）
 
-### 6. 与 SQL 标准的关系
+6. 与 SQL 标准的关系
 
 SQL 标准（截至 SQL:2023）没有定义 Lambda 表达式。各引擎的实现是事实标准。标准化的障碍在于：
 

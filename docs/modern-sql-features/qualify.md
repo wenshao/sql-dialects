@@ -132,7 +132,7 @@ WHERE e.salary = (
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 QUALIFY 作为 SELECT 语句的一个新子句，在 parser 中位于 HAVING 之后、ORDER BY 之前：
 
@@ -142,13 +142,13 @@ SELECT ... FROM ... WHERE ... GROUP BY ... HAVING ... QUALIFY ... ORDER BY ... L
 
 需要在 AST 的 SelectStatement 节点中新增 `qualify` 字段，类型与 `where`、`having` 相同（表达式节点）。
 
-### 2. 语义分析
+2. 语义分析
 
 - QUALIFY 中的表达式**必须**包含至少一个窗口函数调用（直接或通过别名引用）
 - 是否允许引用 SELECT 列别名？建议允许——Snowflake、DuckDB 都允许，用户体验更好
 - QUALIFY 中不能包含聚合函数（除非嵌套在窗口函数内）
 
-### 3. 执行计划
+3. 执行计划
 
 QUALIFY 在执行计划中的位置非常直观：
 
@@ -168,13 +168,13 @@ TableScan
 2. QUALIFY Filter 节点对窗口函数结果做过滤
 3. 过滤后的行传给下游（ORDER BY / LIMIT）
 
-### 4. 优化器考量
+4. 优化器考量
 
 - **谓词下推**: QUALIFY 中的条件**不能**下推到 WHERE——因为窗口函数需要全量数据才能计算
 - **投影裁剪**: 如果 QUALIFY 引用的窗口函数不在 SELECT 列表中，计算后可以裁剪
 - **窗口函数合并**: 如果 QUALIFY 和 SELECT 中有相同的窗口函数定义，应合并为一次计算
 
-### 5. 无 QUALIFY 时的自动改写
+5. 无 QUALIFY 时的自动改写
 
 如果引擎要做 MySQL/PostgreSQL 兼容层，可以在 planner 阶段自动将 QUALIFY 改写为子查询：
 

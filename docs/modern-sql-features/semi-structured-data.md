@@ -357,7 +357,7 @@ CREATE INDEX idx_user ON events (JSON_VALUE(data, '$.user'));
 
 ## 对引擎开发者的实现建议
 
-### 1. 存储格式选择
+1. 存储格式选择
 
 ```
 选项 A: 二进制 JSON (PostgreSQL JSONB 方式)
@@ -376,7 +376,7 @@ CREATE INDEX idx_user ON events (JSON_VALUE(data, '$.user'));
 └── 适合: 需要同时支持 ETL 和分析的场景
 ```
 
-### 2. 类型系统集成
+2. 类型系统集成
 
 半结构化类型需要与现有类型系统深度集成：
 
@@ -384,7 +384,7 @@ CREATE INDEX idx_user ON events (JSON_VALUE(data, '$.user'));
 - NULL 语义（JSON null vs SQL NULL 是不同概念）
 - 比较语义（两个 JSON 对象如何比较大小？key 顺序是否影响相等性？）
 
-### 3. 查询优化
+3. 查询优化
 
 ```
 -- 关键优化: JSON 路径下推

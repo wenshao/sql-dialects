@@ -50,7 +50,7 @@
 
 按"兼容引擎最容易忽略"排序：
 
-### 1. :: 类型转换运算符（parser 需要特殊处理）
+1. :: 类型转换运算符（parser 需要特殊处理）
 
 详见 [functions/type-conversion/postgres.sql](../functions/type-conversion/postgres.sql)
 
@@ -61,7 +61,7 @@
 - 部分引擎选择在 parser 层将 `::` 重写为 `CAST()`，实现相对简单
 - 还需处理 `::type[]` 数组类型转换（如 `'{1,2,3}'::int[]`）
 
-### 2. $$ dollar quoting（函数体边界）
+2. $$ dollar quoting（函数体边界）
 
 详见 [advanced/stored-procedures/postgres.sql](../advanced/stored-procedures/postgres.sql)
 
@@ -71,7 +71,7 @@
 - 嵌套 dollar quoting 在动态 SQL 中常见（函数体内生成 SQL 再用不同标签）
 - 不支持 dollar quoting 的引擎需要提供替代的函数体定界方案
 
-### 3. SERIAL vs IDENTITY（SERIAL 创建隐式 SEQUENCE）
+3. SERIAL vs IDENTITY（SERIAL 创建隐式 SEQUENCE）
 
 详见 [ddl/sequences/postgres.sql](../ddl/sequences/postgres.sql)
 
@@ -82,7 +82,7 @@
 - 迁移工具（pg_dump）导出 SERIAL 列时，序列的 owner 和 current value 要正确处理
 - **兼容建议**: 优先支持 IDENTITY，SERIAL 作为兼容层，内部转换为 IDENTITY
 
-### 4. DDL 是事务性的（可回滚 CREATE TABLE — 实现复杂度高）
+4. DDL 是事务性的（可回滚 CREATE TABLE — 实现复杂度高）
 
 详见 [advanced/transactions/postgres.sql](../advanced/transactions/postgres.sql)
 
@@ -93,7 +93,7 @@
 - 分布式引擎（CockroachDB、YugabyteDB）通过分布式事务实现，但有限制
 - **注意**: 部分 DDL 不能在事务中执行（CREATE DATABASE、CREATE/DROP TABLESPACE）
 
-### 5. MVCC 元组版本化（vs undo log — VACUUM 需求）
+5. MVCC 元组版本化（vs undo log — VACUUM 需求）
 
 详见 [advanced/transactions/postgres.sql](../advanced/transactions/postgres.sql)、[advanced/locking/postgres.sql](../advanced/locking/postgres.sql)
 
@@ -104,7 +104,7 @@
 - 兼容引擎不需要复制此架构，但需要理解用户对 VACUUM 相关参数的配置预期
 - 相关系统列（ctid、xmin、xmax）与 MVCC 实现紧耦合
 
-### 6. RETURNING 子句在所有 DML 上（INSERT/UPDATE/DELETE/MERGE）
+6. RETURNING 子句在所有 DML 上（INSERT/UPDATE/DELETE/MERGE）
 
 详见 [dml/insert/postgres.sql](../dml/insert/postgres.sql)、[dml/update/postgres.sql](../dml/update/postgres.sql)、[dml/delete/postgres.sql](../dml/delete/postgres.sql)
 
@@ -115,7 +115,7 @@
 - 不支持 RETURNING 会导致 ORM 退化为两次查询（INSERT + SELECT），性能下降
 - **兼容建议**: 至少在 INSERT 上支持 RETURNING，这是最高频的使用场景
 
-### 7. 类型严格（不允许隐式转换 — 从 MySQL 迁移的用户会不适应）
+7. 类型严格（不允许隐式转换 — 从 MySQL 迁移的用户会不适应）
 
 详见 [types/numeric/postgres.sql](../types/numeric/postgres.sql)、[types/string/postgres.sql](../types/string/postgres.sql)
 
@@ -126,7 +126,7 @@
 - 从 MySQL 迁移的用户最常遇到的问题，迁移文档中需要重点说明
 - **注意**: PG 的运算符重载依赖类型严格性，放松类型检查可能导致歧义
 
-### 8. OID / system columns（ctid, xmin, xmax — 内部实现暴露）
+8. OID / system columns（ctid, xmin, xmax — 内部实现暴露）
 
 详见 [ddl/create-table/postgres.sql](../ddl/create-table/postgres.sql)
 
@@ -137,7 +137,7 @@
 - 兼容引擎需要决定是否暴露这些列——不暴露可能破坏部分 SQL 和工具
 - **兼容建议**: `ctid` 影响面最大，建议至少提供语义等价物（如内部 rowid）
 
-### 9. NOTIFY/LISTEN（pub-sub — 需要连接管理）
+9. NOTIFY/LISTEN（pub-sub — 需要连接管理）
 
 详见 [advanced/stored-procedures/postgres.sql](../advanced/stored-procedures/postgres.sql)
 
@@ -148,7 +148,7 @@
 - 分布式引擎实现跨节点通知复杂度高
 - **兼容建议**: 大多数兼容引擎选择不实现，但需要在文档中说明替代方案
 
-### 10. search_path（schema 解析顺序 — 安全风险 + 功能）
+10. search_path（schema 解析顺序 — 安全风险 + 功能）
 
 详见 [ddl/users-databases/postgres.sql](../ddl/users-databases/postgres.sql)
 

@@ -198,14 +198,14 @@ Schema 变更是长事务: 后台滚动更新，不锁表但需要时间
 
 ## 版本演进
 
-2012:    Spanner 论文发表（Google 内部已使用多年）
-2017:    Cloud Spanner GA（对外公开服务）
-2020:    JSON 类型支持
-2021:    PostgreSQL 接口（预览），NUMERIC 类型
-2022:    JSON 增强，细粒度 IAM
-2023:    Bit-reversed sequences, THEN RETURN (DML 返回结果)
-2024:    Sequence 增强, Graph 查询（预览），向量搜索（预览）
-2025:    PostgreSQL 接口 GA，性能改进
+- **2012**: Spanner 论文发表（Google 内部已使用多年）
+- **2017**: Cloud Spanner GA（对外公开服务）
+- **2020**: JSON 类型支持
+- **2021**: PostgreSQL 接口（预览），NUMERIC 类型
+- **2022**: JSON 增强，细粒度 IAM
+- **2023**: Bit-reversed sequences, THEN RETURN (DML 返回结果)
+- **2024**: Sequence 增强, Graph 查询（预览），向量搜索（预览）
+- **2025**: PostgreSQL 接口 GA，性能改进
 
 ## 横向对比: Spanner vs 其他引擎
 

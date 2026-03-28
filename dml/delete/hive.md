@@ -10,9 +10,9 @@
 ## 1. Hive DELETE 的两个世界
 
  Hive 的数据删除存在两种完全不同的机制:
-### 1. ACID 表: 行级 DELETE（0.14+），通过 delete delta 文件实现
+1. ACID 表: 行级 DELETE（0.14+），通过 delete delta 文件实现
 
-### 2. 非 ACID 表: 无行级 DELETE，只能 DROP PARTITION 或 INSERT OVERWRITE 过滤
+2. 非 ACID 表: 无行级 DELETE，只能 DROP PARTITION 或 INSERT OVERWRITE 过滤
 
 
  这一分裂源于 Hive 的存储设计:
@@ -105,17 +105,17 @@ TRUNCATE TABLE events PARTITION (dt='2024-01-15');
 
 ## 4. 已知限制
 
-### 1. DELETE 仅限 ACID 表（ORC + transactional=true）
+1. DELETE 仅限 ACID 表（ORC + transactional=true）
 
-### 2. 不支持多表 JOIN 删除: DELETE FROM a JOIN b ON ... 不可用
+2. 不支持多表 JOIN 删除: DELETE FROM a JOIN b ON ... 不可用
 
-### 3. 不支持 ORDER BY / LIMIT: 不能 DELETE ... ORDER BY id LIMIT 10
+3. 不支持 ORDER BY / LIMIT: 不能 DELETE ... ORDER BY id LIMIT 10
 
-### 4. 分区列不能作为 DELETE 条件: 分区是目录，用 DROP PARTITION 删除
+4. 分区列不能作为 DELETE 条件: 分区是目录，用 DROP PARTITION 删除
 
-### 5. 外部表不能 DELETE: 外部表不支持 ACID
+5. 外部表不能 DELETE: 外部表不支持 ACID
 
-### 6. 不支持 RETURNING 子句: 不能返回被删除的行
+6. 不支持 RETURNING 子句: 不能返回被删除的行
 
 
 ## 5. 跨引擎对比: 删除设计
@@ -136,15 +136,15 @@ TRUNCATE TABLE events PARTITION (dt='2024-01-15');
 
 ## 6. 对引擎开发者的启示
 
-### 1. 不可变存储 + 删除标记是大数据 DELETE 的标准范式:
+1. 不可变存储 + 删除标记是大数据 DELETE 的标准范式:
 
     Hive/Delta/Iceberg 都用 delete delta/delete files 实现 DELETE
-### 2. DROP PARTITION 是最高效的"删除": 只删目录和元数据，零 I/O
+2. DROP PARTITION 是最高效的"删除": 只删目录和元数据，零 I/O
 
-### 3. GDPR/数据合规驱动了大数据引擎的 DELETE 需求:
+3. GDPR/数据合规驱动了大数据引擎的 DELETE 需求:
 
     行级 DELETE 的需求来自"被遗忘权"等法规要求
-### 4. DELETE 的写入放大问题: 行级 DELETE 需要读取原始数据来确定要删除的行，
+4. DELETE 的写入放大问题: 行级 DELETE 需要读取原始数据来确定要删除的行，
 
 然后写入删除标记——这在 TB 级表上代价很大
 

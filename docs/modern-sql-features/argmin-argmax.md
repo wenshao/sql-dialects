@@ -189,7 +189,7 @@ INNER JOIN (
 
 ## 对引擎开发者的实现建议
 
-### 1. 聚合框架中的 Accumulator
+1. 聚合框架中的 Accumulator
 
 ARG_MIN/ARG_MAX 本质上是一种特殊的聚合函数，需要在聚合框架中新增一种 accumulator：
 
@@ -217,13 +217,13 @@ ArgMaxAccumulator<V, K> {
 }
 ```
 
-### 2. 类型系统
+2. 类型系统
 
 - 返回值类型 = 第一个参数的类型
 - 排序键类型 = 第二个参数的类型（必须支持比较运算）
 - NULL 处理: 当排序键为 NULL 时应跳过该行（与 MIN/MAX 忽略 NULL 的行为一致）
 
-### 3. 分布式执行
+3. 分布式执行
 
 在分布式环境中，ARG_MAX 可以正确地做两阶段聚合：
 
@@ -237,7 +237,7 @@ merge: 比较各 partial 的 current_key，取最大者的 current_value
 
 这比窗口函数方案高效得多——窗口函数需要 shuffle + 排序，而 ARG_MAX 只需要聚合。
 
-### 4. N 参数扩展
+4. N 参数扩展
 
 Snowflake/Trino 支持 `MAX_BY(val, key, N)` 返回 Top-N，实现方式：
 
@@ -245,7 +245,7 @@ Snowflake/Trino 支持 `MAX_BY(val, key, N)` 返回 Top-N，实现方式：
 - merge 时合并两个堆，保留 Top-N
 - 结果返回数组类型
 
-### 5. 并列值处理
+5. 并列值处理
 
 当多行的排序键相同时，返回哪一行的值？各引擎行为不同：
 

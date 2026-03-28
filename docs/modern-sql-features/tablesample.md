@@ -253,7 +253,7 @@ SELECT * FROM users TABLESAMPLE BERNOULLI(5) REPEATABLE(12345);
 
 ## 用例
 
-### 1. 大表快速统计估算
+1. 大表快速统计估算
 
 ```sql
 -- 1亿行的订单表，精确 COUNT DISTINCT 太慢
@@ -265,7 +265,7 @@ SELECT
 FROM orders TABLESAMPLE BERNOULLI(1);
 ```
 
-### 2. 数据探索
+2. 数据探索
 
 ```sql
 -- 数据分析师快速了解数据分布
@@ -275,7 +275,7 @@ GROUP BY status
 ORDER BY cnt DESC;
 ```
 
-### 3. 测试数据集提取
+3. 测试数据集提取
 
 ```sql
 -- 从生产表提取可重复的测试数据
@@ -285,7 +285,7 @@ SELECT * FROM production.orders TABLESAMPLE BERNOULLI(0.1) REPEATABLE(42);
 
 ## 对引擎开发者的实现建议
 
-### 1. BERNOULLI 实现
+1. BERNOULLI 实现
 
 行级概率过滤，实现最简单：
 
@@ -305,7 +305,7 @@ BernoulliSampleScan {
 
 关键点：必须扫描全表，无法跳过 I/O。优化器不应将 BERNOULLI 采样推到存储层做 I/O 裁剪。
 
-### 2. SYSTEM 实现
+2. SYSTEM 实现
 
 块级跳过，可大幅减少 I/O：
 
@@ -331,7 +331,7 @@ SystemSampleScan {
 
 关键点：需要存储层支持块级跳过（skip_block），否则退化为 BERNOULLI。
 
-### 3. 与优化器的交互
+3. 与优化器的交互
 
 ```
 -- 采样对统计信息的影响
@@ -350,7 +350,7 @@ SELECT * FROM t TABLESAMPLE BERNOULLI(10) WHERE x > 100
 -- 但优化器可以选择先做谓词下推再采样（语义等价当采样是行独立的）
 ```
 
-### 4. REPEATABLE 实现
+4. REPEATABLE 实现
 
 ```
 -- 使用 seed 初始化伪随机数生成器

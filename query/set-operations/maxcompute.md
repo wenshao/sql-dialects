@@ -207,15 +207,15 @@ EXCEPT ALL:      MaxCompute 2.0+ | PostgreSQL: 支持 | MySQL: 不支持
 ## 9. 对引擎开发者的启示
 
 
-### 1. UNION ALL 应该是最基本的操作 — 零开销追加
+1. UNION ALL 应该是最基本的操作 — 零开销追加
 
-### 2. 集合操作可以复用 JOIN 的基础设施（Hash/Sort）
+2. 集合操作可以复用 JOIN 的基础设施（Hash/Sort）
 
-### 3. MINUS/EXCEPT 双关键字支持有利于 Oracle 用户迁移
+3. MINUS/EXCEPT 双关键字支持有利于 Oracle 用户迁移
 
-### 4. INTERSECT/EXCEPT ALL 使用频率低但标准兼容性要求支持
+4. INTERSECT/EXCEPT ALL 使用频率低但标准兼容性要求支持
 
-### 5. 大数据量下建议 UNION ALL + 手动去重 代替 UNION DISTINCT（更可控）
+5. 大数据量下建议 UNION ALL + 手动去重 代替 UNION DISTINCT（更可控）
 
-### 6. 集合操作的列数和类型匹配检查应在编译期完成
+6. 集合操作的列数和类型匹配检查应在编译期完成
 

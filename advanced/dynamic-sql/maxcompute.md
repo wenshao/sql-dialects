@@ -155,15 +155,15 @@ Snowflake:  Snowflake Tasks      | Hive: Oozie/Airflow 参数
 ## 8. 对引擎开发者的启示
 
 
-### 1. BigQuery 的 EXECUTE IMMEDIATE 证明了批处理引擎可以支持动态 SQL
+1. BigQuery 的 EXECUTE IMMEDIATE 证明了批处理引擎可以支持动态 SQL
 
-### 2. 变量系统应支持查询赋值（SET var = SELECT ...） — 否则价值有限
+2. 变量系统应支持查询赋值（SET var = SELECT ...） — 否则价值有限
 
-### 3. 调度层变量替换（文本宏展开）是简单但有效的动态 SQL 方案
+3. 调度层变量替换（文本宏展开）是简单但有效的动态 SQL 方案
 
-### 4. 应用层 SDK 拼接是最灵活的方案 — 但需要防注入机制
+4. 应用层 SDK 拼接是最灵活的方案 — 但需要防注入机制
 
-### 5. 参数化查询（PREPARE/EXECUTE）可以防止注入 — 应优先支持
+5. 参数化查询（PREPARE/EXECUTE）可以防止注入 — 应优先支持
 
-### 6. 控制流（IF/WHILE）+ 动态 SQL = 完整的脚本能力（BigQuery 的方案）
+6. 控制流（IF/WHILE）+ 动态 SQL = 完整的脚本能力（BigQuery 的方案）
 

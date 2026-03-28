@@ -12,11 +12,11 @@
 ## 1. Hive 没有传统存储过程
 
  这是有意的设计选择:
-### 1. 批处理引擎: 存储过程假设低延迟的语句级别执行，Hive 每条 SQL 是一个 MR/Tez 作业
+1. 批处理引擎: 存储过程假设低延迟的语句级别执行，Hive 每条 SQL 是一个 MR/Tez 作业
 
-### 2. 无状态执行: Hive 编译 SQL → DAG → 提交到 YARN，没有持久的服务端会话状态
+2. 无状态执行: Hive 编译 SQL → DAG → 提交到 YARN，没有持久的服务端会话状态
 
-### 3. 编排在外部: ETL 流水线由 Airflow/Oozie 等调度工具编排，不需要 SQL 过程式逻辑
+3. 编排在外部: ETL 流水线由 Airflow/Oozie 等调度工具编排，不需要 SQL 过程式逻辑
 
 
  替代方案体系:
@@ -170,11 +170,11 @@ SELECT TRANSFORM(line) USING '/bin/cat' AS (output STRING) FROM raw_data;
  设计分析: TRANSFORM 的价值
  TRANSFORM 允许用任意语言实现数据处理逻辑（Python/R/Shell），
  这比 Java UDF 的开发成本低得多。但代价是:
-### 1. 性能: 进程间通信（序列化 → stdin → 外部进程 → stdout → 反序列化）
+1. 性能: 进程间通信（序列化 → stdin → 外部进程 → stdout → 反序列化）
 
-### 2. 可靠性: 外部脚本崩溃会导致整个 Task 失败
+2. 可靠性: 外部脚本崩溃会导致整个 Task 失败
 
-### 3. 部署: 脚本需要部署到所有节点上
+3. 部署: 脚本需要部署到所有节点上
 
 
 ## 6. Macro: 表达式别名 (Hive 0.12+)
@@ -215,13 +215,13 @@ DROP TEMPORARY MACRO IF EXISTS add_tax;
 
 ## 9. 对引擎开发者的启示
 
-### 1. UDF/UDAF/UDTF 三级接口是好的抽象: 覆盖了标量、聚合、展开三种场景
+1. UDF/UDAF/UDTF 三级接口是好的抽象: 覆盖了标量、聚合、展开三种场景
 
-### 2. TRANSFORM 是低门槛扩展的好设计: 允许用 Python 写 UDF 极大降低了学习曲线
+2. TRANSFORM 是低门槛扩展的好设计: 允许用 Python 写 UDF 极大降低了学习曲线
 
-### 3. 存储过程不是大数据引擎的必需: Hive 证明了外部编排可以替代存储过程
+3. 存储过程不是大数据引擎的必需: Hive 证明了外部编排可以替代存储过程
 
-### 4. LATERAL VIEW 是 UNNEST 的 Hive 方言: SQL 标准的 UNNEST 更简洁，
+4. LATERAL VIEW 是 UNNEST 的 Hive 方言: SQL 标准的 UNNEST 更简洁，
 
 但 LATERAL VIEW 的显式语法更清晰地表达了"展开+连接"的语义
 

@@ -190,29 +190,29 @@ SELECT info.personal.name, info.contact.email FROM profiles;
 
 ## 6. 已知限制
 
-### 1. 复合类型不能作为分区列
+1. 复合类型不能作为分区列
 
-### 2. COLLECT_LIST 大数据量可能 OOM（单个分组内存溢出）
+2. COLLECT_LIST 大数据量可能 OOM（单个分组内存溢出）
 
-### 3. ARRAY 索引从 0 开始（与字符串位置从 1 开始不一致）
+3. ARRAY 索引从 0 开始（与字符串位置从 1 开始不一致）
 
-### 4. MAP 的键不保证有序
+4. MAP 的键不保证有序
 
-### 5. TextFile 的复合类型序列化依赖分隔符配置（易出错）
+5. TextFile 的复合类型序列化依赖分隔符配置（易出错）
 
-### 6. ORC/Parquet 对复合类型支持最好
+6. ORC/Parquet 对复合类型支持最好
 
 
 ## 7. 对引擎开发者的启示
 
-### 1. 复合类型是处理半结构化数据的关键:
+1. 复合类型是处理半结构化数据的关键:
 
     Hive 的 ARRAY/MAP/STRUCT 让 SQL 可以直接操作嵌套数据
-### 2. LATERAL VIEW EXPLODE 是展开嵌套数据的标准模式:
+2. LATERAL VIEW EXPLODE 是展开嵌套数据的标准模式:
 
     SQL 标准的 UNNEST 更简洁，但 Hive 的语法更显式
-### 3. COLLECT_LIST/COLLECT_SET 是行→数组的逆操作:
+3. COLLECT_LIST/COLLECT_SET 是行→数组的逆操作:
 
     与 EXPLODE 配合形成了完整的嵌套数据处理闭环
-### 4. NAMED_STRUCT 比匿名 STRUCT 更安全: 按名称而非位置匹配字段
+4. NAMED_STRUCT 比匿名 STRUCT 更安全: 按名称而非位置匹配字段
 

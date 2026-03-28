@@ -67,13 +67,13 @@ DROP VIEW IF EXISTS active_users;
  设计分析: Hive 视图 vs RDBMS 视图
  Hive 视图的行为与传统 RDBMS 相似: 逻辑定义，查询时展开为子查询。
  但关键差异:
-### 1. 不可更新: Hive 视图不支持通过视图做 INSERT/UPDATE/DELETE
+1. 不可更新: Hive 视图不支持通过视图做 INSERT/UPDATE/DELETE
 
-### 2. 无 WITH CHECK OPTION: 因为不可更新所以不需要
+2. 无 WITH CHECK OPTION: 因为不可更新所以不需要
 
-### 3. 视图扩展发生在编译阶段: HiveQL → 视图展开 → 逻辑计划 → 优化 → 物理计划
+3. 视图扩展发生在编译阶段: HiveQL → 视图展开 → 逻辑计划 → 优化 → 物理计划
 
-### 4. 视图存储在 Metastore 中: 是跨引擎可见的（Spark/Trino 可以查询 Hive 视图）
+4. 视图存储在 Metastore 中: 是跨引擎可见的（Spark/Trino 可以查询 Hive 视图）
 
 
 ## 2. 物化视图 (Hive 3.0+)
@@ -128,21 +128,21 @@ ALTER MATERIALIZED VIEW mv_daily_revenue DISABLE REWRITE;
  SELECT dt, SUM(total_revenue) FROM mv_daily_revenue GROUP BY dt
 
  重写条件:
-### 1. 物化视图的查询可以包含源查询（子集匹配）
+1. 物化视图的查询可以包含源查询（子集匹配）
 
-### 2. 物化视图数据是最新的（或在可接受的过期范围内）
+2. 物化视图数据是最新的（或在可接受的过期范围内）
 
-### 3. 需要启用 hive.materializedview.rewriting = true
+3. 需要启用 hive.materializedview.rewriting = true
 
-### 4. 物化视图标记为 ENABLE REWRITE
+4. 物化视图标记为 ENABLE REWRITE
 
 
  局限性:
-### 1. 不自动刷新: 需要手动 REBUILD 或定时调度
+1. 不自动刷新: 需要手动 REBUILD 或定时调度
 
-### 2. 重建是全量重建: 不支持增量刷新（3.0 版本）
+2. 重建是全量重建: 不支持增量刷新（3.0 版本）
 
-### 3. 源表变更后物化视图变为 stale: 查询重写不使用过期的物化视图
+3. 源表变更后物化视图变为 stale: 查询重写不使用过期的物化视图
 
 
 ## 3. SHOW 命令
@@ -176,30 +176,30 @@ SHOW VIEWS LIKE 'mv_*';                     -- 模式匹配
 
 ## 5. 已知限制
 
-### 1. 视图不可更新: 不能通过视图 INSERT/UPDATE/DELETE
+1. 视图不可更新: 不能通过视图 INSERT/UPDATE/DELETE
 
-### 2. 物化视图只支持 ORC 格式（与 ACID 相同的限制）
+2. 物化视图只支持 ORC 格式（与 ACID 相同的限制）
 
-### 3. 物化视图不支持分区（3.0 版本）
+3. 物化视图不支持分区（3.0 版本）
 
-### 4. 自动查询重写的匹配能力有限: 只能匹配简单的聚合查询
+4. 自动查询重写的匹配能力有限: 只能匹配简单的聚合查询
 
-### 5. 物化视图 REBUILD 是全量重建，大数据量下代价高
+5. 物化视图 REBUILD 是全量重建，大数据量下代价高
 
-### 6. 查询重写需要 CBO 开启（Cost-Based Optimizer）
+6. 查询重写需要 CBO 开启（Cost-Based Optimizer）
 
 
 ## 6. 对引擎开发者的启示
 
-### 1. 物化视图是分析引擎的"索引替代": Hive 废弃索引后选择物化视图，
+1. 物化视图是分析引擎的"索引替代": Hive 废弃索引后选择物化视图，
 
     本质上是用"预计算结果"替代"数据定位"——分析查询的本质是聚合而非点查
-### 2. 自动查询重写是物化视图的核心价值: 没有自动重写的物化视图只是一个定时 CTAS
+2. 自动查询重写是物化视图的核心价值: 没有自动重写的物化视图只是一个定时 CTAS
 
-### 3. 增量刷新是物化视图的难点: 全量 REBUILD 的代价随数据量线性增长
+3. 增量刷新是物化视图的难点: 全量 REBUILD 的代价随数据量线性增长
 
     Hive 的全量 REBUILD 限制了物化视图在大表上的实用性
-### 4. 视图元数据的跨引擎共享: Hive 视图存储在 Metastore 中，
+4. 视图元数据的跨引擎共享: Hive 视图存储在 Metastore 中，
 
 Spark/Trino 可以直接使用——这是 Hive Metastore 作为元数据标准的价值
 

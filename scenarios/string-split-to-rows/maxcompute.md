@@ -112,13 +112,13 @@ BigQuery:   UNNEST(SPLIT(...))                  | PostgreSQL: UNNEST(STRING_TO_A
 Snowflake:  LATERAL FLATTEN(INPUT => SPLIT(...))| Presto: CROSS JOIN UNNEST(SPLIT(...))
 
  对引擎开发者:
-### 1. SPLIT + EXPLODE 组合是字符串拆分的标准方案 — 应高效实现
+1. SPLIT + EXPLODE 组合是字符串拆分的标准方案 — 应高效实现
 
-### 2. POSEXPLODE 是有价值的增强: 保留位置信息用于一一对应
+2. POSEXPLODE 是有价值的增强: 保留位置信息用于一一对应
 
-### 3. 多 LATERAL VIEW 的笛卡尔积行为需要文档明确说明
+3. 多 LATERAL VIEW 的笛卡尔积行为需要文档明确说明
 
-### 4. BigQuery 的 UNNEST(SPLIT()) 是最简洁的语法 — 值得参考
+4. BigQuery 的 UNNEST(SPLIT()) 是最简洁的语法 — 值得参考
 
-### 5. 正则分隔符支持（SPLIT(',\\s*')）减少了后续 TRIM 操作
+5. 正则分隔符支持（SPLIT(',\\s*')）减少了后续 TRIM 操作
 

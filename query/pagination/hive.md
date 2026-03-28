@@ -127,9 +127,9 @@ SELECT * FROM users WHERE id > 100 ORDER BY id LIMIT 10;
 ```
 
  键集分页的优势:
-### 1. 性能稳定: 不需要 OFFSET 跳过大量行
+1. 性能稳定: 不需要 OFFSET 跳过大量行
 
-### 2. 与 Hive 分区配合好: WHERE dt > '2024-01-15' ORDER BY dt LIMIT 10
+2. 与 Hive 分区配合好: WHERE dt > '2024-01-15' ORDER BY dt LIMIT 10
 
 
 ## 6. 大数据场景下的分页建议
@@ -154,26 +154,26 @@ SELECT * FROM users WHERE id > 100 ORDER BY id LIMIT 10;
 
 ## 8. 已知限制
 
-### 1. 不支持 FETCH FIRST ... ROWS ONLY（SQL 标准语法）
+1. 不支持 FETCH FIRST ... ROWS ONLY（SQL 标准语法）
 
-### 2. 不支持 TOP N（SQL Server 语法）
+2. 不支持 TOP N（SQL Server 语法）
 
-### 3. 不支持 LIMIT offset, count（MySQL 简写语法）
+3. 不支持 LIMIT offset, count（MySQL 简写语法）
 
-### 4. 不支持服务端游标 (DECLARE CURSOR)
+4. 不支持服务端游标 (DECLARE CURSOR)
 
-### 5. OFFSET 在 2.0 之前不可用
+5. OFFSET 在 2.0 之前不可用
 
 
 ## 9. 对引擎开发者的启示
 
-### 1. SORT BY/DISTRIBUTE BY 暴露了分布式执行模型:
+1. SORT BY/DISTRIBUTE BY 暴露了分布式执行模型:
 
     Hive 让用户直接控制 Shuffle 行为，这在 RDBMS 中不存在
-### 2. Top-K 优化是 ORDER BY + LIMIT 的必备:
+2. Top-K 优化是 ORDER BY + LIMIT 的必备:
 
     在分布式引擎中，全局排序是最昂贵的操作之一
-### 3. 键集分页比 OFFSET 分页更适合大数据:
+3. 键集分页比 OFFSET 分页更适合大数据:
 
 OFFSET 需要跳过大量行，键集分页直接定位到起始点
 

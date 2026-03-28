@@ -221,13 +221,13 @@ KILL QUERY WHERE query_id = 'query-id';
 
 ## 关键优化指标
 
-### 1. 主键过滤：ClickHouse MergeTree 通过主键跳过 granule
+1. 主键过滤：ClickHouse MergeTree 通过主键跳过 granule
 
-### 2. 分区裁剪：WHERE 条件匹配分区键
+2. 分区裁剪：WHERE 条件匹配分区键
 
-### 3. 预聚合：使用 AggregatingMergeTree 等
+3. 预聚合：使用 AggregatingMergeTree 等
 
-### 4. 向量化执行：Pipeline 中的并行处理器数量
+4. 向量化执行：Pipeline 中的并行处理器数量
 
 检查数据跳过效果
 

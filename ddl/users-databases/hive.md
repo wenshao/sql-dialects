@@ -69,11 +69,11 @@ DROP DATABASE analytics RESTRICT;           -- 非空则报错（默认）
    → 该数据库下的表存储在 /warehouse/analytics/table_name/ 子目录中
 
  这一设计意味着:
-### 1. 数据库级别的权限可以通过 HDFS 权限控制
+1. 数据库级别的权限可以通过 HDFS 权限控制
 
-### 2. 数据库隔离 = 目录隔离（物理隔离，非逻辑隔离）
+2. 数据库隔离 = 目录隔离（物理隔离，非逻辑隔离）
 
-### 3. 跨数据库查询 = 跨目录读取（对 HDFS 透明）
+3. 跨数据库查询 = 跨目录读取（对 HDFS 透明）
 
 
  Hive 的 Database ≠ Schema:
@@ -87,17 +87,17 @@ DROP DATABASE analytics RESTRICT;           -- 非空则报错（默认）
  HMS 仍然是 Hadoop 生态系统的元数据标准。
 
  HMS 存储的信息:
-### 1. 数据库定义（名称、位置、属性）
+1. 数据库定义（名称、位置、属性）
 
-### 2. 表定义（列、类型、SerDe、存储格式、位置）
+2. 表定义（列、类型、SerDe、存储格式、位置）
 
-### 3. 分区信息（分区值、位置、统计信息）
+3. 分区信息（分区值、位置、统计信息）
 
-### 4. 表/列级别统计信息（用于 CBO）
+4. 表/列级别统计信息（用于 CBO）
 
-### 5. 约束定义（PK/FK/UNIQUE/NOT NULL）
+5. 约束定义（PK/FK/UNIQUE/NOT NULL）
 
-### 6. UDF 注册信息
+6. UDF 注册信息
 
 
  HMS 的架构:
@@ -112,13 +112,13 @@ DROP DATABASE analytics RESTRICT;           -- 非空则报错（默认）
    都可以连接 HMS 读写表元数据。
 
  HMS 的性能瓶颈:
-### 1. 分区数量: 单表数万分区时，SHOW PARTITIONS / MSCK REPAIR TABLE 极慢
+1. 分区数量: 单表数万分区时，SHOW PARTITIONS / MSCK REPAIR TABLE 极慢
 
-### 2. 统计信息: ANALYZE TABLE 计算统计信息需要全表扫描
+2. 统计信息: ANALYZE TABLE 计算统计信息需要全表扫描
 
-### 3. 元数据锁: 多个引擎并发修改元数据时可能冲突
+3. 元数据锁: 多个引擎并发修改元数据时可能冲突
 
-### 4. 后端数据库: MySQL 作为 HMS 后端的连接数和查询性能限制
+4. 后端数据库: MySQL 作为 HMS 后端的连接数和查询性能限制
 
 
 ## 3. 权限管理
@@ -210,31 +210,31 @@ DROP FUNCTION IF EXISTS db.my_lower;
 
 ## 6. 已知限制
 
-### 1. 无 Schema 子级别: Hive 只有 database.table 两级，无法像 PG 那样 db.schema.table
+1. 无 Schema 子级别: Hive 只有 database.table 两级，无法像 PG 那样 db.schema.table
 
-### 2. 无 CREATE USER: 用户管理由 LDAP/Kerberos 等外部系统处理
+2. 无 CREATE USER: 用户管理由 LDAP/Kerberos 等外部系统处理
 
-### 3. HMS 单点问题: 虽然可以 HA 部署，但后端关系数据库仍是瓶颈
+3. HMS 单点问题: 虽然可以 HA 部署，但后端关系数据库仍是瓶颈
 
-### 4. 权限不跨引擎: Hive GRANT 的权限在 Spark/Trino 中不一定生效
+4. 权限不跨引擎: Hive GRANT 的权限在 Spark/Trino 中不一定生效
 
-### 5. 内置权限模型简陋: 无行级安全、无动态数据脱敏（需要 Ranger）
+5. 内置权限模型简陋: 无行级安全、无动态数据脱敏（需要 Ranger）
 
-### 6. CASCADE DROP 危险: DROP DATABASE CASCADE 会删除所有表及其数据
+6. CASCADE DROP 危险: DROP DATABASE CASCADE 会删除所有表及其数据
 
 
 ## 7. 对引擎开发者的启示
 
-### 1. Metastore 独立于查询引擎: Hive 最大的遗产不是 HiveQL，而是 HMS。
+1. Metastore 独立于查询引擎: Hive 最大的遗产不是 HiveQL，而是 HMS。
 
     设计引擎时，将元数据管理作为独立服务是正确的架构决策。
-### 2. 三级命名空间 (catalog.schema.table) 是更好的设计:
+2. 三级命名空间 (catalog.schema.table) 是更好的设计:
 
     Hive 两级命名空间在多租户场景下不够灵活
-### 3. 权限应该外部化: Hive 的经验表明，嵌入式权限管理不够强大，
+3. 权限应该外部化: Hive 的经验表明，嵌入式权限管理不够强大，
 
     生产环境总是需要 Ranger 这样的外部权限系统
-### 4. 元数据作为 API: HMS Thrift API 的成功说明，元数据服务的 API 设计
+4. 元数据作为 API: HMS Thrift API 的成功说明，元数据服务的 API 设计
 
 决定了生态系统的互操作性
 

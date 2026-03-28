@@ -81,11 +81,11 @@ SELECT * FROM global_temp.global_active_users;
 
  设计分析: 临时视图 vs 临时表
    Spark 选择"临时视图"而非"临时表"，根本原因:
-### 1. Spark 是计算引擎，不是存储引擎——视图只保存查询定义（逻辑计划），不物化数据
+1. Spark 是计算引擎，不是存储引擎——视图只保存查询定义（逻辑计划），不物化数据
 
-### 2. 临时视图的创建是瞬间的（仅注册一个逻辑计划），不涉及任何 I/O
+2. 临时视图的创建是瞬间的（仅注册一个逻辑计划），不涉及任何 I/O
 
-### 3. 如果需要物化数据，使用 CACHE TABLE 或 df.cache()
+3. 如果需要物化数据，使用 CACHE TABLE 或 df.cache()
 
 
    GLOBAL TEMPORARY VIEW 的 global_temp 数据库设计是独特的:
@@ -140,13 +140,13 @@ CLEAR CACHE;
 ```
 
  CACHE TABLE 的实现机制:
-### 1. 数据被物化并以 Tungsten 列式二进制格式存储在 Executor 内存中
+1. 数据被物化并以 Tungsten 列式二进制格式存储在 Executor 内存中
 
-### 2. 后续查询直接从 InMemoryTableScan 读取，跳过文件扫描
+2. 后续查询直接从 InMemoryTableScan 读取，跳过文件扫描
 
-### 3. 内存不足时溢出到磁盘（取决于 StorageLevel 配置）
+3. 内存不足时溢出到磁盘（取决于 StorageLevel 配置）
 
-### 4. 不自动刷新——源表变更后缓存不会更新
+4. 不自动刷新——源表变更后缓存不会更新
 
 
  对比物化视图:

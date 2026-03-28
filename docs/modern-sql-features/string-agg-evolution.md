@@ -264,7 +264,7 @@ WITHIN GROUP (ORDER BY ...)
 
 ## 对引擎开发者的实现建议
 
-### 1. 内存管理
+1. 内存管理
 
 字符串聚合的最大挑战是内存：当某个 GROUP 有大量行时，拼接结果可能占用巨大内存。
 
@@ -293,7 +293,7 @@ StringAggAccumulator {
 }
 ```
 
-### 2. ORDER BY 的实现
+2. ORDER BY 的实现
 
 带 ORDER BY 的字符串聚合在分布式环境中很有挑战：
 
@@ -308,7 +308,7 @@ StringAggAccumulator {
 方案 C: 不保证排序（某些引擎的默认行为）
 ```
 
-### 3. 溢出策略设计
+3. 溢出策略设计
 
 建议实现三种策略：
 
@@ -320,7 +320,7 @@ StringAggAccumulator {
 
 建议默认策略为 ERROR，同时支持 ON OVERFLOW TRUNCATE。
 
-### 4. 兼容性考量
+4. 兼容性考量
 
 如果引擎需要兼容 MySQL，同时支持现代标准：
 

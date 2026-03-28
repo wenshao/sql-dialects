@@ -75,7 +75,7 @@ MATCH_RECOGNIZE (
 
 ## 核心概念
 
-### 1. PATTERN —— 模式定义
+1. PATTERN —— 模式定义
 
 PATTERN 子句使用类似正则表达式的语法来描述行序列：
 
@@ -91,7 +91,7 @@ PATTERN (A B+ C* D?)
 -- ()   : 分组
 ```
 
-### 2. DEFINE —— 条件定义
+2. DEFINE —— 条件定义
 
 DEFINE 为 PATTERN 中的每个变量指定匹配条件：
 
@@ -104,7 +104,7 @@ DEFINE
 
 未在 DEFINE 中出现的变量默认匹配所有行（如 PATTERN 中的起始锚点）。
 
-### 3. MEASURES —— 输出列
+3. MEASURES —— 输出列
 
 MEASURES 定义匹配成功后输出哪些值：
 
@@ -118,14 +118,14 @@ MEASURES
     COUNT(UP.*)            AS up_days       -- 上涨了几天
 ```
 
-### 4. 输出模式
+4. 输出模式
 
 ```sql
 ONE ROW PER MATCH          -- 每次匹配输出一行汇总
 ALL ROWS PER MATCH         -- 每次匹配输出所有行（带分类标记）
 ```
 
-### 5. 匹配后行为
+5. 匹配后行为
 
 ```sql
 AFTER MATCH SKIP PAST LAST ROW       -- 默认: 从匹配结尾的下一行继续
@@ -257,7 +257,7 @@ MATCH_RECOGNIZE (
 
 ## 对引擎开发者的实现分析
 
-### 1. 状态机模型: NFA vs DFA
+1. 状态机模型: NFA vs DFA
 
 MATCH_RECOGNIZE 的模式匹配本质上是在行序列上运行正则引擎：
 
@@ -266,7 +266,7 @@ MATCH_RECOGNIZE 的模式匹配本质上是在行序列上运行正则引擎：
 
 实际实现中通常选择 NFA + 优化剪枝，原因是 SQL 模式通常较短且回溯有限。
 
-### 2. 内存管理
+2. 内存管理
 
 ```
 PARTITION BY ticker ORDER BY trade_date
@@ -279,14 +279,14 @@ PARTITION BY ticker ORDER BY trade_date
 - 支持 spill to disk 机制
 - 在 PATTERN 中利用有界量词 `{,100}` 限制搜索范围
 
-### 3. 流处理特殊考量
+3. 流处理特殊考量
 
 在 Flink SQL 等流处理引擎中，MATCH_RECOGNIZE 面临额外挑战：
 - 数据无界: 不能等所有数据到齐后再匹配
 - 需要增量匹配: 每到一行就推进状态机
 - 超时处理: 模式匹配多久没完成算放弃？
 
-### 4. 执行计划位置
+4. 执行计划位置
 
 ```
 TableScan → Filter (WHERE) → Sort (ORDER BY) → MatchRecognize → Project
@@ -294,7 +294,7 @@ TableScan → Filter (WHERE) → Sort (ORDER BY) → MatchRecognize → Project
 
 MATCH_RECOGNIZE 在执行计划中位于排序之后。它消费排好序的行流，输出匹配结果。
 
-### 5. 复杂度评估
+5. 复杂度评估
 
 实现 MATCH_RECOGNIZE 的工程量极大，这是多数引擎不支持的根本原因：
 - Parser 扩展: 新关键字 + 模式语法 + MEASURES 表达式

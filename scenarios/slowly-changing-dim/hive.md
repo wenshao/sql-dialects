@@ -119,14 +119,14 @@ WHERE NOT EXISTS (SELECT 1 FROM dim_customer d WHERE d.customer_id = s.customer_
 
 ## 6. 对引擎开发者的启示
 
-### 1. SCD 是数仓的核心操作: 大数据引擎必须高效支持 MERGE
+1. SCD 是数仓的核心操作: 大数据引擎必须高效支持 MERGE
 
-### 2. INSERT OVERWRITE 是非 ACID 环境下 SCD 的唯一选择:
+2. INSERT OVERWRITE 是非 ACID 环境下 SCD 的唯一选择:
 
     全量重写维度表，代价随维度表大小线性增长
-### 3. MERGE 大幅简化了 SCD Type 2: 一条语句完成关闭旧记录+打开新记录
+3. MERGE 大幅简化了 SCD Type 2: 一条语句完成关闭旧记录+打开新记录
 
-### 4. Delta Lake/Iceberg 的 MERGE 是 Hive ACID MERGE 的现代替代:
+4. Delta Lake/Iceberg 的 MERGE 是 Hive ACID MERGE 的现代替代:
 
 性能更好（不需要 Compaction），事务保证更强
 

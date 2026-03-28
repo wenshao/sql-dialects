@@ -124,11 +124,11 @@ CLUSTERED BY (user_id) INTO 16 BUCKETS;
    分桶: 按 Hash 值分文件，适合高基数列（user_id、order_id）
 
  实践中分桶使用率不高的原因:
-### 1. 写入端必须严格控制桶数和分布
+1. 写入端必须严格控制桶数和分布
 
-### 2. AQE 在很多场景下能自动优化 JOIN（减少了手动分桶的必要性）
+2. AQE 在很多场景下能自动优化 JOIN（减少了手动分桶的必要性）
 
-### 3. Delta Lake 的 Z-ORDER + Liquid Clustering 是更灵活的替代方案
+3. Delta Lake 的 Z-ORDER + Liquid Clustering 是更灵活的替代方案
 
 
 ## 5. Delta Lake OPTIMIZE: 文件合并与优化

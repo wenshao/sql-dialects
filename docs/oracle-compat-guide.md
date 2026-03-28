@@ -51,7 +51,7 @@
 
 按"兼容引擎最容易忽略"排序：
 
-### 1. '' = NULL（最大最著名的坑，影响所有字符串操作）
+1. '' = NULL（最大最著名的坑，影响所有字符串操作）
 
 详见 [types/string/oracle.sql](../types/string/oracle.sql)、[functions/conditional/oracle.sql](../functions/conditional/oracle.sql)
 
@@ -64,7 +64,7 @@
 - 这是 Oracle 最根本的特异行为，兼容引擎必须在存储层和计算层同时处理
 - **兼容建议**: 在字符串类型内部将空字符串映射为 NULL，但需考虑 `INSERT INTO t(c) VALUES ('')` 后 `SELECT c IS NULL FROM t` 应返回 true
 
-### 2. DUAL 表要求（SELECT 常量必须 FROM DUAL）
+2. DUAL 表要求（SELECT 常量必须 FROM DUAL）
 
 详见 [ddl/create-table/oracle.sql](../ddl/create-table/oracle.sql)
 
@@ -75,7 +75,7 @@
 - PL/SQL 中的 `SELECT INTO` 也需要 FROM DUAL
 - **兼容建议**: 在系统初始化时自动创建 DUAL 表，或在 parser 中将 `FROM DUAL` 视为无表查询
 
-### 3. PL/SQL Package（过程语言的模块化单元 — 实现极复杂）
+3. PL/SQL Package（过程语言的模块化单元 — 实现极复杂）
 
 详见 [advanced/stored-procedures/oracle.sql](../advanced/stored-procedures/oracle.sql)
 
@@ -88,7 +88,7 @@
 - **实现复杂度极高**: 需要 session 级变量管理、编译单元依赖跟踪、规范与体分离
 - **兼容建议**: 优先实现最常用的 DBMS_OUTPUT，Package 可以简化为命名空间 + 过程集合
 
-### 4. CONNECT BY（非标准层次查询 — 实现比递归 CTE 复杂）
+4. CONNECT BY（非标准层次查询 — 实现比递归 CTE 复杂）
 
 详见 [scenarios/hierarchical-query/oracle.sql](../scenarios/hierarchical-query/oracle.sql)
 
@@ -102,7 +102,7 @@
 - SQL 标准替代方案是递归 CTE（`WITH RECURSIVE`），但语义不完全等价
 - **兼容建议**: 可以在 parser 层将 CONNECT BY 重写为递归 CTE，但 LEVEL/SYS_CONNECT_BY_PATH 需要特殊处理
 
-### 5. NUMBER 万能类型（无 INT/BIGINT — 性能代价）
+5. NUMBER 万能类型（无 INT/BIGINT — 性能代价）
 
 详见 [types/numeric/oracle.sql](../types/numeric/oracle.sql)
 
@@ -114,7 +114,7 @@
 - 算术运算在 NUMBER 上比原生整数类型慢
 - **兼容建议**: 接受 NUMBER 语法，内部映射到合适的原生类型（NUMBER(10,0) -> INT、NUMBER(19,0) -> BIGINT、NUMBER(p,s) -> DECIMAL）
 
-### 6. VARCHAR2 默认字节语义（不是字符语义 — 截断陷阱）
+6. VARCHAR2 默认字节语义（不是字符语义 — 截断陷阱）
 
 详见 [types/string/oracle.sql](../types/string/oracle.sql)
 
@@ -125,7 +125,7 @@
 - VARCHAR2 最大长度：SQL 层 4000 字节（12c 扩展到 32767）、PL/SQL 层 32767 字节
 - **兼容建议**: 需要同时支持 BYTE 和 CHAR 语义，建议默认 CHAR 语义（更符合直觉），但提供参数控制
 
-### 7. DATE 包含时间（Oracle DATE 不等于 SQL 标准 DATE）
+7. DATE 包含时间（Oracle DATE 不等于 SQL 标准 DATE）
 
 详见 [types/datetime/oracle.sql](../types/datetime/oracle.sql)
 
@@ -137,7 +137,7 @@
 - 实际应该用 `WHERE create_date >= DATE '2024-01-01' AND create_date < DATE '2024-01-02'`
 - **兼容建议**: 将 Oracle 的 DATE 映射为 TIMESTAMP(0)（秒精度），但需要确保所有日期函数的行为一致
 
-### 8. DECODE 函数（NULL 比较语义与 CASE WHEN 不同）
+8. DECODE 函数（NULL 比较语义与 CASE WHEN 不同）
 
 详见 [functions/conditional/oracle.sql](../functions/conditional/oracle.sql)
 
@@ -150,7 +150,7 @@
 - SQL 标准替代方案：CASE WHEN（但需对 NULL 比较特殊处理）
 - **兼容建议**: 实现 DECODE 函数，内部展开为带 NULL 安全比较的 CASE WHEN
 
-### 9. ROWNUM 在 ORDER BY 之前分配（分页陷阱）
+9. ROWNUM 在 ORDER BY 之前分配（分页陷阱）
 
 详见 [query/pagination/oracle.sql](../query/pagination/oracle.sql)
 
@@ -162,7 +162,7 @@
 - 分页需要嵌套子查询：`SELECT * FROM (SELECT t.*, ROWNUM rn FROM (SELECT * FROM t ORDER BY id) t WHERE ROWNUM <= 20) WHERE rn > 10`
 - **兼容建议**: 支持 ROWNUM 伪列，但强烈推荐用户使用 `FETCH FIRST ... ROWS ONLY` 或 `ROW_NUMBER()`
 
-### 10. NLS 参数影响隐式转换（NLS_DATE_FORMAT 等 — 非确定性行为）
+10. NLS 参数影响隐式转换（NLS_DATE_FORMAT 等 — 非确定性行为）
 
 详见 [types/datetime/oracle.sql](../types/datetime/oracle.sql)、[functions/type-conversion/oracle.sql](../functions/type-conversion/oracle.sql)
 

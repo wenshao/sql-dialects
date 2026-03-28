@@ -24,14 +24,14 @@ CREATE TABLE examples (
 ```
 
  设计分析: STRING 为什么是 Hive 的首选?
-### 1. Schema-on-Read: 数据文件中的字符串没有长度约束，STRING 与之自然匹配
+1. Schema-on-Read: 数据文件中的字符串没有长度约束，STRING 与之自然匹配
 
-### 2. 简单: 不需要考虑 VARCHAR(n) 的长度限制（超长会被截断）
+2. 简单: 不需要考虑 VARCHAR(n) 的长度限制（超长会被截断）
 
-### 3. 性能: ORC/Parquet 列式存储对 STRING 有字典编码优化，
+3. 性能: ORC/Parquet 列式存储对 STRING 有字典编码优化，
 
     VARCHAR(n) 的长度约束在列存中没有额外的性能优势
-### 4. 历史: 早期 Hive 只有 STRING，VARCHAR/CHAR 在 0.12/0.13 才加入
+4. 历史: 早期 Hive 只有 STRING，VARCHAR/CHAR 在 0.12/0.13 才加入
 
 
  对比:
@@ -104,29 +104,29 @@ SELECT * FROM users WHERE LOWER(name) = LOWER('Alice');
 
 ## 6. 已知限制
 
-### 1. 无排序规则(COLLATION): 不能设置大小写不敏感比较
+1. 无排序规则(COLLATION): 不能设置大小写不敏感比较
 
-### 2. 无 ENUM 类型: 用 STRING + CHECK 约束(不强制执行)模拟
+2. 无 ENUM 类型: 用 STRING + CHECK 约束(不强制执行)模拟
 
-### 3. 无 BLOB/CLOB/TEXT 分级: 只有 STRING 和 BINARY
+3. 无 BLOB/CLOB/TEXT 分级: 只有 STRING 和 BINARY
 
-### 4. CHAR(n) 尾部补空格: 与 STRING 比较时需要注意 TRIM
+4. CHAR(n) 尾部补空格: 与 STRING 比较时需要注意 TRIM
 
-### 5. VARCHAR 超长截断: VARCHAR(10) 存储 'abcdefghijk' 会截断为 'abcdefghij'
+5. VARCHAR 超长截断: VARCHAR(10) 存储 'abcdefghijk' 会截断为 'abcdefghij'
 
 
 ## 7. 对引擎开发者的启示
 
-### 1. 单一的 STRING 类型是分析引擎的最佳实践:
+1. 单一的 STRING 类型是分析引擎的最佳实践:
 
     Hive/Spark/BigQuery 都选择了统一的 STRING 类型
-### 2. VARCHAR(n) 在列存中没有性能优势:
+2. VARCHAR(n) 在列存中没有性能优势:
 
     列存引擎不需要预分配行内空间，长度限制没有意义
-### 3. COLLATION 支持是企业级需求:
+3. COLLATION 支持是企业级需求:
 
     缺少 COLLATION 导致大小写不敏感查询需要手动 LOWER()
-### 4. 双引号字符串是 Hive 的便利特性:
+4. 双引号字符串是 Hive 的便利特性:
 
 但与 SQL 标准冲突（标准中双引号用于标识符引用）
 

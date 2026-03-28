@@ -203,15 +203,15 @@ MySQL:      Java 正则（REGEXP） | BigQuery: RE2 正则
 ## 12. 对引擎开发者的启示
 
 
-### 1. LENGTH 的字节/字符语义是经典的迁移陷阱 — 应明确命名（LEN vs OCTET_LENGTH）
+1. LENGTH 的字节/字符语义是经典的迁移陷阱 — 应明确命名（LEN vs OCTET_LENGTH）
 
-### 2. || 拼接运算符是 SQL 标准 — 不支持会让用户不便
+2. || 拼接运算符是 SQL 标准 — 不支持会让用户不便
 
-### 3. 正则引擎的选择（Java/POSIX/RE2/PCRE）影响功能和性能
+3. 正则引擎的选择（Java/POSIX/RE2/PCRE）影响功能和性能
 
-### 4. SPLIT + EXPLODE 是 ETL 中的高频操作 — 性能应优先优化
+4. SPLIT + EXPLODE 是 ETL 中的高频操作 — 性能应优先优化
 
-### 5. 字符串聚合必须支持 ORDER BY — WM_CONCAT 的无序是设计缺陷
+5. 字符串聚合必须支持 ORDER BY — WM_CONCAT 的无序是设计缺陷
 
-### 6. URL/JSON/Base64 处理函数在数据工程中使用频率越来越高
+6. URL/JSON/Base64 处理函数在数据工程中使用频率越来越高
 

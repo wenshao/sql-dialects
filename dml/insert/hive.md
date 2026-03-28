@@ -27,13 +27,13 @@ SELECT user_id, event_name, event_time FROM staging_events;
 ```
 
  设计分析: 为什么 INSERT OVERWRITE 是 Hive 的核心?
-### 1. 幂等性: 无论执行多少次，结果相同。ETL 管道失败重试不会产生重复数据。
+1. 幂等性: 无论执行多少次，结果相同。ETL 管道失败重试不会产生重复数据。
 
-### 2. HDFS 适配: HDFS 不支持文件修改，只能整体替换（rename 是原子操作）
+2. HDFS 适配: HDFS 不支持文件修改，只能整体替换（rename 是原子操作）
 
-### 3. 原子性: 写入临时目录 → 原子 rename → 删除旧目录。读者始终看到完整数据。
+3. 原子性: 写入临时目录 → 原子 rename → 删除旧目录。读者始终看到完整数据。
 
-### 4. 简单高效: 不需要事务管理器、锁、delta 文件合并等复杂机制
+4. 简单高效: 不需要事务管理器、锁、delta 文件合并等复杂机制
 
 
  对比:
@@ -184,16 +184,16 @@ CREATE TABLE users_backup AS SELECT * FROM users WHERE age > 18;
 
 ## 9. 对引擎开发者的启示
 
-### 1. INSERT OVERWRITE 是批处理引擎的最佳写入模式:
+1. INSERT OVERWRITE 是批处理引擎的最佳写入模式:
 
     幂等性 + 原子性 + 简单性，适合 ETL 管道
-### 2. 多路输出是源表扫描优化的关键:
+2. 多路输出是源表扫描优化的关键:
 
     大数据引擎应该支持一次扫描多次写入（减少 I/O）
-### 3. LOAD DATA 是零转换文件移动:
+3. LOAD DATA 是零转换文件移动:
 
     这个设计绕过了查询引擎，直接操作存储层——快但不安全
-### 4. 逐行 INSERT 在大数据引擎中是反模式:
+4. 逐行 INSERT 在大数据引擎中是反模式:
 
 Hive 每条 INSERT VALUES 启动一个作业，说明引擎不是为逐行操作设计的
 

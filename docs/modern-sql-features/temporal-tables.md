@@ -285,7 +285,7 @@ WHERE emp_id IN (1001, 1002, 1003);
 
 ## 对引擎开发者的实现分析
 
-### 1. 存储策略: 影子表 vs 内联版本列
+1. 存储策略: 影子表 vs 内联版本列
 
 **影子表方案（SQL Server, MariaDB）**
 
@@ -313,7 +313,7 @@ employees_history 表（历史数据）:
 优点: 实现简单，利用已有 MVCC 机制
 缺点: 大量历史版本会导致存储膨胀和 GC 压力
 
-### 2. 时间戳精度
+2. 时间戳精度
 
 ```
 SQL Server:  datetime2(7)  — 100 纳秒精度
@@ -323,7 +323,7 @@ Db2:         timestamp(12) — 皮秒精度（最高）
 
 建议: 至少使用微秒精度。在高并发场景下，毫秒精度可能导致同一时间戳内多行版本冲突。
 
-### 3. UPDATE 的实现
+3. UPDATE 的实现
 
 ```
 UPDATE employees SET salary = 18000 WHERE emp_id = 1;
@@ -336,7 +336,7 @@ UPDATE employees SET salary = 18000 WHERE emp_id = 1;
 这必须在同一个事务中原子完成。
 ```
 
-### 4. DELETE 的实现
+4. DELETE 的实现
 
 ```
 DELETE FROM employees WHERE emp_id = 1;
@@ -349,7 +349,7 @@ DELETE FROM employees WHERE emp_id = 1;
 历史表中仍保留完整历史。
 ```
 
-### 5. FOR SYSTEM_TIME 查询重写
+5. FOR SYSTEM_TIME 查询重写
 
 ```sql
 -- 用户写:
@@ -363,7 +363,7 @@ SELECT * FROM employees_history WHERE valid_from <= @t AND valid_to > @t;
 -- 优化: 在 valid_from, valid_to 上建索引
 ```
 
-### 6. 历史数据清理
+6. 历史数据清理
 
 历史数据会持续增长，引擎需要提供清理机制：
 

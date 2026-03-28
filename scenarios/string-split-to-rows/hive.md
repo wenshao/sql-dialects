@@ -19,11 +19,11 @@ LATERAL VIEW EXPLODE(SPLIT(t.tags, ',')) exploded AS tag;
 ```
 
  执行流程:
-### 1. SPLIT(tags, ',') → 将 'a,b,c' 转为 ARRAY['a','b','c']
+1. SPLIT(tags, ',') → 将 'a,b,c' 转为 ARRAY['a','b','c']
 
-### 2. EXPLODE(array) → 将数组展开为多行: 'a', 'b', 'c'
+2. EXPLODE(array) → 将数组展开为多行: 'a', 'b', 'c'
 
-### 3. LATERAL VIEW → 将展开的行与原表关联
+3. LATERAL VIEW → 将展开的行与原表关联
 
 
 ## 2. POSEXPLODE: 带位置信息 (0.13+)
@@ -108,10 +108,10 @@ GROUP BY id;
 
 ## 8. 对引擎开发者的启示
 
-### 1. SPLIT → ARRAY → EXPLODE 是直观的数据处理管道:
+1. SPLIT → ARRAY → EXPLODE 是直观的数据处理管道:
 
     字符串 → 数组 → 行，每一步的语义清晰
-### 2. LATERAL VIEW OUTER 很重要: 保留无数据的行避免意外丢失
+2. LATERAL VIEW OUTER 很重要: 保留无数据的行避免意外丢失
 
-### 3. POSEXPLODE 的位置信息在 ETL 中有用: 保留原始顺序或用于去重
+3. POSEXPLODE 的位置信息在 ETL 中有用: 保留原始顺序或用于去重
 

@@ -54,9 +54,9 @@ GROUP BY product;
  设计分析: CASE WHEN PIVOT 的局限
    必须预知所有 pivot 值（Q1, Q2, Q3, Q4）
    如果 pivot 值是动态的（事先不知道有哪些城市），需要:
-### 1. 先查询所有 distinct 值
+1. 先查询所有 distinct 值
 
-### 2. 在应用层（PyODPS/DataWorks）动态拼接 SQL
+2. 在应用层（PyODPS/DataWorks）动态拼接 SQL
 
    这是"动态 PIVOT"问题 — 所有不支持原生 PIVOT 的引擎都面临此问题
 
@@ -156,16 +156,16 @@ BigQuery: UNNEST   | Presto: CROSS JOIN UNNEST
 ## 7. 对引擎开发者的启示
 
 
-### 1. 原生 PIVOT/UNPIVOT 语法虽非标准但用户需求强烈
+1. 原生 PIVOT/UNPIVOT 语法虽非标准但用户需求强烈
 
-### 2. LATERAL VIEW + MAP + EXPLODE 是优雅的 UNPIVOT 替代方案
+2. LATERAL VIEW + MAP + EXPLODE 是优雅的 UNPIVOT 替代方案
 
-### 3. CASE WHEN PIVOT 的动态问题需要应用层支持（SQL 无法动态生成列）
+3. CASE WHEN PIVOT 的动态问题需要应用层支持（SQL 无法动态生成列）
 
-### 4. UNION ALL UNPIVOT 的多次扫描问题是性能陷阱 — 应推荐 LATERAL VIEW
+4. UNION ALL UNPIVOT 的多次扫描问题是性能陷阱 — 应推荐 LATERAL VIEW
 
-### 5. 如果要实现原生 PIVOT: 需要在编译期确定列名（静态 PIVOT）
+5. 如果要实现原生 PIVOT: 需要在编译期确定列名（静态 PIVOT）
 
     动态 PIVOT（运行时确定列名）需要特殊的查询协议
-### 6. BigQuery/Snowflake 的 PIVOT 语法值得参考 — 简洁且直观
+6. BigQuery/Snowflake 的 PIVOT 语法值得参考 — 简洁且直观
 

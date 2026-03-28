@@ -13,13 +13,13 @@
  这是有意的架构决策:
 
  为什么 Hive 不需要动态 SQL?
-### 1. 编译模型: HiveQL 编译为 MapReduce/Tez/Spark DAG，不是解释执行
+1. 编译模型: HiveQL 编译为 MapReduce/Tez/Spark DAG，不是解释执行
 
     动态生成并编译 MR/Tez 作业的代价远高于 RDBMS 的 PREPARE/EXECUTE
-### 2. 批处理定位: Hive 作业是预定义的 ETL 流水线，不是交互式即席查询
+2. 批处理定位: Hive 作业是预定义的 ETL 流水线，不是交互式即席查询
 
     SQL 在提交前已经确定（调度工具中配置好的 SQL 模板）
-### 3. 安全性: 动态 SQL 是 SQL 注入的主要入口，批处理引擎没有这个风险面
+3. 安全性: 动态 SQL 是 SQL 注入的主要入口，批处理引擎没有这个风险面
 
 
 ## 2. 变量替换: hivevar / hiveconf
@@ -57,13 +57,13 @@ SET hiveconf:mapreduce.job.reduces=10;
  设计分析: 变量替换 vs 动态 SQL
  变量替换是文本级别的替换（类似 C 的 #define），发生在 SQL 解析之前。
  这意味着:
-### 1. 不能动态生成表名/列名然后执行（虽然变量可以替换文本）
+1. 不能动态生成表名/列名然后执行（虽然变量可以替换文本）
 
-### 2. 不能根据查询结果决定下一步 SQL（无控制流）
+2. 不能根据查询结果决定下一步 SQL（无控制流）
 
-### 3. 安全性好: 变量值在解析前替换，无 SQL 注入风险
+3. 安全性好: 变量值在解析前替换，无 SQL 注入风险
 
-### 4. 足够应对大多数参数化场景（日期参数、表名参数等）
+4. 足够应对大多数参数化场景（日期参数、表名参数等）
 
 
 ## 3. 应用层动态 SQL: Python (PyHive)
@@ -131,15 +131,15 @@ EXECUTE IMMEDIATE 'SELECT COUNT(*) FROM ' || v_table;
 
 ## 8. 对引擎开发者的启示
 
-### 1. 批处理引擎不需要服务端动态 SQL: Hive 证明了变量替换 + 外部编排
+1. 批处理引擎不需要服务端动态 SQL: Hive 证明了变量替换 + 外部编排
 
     可以满足所有批处理 ETL 需求
-### 2. 变量替换应该是基本能力: 即使不支持动态 SQL，参数化查询是必须的
+2. 变量替换应该是基本能力: 即使不支持动态 SQL，参数化查询是必须的
 
-### 3. 大数据引擎的"动态 SQL"在 API 层: Spark DataFrame API / Flink Table API
+3. 大数据引擎的"动态 SQL"在 API 层: Spark DataFrame API / Flink Table API
 
     提供了比 SQL 字符串拼接更安全、更强大的动态查询构建能力
-### 4. BigQuery 的 Scripting 是一个有趣的折中: 在分析引擎中加入过程式能力
+4. BigQuery 的 Scripting 是一个有趣的折中: 在分析引擎中加入过程式能力
 
 但保持简单（变量、IF/ELSE、LOOP），不尝试复制 PL/SQL 的完整功能
 

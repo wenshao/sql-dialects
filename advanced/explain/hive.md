@@ -176,13 +176,13 @@ SET hive.stats.fetch.column.stats = true;
 ```
 
  CBO 的优化能力:
-### 1. JOIN 顺序优化: 根据表大小选择最优 JOIN 顺序
+1. JOIN 顺序优化: 根据表大小选择最优 JOIN 顺序
 
-### 2. JOIN 策略选择: Map Join vs Sort-Merge Join
+2. JOIN 策略选择: Map Join vs Sort-Merge Join
 
-### 3. 分区裁剪: 利用分区统计信息跳过空分区
+3. 分区裁剪: 利用分区统计信息跳过空分区
 
-### 4. 谓词下推: 将过滤条件推到扫描层
+4. 谓词下推: 将过滤条件推到扫描层
 
 
 ## 7. 向量化执行
@@ -211,13 +211,13 @@ SET hive.vectorized.execution.reduce.enabled = true;
 
 ## 9. 对引擎开发者的启示
 
-### 1. EXPLAIN 是引擎可观测性的基础: 用户排查性能问题的第一工具
+1. EXPLAIN 是引擎可观测性的基础: 用户排查性能问题的第一工具
 
-### 2. 多级 EXPLAIN 很有价值: Hive 的 EXPLAIN/EXTENDED/VECTORIZATION/CBO
+2. 多级 EXPLAIN 很有价值: Hive 的 EXPLAIN/EXTENDED/VECTORIZATION/CBO
 
     分别回答不同层面的问题（执行计划、物理细节、向量化、优化器决策）
-### 3. 统计信息决定 CBO 质量: 没有 ANALYZE TABLE，CBO 的估算可能完全错误
+3. 统计信息决定 CBO 质量: 没有 ANALYZE TABLE，CBO 的估算可能完全错误
 
     Hive 的教训: 很多用户不知道需要先 ANALYZE TABLE 才能让 CBO 生效
-### 4. 向量化执行是分析引擎的标配: Hive 的向量化执行证明了批量处理的性能优势
+4. 向量化执行是分析引擎的标配: Hive 的向量化执行证明了批量处理的性能优势
 

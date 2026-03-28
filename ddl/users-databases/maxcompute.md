@@ -248,15 +248,15 @@ FROM INFORMATION_SCHEMA.TABLES;
 ## 9. 对引擎开发者的启示
 
 
-### 1. 命名层级: 三级命名（Project/Database.Schema.Table）是数据仓库的最佳实践
+1. 命名层级: 三级命名（Project/Database.Schema.Table）是数据仓库的最佳实践
 
-### 2. 外部身份集成: 云数仓不应自建用户系统，应与云平台 IAM 集成
+2. 外部身份集成: 云数仓不应自建用户系统，应与云平台 IAM 集成
 
-### 3. Label Security: 列级安全标签是 PII 数据保护的简洁方案
+3. Label Security: 列级安全标签是 PII 数据保护的简洁方案
 
-### 4. Package 跨项目共享: 解决了多租户间的安全数据共享问题
+4. Package 跨项目共享: 解决了多租户间的安全数据共享问题
 
-### 5. ProjectProtection: 数据不出项目的安全边界是云数仓的刚需
+5. ProjectProtection: 数据不出项目的安全边界是云数仓的刚需
 
-### 6. Project 作为计费单元: 命名空间 + 计费 + 安全的三合一设计值得参考
+6. Project 作为计费单元: 命名空间 + 计费 + 安全的三合一设计值得参考
 

@@ -67,9 +67,9 @@ COMMIT;
 ## 4. Two-Phase Commit (Stream Load)
 
  Stream Load 支持 2PC:
-### 1. Prepare: curl -H "two_phase_commit:true" ...
+1. Prepare: curl -H "two_phase_commit:true" ...
 
-### 2. Commit:  curl -X PUT .../api/db/_commit?txnId=xxx
+2. Commit:  curl -X PUT .../api/db/_commit?txnId=xxx
 
 
 ## 5. 隔离级别

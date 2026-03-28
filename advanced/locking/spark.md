@@ -16,11 +16,11 @@
    批处理引擎（Spark）: 每次操作读写大量数据，操作粒度是文件/分区，不是行
 
  Spark SQL 的并发模型分三层:
-### 1. 原生 Spark（Parquet/ORC）: 无事务，无锁，写入冲突由文件系统决定
+1. 原生 Spark（Parquet/ORC）: 无事务，无锁，写入冲突由文件系统决定
 
-### 2. Delta Lake:               乐观并发控制（OCC），文件级冲突检测
+2. Delta Lake:               乐观并发控制（OCC），文件级冲突检测
 
-### 3. Hive Metastore:           Metastore 级锁（用于 DDL 操作的协调）
+3. Hive Metastore:           Metastore 级锁（用于 DDL 操作的协调）
 
 
  对比:

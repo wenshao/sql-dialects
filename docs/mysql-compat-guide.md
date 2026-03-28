@@ -40,7 +40,7 @@
 
 按"兼容引擎最容易忽略"排序：
 
-### 1. AUTO_INCREMENT 语义复杂度
+1. AUTO_INCREMENT 语义复杂度
 
 详见 [ddl/sequences/mysql.sql](../ddl/sequences/mysql.sql)
 
@@ -50,7 +50,7 @@
 - 5.7 重启后自增值可能回退（8.0 修复）
 - **分布式引擎的选择**: AUTO_RANDOM（TiDB）或段分配
 
-### 2. ONLY_FULL_GROUP_BY 行为差异
+2. ONLY_FULL_GROUP_BY 行为差异
 
 详见 [functions/aggregate/mysql.sql](../functions/aggregate/mysql.sql)
 
@@ -59,7 +59,7 @@
 - 需要实现 functional dependency 检测
 - ANY_VALUE() 函数作为逃生阀
 
-### 3. utf8 不是 UTF-8
+3. utf8 不是 UTF-8
 
 详见 [types/string/mysql.sql](../types/string/mysql.sql)
 
@@ -71,7 +71,7 @@
 
 > **MySQL 8.4 / 9.x 变更**: MySQL 8.4（2024 LTS）废弃了部分特性（如 `mysql_native_password` 默认禁用、一些旧系统变量）。MySQL 9.0 完全移除了 `utf8mb3` 别名——`utf8` 字符集不再可用，必须显式使用 `utf8mb4`。兼容引擎应跟进这些变更以保持行为一致。
 
-### 4. || 是逻辑 OR
+4. || 是逻辑 OR
 
 详见 [functions/string-functions/mysql.sql](../functions/string-functions/mysql.sql)
 
@@ -80,7 +80,7 @@
 - `PIPES_AS_CONCAT` 模式可以改变这个行为
 - Parser 需要根据 sql_mode 切换
 
-### 5. DATETIME vs TIMESTAMP 时区行为
+5. DATETIME vs TIMESTAMP 时区行为
 
 详见 [types/datetime/mysql.sql](../types/datetime/mysql.sql)
 
@@ -88,7 +88,7 @@
 - TIMESTAMP 有 2038 年问题（4 字节有符号整数）
 - ON UPDATE CURRENT_TIMESTAMP 是 MySQL 独有
 
-### 6. CHECK 约束历史
+6. CHECK 约束历史
 
 详见 [ddl/constraints/mysql.sql](../ddl/constraints/mysql.sql)
 
@@ -96,7 +96,7 @@
 - 8.0.16+：真正执行
 - 兼容引擎的选择：要么执行，要么报语法错误，不要静默忽略
 
-### 7. 隐式类型转换
+7. 隐式类型转换
 
 详见 [types/numeric/mysql.sql](../types/numeric/mysql.sql)
 
@@ -104,7 +104,7 @@
 - 字符串和数字比较时，字符串转为数字（可能导致索引失效）
 - PostgreSQL 完全不允许隐式转换，Oracle/SQL Server 有限允许
 
-### 8. DDL 隐式提交
+8. DDL 隐式提交
 
 详见 [advanced/transactions/mysql.sql](../advanced/transactions/mysql.sql)
 
@@ -112,7 +112,7 @@
 - PostgreSQL/SQL Server 的 DDL 是事务性的（可回滚）
 - 分布式引擎的 DDL 通常也是非事务性的
 
-### 9. LIMIT 语法位置
+9. LIMIT 语法位置
 
 详见 [query/pagination/mysql.sql](../query/pagination/mysql.sql)
 
@@ -120,7 +120,7 @@
 - 深分页 LIMIT 100000, 10 性能极差（O(offset)）
 - 不支持 SQL 标准的 OFFSET ... FETCH
 
-### 10. GROUP_CONCAT 默认截断
+10. GROUP_CONCAT 默认截断
 
 详见 [functions/aggregate/mysql.sql](../functions/aggregate/mysql.sql)
 

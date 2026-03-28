@@ -198,7 +198,7 @@ GROUP BY ALL 适合 **OLAP/分析场景**（探索性查询、临时分析、dbt
 
 ## 对引擎开发者的实现建议
 
-### 1. 语义分析阶段
+1. 语义分析阶段
 
 在 binder/analyzer 阶段遇到 `GROUP BY ALL` 时：
 
@@ -210,7 +210,7 @@ GROUP BY ALL 适合 **OLAP/分析场景**（探索性查询、临时分析、dbt
 步骤 5: 后续流程与普通 GROUP BY 完全相同
 ```
 
-### 2. containsAggregateFunction 的实现
+2. containsAggregateFunction 的实现
 
 需要递归遍历表达式树：
 
@@ -226,7 +226,7 @@ function containsAggregateFunction(expr):
     return false
 ```
 
-### 3. SELECT * 的处理
+3. SELECT * 的处理
 
 当 SELECT 包含 `*` 时，需要先展开 `*` 为具体列，再做推断：
 
@@ -239,7 +239,7 @@ SELECT *, SUM(salary) FROM employees GROUP BY ALL;
 
 注意: `salary` 既出现在 `SELECT *` 中（非聚合），又出现在 `SUM(salary)` 中（作为聚合参数）。正确行为是将 `salary` 加入 GROUP BY。
 
-### 4. 错误处理
+4. 错误处理
 
 ```sql
 -- 全是聚合，没有分组列——合法，相当于无 GROUP BY 的全局聚合
@@ -252,7 +252,7 @@ SELECT dept, name FROM employees GROUP BY ALL;
 -- DuckDB 允许这种用法
 ```
 
-### 5. ORDER BY ALL 的实现
+5. ORDER BY ALL 的实现
 
 ORDER BY ALL 更简单——将 SELECT 列表中所有列按序号加入 ORDER BY：
 

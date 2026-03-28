@@ -174,7 +174,7 @@ SELECT * FROM t WHERE EQUAL_NULL(col, 42);    -- 内置函数形式
 
 ## 典型用例
 
-### 1. JOIN 条件中的 NULL 匹配
+1. JOIN 条件中的 NULL 匹配
 
 ```sql
 -- 需求: 两个来源的数据匹配，包括 NULL 维度
@@ -184,7 +184,7 @@ FROM fact_table f
 JOIN dim_region d ON f.region_id IS NOT DISTINCT FROM d.region_id;
 ```
 
-### 2. UPSERT 的变更检测
+2. UPSERT 的变更检测
 
 ```sql
 -- 只在数据真正变化时更新（包括 NULL 变为非 NULL 或反之）
@@ -198,7 +198,7 @@ WHEN MATCHED AND (
 THEN UPDATE SET t.name = s.name, t.email = s.email, t.phone = s.phone;
 ```
 
-### 3. 分组去重中的 NULL 一致性
+3. 分组去重中的 NULL 一致性
 
 ```sql
 -- 找出"值相同的行对"（包括两个都是 NULL 的情况）
@@ -211,7 +211,7 @@ JOIN records b ON a.id < b.id
 
 ## 对引擎开发者的实现建议
 
-### 1. 语法解析
+1. 语法解析
 
 `IS [NOT] DISTINCT FROM` 是一个比较谓词，解析为二元表达式：
 
@@ -227,7 +227,7 @@ AST 中表示为 `IsDistinctFrom(left, right)` 和 `IsNotDistinctFrom(left, righ
 
 如果要兼容 MySQL 的 `<=>` 运算符，在 lexer 中增加 `<=>` token，解析时转换为 `IsNotDistinctFrom` 即可。
 
-### 2. 求值语义
+2. 求值语义
 
 ```
 IsNotDistinctFrom(a, b):
@@ -241,7 +241,7 @@ IsDistinctFrom(a, b):
 
 注意: 这个函数本身**不会返回 NULL**——结果永远是 TRUE 或 FALSE。这与普通比较运算符不同（普通 `=` 可以返回 UNKNOWN/NULL）。
 
-### 3. 优化器支持
+3. 优化器支持
 
 IS NOT DISTINCT FROM 在优化器中需要特殊处理：
 
@@ -251,7 +251,7 @@ IS NOT DISTINCT FROM 在优化器中需要特殊处理：
 
 **谓词简化**: `col IS NOT DISTINCT FROM NULL` 可以简化为 `col IS NULL`。
 
-### 4. 与 INTERSECT/EXCEPT 的关系
+4. 与 INTERSECT/EXCEPT 的关系
 
 集合操作中的行比较隐式使用 IS NOT DISTINCT FROM 语义。如果引擎已经实现了集合操作中的 NULL 相等比较，可以复用相同的比较器。
 

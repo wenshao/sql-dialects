@@ -56,17 +56,17 @@ COST SQL SELECT * FROM users WHERE age > 25;
 
  提交 SQL 后，MaxCompute 返回 Logview URL
  通过 Logview 可以查看:
-### 1. 作业 DAG: 各阶段依赖关系的可视化
+1. 作业 DAG: 各阶段依赖关系的可视化
 
-### 2. 每个阶段的 Instance 数量（并行度）
+2. 每个阶段的 Instance 数量（并行度）
 
-### 3. 数据读写量（每个 Instance 读了多少数据）
+3. 数据读写量（每个 Instance 读了多少数据）
 
-### 4. 执行时间（每个 Instance 的 wall time）
+4. 执行时间（每个 Instance 的 wall time）
 
-### 5. 资源使用: CPU 时间、内存峰值
+5. 资源使用: CPU 时间、内存峰值
 
-### 6. 数据倾斜检测: 各 Instance 的数据量差异
+6. 数据倾斜检测: 各 Instance 的数据量差异
 
 
  设计分析: Logview 的架构
@@ -212,15 +212,15 @@ ALTER TABLE orders PARTITION (dt = '20240115') MERGE SMALLFILES;
 ## 8. 对引擎开发者的启示
 
 
-### 1. EXPLAIN 应展示分区裁剪效果（用户最关心的优化）
+1. EXPLAIN 应展示分区裁剪效果（用户最关心的优化）
 
-### 2. 费用预估（COST SQL/DRY RUN）是按量计费引擎的必备功能
+2. 费用预估（COST SQL/DRY RUN）是按量计费引擎的必备功能
 
-### 3. HBO 在反复执行的 ETL 场景中效果显著 — 值得投资
+3. HBO 在反复执行的 ETL 场景中效果显著 — 值得投资
 
-### 4. 运行时统计（Logview/Query Profile）比静态 EXPLAIN 更有价值
+4. 运行时统计（Logview/Query Profile）比静态 EXPLAIN 更有价值
 
-### 5. 数据倾斜检测应内置到执行计划分析中（自动告警）
+5. 数据倾斜检测应内置到执行计划分析中（自动告警）
 
-### 6. 三层优化器（RBO + CBO + HBO）是查询优化的最先进架构
+6. 三层优化器（RBO + CBO + HBO）是查询优化的最先进架构
 

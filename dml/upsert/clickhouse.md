@@ -16,11 +16,11 @@
  这不是功能缺失，是架构设计的根本选择。
 
  传统 UPSERT (INSERT ON CONFLICT UPDATE) 需要:
-### 1. 唯一索引来检测冲突
+1. 唯一索引来检测冲突
 
-### 2. 对冲突行加锁
+2. 对冲突行加锁
 
-### 3. 原地更新数据
+3. 原地更新数据
 
  这三件事在列式存储 + 追加式写入的架构中代价极高:
    - 列式存储不适合修改单行 (需要重写整个列块)
@@ -106,15 +106,15 @@ SELECT * FROM (
 ```
 
  ReplacingMergeTree 的关键陷阱:
-### 1. 只在同一分区内去重! 如果数据跨分区，相同 ORDER BY 键的行不会合并
+1. 只在同一分区内去重! 如果数据跨分区，相同 ORDER BY 键的行不会合并
 
       所以: 避免用高基数列分区 (PARTITION BY user_id 是灾难)
-### 2. 合并时机不可控: 可能几秒后合并，也可能几小时后
+2. 合并时机不可控: 可能几秒后合并，也可能几小时后
 
       不要依赖"插入后立刻只能看到一行"
-### 3. FINAL 看到的是合并后的视图，但不会触发实际合并
+3. FINAL 看到的是合并后的视图，但不会触发实际合并
 
-### 4. 没有版本列时，保留"最后插入的行"（不推荐，行为不确定）
+4. 没有版本列时，保留"最后插入的行"（不推荐，行为不确定）
 
 
  手动触发合并 (测试用，生产慎用):
@@ -167,13 +167,13 @@ HAVING sum(sign) > 0;           -- 排除已被完全取消的行
 ```
 
  CollapsingMergeTree 的核心问题:
-### 1. 取消行必须和原始行完全一致 (除了 sign)
+1. 取消行必须和原始行完全一致 (除了 sign)
 
       你需要在应用层记住旧值，或者先查旧值再插入取消行
-### 2. 取消行和有效行必须在同一个 INSERT 批次中 (或至少同一个 part)
+2. 取消行和有效行必须在同一个 INSERT 批次中 (或至少同一个 part)
 
       否则合并时可能找不到配对
-### 3. 行插入顺序很重要: 合并时按 ORDER BY 键排序后，相邻的 +1/-1 配对抵消
+3. 行插入顺序很重要: 合并时按 ORDER BY 键排序后，相邻的 +1/-1 配对抵消
 
       如果 -1 行到达得比 +1 行晚，可能暂时看到错误的聚合结果
 
@@ -252,15 +252,15 @@ INSERT INTO user_profiles VALUES (1, 'alice', 'alice@example.com', 25, 1);
  第二次 INSERT 被静默跳过 (因为数据块 hash 相同)
 
  注意:
-### 1. 去重窗口有限 (默认最近 100 个块)
+1. 去重窗口有限 (默认最近 100 个块)
 
-### 2. 只对完全相同的数据块去重 (按字节比较 hash)
+2. 只对完全相同的数据块去重 (按字节比较 hash)
 
-### 3. 不同批次中的相同行不会去重 (只比较整个 INSERT 块)
+3. 不同批次中的相同行不会去重 (只比较整个 INSERT 块)
 
-### 4. 非 Replicated 表用 non_replicated_deduplication_window
+4. 非 Replicated 表用 non_replicated_deduplication_window
 
-### 5. 关闭: SET insert_deduplicate = 0 (某些场景需要允许重复插入)
+5. 关闭: SET insert_deduplicate = 0 (某些场景需要允许重复插入)
 
 
 ## 方式五: 轻量级 DELETE + INSERT (23.3+)
@@ -299,28 +299,28 @@ ALTER TABLE user_profiles UPDATE email = 'new@example.com' WHERE user_id = 1;
 
 ## 最佳实践总结
 
-### 1. 大多数场景: ReplacingMergeTree + INSERT 覆盖
+1. 大多数场景: ReplacingMergeTree + INSERT 覆盖
 
     简单、可靠，查询时用 FINAL 或 argMax 去重
 
-### 2. 需要增量聚合: CollapsingMergeTree 或 VersionedCollapsingMergeTree
+2. 需要增量聚合: CollapsingMergeTree 或 VersionedCollapsingMergeTree
 
     更复杂但支持高效的增量计数/求和
 
-### 3. 防重复消费: insert_deduplicate (幂等性)
+3. 防重复消费: insert_deduplicate (幂等性)
 
     不是 UPSERT，但解决了 exactly-once 语义问题
 
-### 4. 偶尔修数据: ALTER TABLE UPDATE 或 DELETE + INSERT
+4. 偶尔修数据: ALTER TABLE UPDATE 或 DELETE + INSERT
 
     不要用于常规业务流程
 
-### 5. 批量 > 逐行: ClickHouse 优化的是大批次写入
+5. 批量 > 逐行: ClickHouse 优化的是大批次写入
 
     一次 INSERT 10 万行 >> 10 万次 INSERT 1 行
     推荐每批次 1000-100000 行，每秒不超过 1 次 INSERT
 
-### 6. 如果你发现自己在 ClickHouse 上做大量单行 UPSERT:
+6. 如果你发现自己在 ClickHouse 上做大量单行 UPSERT:
 
 停下来。重新考虑架构。
 可能需要: OLTP 数据库 (PostgreSQL) + CDC → ClickHouse

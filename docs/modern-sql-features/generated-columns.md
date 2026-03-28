@@ -227,7 +227,7 @@ CREATE INDEX idx_geo_bucket ON locations(lat_bucket, lng_bucket);
 
 ## 对引擎开发者的实现分析
 
-### 1. STORED 列的实现
+1. STORED 列的实现
 
 STORED 列的实现相对直接，主要修改写入路径：
 
@@ -244,7 +244,7 @@ INSERT/UPDATE 流程:
 - UPDATE 同理，不能直接更新 STORED 列
 - 表达式必须是确定性的（不能用 NOW()、RANDOM() 等非确定性函数）
 
-### 2. VIRTUAL 列的实现（更复杂）
+2. VIRTUAL 列的实现（更复杂）
 
 VIRTUAL 列需要修改查询引擎的读取路径：
 
@@ -261,7 +261,7 @@ SELECT 流程:
 - 如果 VIRTUAL 列有索引，WHERE 过滤可以使用索引（无需计算）
 - VIRTUAL 列的表达式可以参与谓词下推
 
-### 3. VIRTUAL 列的索引
+3. VIRTUAL 列的索引
 
 在 VIRTUAL 列上建索引是最精妙的特性：
 
@@ -277,7 +277,7 @@ SELECT 流程:
 - SELECT virtual_col       → 从索引回表，或实时计算
 ```
 
-### 4. 依赖管理
+4. 依赖管理
 
 计算列引入了列间依赖关系：
 
@@ -293,7 +293,7 @@ full_name = first_name || last_name
 - 禁止循环依赖
 - 计算列不能引用其他计算列（某些引擎允许，如 SQL Server）
 
-### 5. DDL 操作
+5. DDL 操作
 
 ```sql
 -- ALTER TABLE 添加计算列
@@ -306,7 +306,7 @@ ALTER TABLE t DROP COLUMN c;
 -- 检查: 是否有其他计算列依赖 c？是否有索引？
 ```
 
-### 6. PostgreSQL 为何不支持 VIRTUAL
+6. PostgreSQL 为何不支持 VIRTUAL
 
 PostgreSQL 社区在多个版本中讨论过 VIRTUAL 列，核心顾虑：
 

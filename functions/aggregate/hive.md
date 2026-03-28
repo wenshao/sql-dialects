@@ -168,28 +168,28 @@ SELECT HISTOGRAM_NUMERIC(amount, 10) FROM orders;
 
 ## 7. 已知限制
 
-### 1. 无 STRING_AGG / LISTAGG: 用 COLLECT_LIST + CONCAT_WS 替代
+1. 无 STRING_AGG / LISTAGG: 用 COLLECT_LIST + CONCAT_WS 替代
 
-### 2. 无 FILTER 子句: 用 CASE WHEN 替代条件聚合
+2. 无 FILTER 子句: 用 CASE WHEN 替代条件聚合
 
-### 3. COLLECT_LIST 大数据量 OOM: 单个分组数据过多时内存溢出
+3. COLLECT_LIST 大数据量 OOM: 单个分组数据过多时内存溢出
 
-### 4. PERCENTILE 仅支持 BIGINT: 浮点数需要用 PERCENTILE_APPROX
+4. PERCENTILE 仅支持 BIGINT: 浮点数需要用 PERCENTILE_APPROX
 
-### 5. 无 WITHIN GROUP: Hive 没有有序聚合语法
+5. 无 WITHIN GROUP: Hive 没有有序聚合语法
 
-### 6. GROUPING__ID 行为与 SQL 标准不一致: 位编码方式不同
+6. GROUPING__ID 行为与 SQL 标准不一致: 位编码方式不同
 
 
 ## 8. 对引擎开发者的启示
 
-### 1. COLLECT_LIST/COLLECT_SET 是大数据引擎的标配:
+1. COLLECT_LIST/COLLECT_SET 是大数据引擎的标配:
 
     将行聚合为数组是处理嵌套数据的基础能力
-### 2. 近似聚合对大数据量很重要: PERCENTILE_APPROX 比 PERCENTILE 快得多，
+2. 近似聚合对大数据量很重要: PERCENTILE_APPROX 比 PERCENTILE 快得多，
 
     大数据引擎应该提供近似计算选项（如 APPROX_COUNT_DISTINCT）
-### 3. GROUPING SETS 的 SQL 标准兼容性: 不同引擎的语法差异是迁移的痛点
+3. GROUPING SETS 的 SQL 标准兼容性: 不同引擎的语法差异是迁移的痛点
 
-### 4. FILTER 子句应该被支持: 比 CASE WHEN 更简洁，可读性更好
+4. FILTER 子句应该被支持: 比 CASE WHEN 更简洁，可读性更好
 

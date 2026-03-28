@@ -105,11 +105,11 @@ FROM users u JOIN small_table s ON u.role_id = s.id;
  大多数 Hive 部署不使用递归 CTE。
 
  替代方案:
-### 1. 多次自连接（固定层级深度）
+1. 多次自连接（固定层级深度）
 
-### 2. 外部程序（Python/Spark）处理递归逻辑
+2. 外部程序（Python/Spark）处理递归逻辑
 
-### 3. 预计算层级数据写入宽表
+3. 预计算层级数据写入宽表
 
 
 ## 5. 跨引擎对比: CTE 能力
@@ -126,26 +126,26 @@ FROM users u JOIN small_table s ON u.role_id = s.id;
 
 ## 6. 已知限制
 
-### 1. 不支持递归 CTE（WITH RECURSIVE）
+1. 不支持递归 CTE（WITH RECURSIVE）
 
-### 2. CTE 不物化: 多次引用 = 多次执行
+2. CTE 不物化: 多次引用 = 多次执行
 
-### 3. CTE 不能用于 UPDATE/DELETE 语句
+3. CTE 不能用于 UPDATE/DELETE 语句
 
-### 4. CTE 中不能使用 INSERT OVERWRITE
+4. CTE 中不能使用 INSERT OVERWRITE
 
 ### 5. 0.13 之前不支持 CTE（需用子查询替代）
 
 
 ## 7. 对引擎开发者的启示
 
-### 1. CTE 物化是一个优化机会: 如果 CTE 被多次引用，物化可以避免重复计算
+1. CTE 物化是一个优化机会: 如果 CTE 被多次引用，物化可以避免重复计算
 
     但物化增加了中间存储开销，需要优化器做代价权衡
-### 2. 递归 CTE 在大数据引擎中不实用:
+2. 递归 CTE 在大数据引擎中不实用:
 
     递归的迭代次数不确定，与 MapReduce/Tez 的固定 DAG 模型冲突
-### 3. CTE + INSERT 是 Hive 的有用扩展:
+3. CTE + INSERT 是 Hive 的有用扩展:
 
 SQL 标准的 CTE 只用于 SELECT，Hive 扩展到 DML 是实用的设计
 

@@ -90,11 +90,11 @@ LATERAL VIEW EXPLODE(o.items) exploded AS item;
 ```
 
  JsonSerDe 的优势:
-### 1. Schema-on-Read: JSON 字段自动映射到 Hive 列
+1. Schema-on-Read: JSON 字段自动映射到 Hive 列
 
-### 2. 嵌套类型: ARRAY<STRUCT<...>> 直接映射 JSON 数组
+2. 嵌套类型: ARRAY<STRUCT<...>> 直接映射 JSON 数组
 
-### 3. 不需要 get_json_object: 直接用列名和点号访问
+3. 不需要 get_json_object: 直接用列名和点号访问
 
 
 ## 5. 跨引擎对比: JSON 处理
@@ -109,11 +109,11 @@ LATERAL VIEW EXPLODE(o.items) exploded AS item;
 
 ## 6. 对引擎开发者的启示
 
-### 1. SerDe 模式是处理半结构化数据的好方案:
+1. SerDe 模式是处理半结构化数据的好方案:
 
     将 JSON 解析推到建表阶段，查询时直接用列式访问
-### 2. JSON 路径查询 vs 原生类型: 路径查询灵活但性能差（每次运行时解析）
+2. JSON 路径查询 vs 原生类型: 路径查询灵活但性能差（每次运行时解析）
 
     原生 JSON 类型（PostgreSQL JSONB）预解析 + 索引是更好的方案
-### 3. JSON 数组展开应该有一等语法: Hive 的 SPLIT/REGEXP 拆分 JSON 数组很脆弱
+3. JSON 数组展开应该有一等语法: Hive 的 SPLIT/REGEXP 拆分 JSON 数组很脆弱
 

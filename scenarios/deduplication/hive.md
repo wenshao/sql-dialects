@@ -51,11 +51,11 @@ SELECT * FROM (
 ```
 
  设计分析: 为什么 ROW_NUMBER 是 Hive 去重的标准方法?
-### 1. 灵活: 可以精确控制保留哪一行（ORDER BY 决定）
+1. 灵活: 可以精确控制保留哪一行（ORDER BY 决定）
 
-### 2. 高效: 一次扫描 + 窗口函数，比自连接更高效
+2. 高效: 一次扫描 + 窗口函数，比自连接更高效
 
-### 3. 通用: 支持任意去重逻辑（最新/最旧/最大值等）
+3. 通用: 支持任意去重逻辑（最新/最旧/最大值等）
 
 
 ## 3. 物理去重: CTAS + INSERT OVERWRITE
@@ -126,11 +126,11 @@ SELECT APPROX_COUNT_DISTINCT(email) AS approx_count FROM users;
 
 ## 6. 对引擎开发者的启示
 
-### 1. ROW_NUMBER 去重是分析引擎的标准模式: 所有引擎都应该高效支持
+1. ROW_NUMBER 去重是分析引擎的标准模式: 所有引擎都应该高效支持
 
-### 2. DISTINCT ON 是有用的语法糖: 比 ROW_NUMBER + 子查询简洁得多
+2. DISTINCT ON 是有用的语法糖: 比 ROW_NUMBER + 子查询简洁得多
 
-### 3. INSERT OVERWRITE 是 Hive 物理去重的关键: 不需要行级 DELETE
+3. INSERT OVERWRITE 是 Hive 物理去重的关键: 不需要行级 DELETE
 
-### 4. APPROX_COUNT_DISTINCT 对大数据量很重要: 精确去重需要全量数据 Shuffle
+4. APPROX_COUNT_DISTINCT 对大数据量很重要: 精确去重需要全量数据 Shuffle
 

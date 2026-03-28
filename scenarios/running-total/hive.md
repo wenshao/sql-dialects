@@ -95,10 +95,10 @@ FROM transactions;
 
 ## 8. 对引擎开发者的启示
 
-### 1. 窗口函数的 ROWS/RANGE 帧是分析引擎的基础能力
+1. 窗口函数的 ROWS/RANGE 帧是分析引擎的基础能力
 
-### 2. 累计求和的分布式执行: PARTITION BY 决定了数据分布，
+2. 累计求和的分布式执行: PARTITION BY 决定了数据分布，
 
     每个分区在一个 Reducer 中计算，大分区可能导致 OOM
-### 3. IGNORE NULLS 选项应该被支持: 在时间序列场景中用于 forward fill
+3. IGNORE NULLS 选项应该被支持: 在时间序列场景中用于 forward fill
 

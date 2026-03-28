@@ -13,11 +13,11 @@
  所有文本搜索都是暴力扫描（全表/全分区）。
 
  为什么 Hive 不需要全文搜索?
-### 1. 批处理引擎: 全文搜索是在线交互式操作，Hive 面向离线批处理
+1. 批处理引擎: 全文搜索是在线交互式操作，Hive 面向离线批处理
 
-### 2. 索引已废弃: Hive 3.0 废弃了所有索引，全文索引更不可能
+2. 索引已废弃: Hive 3.0 废弃了所有索引，全文索引更不可能
 
-### 3. 生态分工: 全文搜索交给 Elasticsearch/Solr，Hive 负责 ETL 和聚合
+3. 生态分工: 全文搜索交给 Elasticsearch/Solr，Hive 负责 ETL 和聚合
 
 
 ## 2. LIKE 模糊搜索
@@ -109,11 +109,11 @@ LATERAL VIEW EXPLODE(sentence) w AS word;
 ## 6. 替代方案: Elasticsearch 集成
 
  生产环境的全文搜索通常使用 Hive + Elasticsearch:
-### 1. Hive ETL 处理原始数据 → 写入 Elasticsearch
+1. Hive ETL 处理原始数据 → 写入 Elasticsearch
 
-### 2. Elasticsearch 提供全文索引和搜索能力
+2. Elasticsearch 提供全文索引和搜索能力
 
-### 3. 搜索结果的 ID 回联 Hive 表做关联分析
+3. 搜索结果的 ID 回联 Hive 表做关联分析
 
 
  也可以使用 Hive 的 ES Storage Handler:
@@ -135,13 +135,13 @@ LATERAL VIEW EXPLODE(sentence) w AS word;
 
 ## 8. 对引擎开发者的启示
 
-### 1. 全文搜索不是所有 SQL 引擎的必需:
+1. 全文搜索不是所有 SQL 引擎的必需:
 
     分析引擎可以将全文搜索委托给专门的搜索引擎
-### 2. LIKE '%keyword%' 的优化空间:
+2. LIKE '%keyword%' 的优化空间:
 
     列存格式的字典编码可以加速 LIKE 查询（先搜索字典再定位行）
-### 3. 文本分析函数（SENTENCES/LEVENSHTEIN）在大数据引擎中有价值:
+3. 文本分析函数（SENTENCES/LEVENSHTEIN）在大数据引擎中有价值:
 
 Hive 内置的文本分析函数是 ETL 文本处理的实用工具
 

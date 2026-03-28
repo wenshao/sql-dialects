@@ -240,17 +240,17 @@ CREATE TABLE IF NOT EXISTS audit_log (
 ## 9. 对引擎开发者的启示
 
 
-### 1. LIFECYCLE: 将 TTL 作为 DDL 一等公民是最简洁的存储治理方案
+1. LIFECYCLE: 将 TTL 作为 DDL 一等公民是最简洁的存储治理方案
 
-### 2. 两套类型系统的维护成本极高，新引擎必须从第一天设计好类型系统
+2. 两套类型系统的维护成本极高，新引擎必须从第一天设计好类型系统
 
-### 3. 事务表的 delta + compaction 模型是在不可变文件上实现 ACID 的通用方案
+3. 事务表的 delta + compaction 模型是在不可变文件上实现 ACID 的通用方案
 
-### 4. 分区列不是普通列的设计简化了分区裁剪实现，但增加了用户认知负担
+4. 分区列不是普通列的设计简化了分区裁剪实现，但增加了用户认知负担
 
-### 5. 聚集表（CLUSTERED BY）对 JOIN 性能的优化值得在 DDL 层面暴露
+5. 聚集表（CLUSTERED BY）对 JOIN 性能的优化值得在 DDL 层面暴露
 
-### 6. AliORC 的优化方向（自适应编码、异步预读）比格式本身更重要
+6. AliORC 的优化方向（自适应编码、异步预读）比格式本身更重要
 
 
 注意: 没有 AUTO_INCREMENT/SEQUENCE

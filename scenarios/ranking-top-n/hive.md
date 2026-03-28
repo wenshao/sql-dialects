@@ -105,9 +105,9 @@ SELECT order_id, amount FROM orders SORT BY amount DESC LIMIT 100;
 
 ## 8. 对引擎开发者的启示
 
-### 1. Top-K 优化器是排序的关键优化: 避免全量排序
+1. Top-K 优化器是排序的关键优化: 避免全量排序
 
-### 2. QUALIFY 应该被支持: 消除了 ROW_NUMBER + 子查询的冗长写法
+2. QUALIFY 应该被支持: 消除了 ROW_NUMBER + 子查询的冗长写法
 
-### 3. SORT BY + LIMIT 是分布式 Top-K 的好方案: 利用多 Reducer 并行
+3. SORT BY + LIMIT 是分布式 Top-K 的好方案: 利用多 Reducer 并行
 

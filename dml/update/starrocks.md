@@ -53,13 +53,13 @@ UPDATE users u JOIN vip v ON u.id = v.user_id SET u.status = 2;
 
  对引擎开发者的启示:
    列存引擎的 UPDATE 核心挑战:
-### 1. 定位旧行(主键索引) → 内存 HashIndex
+1. 定位旧行(主键索引) → 内存 HashIndex
 
-### 2. 标记旧行删除 → 写入 Delete Bitmap
+2. 标记旧行删除 → 写入 Delete Bitmap
 
-### 3. 写入新行 → 追加到新的 Segment
+3. 写入新行 → 追加到新的 Segment
 
-### 4. 空间回收 → 后台 Compaction
+4. 空间回收 → 后台 Compaction
 
 Partial Update 的优化: 只读取/写入变更的列，减少 I/O。
 

@@ -249,7 +249,7 @@ FROM '2024-03-01' TO '2024-06-01';
 
 ## 用例
 
-### 1. 酒店预订无重叠
+1. 酒店预订无重叠
 
 ```sql
 -- PostgreSQL 完整方案
@@ -272,7 +272,7 @@ WHERE room_id NOT IN (
 );
 ```
 
-### 2. 员工任职区间
+2. 员工任职区间
 
 ```sql
 CREATE TABLE employment_periods (
@@ -289,7 +289,7 @@ WHERE emp_id = 42
 ORDER BY lower(period);
 ```
 
-### 3. 价格有效期查询
+3. 价格有效期查询
 
 ```sql
 -- 查询某产品在某日期的价格
@@ -307,7 +307,7 @@ ORDER BY lower(valid_period);
 
 ## 对引擎开发者的实现建议
 
-### 1. 范围类型的存储表示
+1. 范围类型的存储表示
 
 ```
 RangeValue {
@@ -324,7 +324,7 @@ RangeValue {
 // 这简化了比较和运算
 ```
 
-### 2. GiST 索引支持
+2. GiST 索引支持
 
 范围查询的高效执行依赖 GiST（Generalized Search Tree）索引：
 
@@ -333,7 +333,7 @@ RangeValue {
 - 插入时通过最小化边界框扩展来选择子树
 - 对于 EXCLUDE 约束，在插入前检查是否有冲突
 
-### 3. 不支持原生范围类型时的替代实现
+3. 不支持原生范围类型时的替代实现
 
 ```sql
 -- 对于不支持范围类型的引擎，可用两列 + 唯一索引 + 触发器模拟

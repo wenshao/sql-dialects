@@ -170,16 +170,16 @@ SELECT * FROM orders WHERE amount BETWEEN 100 AND 1000;
 
 ## 9. 对引擎开发者的启示
 
-### 1. CAST 的失败行为需要明确设计:
+1. CAST 的失败行为需要明确设计:
 
     静默返回 NULL (Hive/MySQL) vs 报错 (PostgreSQL) 各有道理。
     BigQuery 的 SAFE_CAST 提供了两种选择，是最灵活的方案。
-### 2. IF 函数是有用的语法糖: 比 CASE WHEN 简洁，值得支持
+2. IF 函数是有用的语法糖: 比 CASE WHEN 简洁，值得支持
 
-### 3. ASSERT_TRUE 是数据质量检查的好模式:
+3. ASSERT_TRUE 是数据质量检查的好模式:
 
     在 SQL 中嵌入断言比 try/catch 更直观
-### 4. NULL 处理函数应该丰富:
+4. NULL 处理函数应该丰富:
 
 COALESCE/NVL/NULLIF/IFNULL 覆盖了常见的 NULL 处理场景
 

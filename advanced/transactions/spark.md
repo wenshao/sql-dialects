@@ -61,13 +61,13 @@ WHEN NOT MATCHED THEN INSERT *;
 ```
 
  Delta Lake 事务的实现机制:
-### 1. 每次写入创建新的 Parquet 数据文件（不修改已有文件）
+1. 每次写入创建新的 Parquet 数据文件（不修改已有文件）
 
-### 2. 在 _delta_log/ 目录下写入一个 JSON 提交文件（原子操作）
+2. 在 _delta_log/ 目录下写入一个 JSON 提交文件（原子操作）
 
-### 3. 提交文件记录: 添加了哪些文件、删除了哪些文件、Schema 变更等
+3. 提交文件记录: 添加了哪些文件、删除了哪些文件、Schema 变更等
 
-### 4. 读取时根据事务日志确定哪些文件构成表的"当前版本"
+4. 读取时根据事务日志确定哪些文件构成表的"当前版本"
 
 
  这类似于数据库的 WAL（Write-Ahead Log），但操作粒度是文件而非行。
@@ -109,13 +109,13 @@ RESTORE TABLE users TO TIMESTAMP AS OF '2024-01-15 10:00:00';
 ```
 
  Time Travel 的设计价值:
-### 1. 数据审计: 查看表在任意时间点的状态
+1. 数据审计: 查看表在任意时间点的状态
 
-### 2. 错误恢复: 误操作后 RESTORE 回到正确版本（类似数据库 PITR）
+2. 错误恢复: 误操作后 RESTORE 回到正确版本（类似数据库 PITR）
 
-### 3. 可重现性: 机器学习训练可以引用固定版本的数据集
+3. 可重现性: 机器学习训练可以引用固定版本的数据集
 
-### 4. 零成本读取: 不需要锁——直接读取历史快照
+4. 零成本读取: 不需要锁——直接读取历史快照
 
 
  对比:
@@ -182,14 +182,14 @@ ALTER TABLE users SET TBLPROPERTIES ('delta.isolationLevel' = 'Serializable');
 ## 8. Savepoint 模拟（Delta Lake）
 
 
-### 1. 记录当前版本号
+1. 记录当前版本号
 
  DESCRIBE HISTORY users LIMIT 1;  -> version = 10
-### 2. 执行一系列操作
+2. 执行一系列操作
 
  UPDATE users SET ...;  -- version = 11
  DELETE FROM users ...;  -- version = 12
-### 3. 如果需要回退: RESTORE TABLE users TO VERSION AS OF 10;
+3. 如果需要回退: RESTORE TABLE users TO VERSION AS OF 10;
 
 
 ## 9. 版本演进

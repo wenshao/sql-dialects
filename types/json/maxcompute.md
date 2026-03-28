@@ -220,16 +220,16 @@ LATERAL VIEW EXPLODE(u.props) t AS key, value;
 ## 7. 对引擎开发者的启示
 
 
-### 1. JSON 在大数据场景中很常见（日志、事件、API 数据）— 必须支持
+1. JSON 在大数据场景中很常见（日志、事件、API 数据）— 必须支持
 
-### 2. 原生 JSON 类型 > STRING + 解析函数（性能和类型安全）
+2. 原生 JSON 类型 > STRING + 解析函数（性能和类型安全）
 
-### 3. Snowflake 的 VARIANT 是有趣的设计: 比 JSON 更通用的半结构化类型
+3. Snowflake 的 VARIANT 是有趣的设计: 比 JSON 更通用的半结构化类型
 
-### 4. 固定 schema 的 JSON 应转为复合类型（STRUCT）— 列式存储更高效
+4. 固定 schema 的 JSON 应转为复合类型（STRUCT）— 列式存储更高效
 
-### 5. JSON 索引（如 PostgreSQL 的 GIN on JSONB）在 OLTP 中价值大
+5. JSON 索引（如 PostgreSQL 的 GIN on JSONB）在 OLTP 中价值大
 
     但在 OLAP 中价值有限（反正都是全表扫描）
-### 6. GET_JSON_OBJECT 返回 STRING 的设计导致大量 CAST — 应支持类型推断
+6. GET_JSON_OBJECT 返回 STRING 的设计导致大量 CAST — 应支持类型推断
 

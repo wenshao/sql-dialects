@@ -31,11 +31,11 @@ SELECT * FROM staging_orders WHERE dt = '20240115';
 ```
 
  底层实现:
-### 1. 写入新的 AliORC 文件到临时目录
+1. 写入新的 AliORC 文件到临时目录
 
-### 2. 所有文件写完后，原子性地替换旧目录（元数据操作）
+2. 所有文件写完后，原子性地替换旧目录（元数据操作）
 
-### 3. 如果任何步骤失败: 临时目录被清理，旧数据不受影响
+3. 如果任何步骤失败: 临时目录被清理，旧数据不受影响
 
 这不是传统 ACID 事务，而是文件系统级别的原子替换
 
@@ -205,15 +205,15 @@ Snowflake:  支持              | PostgreSQL: 支持（SERIALIZABLE 更强）
 ## 8. 对引擎开发者的启示
 
 
-### 1. INSERT OVERWRITE 的原子性是批处理引擎最重要的事务保证
+1. INSERT OVERWRITE 的原子性是批处理引擎最重要的事务保证
 
-### 2. 在不可变文件上叠加事务（delta + compaction）是通用模式
+2. 在不可变文件上叠加事务（delta + compaction）是通用模式
 
-### 3. 所有表默认支持事务比后期追加更好（Delta Lake/Iceberg 的做法）
+3. 所有表默认支持事务比后期追加更好（Delta Lake/Iceberg 的做法）
 
-### 4. compaction 策略决定读取性能: minor(合并 delta) vs major(重写 base)
+4. compaction 策略决定读取性能: minor(合并 delta) vs major(重写 base)
 
-### 5. Time Travel 的存储成本与历史可追溯性需要权衡
+5. Time Travel 的存储成本与历史可追溯性需要权衡
 
-### 6. 分区级并发是大数据引擎的最佳并发粒度（行级锁在批处理中无意义）
+6. 分区级并发是大数据引擎的最佳并发粒度（行级锁在批处理中无意义）
 

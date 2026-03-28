@@ -107,13 +107,13 @@ DROP MATERIALIZED VIEW mv_order_detail;
 
  对引擎开发者的启示:
    MV 查询改写的实现本质是"查询包含关系判断":
-### 1. 列映射: MV 列 >= 查询列
+1. 列映射: MV 列 >= 查询列
 
-### 2. 谓词包含: MV 的 WHERE 被查询的 WHERE 包含(或无条件)
+2. 谓词包含: MV 的 WHERE 被查询的 WHERE 包含(或无条件)
 
-### 3. 聚合兼容: SUM 可上卷，COUNT 可上卷(SUM of COUNT)，AVG 不可
+3. 聚合兼容: SUM 可上卷，COUNT 可上卷(SUM of COUNT)，AVG 不可
 
-### 4. JOIN 兼容: 查询的 JOIN 图是 MV 的子图
+4. JOIN 兼容: 查询的 JOIN 图是 MV 的子图
 
 StarRocks 的实现在 fe/optimizer/rule/transformation/materialization/ 目录。
 

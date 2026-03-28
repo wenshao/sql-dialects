@@ -119,33 +119,33 @@ FROM users;
 ## 6. 窗口函数在 Hive 的执行模型
 
  PARTITION BY 的执行:
-### 1. 数据按 PARTITION BY 键 Shuffle（与 DISTRIBUTE BY 相同）
+1. 数据按 PARTITION BY 键 Shuffle（与 DISTRIBUTE BY 相同）
 
-### 2. 每个 Reducer 处理一个分区
+2. 每个 Reducer 处理一个分区
 
-### 3. 分区内按 ORDER BY 排序后计算窗口函数
+3. 分区内按 ORDER BY 排序后计算窗口函数
 
 
  性能要点:
-### 1. PARTITION BY 避免了全局排序（比 ORDER BY 独占单个 Reducer 高效）
+1. PARTITION BY 避免了全局排序（比 ORDER BY 独占单个 Reducer 高效）
 
-### 2. 多个窗口函数如果使用相同的 PARTITION BY + ORDER BY，可以共享排序
+2. 多个窗口函数如果使用相同的 PARTITION BY + ORDER BY，可以共享排序
 
-### 3. 大分区可能导致 OOM（单个分区的所有数据必须在一个 Reducer 中）
+3. 大分区可能导致 OOM（单个分区的所有数据必须在一个 Reducer 中）
 
 
 ## 7. 已知限制
 
-### 1. 不支持命名窗口（WINDOW 子句）:
+1. 不支持命名窗口（WINDOW 子句）:
 
     不能 WINDOW w AS (PARTITION BY city ORDER BY age) ... OVER w
-### 2. 不支持 GROUPS 帧模式: 只有 ROWS 和 RANGE
+2. 不支持 GROUPS 帧模式: 只有 ROWS 和 RANGE
 
-### 3. 不支持 FILTER 子句: SUM(age) FILTER (WHERE active) 不可用
+3. 不支持 FILTER 子句: SUM(age) FILTER (WHERE active) 不可用
 
-### 4. 不支持 QUALIFY 子句: 需要用子查询包装后过滤
+4. 不支持 QUALIFY 子句: 需要用子查询包装后过滤
 
-### 5. 不支持 EXCLUDE 子句: ROWS BETWEEN ... EXCLUDE CURRENT ROW 不可用
+5. 不支持 EXCLUDE 子句: ROWS BETWEEN ... EXCLUDE CURRENT ROW 不可用
 
 
 ## 8. 跨引擎对比: 窗口函数能力
@@ -161,17 +161,17 @@ FROM users;
 
 ## 9. 对引擎开发者的启示
 
-### 1. 窗口函数是分析引擎的核心能力:
+1. 窗口函数是分析引擎的核心能力:
 
     Hive 0.11 引入窗口函数后，大数据 SQL 的表达能力大幅提升
-### 2. LAST_VALUE 的默认帧是常见陷阱:
+2. LAST_VALUE 的默认帧是常见陷阱:
 
     考虑让 LAST_VALUE 的默认帧为 UNBOUNDED FOLLOWING（更符合用户直觉）
-### 3. QUALIFY 应该被支持: 避免了窗口函数 + 子查询包装的冗长写法
+3. QUALIFY 应该被支持: 避免了窗口函数 + 子查询包装的冗长写法
 
-### 4. 命名窗口提升可读性: 多个窗口函数复用同一窗口定义时很有用
+4. 命名窗口提升可读性: 多个窗口函数复用同一窗口定义时很有用
 
-### 5. 窗口函数的分布式执行: PARTITION BY 决定了 Shuffle，
+5. 窗口函数的分布式执行: PARTITION BY 决定了 Shuffle，
 
 优化器应该尽量合并使用相同 PARTITION BY 的窗口函数
 

@@ -72,7 +72,7 @@ APPROX_COUNT_DISTINCT(user_id):
 
 ## 核心算法
 
-### 1. HyperLogLog (HLL) —— 去重计数
+1. HyperLogLog (HLL) —— 去重计数
 
 ```
 原理（极简版）:
@@ -94,7 +94,7 @@ Google 改进版，BigQuery 使用：
 - 大基数时使用稀疏表示（节省空间）
 - 偏差修正更精确
 
-### 2. t-digest —— 分位数估计
+2. t-digest —— 分位数估计
 
 ```
 原理:
@@ -109,7 +109,7 @@ Google 改进版，BigQuery 使用：
 
 t-digest 的设计巧妙之处在于在人们最关心的极端分位数（P99, P999）上最精确。
 
-### 3. Count-Min Sketch —— 频次估计
+3. Count-Min Sketch —— 频次估计
 
 ```
 原理:
@@ -122,7 +122,7 @@ t-digest 的设计巧妙之处在于在人们最关心的极端分位数（P99, 
 用途: Top-K、频次查询
 ```
 
-### 4. KLL Sketch —— 分位数估计（更新的算法）
+4. KLL Sketch —— 分位数估计（更新的算法）
 
 ```
 原理:
@@ -302,7 +302,7 @@ HyperLogLog:
 
 ## 对引擎开发者的实现建议
 
-### 1. 注册为聚合函数
+1. 注册为聚合函数
 
 近似函数在引擎框架中是标准的聚合函数，需要实现：
 
@@ -325,7 +325,7 @@ ApproxCountDistinct Accumulator {
 }
 ```
 
-### 2. 序列化支持
+2. 序列化支持
 
 为了支持分布式聚合和预聚合存储，sketch 需要高效的序列化/反序列化：
 
@@ -337,7 +337,7 @@ t-digest 序列化格式:
 [4 bytes: centroid 数量] [每个 centroid: 8 bytes mean + 4 bytes weight]
 ```
 
-### 3. 精度参数
+3. 精度参数
 
 建议提供用户可调的精度参数：
 
@@ -351,7 +351,7 @@ SELECT approx_distinct(user_id, 0.05) FROM events;  -- 5% 误差（更快）
 -- 0.05 → precision=10 (1024 桶, 约 768 B)
 ```
 
-### 4. 小基数优化
+4. 小基数优化
 
 HyperLogLog 在小基数（< 数千）时误差较大。推荐实现自适应策略：
 
@@ -364,7 +364,7 @@ ClickHouse 的 uniqCombined 就是这个策略:
   基数 >= 65536: 转换为 HLL（近似）
 ```
 
-### 5. 与精确函数的兼容
+5. 与精确函数的兼容
 
 建议引擎在查询计划层提供自动替换选项：
 

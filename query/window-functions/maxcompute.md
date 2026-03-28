@@ -226,15 +226,15 @@ MaxCompute: 不支持    | PostgreSQL: 支持
 ## 9. 对引擎开发者的启示
 
 
-### 1. 窗口函数是 OLAP 引擎的核心 — 必须完整支持
+1. 窗口函数是 OLAP 引擎的核心 — 必须完整支持
 
-### 2. QUALIFY 语法极大简化了窗口过滤，值得加入（BigQuery/Snowflake 已验证）
+2. QUALIFY 语法极大简化了窗口过滤，值得加入（BigQuery/Snowflake 已验证）
 
-### 3. 无 PARTITION BY 的窗口导致单节点瓶颈 — 应该有 WARNING 提示
+3. 无 PARTITION BY 的窗口导致单节点瓶颈 — 应该有 WARNING 提示
 
-### 4. ROWS 帧比 RANGE 帧更常用且实现更简单 — 优先支持
+4. ROWS 帧比 RANGE 帧更常用且实现更简单 — 优先支持
 
-### 5. 窗口函数去重（ROW_NUMBER + WHERE rn=1）是用户最频繁的模式
+5. 窗口函数去重（ROW_NUMBER + WHERE rn=1）是用户最频繁的模式
 
-### 6. HBO 可以利用窗口函数的 PARTITION BY 优化 Shuffle 策略
+6. HBO 可以利用窗口函数的 PARTITION BY 优化 Shuffle 策略
 

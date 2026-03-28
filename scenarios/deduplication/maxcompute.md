@@ -158,11 +158,11 @@ SELECT user_id, email, username, created_at FROM (
    ClickHouse: ReplacingMergeTree（后台自动去重）
 
  对引擎开发者:
-### 1. QUALIFY 语法极大简化去重: QUALIFY ROW_NUMBER() OVER (...) = 1
+1. QUALIFY 语法极大简化去重: QUALIFY ROW_NUMBER() OVER (...) = 1
 
-### 2. ClickHouse ReplacingMergeTree 的异步去重是有趣的替代方案
+2. ClickHouse ReplacingMergeTree 的异步去重是有趣的替代方案
 
-### 3. APPROX_DISTINCT 是大数据引擎的必备功能
+3. APPROX_DISTINCT 是大数据引擎的必备功能
 
-### 4. 分区级去重是 Hive 族引擎的最佳实践 — 避免全表重写
+4. 分区级去重是 Hive 族引擎的最佳实践 — 避免全表重写
 

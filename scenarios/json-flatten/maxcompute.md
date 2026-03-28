@@ -135,11 +135,11 @@ LATERAL VIEW EXPLODE(SPLIT(
    ClickHouse: JSONExtract + arrayJoin
 
  对引擎开发者:
-### 1. Snowflake FLATTEN 是 JSON 展平的最佳 API 设计 — 一个函数解决所有展平
+1. Snowflake FLATTEN 是 JSON 展平的最佳 API 设计 — 一个函数解决所有展平
 
-### 2. JSON 数组展开应有原生支持（不应依赖 SPLIT + REGEXP 字符串黑科技）
+2. JSON 数组展开应有原生支持（不应依赖 SPLIT + REGEXP 字符串黑科技）
 
-### 3. ARRAY<STRUCT> 比 JSON STRING 性能好得多 — 引擎应鼓励复合类型
+3. ARRAY<STRUCT> 比 JSON STRING 性能好得多 — 引擎应鼓励复合类型
 
-### 4. JSON_TUPLE 的"一次解析多字段"设计减少了重复解析开销
+4. JSON_TUPLE 的"一次解析多字段"设计减少了重复解析开销
 

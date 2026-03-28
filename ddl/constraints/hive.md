@@ -34,13 +34,13 @@ STORED AS ORC;
    NORELY:     默认，优化器不利用约束信息
 
  为什么 Hive 不强制执行约束？
-### 1. 性能: 数据量 TB/PB 级，每次 INSERT 检查唯一性需要全表扫描或维护索引
+1. 性能: 数据量 TB/PB 级，每次 INSERT 检查唯一性需要全表扫描或维护索引
 
-### 2. 分布式环境: 多个 Mapper/Reducer 并行写入，跨节点唯一性检查代价极高
+2. 分布式环境: 多个 Mapper/Reducer 并行写入，跨节点唯一性检查代价极高
 
-### 3. HDFS 限制: 底层存储不支持随机读写，无法高效维护索引结构
+3. HDFS 限制: 底层存储不支持随机读写，无法高效维护索引结构
 
-### 4. INSERT OVERWRITE 语义: 整体覆盖分区，约束检查只在写入端有意义
+4. INSERT OVERWRITE 语义: 整体覆盖分区，约束检查只在写入端有意义
 
 
 ## 3. RELY 约束: 优化器提示
@@ -57,11 +57,11 @@ CREATE TABLE users_rely (
  RELY 标记的作用:
  告诉优化器 "可以利用此约束做查询优化"，即使约束不被强制执行。
  典型优化:
-### 1. JOIN 消除: 如果知道某列是唯一的(PK/UNIQUE)，可以消除不必要的 JOIN
+1. JOIN 消除: 如果知道某列是唯一的(PK/UNIQUE)，可以消除不必要的 JOIN
 
-### 2. 空值传播: NOT NULL RELY 让优化器省略 IS NULL 检查
+2. 空值传播: NOT NULL RELY 让优化器省略 IS NULL 检查
 
-### 3. 外键推导: FK RELY 可以帮助优化器推导 JOIN 选择性
+3. 外键推导: FK RELY 可以帮助优化器推导 JOIN 选择性
 
 
  风险: 如果数据实际上违反约束，RELY 会导致查询结果错误！
@@ -137,19 +137,19 @@ ALTER TABLE orders ADD CONSTRAINT pk_orders_v2 PRIMARY KEY (id) DISABLE NOVALIDA
 
 ## 8. 对引擎开发者的启示
 
-### 1. 约束要么执行，要么明确告知不执行:
+1. 约束要么执行，要么明确告知不执行:
 
     MySQL 5.7 的 CHECK（解析但不执行）是反面教材，Hive 的 DISABLE 至少透明
-### 2. 声明式约束对优化器有价值: 即使不执行，PK/FK 信息可用于 JOIN 优化和查询改写
+2. 声明式约束对优化器有价值: 即使不执行，PK/FK 信息可用于 JOIN 优化和查询改写
 
-### 3. NOT NULL 是最容易强制执行的约束: 只需在写入路径检查，不需要全局数据扫描
+3. NOT NULL 是最容易强制执行的约束: 只需在写入路径检查，不需要全局数据扫描
 
-### 4. 分布式系统中唯一性约束的代价:
+4. 分布式系统中唯一性约束的代价:
 
     方案 A: 全局协调（代价极高，不适合大数据量）
     方案 B: 声明但不执行 + 数据质量工具离线检查（Hive/BigQuery 方案）
     方案 C: 范围分区 + 局部唯一性保证（TiDB 方案）
-### 5. 数据质量应该是独立系统: Great Expectations、dbt tests 等
+5. 数据质量应该是独立系统: Great Expectations、dbt tests 等
 
 而不是嵌入在查询引擎中（大数据引擎的共识）
 

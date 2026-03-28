@@ -116,13 +116,13 @@ CLEAR CACHE;
 ```
 
  CACHE TABLE 的实现机制:
-### 1. 数据以 Tungsten 列式二进制格式存储在 Executor 内存中
+1. 数据以 Tungsten 列式二进制格式存储在 Executor 内存中
 
-### 2. 后续查询通过 InMemoryTableScan 操作符读取（跳过文件扫描）
+2. 后续查询通过 InMemoryTableScan 操作符读取（跳过文件扫描）
 
-### 3. 内存不足时溢出到磁盘（取决于 Storage Level）
+3. 内存不足时溢出到磁盘（取决于 Storage Level）
 
-### 4. 不自动刷新——源表变更后缓存变为"陈旧"（Stale）
+4. 不自动刷新——源表变更后缓存变为"陈旧"（Stale）
 
 
  CACHE TABLE vs df.cache():

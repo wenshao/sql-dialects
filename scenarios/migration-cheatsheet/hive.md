@@ -74,25 +74,25 @@
 
 ## 4. 迁移关键陷阱
 
-### 1. 无主键/唯一约束强制: 数据唯一性需要在 ETL 层保证
+1. 无主键/唯一约束强制: 数据唯一性需要在 ETL 层保证
 
-### 2. 无自增列: 使用 ROW_NUMBER() 或 UUID()
+2. 无自增列: 使用 ROW_NUMBER() 或 UUID()
 
-### 3. 无索引: 依赖分区裁剪 + ORC/Parquet 内置统计
+3. 无索引: 依赖分区裁剪 + ORC/Parquet 内置统计
 
-### 4. INSERT 代价高: 每条 INSERT 是一个 MR/Tez 作业
+4. INSERT 代价高: 每条 INSERT 是一个 MR/Tez 作业
 
-### 5. 分区设计关键: 需要在迁移时设计好分区策略
+5. 分区设计关键: 需要在迁移时设计好分区策略
 
-### 6. 存储格式选择: ORC(ACID) 或 Parquet(跨引擎兼容)
+6. 存储格式选择: ORC(ACID) 或 Parquet(跨引擎兼容)
 
-### 7. 日期格式不同: Java SimpleDateFormat (yyyy-MM-dd)
+7. 日期格式不同: Java SimpleDateFormat (yyyy-MM-dd)
 
-### 8. 不支持 ||: 必须用 CONCAT()
+8. 不支持 ||: 必须用 CONCAT()
 
-### 9. 不支持事务控制: 无 BEGIN/COMMIT/ROLLBACK
+9. 不支持事务控制: 无 BEGIN/COMMIT/ROLLBACK
 
-### 10. CAST 失败返回 NULL: 不报错（与 PG 不同）
+10. CAST 失败返回 NULL: 不报错（与 PG 不同）
 
 
 ## 5. 从 Hive 迁移到其他引擎
@@ -118,10 +118,10 @@
 
 ## 7. 对引擎开发者的启示
 
-### 1. Hive 的语法是大数据 SQL 的"基准方言": Spark/MaxCompute/Impala 都高度兼容
+1. Hive 的语法是大数据 SQL 的"基准方言": Spark/MaxCompute/Impala 都高度兼容
 
-### 2. 迁移的核心困难不是语法而是设计模式:
+2. 迁移的核心困难不是语法而是设计模式:
 
     RDBMS 的 INSERT/UPDATE/DELETE 在 Hive 中需要转换为 INSERT OVERWRITE
-### 3. 分区设计是迁移成败的关键: RDBMS 不需要分区策略，Hive 查询性能完全依赖它
+3. 分区设计是迁移成败的关键: RDBMS 不需要分区策略，Hive 查询性能完全依赖它
 

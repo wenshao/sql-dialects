@@ -91,23 +91,23 @@ WHERE id IN (
 
 
  Copy-on-Write:
-### 1. 扫描文件，找到匹配 WHERE 条件的行所在的文件
+1. 扫描文件，找到匹配 WHERE 条件的行所在的文件
 
-### 2. 读取这些文件的全部数据
+2. 读取这些文件的全部数据
 
-### 3. 修改匹配行，与未修改行合并
+3. 修改匹配行，与未修改行合并
 
-### 4. 写入新的 Parquet 文件，记录到事务日志
+4. 写入新的 Parquet 文件，记录到事务日志
 
 
  Merge-on-Read（Deletion Vectors, Delta 2.0+）:
-### 1. 创建 Deletion Vector 标记旧行
+1. 创建 Deletion Vector 标记旧行
 
-### 2. 写入新行到新的 Parquet 文件
+2. 写入新行到新的 Parquet 文件
 
-### 3. 读取时合并 Deletion Vector 和新文件
+3. 读取时合并 Deletion Vector 和新文件
 
-### 4. 后续 OPTIMIZE 时物理合并
+4. 后续 OPTIMIZE 时物理合并
 
 
  对引擎开发者的启示:

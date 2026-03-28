@@ -28,11 +28,11 @@ SELECT * FROM users ORDER BY id OFFSET 20 ROWS FETCH FIRST 10 ROWS ONLY;
 
  设计分析: LIMIT 在分布式环境中的实现
    Spark 的 LIMIT 不是简单的"取前 N 行":
-### 1. 每个分区取 top N（并行执行，每个 Executor 独立取 N 行）
+1. 每个分区取 top N（并行执行，每个 Executor 独立取 N 行）
 
-### 2. 合并所有分区的结果到 Driver 端
+2. 合并所有分区的结果到 Driver 端
 
-### 3. 在 Driver 端取最终的 top N
+3. 在 Driver 端取最终的 top N
 
    这意味着: LIMIT 总是全局有序的（需要数据传输到 Driver）
    大 LIMIT 值可能导致 Driver OOM

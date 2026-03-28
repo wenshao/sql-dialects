@@ -10,13 +10,13 @@
 ## 1. UPDATE 的前提条件
 
  Hive UPDATE 仅支持 ACID 事务表:
-### 1. ORC 格式: 只有 ORC 支持 ACID（Parquet 不支持）
+1. ORC 格式: 只有 ORC 支持 ACID（Parquet 不支持）
 
-### 2. transactional=true: 表属性中启用事务
+2. transactional=true: 表属性中启用事务
 
-### 3. 托管表: 外部表(EXTERNAL)不支持 UPDATE
+3. 托管表: 外部表(EXTERNAL)不支持 UPDATE
 
-### 4. 事务管理器: hive.txn.manager = DbTxnManager
+4. 事务管理器: hive.txn.manager = DbTxnManager
 
 
  CREATE TABLE users (id BIGINT, username STRING, email STRING, age INT)
@@ -65,11 +65,11 @@ UPDATE users SET age = (SELECT AVG(age) FROM users) WHERE age IS NULL;
 
  UPDATE 的内部实现:
  UPDATE users SET age=26 WHERE id=1 被转换为:
-### 1. 读取 WHERE 匹配的行
+1. 读取 WHERE 匹配的行
 
-### 2. 写入 delete delta（标记旧行为删除）
+2. 写入 delete delta（标记旧行为删除）
 
-### 3. 写入 insert delta（插入包含新值的行）
+3. 写入 insert delta（插入包含新值的行）
 
  本质上: UPDATE = DELETE + INSERT
  这意味着 UPDATE 的 I/O 代价约为同等行数 DELETE + INSERT 的总和
@@ -109,19 +109,19 @@ WHERE dt = '2024-01-15';
 
 ## 4. 已知限制
 
-### 1. 仅 ACID 表支持 UPDATE（ORC + transactional=true）
+1. 仅 ACID 表支持 UPDATE（ORC + transactional=true）
 
-### 2. 不支持多表 JOIN UPDATE: 不能 UPDATE a SET ... FROM a JOIN b ON ...
+2. 不支持多表 JOIN UPDATE: 不能 UPDATE a SET ... FROM a JOIN b ON ...
 
-### 3. 不支持 ORDER BY / LIMIT
+3. 不支持 ORDER BY / LIMIT
 
-### 4. 分区列不能更新: 分区值是目录路径的一部分
+4. 分区列不能更新: 分区值是目录路径的一部分
 
-### 5. 分桶列不能更新 (Hive 2.x): 会破坏桶分配
+5. 分桶列不能更新 (Hive 2.x): 会破坏桶分配
 
-### 6. 不支持 RETURNING 子句: 不能返回被更新的行
+6. 不支持 RETURNING 子句: 不能返回被更新的行
 
-### 7. 每次 UPDATE 增加 delta 文件: 频繁 UPDATE 需要定期 Compaction
+7. 每次 UPDATE 增加 delta 文件: 频繁 UPDATE 需要定期 Compaction
 
 
 ## 5. 跨引擎对比: UPDATE 设计
@@ -142,16 +142,16 @@ WHERE dt = '2024-01-15';
 
 ## 6. 对引擎开发者的启示
 
-### 1. UPDATE = DELETE + INSERT 是不可变存储系统的必然选择:
+1. UPDATE = DELETE + INSERT 是不可变存储系统的必然选择:
 
     Hive/PostgreSQL 都将 UPDATE 分解为删除旧行 + 插入新行
-### 2. 分区列不可更新是目录分区模型的限制:
+2. 分区列不可更新是目录分区模型的限制:
 
     修改分区值 = 将文件从一个目录移到另一个目录，这在原子性上难以保证
-### 3. INSERT OVERWRITE 是比 UPDATE 更适合批处理的写入模式:
+3. INSERT OVERWRITE 是比 UPDATE 更适合批处理的写入模式:
 
     对于批量数据修正，全量重写比逐行 UPDATE 更简单、更高效
-### 4. 频繁 UPDATE 的场景不适合 Hive:
+4. 频繁 UPDATE 的场景不适合 Hive:
 
 每次 UPDATE 产生 delta 文件，累积后需要 Compaction，
 这使得 Hive ACID 不适合高并发 OLTP 写入
