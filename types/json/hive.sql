@@ -1,86 +1,114 @@
--- Hive: JSON 类型
+-- Hive: JSON 处理 (无原生 JSON 类型)
 --
 -- 参考资料:
 --   [1] Apache Hive - get_json_object
---       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF#LanguageManualUDF-get_json_object
---   [2] Apache Hive - JSON SerDe
---       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL#LanguageManualDDL-JSON
+--       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
+--   [2] Apache Hive - JsonSerDe
+--       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL
 
--- 没有原生 JSON 类型
--- 使用 STRING 存储 JSON，配合 JSON 函数和 SerDe 操作
--- 复合类型：MAP / ARRAY / STRUCT / UNIONTYPE
+-- ============================================================
+-- 1. Hive 没有原生 JSON 类型
+-- ============================================================
+-- JSON 数据存储为 STRING，通过函数在查询时解析。
+-- 替代方案: 使用 ARRAY/MAP/STRUCT 原生复合类型代替 JSON。
+-- 或使用 JsonSerDe 在建表时将 JSON 映射为 Hive 列。
 
-CREATE TABLE events (
-    id   BIGINT,
-    data STRING                            -- 存储 JSON 字符串
-);
+CREATE TABLE events (id BIGINT, data STRING) STORED AS ORC;
 
--- 插入 JSON
-INSERT INTO events (id, data) VALUES (1, '{"name": "alice", "age": 25}');
+-- ============================================================
+-- 2. get_json_object: JSONPath 查询
+-- ============================================================
+SELECT
+    GET_JSON_OBJECT(data, '$.name')     AS name,      -- 顶层字段
+    GET_JSON_OBJECT(data, '$.age')      AS age,       -- 返回 STRING
+    GET_JSON_OBJECT(data, '$.tags[0]')  AS first_tag,  -- 数组元素
+    GET_JSON_OBJECT(data, '$.addr.city') AS city       -- 嵌套字段
+FROM events;
 
--- 读取 JSON 字段
-SELECT GET_JSON_OBJECT(data, '$.name') FROM events;      -- 返回 STRING
-SELECT GET_JSON_OBJECT(data, '$.age') FROM events;       -- 返回 STRING
-SELECT GET_JSON_OBJECT(data, '$.tags[0]') FROM events;   -- 数组元素
-SELECT GET_JSON_OBJECT(data, '$.addr.city') FROM events;  -- 嵌套键
-
--- 一次提取多个字段
-SELECT JSON_TUPLE(data, 'name', 'age') AS (name, age) FROM events;
-
--- 查询条件
+-- WHERE 条件中使用
 SELECT * FROM events WHERE GET_JSON_OBJECT(data, '$.name') = 'alice';
 
--- JSON SerDe（用表结构直接映射 JSON）
+-- 限制: 每次调用只提取一个字段，多字段需要多次解析 JSON 字符串
+
+-- ============================================================
+-- 3. json_tuple: 一次提取多个顶层字段 (推荐)
+-- ============================================================
+SELECT e.id, j.name, j.age
+FROM events e
+LATERAL VIEW JSON_TUPLE(e.data, 'name', 'age') j AS name, age;
+
+-- json_tuple 比多次 get_json_object 高效: 只解析一次 JSON
+-- 限制: 只支持顶层字段，不支持嵌套路径
+
+-- ============================================================
+-- 4. JsonSerDe: 建表时映射 JSON (推荐方案)
+-- ============================================================
 CREATE TABLE json_events (
     name   STRING,
     age    INT,
-    tags   ARRAY<STRING>
+    tags   ARRAY<STRING>,
+    addr   STRUCT<city:STRING, zip:STRING>
 )
-ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe';
--- 自动将 JSON 字段映射为列
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+STORED AS TEXTFILE;
 
--- 复合类型（推荐替代 JSON）
--- ARRAY<T>: 数组
--- MAP<K, V>: 键值对
--- STRUCT<f1:T1, f2:T2>: 结构体
--- UNIONTYPE<T1, T2>: 联合类型（少用）
+-- 直接用列名访问（不需要 get_json_object）
+SELECT name, addr.city, tags[0] FROM json_events;
 
+-- SerDe 的优势:
+-- 1. 查询简单: 像普通列一样访问
+-- 2. 类型安全: JSON 字段映射为 Hive 类型
+-- 3. 嵌套支持: ARRAY/STRUCT 自动映射
+
+-- ============================================================
+-- 5. 复合类型替代 JSON (推荐)
+-- ============================================================
 CREATE TABLE users (
     name     STRING,
     address  STRUCT<street:STRING, city:STRING, zip:STRING>,
     tags     ARRAY<STRING>,
-    props    MAP<STRING, STRING>
-);
+    settings MAP<STRING, STRING>
+) STORED AS ORC;
 
--- 访问复合类型
-SELECT address.city FROM users;
-SELECT tags[0] FROM users;
-SELECT props['key1'] FROM users;
-SELECT SIZE(tags) FROM users;
-SELECT SIZE(props) FROM users;
+-- 访问
+SELECT address.city, tags[0], settings['theme'] FROM users;
 
--- 数组操作
-SELECT ARRAY(1, 2, 3);
-SELECT ARRAY_CONTAINS(tags, 'vip') FROM users;
-SELECT SORT_ARRAY(tags) FROM users;       -- 排序
-SELECT EXPLODE(tags) AS tag FROM users;   -- 展开为多行
-SELECT POSEXPLODE(tags) AS (pos, tag) FROM users;  -- 带位置展开
+-- 设计分析: 为什么 Hive 推荐用复合类型而非 JSON?
+-- 1. 类型检查: 复合类型在编译时检查，JSON 在运行时解析
+-- 2. 列存优化: ORC/Parquet 可以对 STRUCT 字段做列级裁剪（只读需要的字段）
+-- 3. 性能: 不需要每次查询时解析 JSON 字符串
+-- 4. 索引统计: ORC 的 min/max 统计可以应用于 STRUCT 内部字段
 
--- MAP 操作
-SELECT MAP('k1', 'v1', 'k2', 'v2');
-SELECT MAP_KEYS(props) FROM users;
-SELECT MAP_VALUES(props) FROM users;
+-- ============================================================
+-- 6. 跨引擎对比: JSON 支持
+-- ============================================================
+-- 引擎          JSON 类型    路径查询          JSON 索引
+-- MySQL(5.7+)   JSON         JSON_EXTRACT/->   函数索引(8.0+)
+-- PostgreSQL    JSON/JSONB   ->>/->             GIN 索引(JSONB)
+-- Hive          STRING       GET_JSON_OBJECT    无
+-- Spark SQL     STRING       GET_JSON_OBJECT    无
+-- BigQuery      JSON(预览)   JSON_EXTRACT       无
+-- ClickHouse    String       JSONExtract        无
+-- Trino         JSON         JSON_EXTRACT       无
+--
+-- PostgreSQL 的 JSONB 是最强的 JSON 实现:
+-- 预解析 + GIN 索引 + 丰富的操作符（@>、?、#>）
 
--- STRUCT 操作
-SELECT NAMED_STRUCT('name', 'alice', 'age', 25);
-SELECT STRUCT('alice', 25);
+-- ============================================================
+-- 7. 已知限制
+-- ============================================================
+-- 1. 无原生 JSON 类型: JSON 作为 STRING 存储，性能差
+-- 2. get_json_object 每次重新解析: 多字段提取效率低
+-- 3. json_tuple 只支持顶层字段: 嵌套字段需要 get_json_object
+-- 4. 无 JSON 构建函数: 不能在 SQL 中构建 JSON（无 JSON_OBJECT/JSON_ARRAY）
+-- 5. 无 JSON 修改函数: 不能在 SQL 中修改 JSON 字段
 
--- LATERAL VIEW（展开复合类型与原表关联）
-SELECT u.name, t.tag
-FROM users u
-LATERAL VIEW EXPLODE(u.tags) t AS tag;
-
--- 注意：没有原生 JSON 类型，用 STRING 存储
--- 注意：推荐使用 MAP/ARRAY/STRUCT + SerDe 替代纯 JSON 字符串
--- 注意：GET_JSON_OBJECT 每次调用都要解析，性能差
--- 注意：JSON SerDe 可以直接将 JSON 文件映射为 Hive 表
+-- ============================================================
+-- 8. 对引擎开发者的启示
+-- ============================================================
+-- 1. JSON 类型 vs 函数处理: Hive 选择了函数处理（不引入新类型），
+--    PostgreSQL 选择了原生类型（JSONB）。原生类型性能更好但实现复杂。
+-- 2. SerDe 模式是 JSON 处理的好方案: 在建表时解析一次，查询时直接用列访问
+-- 3. 复合类型(ARRAY/MAP/STRUCT)比 JSON 更适合分析:
+--    列式存储可以对复合类型做精确的列裁剪和统计
+-- 4. JSON 处理是大数据引擎的必备能力: 半结构化数据越来越多

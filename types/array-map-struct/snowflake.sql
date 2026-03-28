@@ -1,214 +1,154 @@
--- Snowflake: 复合/复杂类型 (Array, Map, Struct)
+-- Snowflake: 复合类型 (VARIANT / ARRAY / OBJECT)
 --
 -- 参考资料:
---   [1] Snowflake Documentation - ARRAY Data Type
---       https://docs.snowflake.com/en/sql-reference/data-types-semistructured#array
---   [2] Snowflake Documentation - OBJECT Data Type
---       https://docs.snowflake.com/en/sql-reference/data-types-semistructured#object
---   [3] Snowflake Documentation - VARIANT Data Type
---       https://docs.snowflake.com/en/sql-reference/data-types-semistructured#variant
---   [4] Snowflake Documentation - Array Functions
---       https://docs.snowflake.com/en/sql-reference/functions-semistructured
---   [5] Snowflake Documentation - MAP Data Type
---       https://docs.snowflake.com/en/sql-reference/data-types-semistructured#map
+--   [1] Snowflake Documentation - Semi-structured Data Types
+--       https://docs.snowflake.com/en/sql-reference/data-types-semistructured
 
 -- ============================================================
--- 半结构化数据类型概述
+-- 1. 三种半结构化类型
 -- ============================================================
--- Snowflake 提供三种半结构化类型:
--- VARIANT: 可以存储任意类型（标量、数组、对象）
--- ARRAY: 有序的 VARIANT 元素集合
--- OBJECT: 键值对集合（键为字符串）
--- MAP: 类型化的键值对集合（Snowflake 新增）
 
--- ============================================================
--- ARRAY 类型
--- ============================================================
+-- VARIANT: 万能类型，可存储标量/数组/对象（最大 16MB）
+-- ARRAY:   有序 VARIANT 元素集合
+-- OBJECT:  键值对集合（键为字符串，值为 VARIANT）
 
 CREATE TABLE users (
     id     NUMBER NOT NULL,
     name   VARCHAR(100) NOT NULL,
-    tags   ARRAY,                              -- 动态类型 ARRAY
-    scores ARRAY
+    tags   ARRAY,                              -- 动态类型数组
+    scores ARRAY,
+    attrs  OBJECT                              -- 键值对
 );
 
--- 插入数组数据
-INSERT INTO users SELECT
-    1, 'Alice', ARRAY_CONSTRUCT('admin', 'dev'), ARRAY_CONSTRUCT(90, 85, 95);
-INSERT INTO users SELECT
-    2, 'Bob', ARRAY_CONSTRUCT('user', 'tester'), ARRAY_CONSTRUCT(70, 80, 75);
-
--- 使用 PARSE_JSON
-INSERT INTO users SELECT
-    3, 'Carol', PARSE_JSON('["dev", "ops"]'), PARSE_JSON('[88, 92]');
-
--- 数组索引（从 0 开始）
-SELECT tags[0]::VARCHAR FROM users;           -- 第一个元素
-SELECT GET(tags, 0) FROM users;               -- 等价
-
 -- ============================================================
--- ARRAY 函数
+-- 2. 语法设计分析（对 SQL 引擎开发者）
 -- ============================================================
 
--- ARRAY_SIZE: 长度
-SELECT ARRAY_SIZE(tags) FROM users;
+-- 2.1 VARIANT 的统一存储设计
+-- Snowflake 用 VARIANT 作为半结构化数据的统一容器:
+--   JSON 对象 → VARIANT（内部存储为 OBJECT）
+--   JSON 数组 → VARIANT（内部存储为 ARRAY）
+--   标量值    → VARIANT（内部存储为对应类型）
+--
+-- 对比:
+--   PostgreSQL: JSON + JSONB（两种独立类型，JSONB 是二进制优化版）
+--   MySQL:      JSON（单一类型，内部二进制存储）
+--   BigQuery:   STRUCT + ARRAY（强类型，必须预定义 Schema）
+--   Redshift:   SUPER（借鉴 Snowflake VARIANT 设计）
+--   Databricks: MAP/STRUCT/ARRAY（强类型）
+--
+-- Snowflake VARIANT 的内部优化:
+--   虽然 VARIANT 是动态类型，但 Snowflake 自动推断子列类型
+--   (Sub-column Pruning)，为高频访问的路径创建独立物理子列。
+--   查询 data:name 时，引擎可能只读取 name 子列而非整个 VARIANT。
 
--- ARRAY_CONTAINS: 包含检查
-SELECT ARRAY_CONTAINS('admin'::VARIANT, tags) FROM users;
-
--- ARRAY_POSITION: 查找位置（从 0 开始）
-SELECT ARRAY_POSITION('admin'::VARIANT, tags) FROM users;
-
--- ARRAY_APPEND / ARRAY_PREPEND
-SELECT ARRAY_APPEND(tags, 'new_tag') FROM users;
-SELECT ARRAY_PREPEND(tags, 'first') FROM users;
-
--- ARRAY_CAT: 连接
-SELECT ARRAY_CAT(ARRAY_CONSTRUCT(1,2), ARRAY_CONSTRUCT(3,4));
-
--- ARRAY_COMPACT: 移除 NULL
-SELECT ARRAY_COMPACT(ARRAY_CONSTRUCT(1, NULL, 2, NULL, 3));
-
--- ARRAY_DISTINCT: 去重
-SELECT ARRAY_DISTINCT(ARRAY_CONSTRUCT(1, 2, 2, 3));
-
--- ARRAY_INTERSECTION: 交集
-SELECT ARRAY_INTERSECTION(ARRAY_CONSTRUCT(1,2,3), ARRAY_CONSTRUCT(2,3,4));
-
--- ARRAY_EXCEPT: 差集（Snowflake 2023+）
-SELECT ARRAY_EXCEPT(ARRAY_CONSTRUCT(1,2,3), ARRAY_CONSTRUCT(2));
-
--- ARRAY_SLICE: 切片
-SELECT ARRAY_SLICE(ARRAY_CONSTRUCT(1,2,3,4,5), 1, 3);  -- [2,3]
-
--- ARRAY_SORT: 排序
-SELECT ARRAY_SORT(ARRAY_CONSTRUCT(3, 1, 2));
-
--- ARRAY_TO_STRING: 转为字符串
-SELECT ARRAY_TO_STRING(ARRAY_CONSTRUCT('a','b','c'), ', ');
-
--- ARRAY_CONSTRUCT_COMPACT: 构造时排除 NULL
-SELECT ARRAY_CONSTRUCT_COMPACT(1, NULL, 2, NULL, 3);
+-- 2.2 弱类型 vs 强类型嵌套
+-- Snowflake (VARIANT): Schema-on-Read，写入时不校验结构
+-- BigQuery (STRUCT):   Schema-on-Write，必须预定义每个字段的类型
+-- 权衡: 灵活性 vs 类型安全性
 
 -- ============================================================
--- FLATTEN: 展开数组为行（= UNNEST）
+-- 3. ARRAY 操作
 -- ============================================================
 
--- 基本 FLATTEN
+-- 构造
+INSERT INTO users SELECT 1, 'Alice',
+    ARRAY_CONSTRUCT('admin', 'dev'), ARRAY_CONSTRUCT(90, 85, 95), NULL;
+
+-- 访问（从 0 开始）
+SELECT tags[0]::VARCHAR FROM users;
+SELECT GET(tags, 0) FROM users;
+
+-- 常用函数
+SELECT ARRAY_SIZE(tags) FROM users;                           -- 长度
+SELECT ARRAY_CONTAINS('admin'::VARIANT, tags) FROM users;     -- 包含
+SELECT ARRAY_POSITION('admin'::VARIANT, tags) FROM users;     -- 位置
+SELECT ARRAY_APPEND(tags, 'new') FROM users;                  -- 追加
+SELECT ARRAY_PREPEND(tags, 'first') FROM users;               -- 前插
+SELECT ARRAY_CAT(ARRAY_CONSTRUCT(1,2), ARRAY_CONSTRUCT(3,4)); -- 连接
+SELECT ARRAY_COMPACT(ARRAY_CONSTRUCT(1, NULL, 2));            -- 移除NULL
+SELECT ARRAY_DISTINCT(ARRAY_CONSTRUCT(1, 2, 2, 3));           -- 去重
+SELECT ARRAY_INTERSECTION(ARRAY_CONSTRUCT(1,2,3), ARRAY_CONSTRUCT(2,3,4)); -- 交集
+SELECT ARRAY_EXCEPT(ARRAY_CONSTRUCT(1,2,3), ARRAY_CONSTRUCT(2));           -- 差集
+SELECT ARRAY_SLICE(ARRAY_CONSTRUCT(1,2,3,4,5), 1, 3);        -- 切片[1,3)
+SELECT ARRAY_SORT(ARRAY_CONSTRUCT(3, 1, 2));                  -- 排序
+SELECT ARRAY_TO_STRING(ARRAY_CONSTRUCT('a','b','c'), ', ');   -- 转字符串
+
+-- ============================================================
+-- 4. FLATTEN: 展开数组为行
+-- ============================================================
+
 SELECT u.name, f.value::VARCHAR AS tag
 FROM users u, LATERAL FLATTEN(input => u.tags) f;
-
--- FLATTEN 参数
--- input: 要展开的 VARIANT/ARRAY/OBJECT
--- path: JSON 路径
--- outer: 是否保留空值行（类似 LEFT JOIN）
--- recursive: 是否递归展开
--- mode: 展开模式 ('BOTH', 'ARRAY', 'OBJECT')
 
 -- OUTER FLATTEN（保留空数组的行）
 SELECT u.name, f.value::VARCHAR AS tag
 FROM users u, LATERAL FLATTEN(input => u.tags, outer => TRUE) f;
 
--- FLATTEN 返回的列:
--- SEQ: 序列号
--- KEY: 键（对象）或索引（数组）
--- PATH: JSON 路径
--- INDEX: 数组索引
--- VALUE: 值
--- THIS: 当前正在展开的元素
+-- FLATTEN 输出列: SEQ, KEY, PATH, INDEX, VALUE, THIS
 
--- ============================================================
--- ARRAY_AGG: 聚合为数组
--- ============================================================
-
+-- 聚合回数组
 SELECT department, ARRAY_AGG(name) WITHIN GROUP (ORDER BY name) AS members
-FROM employees
-GROUP BY department;
-
--- ARRAY_AGG DISTINCT
-SELECT ARRAY_AGG(DISTINCT tag) FROM users, LATERAL FLATTEN(input => tags) f;
+FROM employees GROUP BY department;
 
 -- ============================================================
--- OBJECT 类型（= MAP / STRUCT）
+-- 5. OBJECT 操作
 -- ============================================================
 
-CREATE TABLE products (
-    id         NUMBER NOT NULL,
-    name       VARCHAR(100),
-    attributes OBJECT,                         -- 键值对
-    metadata   VARIANT                         -- 任意结构
-);
+-- 构造
+SELECT OBJECT_CONSTRUCT('brand', 'Dell', 'ram', '16GB', 'cpu', 'i7');
+SELECT OBJECT_CONSTRUCT_KEEP_NULL('a', 1, 'b', NULL);  -- 保留 NULL
 
--- 插入 OBJECT 数据
-INSERT INTO products SELECT
-    1, 'Laptop',
-    OBJECT_CONSTRUCT('brand', 'Dell', 'ram', '16GB', 'cpu', 'i7'),
-    PARSE_JSON('{"category": "electronics", "ratings": [4.5, 4.8]}');
+-- 访问
+SELECT attrs:brand::VARCHAR FROM products;      -- 冒号语法
+SELECT attrs['brand']::VARCHAR FROM products;   -- 方括号语法
 
--- 访问 OBJECT 字段
-SELECT attributes['brand']::VARCHAR FROM products;
-SELECT attributes:brand::VARCHAR FROM products;    -- 冒号语法
-SELECT metadata:category::VARCHAR FROM products;
+-- 修改
+SELECT OBJECT_INSERT(attrs, 'color', 'black') FROM products;      -- 添加键
+SELECT OBJECT_DELETE(attrs, 'cpu') FROM products;                   -- 删除键
+SELECT OBJECT_PICK(attrs, 'brand', 'ram') FROM products;           -- 选择键
 
--- 嵌套访问
-SELECT metadata:ratings[0]::FLOAT FROM products;
+-- 获取所有键
+SELECT OBJECT_KEYS(attrs) FROM products;
 
--- OBJECT 函数
-SELECT OBJECT_KEYS(attributes) FROM products;      -- 所有键
-
--- OBJECT_CONSTRUCT: 构造对象
-SELECT OBJECT_CONSTRUCT('k1', 'v1', 'k2', 'v2');
-
--- OBJECT_INSERT: 添加/修改键值对
-SELECT OBJECT_INSERT(attributes, 'color', 'black') FROM products;
-
--- OBJECT_DELETE: 删除键
-SELECT OBJECT_DELETE(attributes, 'cpu') FROM products;
-
--- OBJECT_PICK: 选择指定键
-SELECT OBJECT_PICK(attributes, 'brand', 'ram') FROM products;
-
--- FLATTEN OBJECT
+-- FLATTEN OBJECT（展开为 KEY-VALUE 行）
 SELECT p.name, f.key, f.value::VARCHAR
-FROM products p, LATERAL FLATTEN(input => p.attributes) f;
+FROM products p, LATERAL FLATTEN(input => p.attrs) f;
 
--- OBJECT_AGG: 聚合为对象（= MAP_AGG）
+-- 聚合为对象
 SELECT OBJECT_AGG(name, salary::VARIANT) FROM employees;
 
 -- ============================================================
--- MAP 类型（Snowflake 结构化类型）
+-- 6. MAP 类型（结构化键值对，2023+）
 -- ============================================================
 
--- 结构化 MAP 类型（Snowflake 2023+）
-CREATE TABLE configs (
-    id       NUMBER,
-    settings MAP(VARCHAR, VARCHAR)
-);
+CREATE TABLE configs (id NUMBER, settings MAP(VARCHAR, VARCHAR));
+
+-- MAP 是强类型的键值对（与 OBJECT 的区别: MAP 有明确的键/值类型）
 
 -- ============================================================
--- 嵌套类型
+-- 7. 嵌套结构
 -- ============================================================
 
 -- ARRAY of OBJECT
-INSERT INTO products SELECT 2, 'Bundle',
-    OBJECT_CONSTRUCT('type', 'bundle'),
-    PARSE_JSON('[
-        {"product": "Widget", "qty": 2, "price": 9.99},
-        {"product": "Gadget", "qty": 1, "price": 29.99}
-    ]');
-
--- 展开嵌套
 SELECT p.name, f.value:product::VARCHAR AS product, f.value:price::FLOAT AS price
-FROM products p, LATERAL FLATTEN(input => p.metadata) f
-WHERE p.id = 2;
+FROM products p, LATERAL FLATTEN(input => p.metadata) f;
+
+-- 递归展开
+SELECT f.PATH, f.KEY, f.VALUE
+FROM events, LATERAL FLATTEN(input => data, RECURSIVE => TRUE) f
+WHERE TYPEOF(f.VALUE) NOT IN ('OBJECT', 'ARRAY');
 
 -- ============================================================
--- 注意事项
+-- 横向对比: 复合类型能力
 -- ============================================================
-
--- 1. Snowflake 使用 VARIANT/ARRAY/OBJECT 三种半结构化类型
--- 2. ARRAY 索引从 0 开始
--- 3. FLATTEN 是展开数组/对象的主要方式
--- 4. VARIANT 可以存储任意类型数据
--- 5. 半结构化数据支持 Micro-Partition 剪枝
--- 6. 冒号语法 (:) 提供简洁的字段访问
+-- 特性          | Snowflake       | BigQuery       | PostgreSQL  | MySQL
+-- 数组类型      | ARRAY(VARIANT)  | ARRAY(typed)   | ARRAY       | 不支持
+-- 对象/结构体   | OBJECT/VARIANT  | STRUCT(typed)  | JSONB       | JSON
+-- 类型灵活性    | Schema-on-Read  | Schema-on-Write| 动态        | 动态
+-- 路径访问      | : 冒号语法      | . 点号         | -> / ->>    | $.path
+-- 展开为行      | FLATTEN         | UNNEST         | unnest      | JSON_TABLE
+-- 数组函数      | 丰富(20+)       | 中等           | 中等        | 基本
+-- 聚合为数组    | ARRAY_AGG       | ARRAY_AGG      | array_agg   | 不支持
+-- 聚合为对象    | OBJECT_AGG      | 不支持         | 不支持      | 不支持
+-- 最大大小      | 16MB/值         | 无限制         | 1GB         | 1GB

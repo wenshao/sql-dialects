@@ -1,228 +1,149 @@
--- Hive: 复合/复杂类型 (Array, Map, Struct)
+-- Hive: 复合类型 (ARRAY, MAP, STRUCT)
 --
 -- 参考资料:
---   [1] Apache Hive Documentation - Complex Types
+--   [1] Apache Hive - Complex Types
 --       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types#LanguageManualTypes-ComplexTypes
---   [2] Apache Hive Documentation - Built-in Functions
---       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
---   [3] Apache Hive Documentation - LATERAL VIEW
+--   [2] Apache Hive - LATERAL VIEW
 --       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+LateralView
 
 -- ============================================================
--- ARRAY 类型
+-- 1. ARRAY 类型
 -- ============================================================
-
 CREATE TABLE users (
-    id     BIGINT,
-    name   STRING,
-    tags   ARRAY<STRING>,
-    scores ARRAY<INT>
-)
-STORED AS ORC;
+    id BIGINT, name STRING,
+    tags ARRAY<STRING>, scores ARRAY<INT>
+) STORED AS ORC;
 
--- 插入数组数据
 INSERT INTO users VALUES
     (1, 'Alice', ARRAY('admin', 'dev'), ARRAY(90, 85, 95)),
-    (2, 'Bob',   ARRAY('user', 'tester'), ARRAY(70, 80, 75));
+    (2, 'Bob',   ARRAY('user'),         ARRAY(70, 80));
 
--- 数组索引（从 0 开始）
-SELECT tags[0] FROM users;                    -- 第一个元素
-SELECT scores[2] FROM users;                  -- 第三个元素
+-- 数组索引（从 0 开始，与 Java 一致）
+SELECT tags[0], scores[2] FROM users;
 
--- ============================================================
--- ARRAY 函数
--- ============================================================
+-- 数组函数
+SELECT SIZE(tags) FROM users;                              -- 长度
+SELECT ARRAY_CONTAINS(tags, 'admin') FROM users;           -- 包含检查
+SELECT SORT_ARRAY(scores) FROM users;                      -- 排序
+SELECT ARRAY_DISTINCT(ARRAY(1, 2, 2, 3));                  -- 去重 (2.2+)
+SELECT ARRAY_UNION(ARRAY(1, 2), ARRAY(2, 3));              -- 合并 (2.2+)
+SELECT ARRAY_INTERSECT(ARRAY(1, 2, 3), ARRAY(2, 3, 4));   -- 交集 (2.2+)
+SELECT ARRAY_EXCEPT(ARRAY(1, 2, 3), ARRAY(2));             -- 差集 (2.2+)
 
--- SIZE / ARRAY_LENGTH: 长度
-SELECT SIZE(tags) FROM users;
+-- EXPLODE: 展开数组为多行
+SELECT u.name, tag FROM users u LATERAL VIEW EXPLODE(u.tags) t AS tag;
 
--- ARRAY_CONTAINS: 包含检查
-SELECT * FROM users WHERE ARRAY_CONTAINS(tags, 'admin');
+-- POSEXPLODE: 带位置信息 (0.13+)
+SELECT u.name, pos, tag FROM users u LATERAL VIEW POSEXPLODE(u.tags) t AS pos, tag;
 
--- SORT_ARRAY: 排序
-SELECT SORT_ARRAY(scores) FROM users;
+-- OUTER: 保留空数组的行
+SELECT u.name, tag FROM users u LATERAL VIEW OUTER EXPLODE(u.tags) t AS tag;
 
--- CONCAT: 数组连接（Hive 2.0+）
-SELECT CONCAT(tags, ARRAY('new_tag')) FROM users;
+-- COLLECT_LIST / COLLECT_SET: 行聚合为数组
+SELECT department, COLLECT_LIST(name) AS members FROM employees GROUP BY department;
+SELECT department, COLLECT_SET(name) AS unique_members FROM employees GROUP BY department;
 
--- ARRAY_DISTINCT: 去重（Hive 2.2+）
-SELECT ARRAY_DISTINCT(ARRAY(1, 2, 2, 3)) AS result;
-
--- ARRAY_UNION: 合并（Hive 2.2+）
-SELECT ARRAY_UNION(ARRAY(1, 2), ARRAY(2, 3)) AS result;
-
--- ARRAY_INTERSECT: 交集（Hive 2.2+）
-SELECT ARRAY_INTERSECT(ARRAY(1, 2, 3), ARRAY(2, 3, 4)) AS result;
-
--- ARRAY_EXCEPT: 差集（Hive 2.2+）
-SELECT ARRAY_EXCEPT(ARRAY(1, 2, 3), ARRAY(2)) AS result;
-
--- ARRAY_JOIN: 转为字符串（Hive 3.0+）
-SELECT ARRAY_JOIN(tags, ', ') FROM users;
-
--- ARRAY_POSITION: 查找位置（Hive 3.0+）
-SELECT ARRAY_POSITION(tags, 'admin') FROM users;
-
--- ARRAY_REMOVE: 移除元素（Hive 3.0+）
-SELECT ARRAY_REMOVE(tags, 'admin') FROM users;
+-- 设计分析: ARRAY 是 Hive 的一等类型
+-- 大多数 RDBMS（MySQL/SQL Server）没有原生 ARRAY 类型。
+-- PostgreSQL 有 ARRAY，BigQuery 有 ARRAY，都是分析友好的引擎。
+-- Hive 的 ARRAY 与 LATERAL VIEW EXPLODE 配合是处理嵌套数据的标准模式。
 
 -- ============================================================
--- EXPLODE / LATERAL VIEW: 展开数组为行（= UNNEST）
+-- 2. MAP 类型
 -- ============================================================
-
--- EXPLODE: 将数组展开为多行
-SELECT EXPLODE(tags) AS tag FROM users;
-
--- LATERAL VIEW: 与原表关联
-SELECT u.name, t.tag
-FROM users u
-LATERAL VIEW EXPLODE(u.tags) t AS tag;
-
--- LATERAL VIEW OUTER: 保留空数组的行
-SELECT u.name, t.tag
-FROM users u
-LATERAL VIEW OUTER EXPLODE(u.tags) t AS tag;
-
--- POSEXPLODE: 带位置展开
-SELECT u.name, t.pos, t.tag
-FROM users u
-LATERAL VIEW POSEXPLODE(u.tags) t AS pos, tag;
-
--- 多个 LATERAL VIEW
-SELECT u.name, t.tag, s.score
-FROM users u
-LATERAL VIEW EXPLODE(u.tags) t AS tag
-LATERAL VIEW EXPLODE(u.scores) s AS score;
-
--- ============================================================
--- COLLECT_LIST / COLLECT_SET: 聚合为数组（= ARRAY_AGG）
--- ============================================================
-
-SELECT department, COLLECT_LIST(name) AS members
-FROM employees
-GROUP BY department;
-
--- 去重版本
-SELECT department, COLLECT_SET(name) AS unique_members
-FROM employees
-GROUP BY department;
-
--- ============================================================
--- MAP 类型
--- ============================================================
-
 CREATE TABLE products (
-    id         BIGINT,
-    name       STRING,
-    attributes MAP<STRING, STRING>,
-    metrics    MAP<STRING, DOUBLE>
-)
-STORED AS ORC;
+    id BIGINT, name STRING,
+    attributes MAP<STRING, STRING>, metrics MAP<STRING, DOUBLE>
+) STORED AS ORC;
 
-INSERT INTO products VALUES
-    (1, 'Laptop',
-     MAP('brand', 'Dell', 'ram', '16GB', 'cpu', 'i7'),
-     MAP('price', 999.99, 'weight', 2.1));
+INSERT INTO products VALUES (1, 'Laptop',
+    MAP('brand', 'Dell', 'ram', '16GB'), MAP('price', 999.99, 'weight', 2.1));
 
 -- Map 访问
-SELECT attributes['brand'] FROM products;     -- 获取值
+SELECT attributes['brand'] FROM products;
 
 -- Map 函数
-SELECT MAP_KEYS(attributes) FROM products;    -- 所有键 -> ARRAY<STRING>
-SELECT MAP_VALUES(attributes) FROM products;  -- 所有值 -> ARRAY<STRING>
-SELECT SIZE(attributes) FROM products;        -- Map 大小
+SELECT MAP_KEYS(attributes) FROM products;      -- 所有键 → ARRAY
+SELECT MAP_VALUES(attributes) FROM products;    -- 所有值 → ARRAY
+SELECT SIZE(attributes) FROM products;          -- 键值对数量
 
 -- Map 展开
-SELECT p.name, mk.key, mk.value
-FROM products p
-LATERAL VIEW EXPLODE(p.attributes) mk AS key, value;
+SELECT p.name, k, v FROM products p
+LATERAL VIEW EXPLODE(p.attributes) t AS k, v;
 
 -- Map 构造
 SELECT MAP('k1', 'v1', 'k2', 'v2');
-
--- STR_TO_MAP: 字符串转 Map
-SELECT STR_TO_MAP('a:1,b:2,c:3', ',', ':');
+SELECT STR_TO_MAP('a:1,b:2,c:3', ',', ':');    -- 字符串转 Map
 
 -- ============================================================
--- STRUCT 类型
+-- 3. STRUCT 类型
 -- ============================================================
-
 CREATE TABLE orders (
-    id       BIGINT,
+    id BIGINT,
     customer STRUCT<name: STRING, email: STRING>,
-    address  STRUCT<street: STRING, city: STRING, state: STRING, zip: STRING>
-)
-STORED AS ORC;
+    address  STRUCT<city: STRING, state: STRING, zip: STRING>
+) STORED AS ORC;
 
-INSERT INTO orders VALUES (
-    1,
+INSERT INTO orders VALUES (1,
     NAMED_STRUCT('name', 'Alice', 'email', 'alice@example.com'),
-    NAMED_STRUCT('street', '123 Main St', 'city', 'Springfield', 'state', 'IL', 'zip', '62701')
-);
+    NAMED_STRUCT('city', 'Springfield', 'state', 'IL', 'zip', '62701'));
 
--- 访问 STRUCT 字段
-SELECT customer.name, customer.email FROM orders;
-SELECT address.city, address.zip FROM orders;
+-- 访问 STRUCT 字段（点号语法）
+SELECT customer.name, customer.email, address.city FROM orders;
 
 -- STRUCT 构造
-SELECT STRUCT('Alice', 30);                           -- 匿名
-SELECT NAMED_STRUCT('name', 'Alice', 'age', 30);     -- 命名
+SELECT STRUCT('Alice', 30);                          -- 匿名
+SELECT NAMED_STRUCT('name', 'Alice', 'age', 30);    -- 命名
 
 -- ============================================================
--- 嵌套类型
+-- 4. 嵌套类型
 -- ============================================================
-
--- ARRAY of STRUCT
+-- ARRAY of STRUCT (最常见的嵌套模式)
 CREATE TABLE events (
-    id    BIGINT,
+    id BIGINT,
     items ARRAY<STRUCT<product_id: BIGINT, name: STRING, qty: INT, price: DOUBLE>>
-)
-STORED AS ORC;
+) STORED AS ORC;
 
-INSERT INTO events VALUES (1, ARRAY(
-    NAMED_STRUCT('product_id', 1L, 'name', 'Widget', 'qty', 2, 'price', 9.99),
-    NAMED_STRUCT('product_id', 2L, 'name', 'Gadget', 'qty', 1, 'price', 29.99)
-));
-
--- 查询嵌套
-SELECT e.id, item.name, item.price
-FROM events e
+SELECT e.id, item.name, item.price FROM events e
 LATERAL VIEW EXPLODE(e.items) t AS item;
-
--- MAP of ARRAY
-CREATE TABLE configs (
-    id       BIGINT,
-    settings MAP<STRING, ARRAY<STRING>>
-)
-STORED AS ORC;
-
--- ARRAY of MAP
-CREATE TABLE logs (
-    id      BIGINT,
-    entries ARRAY<MAP<STRING, STRING>>
-)
-STORED AS ORC;
 
 -- STRUCT 嵌套 STRUCT
 CREATE TABLE profiles (
-    id   BIGINT,
-    info STRUCT<
-        personal: STRUCT<name: STRING, age: INT>,
-        contact:  STRUCT<email: STRING, phone: STRING>
-    >
-)
-STORED AS ORC;
-
+    id BIGINT,
+    info STRUCT<personal: STRUCT<name: STRING, age: INT>,
+                contact: STRUCT<email: STRING, phone: STRING>>
+) STORED AS ORC;
 SELECT info.personal.name, info.contact.email FROM profiles;
 
 -- ============================================================
--- 注意事项
+-- 5. 跨引擎对比: 复合类型
 -- ============================================================
+-- 引擎          ARRAY    MAP       STRUCT    嵌套       展开
+-- MySQL         不支持   不支持    不支持    N/A        JSON_TABLE
+-- PostgreSQL    支持     不支持    不支持    支持       UNNEST
+-- Hive          支持     支持      支持      支持       LATERAL VIEW
+-- Spark SQL     支持     支持      支持      支持       继承 Hive
+-- BigQuery      支持     不支持    STRUCT    支持       UNNEST
+-- ClickHouse    支持     支持      Tuple     支持       arrayJoin
+-- Trino         支持     支持      ROW       支持       UNNEST
 
--- 1. Hive 原生支持 ARRAY、MAP、STRUCT
--- 2. 支持任意深度的嵌套
--- 3. LATERAL VIEW EXPLODE 是展开数组/Map 的标准方式
--- 4. ARRAY 下标从 0 开始
--- 5. ORC/Parquet 格式对复杂类型有最佳支持
--- 6. COLLECT_LIST/COLLECT_SET 是聚合函数
--- 7. 复杂类型不能作为分区列
+-- ============================================================
+-- 6. 已知限制
+-- ============================================================
+-- 1. 复合类型不能作为分区列
+-- 2. COLLECT_LIST 大数据量可能 OOM（单个分组内存溢出）
+-- 3. ARRAY 索引从 0 开始（与字符串位置从 1 开始不一致）
+-- 4. MAP 的键不保证有序
+-- 5. TextFile 的复合类型序列化依赖分隔符配置（易出错）
+-- 6. ORC/Parquet 对复合类型支持最好
+
+-- ============================================================
+-- 7. 对引擎开发者的启示
+-- ============================================================
+-- 1. 复合类型是处理半结构化数据的关键:
+--    Hive 的 ARRAY/MAP/STRUCT 让 SQL 可以直接操作嵌套数据
+-- 2. LATERAL VIEW EXPLODE 是展开嵌套数据的标准模式:
+--    SQL 标准的 UNNEST 更简洁，但 Hive 的语法更显式
+-- 3. COLLECT_LIST/COLLECT_SET 是行→数组的逆操作:
+--    与 EXPLODE 配合形成了完整的嵌套数据处理闭环
+-- 4. NAMED_STRUCT 比匿名 STRUCT 更安全: 按名称而非位置匹配字段
