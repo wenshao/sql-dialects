@@ -1,5 +1,12 @@
 # 日期时间函数名映射：各 SQL 方言全对比
 
+> 参考资料:
+> - [MySQL 8.0 - Date and Time Functions](https://dev.mysql.com/doc/refman/8.0/en/date-and-time-functions.html)
+> - [PostgreSQL - Date/Time Functions](https://www.postgresql.org/docs/current/functions-datetime.html)
+> - [SQL Server - Date and Time Functions](https://learn.microsoft.com/en-us/sql/t-sql/functions/date-and-time-data-types-and-functions-transact-sql)
+> - [BigQuery - Date Functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/date_functions)
+> - [Snowflake - Date & Time Functions](https://docs.snowflake.com/en/sql-reference/functions-date-time)
+
 日期时间处理是 SQL 跨引擎迁移中最危险的领域。函数名不同还好办（编译期报错），真正致命的是**参数顺序不同**——同名函数 `DATEADD`/`DATEDIFF` 在不同引擎中参数位置完全相反，编译通过但结果错误，往往上线后才发现。
 
 本文覆盖 16 个主流引擎：MySQL, PostgreSQL, SQL Server, Oracle, SQLite, BigQuery, Snowflake, ClickHouse, DuckDB, Trino, Hive, Spark SQL, Redshift, StarRocks, Doris, MaxCompute。
