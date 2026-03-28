@@ -4,6 +4,8 @@
 **文件数**: 51 个 SQL 文件
 **总行数**: 4707 行
 
+> **关键人物**：[Matei Zaharia](../docs/people/spark-databricks.md)（Spark 创始人，ACM 博士论文奖）、[Michael Armbrust](../docs/people/spark-databricks.md)（Spark SQL 核心设计者，Catalyst 优化器）、[Reynold Xin](../docs/people/spark-databricks.md)（Tungsten 引擎，Photon）
+
 ## 概述与定位
 
 Spark SQL 是 Apache Spark 大数据统一计算引擎的 SQL 层。它不是一个独立的数据库，而是运行在 Spark 之上的 SQL 接口——既可以查询 Hive 表、Parquet/ORC 文件，也可以查询 JDBC 数据源、Kafka 流等。Spark SQL 的独特价值在于**SQL 与编程 API 的无缝融合**：一个 DataFrame 既可以用 SQL 查询，也可以用 Python/Scala/Java API 操作，两者可以自由混合。
