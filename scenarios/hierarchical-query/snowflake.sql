@@ -1,4 +1,4 @@
--- Snowflake: 层次查询与树形结构 (Hierarchical Query & Tree Traversal)
+-- Snowflake: 层次查询与树形结构
 --
 -- 参考资料:
 --   [1] Snowflake Documentation - Recursive CTEs
@@ -7,49 +7,38 @@
 --       https://docs.snowflake.com/en/sql-reference/constructs/connect-by
 
 -- ============================================================
--- 准备数据：组织架构表（邻接表模型）
+-- 示例数据
 -- ============================================================
-
 CREATE TABLE employees (
-    id        INT,
-    name      VARCHAR(100) NOT NULL,
-    parent_id INT, FOREIGN KEY (parent_id) REFERENCES employees(id),
-    dept      VARCHAR(100)
-);
-INSERT INTO employees (id, name, parent_id, dept) VALUES
+    id INT, name VARCHAR(100) NOT NULL, parent_id INT, dept VARCHAR(100));
+INSERT INTO employees VALUES
     (1,'CEO',NULL,'总裁办'),(2,'CTO',1,'技术部'),(3,'CFO',1,'财务部'),
     (4,'VP工程',2,'技术部'),(5,'VP产品',2,'技术部'),
     (6,'开发经理',4,'技术部'),(7,'测试经理',4,'技术部'),
-    (8,'开发工程师A',6,'技术部'),(9,'开发工程师B',6,'技术部'),
-    (10,'测试工程师',7,'技术部'),(11,'会计主管',3,'财务部'),
-    (12,'出纳',11,'财务部');
+    (8,'工程师A',6,'技术部'),(9,'工程师B',6,'技术部'),
+    (10,'测试员',7,'技术部'),(11,'会计主管',3,'财务部'),(12,'出纳',11,'财务部');
 
 -- ============================================================
--- 1. 递归 CTE —— 标准方法
+-- 1. 递归 CTE（标准方法）
 -- ============================================================
 
 -- 自顶向下遍历
 WITH RECURSIVE org_tree AS (
-    SELECT id, name, parent_id, dept,
-           0 AS level,
+    SELECT id, name, parent_id, dept, 0 AS level,
            CAST(name AS VARCHAR(1000)) AS path
-    FROM employees
-    WHERE parent_id IS NULL
+    FROM employees WHERE parent_id IS NULL
     UNION ALL
-    SELECT e.id, e.name, e.parent_id, e.dept,
-           t.level + 1,
+    SELECT e.id, e.name, e.parent_id, e.dept, t.level + 1,
            t.path || ' > ' || e.name
-    FROM employees e
-    JOIN org_tree t ON e.parent_id = t.id
+    FROM employees e JOIN org_tree t ON e.parent_id = t.id
 )
 SELECT id, REPEAT('  ', level) || name AS indented_name, level, path
-FROM org_tree
-ORDER BY path;
+FROM org_tree ORDER BY path;
 
--- 自底向上遍历（找上级链）
+-- 自底向上遍历
 WITH RECURSIVE ancestors AS (
     SELECT id, name, parent_id, 0 AS level
-    FROM employees WHERE name = '开发工程师A'
+    FROM employees WHERE name = '工程师A'
     UNION ALL
     SELECT e.id, e.name, e.parent_id, a.level + 1
     FROM employees e JOIN ancestors a ON e.id = a.parent_id
@@ -57,70 +46,11 @@ WITH RECURSIVE ancestors AS (
 SELECT * FROM ancestors;
 
 -- ============================================================
--- 2. 深度优先 vs 广度优先遍历
+-- 2. 语法设计分析（对 SQL 引擎开发者）
 -- ============================================================
 
--- 深度优先（手动构造排序路径）
-WITH RECURSIVE org_tree AS (
-    SELECT id, name, parent_id, 0 AS level,
-           CAST(name AS VARCHAR(1000)) AS sort_path
-    FROM employees WHERE parent_id IS NULL
-    UNION ALL
-    SELECT e.id, e.name, e.parent_id, t.level + 1,
-           t.sort_path || ' > ' || e.name
-    FROM employees e JOIN org_tree t ON e.parent_id = t.id
-)
-SELECT id, REPEAT('  ', level) || name AS indented_name, level
-FROM org_tree ORDER BY sort_path;
-
--- 广度优先（按 level 排序）
-WITH RECURSIVE org_tree AS (
-    SELECT id, name, parent_id, 0 AS level
-    FROM employees WHERE parent_id IS NULL
-    UNION ALL
-    SELECT e.id, e.name, e.parent_id, t.level + 1
-    FROM employees e JOIN org_tree t ON e.parent_id = t.id
-)
-SELECT * FROM org_tree ORDER BY level, name;
-
--- ============================================================
--- 3. 循环检测
--- ============================================================
-
--- 使用深度限制防止无限递归
-WITH RECURSIVE org_tree AS (
-    SELECT id, name, parent_id, 0 AS level
-    FROM employees WHERE parent_id IS NULL
-    UNION ALL
-    SELECT e.id, e.name, e.parent_id, t.level + 1
-    FROM employees e JOIN org_tree t ON e.parent_id = t.id
-    WHERE t.level < 100  -- 深度限制
-)
-SELECT * FROM org_tree;
-
--- ============================================================
--- 4. 路径枚举模型（物化路径）
--- ============================================================
-
-CREATE TABLE categories (
-    id   INT PRIMARY KEY,
-    name VARCHAR(100),
-    path VARCHAR(100)
-);
-
--- 查询子孙节点
-SELECT * FROM categories WHERE path LIKE '1/2%';
-
--- 查询深度
-SELECT *, LENGTH(path) - LENGTH(REPLACE(path, '/', '')) AS depth
-FROM categories;
-
--- ============================================================
--- 5. CONNECT BY 语法
--- ============================================================
-
-SELECT id,
-       LPAD(' ', 2 * (LEVEL - 1)) || name AS indented_name,
+-- 2.1 CONNECT BY: Snowflake 兼容 Oracle 语法
+SELECT id, LPAD(' ', 2 * (LEVEL - 1)) || name AS indented_name,
        LEVEL AS depth,
        SYS_CONNECT_BY_PATH(name, ' > ') AS path
 FROM employees
@@ -128,24 +58,21 @@ START WITH parent_id IS NULL
 CONNECT BY PRIOR id = parent_id
 ORDER SIBLINGS BY name;
 
--- ============================================================
--- 5. 多层自连接方法（适用于不支持递归 CTE 的引擎）
--- ============================================================
-
--- 固定深度查询（最多4层）
-SELECT
-    e1.name AS level_0,
-    e2.name AS level_1,
-    e3.name AS level_2,
-    e4.name AS level_3
-FROM employees e1
-LEFT JOIN employees e2 ON e2.parent_id = e1.id
-LEFT JOIN employees e3 ON e3.parent_id = e2.id
-LEFT JOIN employees e4 ON e4.parent_id = e3.id
-WHERE e1.parent_id IS NULL;
+-- CONNECT BY 是 Oracle 独有语法（非 SQL 标准）。
+-- Snowflake 是少数同时支持递归 CTE 和 CONNECT BY 的数据库。
+-- 对比:
+--   Oracle:     CONNECT BY（原创，功能最强）
+--   PostgreSQL: 只支持递归 CTE
+--   MySQL:      只支持递归 CTE (8.0+)
+--   BigQuery:   只支持递归 CTE
+--
+-- 对引擎开发者的启示:
+--   递归 CTE 是 SQL 标准方案，CONNECT BY 是 Oracle 遗产。
+--   如果目标是兼容 Oracle 迁移，CONNECT BY 是必要的。
+--   否则递归 CTE 足够（PostgreSQL 的选择）。
 
 -- ============================================================
--- 6. 子树聚合
+-- 3. 子树聚合
 -- ============================================================
 
 WITH RECURSIVE tree AS (
@@ -160,7 +87,33 @@ FROM tree t JOIN employees e ON t.root_id = e.id
 GROUP BY root_id, e.name
 ORDER BY subordinate_count DESC;
 
--- 注意：Snowflake 支持递归 CTE
--- 注意：Snowflake 也支持 CONNECT BY（兼容 Oracle）
--- 注意：使用 QUALIFY 子句过滤递归结果
--- 注意：CONNECT BY 支持 SYS_CONNECT_BY_PATH、CONNECT_BY_ROOT
+-- ============================================================
+-- 4. 深度限制（防止无限递归）
+-- ============================================================
+
+WITH RECURSIVE org_tree AS (
+    SELECT id, name, parent_id, 0 AS level
+    FROM employees WHERE parent_id IS NULL
+    UNION ALL
+    SELECT e.id, e.name, e.parent_id, t.level + 1
+    FROM employees e JOIN org_tree t ON e.parent_id = t.id
+    WHERE t.level < 100
+)
+SELECT * FROM org_tree;
+
+-- ============================================================
+-- 5. 路径枚举模型（物化路径）
+-- ============================================================
+
+CREATE TABLE categories (id INT PRIMARY KEY, name VARCHAR(100), path VARCHAR(100));
+SELECT * FROM categories WHERE path LIKE '1/2%';  -- 查询子孙
+SELECT *, LENGTH(path) - LENGTH(REPLACE(path, '/', '')) AS depth FROM categories;
+
+-- ============================================================
+-- 横向对比: 层次查询能力
+-- ============================================================
+-- 能力            | Snowflake   | Oracle     | PostgreSQL | MySQL 8.0
+-- 递归 CTE        | 支持        | 支持(11g+) | 支持       | 支持
+-- CONNECT BY      | 支持        | 原创       | 不支持     | 不支持
+-- 循环检测        | 深度限制    | NOCYCLE    | CYCLE 子句 | 深度限制
+-- SYS_CONNECT_BY  | 支持        | 原创       | 不支持     | 不支持
