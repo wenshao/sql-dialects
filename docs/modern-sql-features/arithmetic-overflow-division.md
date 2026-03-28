@@ -25,15 +25,15 @@
 | **Oracle** | `2.5` | NUMBER | 无（用 `TRUNC(5/2)`） |
 | **SQL Server** | `2` | INT | `/` 即整数除（整数操作数时） |
 | **BigQuery** | `2.5` | FLOAT64 | `DIV(a, b)` 函数（`DIV(5, 2) = 2`） |
-| **Snowflake** | `2` | NUMBER | `/` 对 NUMBER 操作数是整数除 |
+| **Snowflake** | `2.500000` | NUMBER(7,6) | 无内置整数除运算符（用 `TRUNC(5/2)`） |
 | **ClickHouse** | `2` | Int | `intDiv(5, 2) = 2`；`/` 对整数是整数除 |
 | **Hive** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **Spark SQL** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **MaxCompute** | `2.5` | DOUBLE | 无标准整数除法运算符 |
-| **StarRocks** | `2` | INT | `/` 对整数是整数除 |
-| **Doris** | `2` | INT | `/` 对整数是整数除 |
+| **StarRocks** | `2.5` | DOUBLE | 无内置整数除运算符（用 `FLOOR(5/2)`） |
+| **Doris** | `2.5` | DOUBLE | `DIV`（`5 DIV 2 = 2`） |
 | **Trino** | `2` | INTEGER | `/` 对整数是整数除 |
-| **DuckDB** | `2` | INTEGER | `/` 对整数是整数除；`//` 也可用 |
+| **DuckDB** | `2` | INTEGER | `//` 整数除法运算符（`5 // 2 = 2`） |
 | **Flink SQL** | `2` | INT | `/` 对整数是整数除 |
 | **Redshift** | `2` | INTEGER | `/` 对整数是整数除（PG 兼容） |
 | **Databricks** | `2.5` | DOUBLE | `DIV`（同 Spark） |
@@ -48,7 +48,7 @@
 
 | INT/INT = INT（截断） | INT/INT = DECIMAL/FLOAT（真除法） |
 |---|---|
-| PostgreSQL, SQL Server, Snowflake, ClickHouse, StarRocks, Doris, Trino, DuckDB, Flink, Redshift, Teradata, Db2, SAP HANA, Vertica, SQLite | MySQL, Oracle, BigQuery, Hive, Spark, MaxCompute, Databricks, Impala |
+| PostgreSQL, SQL Server, ClickHouse, Trino, DuckDB, Flink, Redshift, Teradata, Db2, SAP HANA, Vertica, SQLite | MySQL, Oracle, BigQuery, Snowflake, Hive, Spark, MaxCompute, Databricks, Impala, StarRocks, Doris |
 
 **对引擎开发者**: 这是必须在设计之初明确的决策。两种选择都有道理——PostgreSQL 方式与大多数编程语言一致（C/Java/Python 3 的 `//`），MySQL 方式更符合数学直觉。但**迁移时必须逐一检查所有除法表达式**。
 
