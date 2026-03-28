@@ -1,25 +1,23 @@
--- StarRocks: Math Functions
+-- StarRocks: 数学函数
 --
 -- 参考资料:
 --   [1] StarRocks Documentation - Math Functions
---       https://docs.starrocks.io/docs/sql-reference/sql-functions/math-functions/
+--       https://docs.starrocks.io/docs/sql-reference/sql-functions/
 
-SELECT ABS(-42); SELECT CEIL(4.3); SELECT CEILING(4.3); SELECT FLOOR(4.7);
-SELECT ROUND(3.14159, 2); SELECT TRUNCATE(3.14159, 2);
-SELECT MOD(17, 5); SELECT 17 % 5;
-SELECT POWER(2, 10); SELECT POW(2, 10); SELECT SQRT(144);
-SELECT EXP(1); SELECT LN(EXP(1)); SELECT LOG(EXP(1));
-SELECT LOG2(1024); SELECT LOG10(1000);
-SELECT SIGN(-42); SELECT PI();
-SELECT RAND(); SELECT RAND(42);
+-- ============================================================
+-- 与 Doris 完全相同(同源，MySQL 兼容)
+-- ============================================================
+SELECT ABS(-42), CEIL(4.3), FLOOR(4.7);
+SELECT ROUND(3.14159, 2), TRUNCATE(3.14159, 2);
+SELECT MOD(17, 5), POWER(2, 10), SQRT(144);
+SELECT EXP(1), LN(EXP(1)), LOG2(1024), LOG10(1000);
+SELECT SIGN(-42), PI(), RAND();
+SELECT GREATEST(1, 5, 3), LEAST(1, 5, 3);
 
-SELECT SIN(0); SELECT COS(0); SELECT TAN(0);
-SELECT ASIN(1); SELECT ACOS(1); SELECT ATAN(1); SELECT ATAN2(1, 1);
-SELECT DEGREES(PI()); SELECT RADIANS(180);
+SELECT SIN(0), COS(0), TAN(0);
+SELECT ASIN(1), ACOS(1), ATAN(1);
+SELECT DEGREES(PI()), RADIANS(180);
 
-SELECT GREATEST(1, 5, 3); SELECT LEAST(1, 5, 3);
+SELECT BITAND(5, 3), BITOR(5, 3), BITXOR(5, 3), BITNOT(5);
 
-SELECT BITAND(5, 3); SELECT BITOR(5, 3); SELECT BITXOR(5, 3); SELECT BITNOT(5);
-
--- 注意：StarRocks 数学函数与 MySQL 基本兼容
--- 注意：位运算使用函数形式
+-- StarRocks vs Doris: 数学函数完全相同。

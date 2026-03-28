@@ -1,75 +1,67 @@
 -- Apache Doris: 存储过程
 --
 -- 参考资料:
---   [1] Doris SQL Manual
+--   [1] Doris Documentation
 --       https://doris.apache.org/docs/sql-manual/sql-statements/
---   [2] Doris Data Types
---       https://doris.apache.org/docs/sql-manual/data-types/
---   [3] Doris Functions
---       https://doris.apache.org/docs/sql-manual/sql-functions/
-
--- Doris 不支持存储过程
--- 以下是替代方案
 
 -- ============================================================
--- 替代方案一：使用客户端脚本
+-- 1. 不支持存储过程: OLAP 引擎的架构选择
 -- ============================================================
-
--- 在 Python / Java / Shell 中编写逻辑
--- 通过 MySQL 协议连接 Doris 执行 SQL
-
--- Python 示例（伪代码）:
--- conn = pymysql.connect(host='fe_host', port=9030, user='root', db='mydb')
--- cursor = conn.cursor()
--- cursor.execute("SELECT COUNT(*) FROM users WHERE status = 1")
--- count = cursor.fetchone()[0]
--- if count > 0:
---     cursor.execute("INSERT INTO users_archive SELECT * FROM users WHERE status = 0")
---     cursor.execute("DELETE FROM users WHERE status = 0")
--- conn.commit()
+-- Doris 不支持存储过程、用户自定义函数(SQL 定义)、触发器、游标。
+--
+-- 设计理由:
+--   存储过程的核心价值: 减少网络往返(逻辑在服务端执行)。
+--   OLAP 引擎的查询模式: 少量复杂 SQL(每条扫描大量数据)。
+--   存储过程在 OLAP 场景的价值极低——网络往返不是瓶颈，数据扫描才是。
+--
+-- 对比:
+--   StarRocks:  同样不支持(同源)
+--   ClickHouse: 不支持存储过程。支持 UDF(C++/SQL/Executable)
+--   BigQuery:   不支持传统存储过程。有 Scripting(DECLARE/SET/IF/LOOP)
+--   MySQL:      完整支持(CREATE PROCEDURE / FUNCTION)
+--   PostgreSQL: 最强的过程化支持(PL/pgSQL, PL/Python, PL/V8)
+--
+-- 对引擎开发者的启示:
+--   存储过程需要服务端维护执行状态(游标、变量、控制流)。
+--   这与 MPP 引擎的无状态计算节点设计冲突。
+--   替代方案: 外部调度(Airflow) + 多条 SQL 任务编排。
 
 -- ============================================================
--- 替代方案二：使用 INSERT INTO ... SELECT 实现 ETL
+-- 2. 替代方案: INSERT INTO ... SELECT (ETL)
 -- ============================================================
-
--- 数据清洗
 INSERT INTO users_clean
 SELECT id, TRIM(username), LOWER(email), COALESCE(age, 0)
 FROM users_raw;
 
--- 增量同步
 INSERT INTO users (id, username, email, age)
-SELECT id, username, email, age
-FROM staging_users
+SELECT id, username, email, age FROM staging_users
 WHERE updated_at > '2024-01-01';
 
 -- ============================================================
--- 替代方案三：使用 CTAS 实现数据转换
+-- 3. 替代方案: CTAS (数据转换)
 -- ============================================================
-
 CREATE TABLE users_enriched AS
 SELECT u.*, COUNT(o.id) AS order_count, SUM(o.amount) AS total_spend
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id
+FROM users u LEFT JOIN orders o ON u.id = o.user_id
 GROUP BY u.id, u.username, u.email, u.age;
 
 -- ============================================================
--- 替代方案四：使用外部调度工具
+-- 4. 替代方案: 外部调度工具
 -- ============================================================
-
 -- Apache Airflow / DolphinScheduler / Azkaban
 -- 编排多个 SQL 任务，实现复杂 ETL 流程
 
 -- ============================================================
--- 变量和会话设置
+-- 5. Java UDF (2.0+)
 -- ============================================================
+-- Doris 2.0+ 支持 Java UDF(用户自定义函数):
+-- CREATE FUNCTION my_add(INT, INT) RETURNS INT
+-- PROPERTIES ("file"="hdfs:///udf/my_udf.jar", "symbol"="com.example.MyAdd");
+-- 不是存储过程，但可以扩展内置函数。
 
--- 设置会话变量（替代存储过程中的变量）
+-- ============================================================
+-- 6. 会话变量 (替代过程变量)
+-- ============================================================
 SET exec_mem_limit = 8589934592;
 SET query_timeout = 3600;
 SET parallel_fragment_exec_instance_num = 8;
-
--- 注意：Doris 不支持存储过程
--- 注意：不支持 UDF（用户自定义函数）的 SQL 定义
--- 注意：支持 Java UDF（2.0+）和 Remote UDF
--- 注意：复杂逻辑推荐在应用层或调度工具中实现

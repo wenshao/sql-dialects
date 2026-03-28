@@ -1,151 +1,70 @@
 -- StarRocks: 权限管理
 --
 -- 参考资料:
---   [1] StarRocks - GRANT
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/account-management/GRANT/
---   [2] StarRocks - CREATE USER
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/account-management/CREATE_USER/
-
--- StarRocks 使用 RBAC（基于角色的访问控制，3.0+）
+--   [1] StarRocks Documentation - Privilege
+--       https://docs.starrocks.io/docs/sql-reference/sql-statements/
 
 -- ============================================================
--- 创建用户
+-- 1. 权限模型: 更接近 SQL 标准
 -- ============================================================
+-- StarRocks 的 GRANT 语法更接近 SQL 标准(无 _PRIV 后缀)。
+-- 对比 Doris: GRANT SELECT_PRIV ON db.* → StarRocks: GRANT SELECT ON db.*
 
-CREATE USER 'alice' IDENTIFIED BY 'StrongP@ss123';
-CREATE USER 'bob' IDENTIFIED BY 'password';
-
--- 限制访问 IP
-CREATE USER 'alice'@'192.168.1.%' IDENTIFIED BY 'password';
-
--- 修改密码
-ALTER USER 'alice' IDENTIFIED BY 'NewP@ss456';
-SET PASSWORD FOR 'alice' = PASSWORD('NewP@ss456');
-
--- 删除用户
+-- ============================================================
+-- 2. 用户管理
+-- ============================================================
+CREATE USER 'alice'@'%' IDENTIFIED BY 'password123';
+CREATE USER 'alice'@'10.0.0.%' IDENTIFIED BY 'password123';
+ALTER USER 'alice' IDENTIFIED BY 'new_password';
 DROP USER 'alice';
 
 -- ============================================================
--- 内置角色
+-- 3. 角色管理
 -- ============================================================
-
--- root: 最高权限（系统内置用户）
--- db_admin: 数据库管理
--- cluster_admin: 集群管理
--- user_admin: 用户管理
--- public: 所有用户默认拥有
-
--- ============================================================
--- 创建角色（3.0+）
--- ============================================================
-
-CREATE ROLE analyst;
-CREATE ROLE data_engineer;
-CREATE ROLE app_reader;
-
--- 授予角色给用户
-GRANT analyst TO 'alice';
-GRANT data_engineer TO 'bob';
-
--- 角色继承
-GRANT analyst TO ROLE data_engineer;
-
--- 设置默认角色
-SET DEFAULT ROLE analyst TO 'alice';
-SET DEFAULT ROLE ALL TO 'bob';
+CREATE ROLE app_read;
+CREATE ROLE app_write;
+GRANT SELECT ON db.* TO ROLE app_read;
+GRANT INSERT, ALTER ON db.* TO ROLE app_write;
+GRANT app_read TO 'alice'@'%';
+DROP ROLE app_read;
 
 -- ============================================================
--- Catalog 权限（3.0+，多源数据访问）
+-- 4. 权限层级
 -- ============================================================
+GRANT ALL ON *.* TO 'alice'@'%';               -- 全局
+GRANT SELECT ON db.* TO 'alice'@'%';           -- 数据库级
+GRANT SELECT ON db.users TO 'alice'@'%';       -- 表级
+GRANT INSERT ON db.users TO 'alice'@'%';
+REVOKE SELECT ON db.* FROM 'alice'@'%';
 
-GRANT USAGE ON CATALOG hive_catalog TO ROLE analyst;
-GRANT ALL ON CATALOG hive_catalog TO ROLE data_engineer;
-
--- ============================================================
--- 数据库权限
--- ============================================================
-
-GRANT ALL ON DATABASE mydb TO ROLE data_engineer;
-GRANT SELECT ON ALL TABLES IN DATABASE mydb TO ROLE analyst;
+-- External Catalog 权限(2.3+)
+GRANT USAGE ON CATALOG hive_catalog TO 'alice'@'%';
 
 -- ============================================================
--- 表权限
+-- 5. Resource Group 权限
 -- ============================================================
-
-GRANT SELECT ON TABLE mydb.users TO ROLE analyst;
-GRANT SELECT, INSERT ON TABLE mydb.users TO ROLE data_engineer;
-GRANT ALL ON TABLE mydb.users TO ROLE data_engineer;
-
--- 所有表
-GRANT SELECT ON ALL TABLES IN DATABASE mydb TO ROLE analyst;
+CREATE RESOURCE GROUP rg_report TO (user='alice')
+WITH ('cpu_core_limit'='10', 'mem_limit'='30%');
 
 -- ============================================================
--- 全局权限
+-- 6. 查看权限
 -- ============================================================
-
--- 全局函数权限
-GRANT USAGE ON ALL GLOBAL FUNCTIONS TO ROLE analyst;
-
--- 资源组权限
-GRANT USAGE ON RESOURCE GROUP rg_analyst TO ROLE analyst;
-
--- 导入权限
-GRANT INSERT ON TABLE mydb.orders TO ROLE data_engineer;
-
--- ============================================================
--- 撤销权限
--- ============================================================
-
-REVOKE SELECT ON TABLE mydb.users FROM ROLE analyst;
-REVOKE ALL ON DATABASE mydb FROM ROLE analyst;
-REVOKE analyst FROM 'alice';
-
--- ============================================================
--- 旧版权限模型（3.0 之前）
--- ============================================================
-
--- 3.0 之前使用简单的 GRANT 模型
--- GRANT SELECT_PRIV ON mydb.users TO 'alice';
--- GRANT LOAD_PRIV ON mydb.users TO 'alice';
-
--- 权限类型（旧版）：
--- SELECT_PRIV: 读取
--- LOAD_PRIV: 导入
--- ALTER_PRIV: ALTER TABLE
--- CREATE_PRIV: CREATE TABLE
--- DROP_PRIV: DROP TABLE
--- NODE_PRIV: 集群管理
--- ADMIN_PRIV: 管理员
--- GRANT_PRIV: 授权
-
--- ============================================================
--- 安全配置
--- ============================================================
-
--- 密码策略
--- 通过 FE 配置文件设置最小密码长度、复杂度等
--- password_min_length = 8
--- password_max_length = 64
-
--- 审计日志
--- 通过 FE 审计插件记录所有操作
--- 安装审计插件：INSTALL PLUGIN FROM "/path/to/audit_plugin"
-
--- ============================================================
--- 查看权限
--- ============================================================
-
-SHOW GRANTS;
-SHOW GRANTS FOR 'alice';
-SHOW GRANTS FOR ROLE analyst;
+SHOW GRANTS FOR 'alice'@'%';
+SHOW ALL GRANTS;
 SHOW ROLES;
-SHOW ALL AUTHENTICATION;
 
--- 查看权限信息
-SELECT * FROM information_schema.user_privileges;
-
--- 注意：3.0+ 推荐使用 RBAC 新权限模型
--- 注意：旧版权限模型在 3.0+ 仍然兼容但不推荐
--- 注意：root 用户不能被删除或修改
--- 注意：Catalog 权限支持多源数据的访问控制
--- 注意：资源组权限可以控制查询资源隔离
+-- ============================================================
+-- 7. StarRocks vs Doris 权限差异
+-- ============================================================
+-- 语法:
+--   StarRocks: GRANT SELECT ON db.* TO user (SQL 标准)
+--   Doris:     GRANT SELECT_PRIV ON db.* TO user (_PRIV 后缀)
+--
+-- 行级权限:
+--   StarRocks: 不支持
+--   Doris 2.1+: Row Policy(行级权限)
+--
+-- 对引擎开发者的启示:
+--   权限模型的设计需要在"MySQL 兼容"和"SQL 标准"之间选择。
+--   StarRocks 选择了更标准的语法，Doris 保留了更多 MySQL 习惯。
+--   迁移时需要注意 GRANT 语法的差异。

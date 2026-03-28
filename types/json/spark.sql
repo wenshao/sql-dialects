@@ -1,107 +1,139 @@
--- Spark SQL: JSON Type (Spark 2.0+)
+-- Spark SQL: JSON 类型与处理 (JSON Type)
 --
 -- 参考资料:
---   [1] Spark SQL Reference
---       https://spark.apache.org/docs/latest/sql-ref.html
---   [2] Spark SQL - Built-in Functions
---       https://spark.apache.org/docs/latest/sql-ref-functions.html
---   [3] Spark SQL - Data Types
---       https://spark.apache.org/docs/latest/sql-ref-datatypes.html
+--   [1] Spark SQL - JSON Functions
+--       https://spark.apache.org/docs/latest/sql-ref-functions-builtin.html
+--   [2] Spark SQL - JSON Data Source
+--       https://spark.apache.org/docs/latest/sql-data-sources-json.html
 
--- Spark has no native JSON column type
--- JSON is stored as STRING and processed with built-in functions
+-- ============================================================
+-- 1. 核心设计: Spark 没有原生 JSON 列类型
+-- ============================================================
+
+-- Spark 将 JSON 存储为 STRING，通过函数解析和操作。
+-- 这与 PostgreSQL/MySQL 的原生 JSON 类型有本质区别:
+--   PostgreSQL JSONB: 二进制存储，支持 GIN 索引，查询 O(1) 字段访问
+--   MySQL JSON:       二进制存储，支持虚拟列索引
+--   Spark STRING:     每次查询都重新解析 JSON 字符串
+--
+-- Spark 4.0 引入 Variant 类型:
+--   VARIANT 是二进制半结构化类型，类似 Snowflake VARIANT
+--   解析一次，多次访问字段，性能远优于 STRING + get_json_object
 
 CREATE TABLE events (
     id   BIGINT,
-    data STRING                        -- JSON stored as STRING
+    data STRING                                  -- JSON 存为 STRING
 ) USING PARQUET;
 
--- Insert JSON
-INSERT INTO events VALUES (1, '{"name": "alice", "age": 25, "tags": ["vip", "new"]}');
+INSERT INTO events VALUES (1, '{"name":"alice","age":25,"tags":["vip","new"]}');
 
--- Extract JSON fields
-SELECT GET_JSON_OBJECT(data, '$.name') FROM events;        -- alice (STRING)
-SELECT GET_JSON_OBJECT(data, '$.age') FROM events;         -- 25 (STRING)
-SELECT GET_JSON_OBJECT(data, '$.tags[0]') FROM events;     -- vip (STRING)
-SELECT GET_JSON_OBJECT(data, '$.tags') FROM events;        -- ["vip","new"] (STRING)
+-- ============================================================
+-- 2. get_json_object: 路径提取
+-- ============================================================
+SELECT get_json_object(data, '$.name') FROM events;      -- 'alice' (STRING)
+SELECT get_json_object(data, '$.age') FROM events;       -- '25' (STRING!)
+SELECT get_json_object(data, '$.tags[0]') FROM events;   -- 'vip'
+SELECT get_json_object(data, '$.tags') FROM events;      -- '["vip","new"]'
 
--- JSON_TUPLE (extract multiple fields at once, efficient)
-SELECT id, j.name, j.age
-FROM events
-LATERAL VIEW JSON_TUPLE(data, 'name', 'age') j AS name, age;
+-- 总是返回 STRING，需要 CAST 转换:
+SELECT CAST(get_json_object(data, '$.age') AS INT) FROM events;
 
--- FROM_JSON (parse JSON string into STRUCT, Spark 2.1+)
-SELECT FROM_JSON(data, 'STRUCT<name: STRING, age: INT, tags: ARRAY<STRING>>') AS parsed
+-- ============================================================
+-- 3. from_json: 结构化解析（推荐）
+-- ============================================================
+SELECT from_json(data, 'STRUCT<name:STRING, age:INT, tags:ARRAY<STRING>>') AS parsed
 FROM events;
 
--- FROM_JSON with schema inference
-SELECT FROM_JSON(data, schema_of_json('{"name":"","age":0,"tags":[""]}')) AS parsed
-FROM events;
-
--- Access parsed struct fields
-SELECT parsed.name, parsed.age, parsed.tags
-FROM (
-    SELECT FROM_JSON(data, 'STRUCT<name: STRING, age: INT, tags: ARRAY<STRING>>') AS parsed
+-- 访问解析后的字段
+SELECT parsed.name, parsed.age, parsed.tags FROM (
+    SELECT from_json(data, 'STRUCT<name:STRING, age:INT, tags:ARRAY<STRING>>') AS parsed
     FROM events
 );
 
--- TO_JSON (struct/map/array to JSON string)
-SELECT TO_JSON(STRUCT('alice' AS name, 25 AS age));
-SELECT TO_JSON(MAP('key1', 'value1', 'key2', 'value2'));
-SELECT TO_JSON(ARRAY('a', 'b', 'c'));
+-- 使用 schema_of_json 推断 Schema
+SELECT schema_of_json('{"name":"","age":0,"tags":[""]}');
 
--- JSON_OBJECT (Spark 3.5+)
+SELECT from_json(data,
+    schema_of_json('{"name":"","age":0,"tags":[""]}')
+) AS parsed
+FROM events;
+
+-- from_json vs get_json_object:
+--   from_json:          一次解析，返回类型化 STRUCT，可多次访问字段
+--   get_json_object:    每次调用重新解析 JSON（多字段提取时低效）
+
+-- ============================================================
+-- 4. json_tuple: 多字段提取（Hive 兼容）
+-- ============================================================
+SELECT id, j.name, j.age
+FROM events
+LATERAL VIEW json_tuple(data, 'name', 'age') j AS name, age;
+
+-- json_tuple 一次解析提取多个顶级字段——比多次 get_json_object 更高效
+-- 但不支持嵌套路径（$.a.b.c）
+
+-- ============================================================
+-- 5. to_json: 生成 JSON
+-- ============================================================
+SELECT to_json(STRUCT('alice' AS name, 25 AS age));
+SELECT to_json(MAP('key1', 'value1', 'key2', 'value2'));
+SELECT to_json(ARRAY('a', 'b', 'c'));
+
+-- JSON_OBJECT / JSON_ARRAY（Spark 3.5+）
 SELECT JSON_OBJECT('name', 'alice', 'age', 25);
-
--- JSON_ARRAY (Spark 3.5+)
 SELECT JSON_ARRAY('a', 'b', 'c');
 
--- SCHEMA_OF_JSON (infer schema from JSON string, Spark 2.4+)
-SELECT SCHEMA_OF_JSON('{"name": "alice", "age": 25}');
--- Returns: STRUCT<age: BIGINT, name: STRING>
-
--- JSON in WHERE clause
-SELECT * FROM events WHERE GET_JSON_OBJECT(data, '$.name') = 'alice';
-SELECT * FROM events WHERE CAST(GET_JSON_OBJECT(data, '$.age') AS INT) > 20;
-
--- Explode JSON arrays
+-- ============================================================
+-- 6. JSON 数组展开
+-- ============================================================
 SELECT id, tag
 FROM events
 LATERAL VIEW EXPLODE(
-    FROM_JSON(GET_JSON_OBJECT(data, '$.tags'), 'ARRAY<STRING>')
+    from_json(get_json_object(data, '$.tags'), 'ARRAY<STRING>')
 ) t AS tag;
 
--- JSON aggregation
-SELECT TO_JSON(COLLECT_LIST(username)) FROM users;
-SELECT TO_JSON(MAP_FROM_ENTRIES(COLLECT_LIST(STRUCT(username, age)))) FROM users;
+-- ============================================================
+-- 7. JSON 聚合
+-- ============================================================
+SELECT to_json(COLLECT_LIST(username)) FROM users;
+SELECT to_json(MAP_FROM_ENTRIES(COLLECT_LIST(STRUCT(username, age)))) FROM users;
 
--- Read JSON files
+-- ============================================================
+-- 8. JSON 文件读取
+-- ============================================================
 -- CREATE TABLE json_data USING JSON OPTIONS (path '/data/events.json');
--- SELECT * FROM json_data;
-
--- Read JSON with explicit schema
 -- CREATE TABLE json_data (name STRING, age INT, tags ARRAY<STRING>)
 -- USING JSON OPTIONS (path '/data/events.json', multiLine 'true');
 
--- Complex nested JSON handling
-SELECT
-    GET_JSON_OBJECT(data, '$.address.city') AS city,
-    GET_JSON_OBJECT(data, '$.address.zip') AS zip
-FROM events;
+-- ============================================================
+-- 9. 嵌套 JSON 处理
+-- ============================================================
+SELECT get_json_object(data, '$.address.city') AS city FROM events;
 
--- Parse nested JSON with FROM_JSON
-SELECT parsed.*
-FROM (
-    SELECT FROM_JSON(data,
-        'STRUCT<name: STRING, age: INT, address: STRUCT<city: STRING, zip: STRING>>'
+SELECT parsed.* FROM (
+    SELECT from_json(data,
+        'STRUCT<name:STRING, age:INT, address:STRUCT<city:STRING, zip:STRING>>'
     ) AS parsed
     FROM events
 );
 
--- Note: Spark stores JSON as STRING; there is no dedicated JSON column type
--- Note: GET_JSON_OBJECT always returns STRING; cast for other types
--- Note: FROM_JSON is more powerful but requires schema specification
--- Note: JSON_TUPLE with LATERAL VIEW is efficient for extracting multiple fields
--- Note: Spark can read JSON files directly with automatic schema inference
--- Note: No JSON path operators (-> / ->>); use GET_JSON_OBJECT function
--- Note: For nested/complex JSON, FROM_JSON with STRUCT types is recommended
+-- WHERE 子句中使用 JSON
+SELECT * FROM events WHERE get_json_object(data, '$.name') = 'alice';
+SELECT * FROM events WHERE CAST(get_json_object(data, '$.age') AS INT) > 20;
+
+-- ============================================================
+-- 10. 版本演进
+-- ============================================================
+-- Spark 2.0: get_json_object, json_tuple
+-- Spark 2.1: from_json, to_json
+-- Spark 2.4: schema_of_json
+-- Spark 3.5: JSON_OBJECT, JSON_ARRAY
+-- Spark 4.0: Variant 类型（原生半结构化支持）
+--
+-- 限制:
+--   无原生 JSON 列类型（存为 STRING，每次查询重新解析）
+--   无 JSON 路径操作符（-> / ->>），使用 get_json_object 函数
+--   get_json_object 总是返回 STRING（需要 CAST）
+--   from_json 需要提供完整 Schema（不支持部分 Schema）
+--   无 JSON 索引（无法加速 JSON 字段查询）
+--   Spark 4.0 的 Variant 类型将大幅改善 JSON 处理性能

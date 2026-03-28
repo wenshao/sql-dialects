@@ -1,92 +1,82 @@
 -- Apache Doris: 事务
 --
 -- 参考资料:
---   [1] Doris SQL Manual
---       https://doris.apache.org/docs/sql-manual/sql-statements/
---   [2] Doris Data Types
---       https://doris.apache.org/docs/sql-manual/data-types/
---   [3] Doris Functions
---       https://doris.apache.org/docs/sql-manual/sql-functions/
-
--- Doris 的事务支持与传统 RDBMS 不同
--- 主要通过导入任务的原子性来保证数据一致性
+--   [1] Doris Documentation - Transaction
+--       https://doris.apache.org/docs/data-operate/transaction
 
 -- ============================================================
--- 导入事务（Import Transaction）
+-- 1. 事务模型: Import 事务而非 OLTP 事务
 -- ============================================================
+-- Doris 的事务语义与传统 RDBMS 完全不同:
+--   传统 RDBMS: BEGIN → 多条 DML → COMMIT/ROLLBACK
+--   Doris:      每个导入任务是一个原子操作(Import Transaction)
+--
+-- 设计理由:
+--   OLAP 引擎的写入是"批量追加"——一次导入可能写入数百万行。
+--   为每行维护事务状态(行锁、undo log)代价过高。
+--   Import 事务: 整个导入要么全部成功，要么全部回滚。
+--
+-- 对比:
+--   StarRocks: 相同的 Import 事务模型(同源)
+--   ClickHouse: 类似——每个 INSERT 是原子的，无多语句事务
+--   BigQuery:  每个 DML 是原子的，支持多语句事务(Preview)
+--   MySQL:     完整 ACID 事务(BEGIN/COMMIT/ROLLBACK/SAVEPOINT)
+--   PostgreSQL: 最完整的事务支持(嵌套事务/SAVEPOINT)
 
--- 每个导入任务是一个事务
--- 事务通过 Label 标识，保证幂等性
-
--- Stream Load（自动事务）
--- curl -H "label:txn_20240115" -T data.csv \
---   http://fe_host:8030/api/db/users/_stream_load
--- 相同 label 的导入不会重复执行
-
--- INSERT 自带事务
+-- ============================================================
+-- 2. Label 机制 (幂等导入)
+-- ============================================================
 INSERT INTO users WITH LABEL insert_20240115
 (username, email, age) VALUES ('alice', 'alice@example.com', 25);
 
--- ============================================================
--- BEGIN/COMMIT（2.1+，写事务）
--- ============================================================
+-- 相同 Label 的导入不会重复执行——这是幂等性保证。
+-- Stream Load 也支持 Label: curl -H "label:txn_20240115" ...
+-- 设计启示: Label 机制解决了"at-least-once 到 exactly-once"的转化。
 
--- 2.1+ 支持多语句写事务
+-- ============================================================
+-- 3. BEGIN/COMMIT (2.1+，多语句写事务)
+-- ============================================================
 BEGIN;
-INSERT INTO users (id, username, email) VALUES (1, 'alice', 'alice@example.com');
-INSERT INTO users (id, username, email) VALUES (2, 'bob', 'bob@example.com');
+INSERT INTO users (id, username, email) VALUES (1, 'alice', 'a@e.com');
+INSERT INTO users (id, username, email) VALUES (2, 'bob', 'b@e.com');
 COMMIT;
 
--- 回滚
 BEGIN;
-INSERT INTO users (id, username, email) VALUES (3, 'charlie', 'charlie@example.com');
+INSERT INTO users (id, username, email) VALUES (3, 'charlie', 'c@e.com');
 ROLLBACK;
 
 -- 带 Label 的事务
 BEGIN WITH LABEL txn_20240115;
-INSERT INTO users (id, username, email) VALUES (1, 'alice', 'alice@example.com');
+INSERT INTO users (id, username, email) VALUES (1, 'alice', 'a@e.com');
 INSERT INTO orders (id, user_id, amount) VALUES (1, 1, 100.00);
 COMMIT;
 
--- ============================================================
--- 隔离级别
--- ============================================================
-
--- Doris 默认提供 Read Committed 级别
--- 导入的数据在 COMMIT 后对其他查询可见
+-- 设计分析:
+--   Doris 2.1+ 支持多语句写事务——这是向 HTAP 演进的信号。
+--   但仍不支持 SAVEPOINT、嵌套事务、读事务(SELECT 不在事务内)。
 
 -- ============================================================
--- Two-Phase Commit（两阶段提交，2PC）
+-- 4. Two-Phase Commit (Stream Load)
 -- ============================================================
-
--- Stream Load 支持 2PC
--- 1. Prepare 阶段：curl -H "two_phase_commit:true" ...
--- 2. Commit 阶段：curl -X PUT .../api/db/_commit?txnId=xxx
+-- Stream Load 支持 2PC:
+-- 1. Prepare: curl -H "two_phase_commit:true" ...
+-- 2. Commit:  curl -X PUT .../api/db/_commit?txnId=xxx
 
 -- ============================================================
--- 数据一致性保证
+-- 5. 隔离级别
 -- ============================================================
+-- 默认 Read Committed: 导入 COMMIT 后对新查询可见。
+-- 不支持 Repeatable Read / Serializable。
 
--- 1. Label 机制保证导入幂等
--- 2. 原子性：一个导入任务要么全部成功，要么全部失败
--- 3. REPLACE/DELETE 操作在 Unique Key 模型上是原子的
+-- ============================================================
+-- 6. MVCC
+-- ============================================================
+-- 查询看到查询开始时的一致性快照，不受并发导入影响。
 
--- 查看事务状态
 SHOW TRANSACTION WHERE label = 'txn_20240115';
-
--- 查看导入任务状态
 SHOW LOAD WHERE label = 'insert_20240115';
 
--- ============================================================
--- MVCC（多版本并发控制）
--- ============================================================
-
--- Doris 使用 MVCC 实现快照读
--- 查询看到的是查询开始时的一致性快照
--- 不受并发导入的影响
-
--- 注意：Doris 的事务主要面向导入场景
--- 注意：2.1+ 支持 BEGIN/COMMIT 多语句事务
--- 注意：Label 机制保证导入幂等（相同 label 不重复导入）
--- 注意：不支持 SAVEPOINT
--- 注意：不支持传统的行级锁
+-- 对引擎开发者的启示:
+--   Label 幂等机制是分布式数据导入的关键设计:
+--     客户端重试不会导致数据重复
+--     简化了 at-least-once 消息系统(Kafka)与数据库的集成

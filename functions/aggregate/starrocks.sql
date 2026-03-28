@@ -1,100 +1,72 @@
 -- StarRocks: 聚合函数
 --
 -- 参考资料:
---   [1] StarRocks - Aggregate Functions
---       https://docs.starrocks.io/docs/sql-reference/sql-functions/aggregate-functions/
---   [2] StarRocks SQL Functions
+--   [1] StarRocks Documentation - Aggregate Functions
 --       https://docs.starrocks.io/docs/sql-reference/sql-functions/
 
--- 基本聚合
-SELECT COUNT(*) FROM users;
-SELECT COUNT(DISTINCT city) FROM users;
-SELECT SUM(amount) FROM orders;
-SELECT AVG(amount) FROM orders;
-SELECT MIN(amount) FROM orders;
-SELECT MAX(amount) FROM orders;
+-- ============================================================
+-- 1. 基本聚合 (与 Doris 完全兼容)
+-- ============================================================
+SELECT COUNT(*), COUNT(email), COUNT(DISTINCT city) FROM users;
+SELECT SUM(amount), AVG(amount), MIN(amount), MAX(amount) FROM orders;
 
--- GROUP BY
 SELECT city, COUNT(*) AS cnt, AVG(age) AS avg_age
-FROM users
-GROUP BY city;
+FROM users GROUP BY city HAVING cnt > 10;
 
--- HAVING
-SELECT city, COUNT(*) AS cnt
-FROM users
-GROUP BY city
-HAVING COUNT(*) > 10;
-
--- GROUPING SETS / ROLLUP / CUBE
+-- ============================================================
+-- 2. 多维聚合
+-- ============================================================
 SELECT city, status, COUNT(*)
-FROM users
-GROUP BY GROUPING SETS ((city), (status), ());
+FROM users GROUP BY GROUPING SETS ((city), (status), (city, status), ());
 
 SELECT city, status, COUNT(*)
-FROM users
-GROUP BY ROLLUP (city, status);
+FROM users GROUP BY ROLLUP (city, status);
 
 SELECT city, status, COUNT(*)
-FROM users
-GROUP BY CUBE (city, status);
+FROM users GROUP BY CUBE (city, status);
 
-SELECT city, GROUPING(city) AS is_total, COUNT(*)
-FROM users
-GROUP BY ROLLUP (city);
-
--- GROUPING_ID（多列判断）
-SELECT city, status, GROUPING_ID(city, status), COUNT(*)
-FROM users
-GROUP BY ROLLUP (city, status);
-
--- 字符串聚合
+-- ============================================================
+-- 3. 字符串聚合
+-- ============================================================
 SELECT GROUP_CONCAT(username ORDER BY username SEPARATOR ', ') FROM users;
-SELECT GROUP_CONCAT(DISTINCT city SEPARATOR ', ') FROM users;
 
--- 数组聚合
-SELECT ARRAY_AGG(username ORDER BY username) FROM users;  -- 3.0+
+-- ============================================================
+-- 4. 近似聚合与精确去重
+-- ============================================================
+SELECT APPROX_COUNT_DISTINCT(user_id) FROM orders;
+SELECT NDV(user_id) FROM orders;
 
--- BITMAP 聚合（StarRocks 核心特性）
-SELECT BITMAP_UNION_COUNT(user_bitmap) FROM agg_table;    -- 位图合并去重计数
-SELECT BITMAP_UNION(user_bitmap) FROM agg_table;          -- 位图合并
-SELECT BITMAP_INTERSECT(user_bitmap) FROM agg_table;      -- 位图交集
-SELECT BITMAP_COUNT(BITMAP_UNION(user_bitmap)) FROM agg_table;
+-- BITMAP 精确去重
+SELECT BITMAP_UNION_COUNT(TO_BITMAP(user_id)) FROM orders;
 
--- HLL 聚合
-SELECT HLL_UNION_AGG(uv_hll) FROM agg_table;             -- HLL 合并
-SELECT HLL_CARDINALITY(HLL_UNION_AGG(uv_hll)) FROM agg_table; -- HLL 去重计数
-SELECT NDV(user_id) FROM events;                         -- 近似去重（HLL）
+-- HLL 近似去重
+SELECT HLL_UNION_AGG(HLL_HASH(user_id)) FROM orders;
 
--- 百分位
-SELECT PERCENTILE_APPROX(amount, 0.5) FROM orders;       -- 近似中位数
-SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY amount) FROM orders; -- 精确
+-- ============================================================
+-- 5. 百分位数
+-- ============================================================
+SELECT PERCENTILE_APPROX(amount, 0.5) FROM orders;
+SELECT PERCENTILE_APPROX(amount, 0.95) FROM orders;
 
--- 统计函数
-SELECT STDDEV(amount) FROM orders;                       -- 样本标准差
-SELECT STDDEV_POP(amount) FROM orders;                   -- 总体标准差
-SELECT STDDEV_SAMP(amount) FROM orders;                  -- 样本标准差
-SELECT VARIANCE(amount) FROM orders;                     -- 样本方差
-SELECT VAR_POP(amount) FROM orders;                      -- 总体方差
-SELECT VAR_SAMP(amount) FROM orders;                     -- 样本方差
-SELECT CORR(x, y) FROM data;                             -- 相关系数
-SELECT COVAR_SAMP(x, y) FROM data;                       -- 样本协方差
-SELECT COVAR_POP(x, y) FROM data;                        -- 总体协方差
+-- ============================================================
+-- 6. 收集为数组
+-- ============================================================
+SELECT ARRAY_AGG(username) FROM users GROUP BY city;
 
--- 其他
-SELECT ANY_VALUE(name) FROM users;                       -- 任意值
-SELECT MAX_BY(name, age) FROM users;                     -- 按 age 最大值取 name（2.5+）
-SELECT MIN_BY(name, age) FROM users;                     -- 按 age 最小值取 name（2.5+）
-SELECT MULTI_DISTINCT_COUNT(city, status) FROM users;    -- 多列去重计数
-
--- 条件聚合（使用 CASE/IF）
-SELECT
-    COUNT(*) AS total,
-    SUM(IF(age < 30, 1, 0)) AS young,
-    SUM(IF(status = 'active', amount, 0)) AS active_amount
-FROM users;
-
--- 注意：GROUP_CONCAT 与 MySQL 兼容
--- 注意：BITMAP/HLL 聚合是 StarRocks 的核心分析特性
--- 注意：NDV 是 COUNT(DISTINCT) 的 HLL 近似版
--- 注意：没有 FILTER 子句
--- 注意：聚合模型表可以预聚合提升查询性能
+-- ============================================================
+-- 7. StarRocks vs Doris 聚合差异
+-- ============================================================
+-- 核心函数完全相同(同源)。
+--
+-- 差异:
+--   StarRocks: ARRAY_AGG (更标准)
+--   Doris:     COLLECT_LIST / COLLECT_SET (Hive 风格)
+--
+--   StarRocks: QUANTILE_STATE 不支持(用 PERCENTILE_APPROX)
+--   Doris:     QUANTILE_STATE 聚合类型(Aggregate Key 模型)
+--
+-- 对引擎开发者的启示:
+--   聚合函数的向量化实现是 OLAP 引擎性能的关键:
+--     Batch Aggregation: 一次处理一个向量(1024 行)而非逐行
+--     SIMD 加速: SUM/COUNT 可用 AVX2/AVX512 指令
+--     Two-Phase Aggregation: 先本地聚合(Partial)，再全局聚合(Final)

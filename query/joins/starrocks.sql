@@ -1,82 +1,58 @@
 -- StarRocks: JOIN
 --
 -- 参考资料:
---   [1] StarRocks - SELECT (JOIN)
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/query/SELECT/
---   [2] StarRocks SQL Functions
---       https://docs.starrocks.io/docs/sql-reference/sql-functions/
+--   [1] StarRocks Documentation - JOIN
+--       https://docs.starrocks.io/docs/sql-reference/sql-statements/
 
--- INNER JOIN
-SELECT u.username, o.amount
-FROM users u
-INNER JOIN orders o ON u.id = o.user_id;
+-- ============================================================
+-- 1. 标准 JOIN (与 Doris 完全兼容)
+-- ============================================================
+SELECT u.username, o.amount FROM users u INNER JOIN orders o ON u.id = o.user_id;
+SELECT u.username, o.amount FROM users u LEFT JOIN orders o ON u.id = o.user_id;
+SELECT u.username, o.amount FROM users u FULL OUTER JOIN orders o ON u.id = o.user_id;
+SELECT u.* FROM users u LEFT SEMI JOIN orders o ON u.id = o.user_id;
+SELECT u.* FROM users u LEFT ANTI JOIN orders o ON u.id = o.user_id;
 
--- LEFT JOIN
-SELECT u.username, o.amount
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id;
+-- ============================================================
+-- 2. 分布式 JOIN 策略
+-- ============================================================
+-- 与 Doris 相同: Broadcast / Shuffle / Bucket Shuffle / Colocate
 
--- RIGHT JOIN
-SELECT u.username, o.amount
-FROM users u
-RIGHT JOIN orders o ON u.id = o.user_id;
+-- ============================================================
+-- 3. Global Runtime Filter (StarRocks 优势)
+-- ============================================================
+-- StarRocks 的 Runtime Filter 是全局的(跨 Fragment 广播)。
+-- Doris 的 Runtime Filter 早期只在本地 Fragment 内。
+-- SET enable_global_runtime_filter = true;
 
--- FULL OUTER JOIN
-SELECT u.username, o.amount
-FROM users u
-FULL OUTER JOIN orders o ON u.id = o.user_id;
+-- ============================================================
+-- 4. ASOF JOIN (4.0+，StarRocks 独有)
+-- ============================================================
+-- 按时间最近匹配 JOIN——时序数据的杀手级功能:
+-- SELECT t.*, q.price
+-- FROM trades t ASOF JOIN quotes q
+-- ON t.symbol = q.symbol AND t.trade_time >= q.quote_time;
+--
+-- ASOF JOIN 匹配每条 trade 对应的"最近之前"的 quote。
+-- 对比: ClickHouse 也支持 ASOF JOIN(更早实现)。
+-- Doris: 不支持(需要用窗口函数 + 子查询模拟)。
 
--- CROSS JOIN
-SELECT u.username, r.role_name
-FROM users u
-CROSS JOIN roles r;
+-- ============================================================
+-- 5. QUALIFY (3.2+，StarRocks 独有)
+-- ============================================================
+-- 窗口函数的过滤子句(不需要子查询):
+-- SELECT username, city, ROW_NUMBER() OVER (PARTITION BY city ORDER BY age) AS rn
+-- FROM users
+-- QUALIFY rn <= 3;
+--
+-- 对比: Doris 不支持(需要子查询包装)。
+-- 对比: BigQuery/Snowflake 都支持 QUALIFY。
 
--- 自连接
-SELECT e.username AS employee, m.username AS manager
-FROM users e
-LEFT JOIN users m ON e.manager_id = m.id;
-
--- USING
-SELECT * FROM users JOIN orders USING (user_id);
-
--- SEMI JOIN（左半连接）
-SELECT u.*
-FROM users u
-LEFT SEMI JOIN orders o ON u.id = o.user_id;
-
--- ANTI JOIN（反连接）
-SELECT u.*
-FROM users u
-LEFT ANTI JOIN orders o ON u.id = o.user_id;
-
--- BUCKET SHUFFLE JOIN hint（利用数据分布优化）
-SELECT u.username, o.amount
-FROM users u
-JOIN [bucket] orders o ON u.id = o.user_id;
-
--- BROADCAST JOIN hint（广播小表）
-SELECT u.username, o.amount
-FROM users u
-JOIN [broadcast] orders o ON u.id = o.user_id;
-
--- SHUFFLE JOIN hint（重分布连接）
-SELECT u.username, o.amount
-FROM users u
-JOIN [shuffle] orders o ON u.id = o.user_id;
-
--- COLOCATE JOIN（利用 Colocate Group 本地连接）
--- 前提：两表属于同一 Colocate Group 且按 JOIN 列分桶
-SELECT u.username, o.amount
-FROM users u
-JOIN orders o ON u.id = o.user_id;
-
--- 多表 JOIN
-SELECT u.username, o.amount, p.product_name
-FROM users u
-JOIN orders o ON u.id = o.user_id
-JOIN order_items oi ON o.id = oi.order_id
-JOIN products p ON oi.product_id = p.id;
-
--- 注意：StarRocks 兼容 MySQL 协议，支持标准 JOIN 语法
--- 注意：StarRocks 不支持 NATURAL JOIN
--- 注意：StarRocks 不支持 LATERAL JOIN
+-- ============================================================
+-- 6. StarRocks vs Doris JOIN 差异
+-- ============================================================
+-- Global Runtime Filter: StarRocks 更成熟
+-- ASOF JOIN:            StarRocks 4.0+(独有)
+-- QUALIFY:              StarRocks 3.2+(独有)
+-- Colocate JOIN:        两者都支持(同源)
+-- SEMI/ANTI JOIN:       两者都支持(同源)

@@ -1,38 +1,32 @@
 -- Apache Doris: UPDATE
 --
 -- 参考资料:
---   [1] Doris SQL Manual
+--   [1] Doris Documentation - UPDATE
 --       https://doris.apache.org/docs/sql-manual/sql-statements/
---   [2] Doris Data Types
---       https://doris.apache.org/docs/sql-manual/data-types/
---   [3] Doris Functions
---       https://doris.apache.org/docs/sql-manual/sql-functions/
 
--- 注意: Doris UPDATE 仅支持 Unique Key 模型表
--- 其他模型（明细模型、聚合模型）不支持直接 UPDATE
+-- ============================================================
+-- 1. UPDATE 的模型依赖: 仅 Unique Key 模型支持
+-- ============================================================
+-- Doris UPDATE 仅支持 Unique Key 模型表。
+-- Duplicate Key / Aggregate Key 模型不支持直接 UPDATE。
+--
+-- 实现原理:
+--   UPDATE = DELETE(标记旧行) + INSERT(写入新行)
+--   Merge-on-Write 模型: 实时更新(写入时定位旧行)
+--   Merge-on-Read 模型:  延迟更新(Compaction 时合并)
+--
+-- 对比:
+--   StarRocks:  Primary Key 模型支持(同源但语法更清晰)
+--   ClickHouse: ALTER TABLE UPDATE(异步 Mutation，非实时)
+--   MySQL:      标准 UPDATE(行级实时)
+--   BigQuery:   标准 UPDATE(列式但支持行级)
 
--- 基本更新
+-- ============================================================
+-- 2. 基本 UPDATE
+-- ============================================================
 UPDATE users SET age = 26 WHERE username = 'alice';
-
--- 多列更新
-UPDATE users SET email = 'new@example.com', age = 26 WHERE username = 'alice';
-
--- 子查询更新
-UPDATE users SET age = (SELECT AVG(age) FROM users) WHERE age IS NULL;
-
--- 多表 JOIN 更新（2.0+）
-UPDATE users u
-JOIN orders o ON u.id = o.user_id
-SET u.status = 1
-WHERE o.amount > 1000;
-
--- CTE + UPDATE（2.1+）
-WITH vip AS (
-    SELECT user_id FROM orders GROUP BY user_id HAVING SUM(amount) > 10000
-)
-UPDATE users u
-JOIN vip v ON u.id = v.user_id
-SET u.status = 2;
+UPDATE users SET email = 'new@e.com', age = 26 WHERE username = 'alice';
+UPDATE users SET age = age + 1;
 
 -- CASE 表达式
 UPDATE users SET status = CASE
@@ -41,22 +35,39 @@ UPDATE users SET status = CASE
     ELSE 1
 END;
 
--- 自引用更新
-UPDATE users SET age = age + 1;
+-- ============================================================
+-- 3. 多表 JOIN 更新 (2.0+)
+-- ============================================================
+UPDATE users u JOIN orders o ON u.id = o.user_id
+SET u.status = 1 WHERE o.amount > 1000;
 
--- 基于子查询的批量更新
-UPDATE users SET
-    email = t.new_email
-FROM (SELECT 'alice' AS username, 'alice_new@example.com' AS new_email
-      UNION ALL
-      SELECT 'bob', 'bob_new@example.com') t
-WHERE users.username = t.username;
+-- CTE + UPDATE (2.1+)
+WITH vip AS (
+    SELECT user_id FROM orders GROUP BY user_id HAVING SUM(amount) > 10000
+)
+UPDATE users u JOIN vip v ON u.id = v.user_id SET u.status = 2;
 
--- 条件更新（结合 Merge-on-Write）
-UPDATE users SET status = 1 WHERE last_login > '2024-01-01';
+-- 子查询更新
+UPDATE users SET age = (SELECT AVG(age) FROM users) WHERE age IS NULL;
 
--- 限制:
--- 仅 Unique Key 模型表支持
--- 不支持更新 Key 列
--- 不支持 ORDER BY / LIMIT
+-- ============================================================
+-- 4. Partial Column Update (2.0+，部分列更新)
+-- ============================================================
+-- 只更新指定列，其他列保持不变(Merge-on-Write Unique Key 模型)。
+-- SET enable_unique_key_partial_update = true;
+-- INSERT INTO users (id, email) VALUES (1, 'new@e.com');
+-- 或 Stream Load: curl -H "partial_columns:true" ...
+
+-- 设计分析:
+--   Partial Update 避免了"读取旧行全部列 → 修改 → 写回"的开销。
+--   对比 StarRocks: 也支持 Partial Update(Primary Key 模型)。
+--   对比 ClickHouse: 不支持部分列更新。
+
+-- ============================================================
+-- 5. 限制
+-- ============================================================
+-- 仅 Unique Key 模型支持
+-- 不支持更新 Key 列(排序键)
 -- 不支持更新分区键
+-- 不支持 ORDER BY / LIMIT
+-- 不支持 UPDATE ... RETURNING(PostgreSQL 特有)

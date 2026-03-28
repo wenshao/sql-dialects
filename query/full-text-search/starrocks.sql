@@ -1,47 +1,46 @@
 -- StarRocks: 全文搜索
 --
 -- 参考资料:
---   [1] StarRocks - String Functions
---       https://docs.starrocks.io/docs/sql-reference/sql-functions/string-functions/
---   [2] StarRocks SQL Functions
---       https://docs.starrocks.io/docs/sql-reference/sql-functions/
+--   [1] StarRocks Documentation - Index
+--       https://docs.starrocks.io/docs/table_design/indexes/
 
--- LIKE 模糊搜索
-SELECT * FROM articles
-WHERE content LIKE '%database%';
+-- ============================================================
+-- 1. 全文搜索: 追赶 Doris 的领域
+-- ============================================================
+-- StarRocks 3.1+ 引入 GIN(Generalized Inverted Index) 索引，
+-- 但比 Doris 2.0 的倒排索引晚约一年。
 
--- 正则表达式搜索
-SELECT * FROM articles
-WHERE content REGEXP '(?i)database.*performance';
-
--- INSTR（查找子字符串位置）
-SELECT * FROM articles
-WHERE INSTR(LOWER(content), 'database') > 0;
-
--- LOCATE（查找子字符串位置）
-SELECT * FROM articles
-WHERE LOCATE('database', LOWER(content)) > 0;
-
--- 多关键词搜索（OR）
-SELECT * FROM articles
-WHERE content REGEXP '(?i)(database|performance|optimization)';
-
--- 多关键词搜索（AND）
-SELECT * FROM articles
-WHERE content LIKE '%database%' AND content LIKE '%performance%';
-
--- 简单相关度排序
-SELECT title,
-    (LENGTH(content) - LENGTH(REPLACE(LOWER(content), 'database', ''))) / LENGTH('database') AS keyword_count
-FROM articles
-WHERE content LIKE '%database%'
-ORDER BY keyword_count DESC;
-
--- GIN 索引加速（3.3+，倒排索引）
+-- GIN 索引 (3.1+):
 -- CREATE INDEX idx_content ON articles (content) USING GIN;
--- 创建索引后可加速 LIKE、MATCH 等搜索
 
--- 注意：StarRocks 原生不支持全文搜索引擎（如 tsvector/tsquery）
--- 注意：StarRocks 3.3+ 引入 GIN（倒排）索引，可加速字符串匹配
--- 注意：所有字符串搜索默认需要全表扫描
--- 注意：如需高性能全文搜索，建议集成 Elasticsearch
+-- ============================================================
+-- 2. Bloom Filter 替代 (早期方案)
+-- ============================================================
+-- 在 GIN 索引之前，StarRocks 使用 Bloom Filter 近似全文搜索:
+CREATE TABLE articles (
+    id BIGINT NOT NULL, content STRING
+) DUPLICATE KEY(id)
+DISTRIBUTED BY HASH(id) BUCKETS 16
+PROPERTIES ("bloom_filter_columns" = "content");
+
+-- LIKE 查询(无索引加速):
+SELECT * FROM articles WHERE content LIKE '%database%';
+
+-- ============================================================
+-- 3. 对比 Doris
+-- ============================================================
+-- Doris 2.0+:
+--   INVERTED INDEX: 真正的倒排索引(CLucene)
+--   MATCH_ALL/MATCH_ANY/MATCH_PHRASE: 专用全文检索语法
+--   chinese/english/unicode 分词器
+--
+-- StarRocks 3.1+:
+--   GIN Index: 倒排索引
+--   功能正在追赶 Doris
+--
+-- 对引擎开发者的启示:
+--   全文检索是"分析引擎 vs 搜索引擎"的交叉地带。
+--   Doris 选择集成 CLucene(成熟的搜索库)是务实的决策。
+--   StarRocks 选择自研 GIN 可能在长期有更好的集成度。
+--   对比 Elasticsearch: 专业搜索引擎仍是最优选择，
+--   但 Doris 的倒排索引减少了"分析 + 搜索"双引擎的运维成本。

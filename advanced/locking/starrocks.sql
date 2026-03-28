@@ -1,84 +1,66 @@
--- StarRocks: 锁机制 (Locking)
+-- StarRocks: 锁机制与并发控制
 --
 -- 参考资料:
---   [1] StarRocks Documentation - Data Models
+--   [1] StarRocks Documentation - Primary Key Model
 --       https://docs.starrocks.io/docs/table_design/table_types/
---   [2] StarRocks Documentation - Loading Overview
---       https://docs.starrocks.io/docs/loading/Loading_intro/
 
 -- ============================================================
--- StarRocks 并发模型概述
+-- 1. 并发模型: 与 Doris 同源
 -- ============================================================
--- StarRocks 是 MPP 分析数据库（Doris 分支）:
--- 1. 不支持传统的行级锁
--- 2. 使用 MVCC 实现读写并发
--- 3. 写入通过批量导入或 INSERT INTO
--- 4. 不支持 SELECT FOR UPDATE
+-- StarRocks 同样不支持行级锁、表锁、咨询锁。
+-- 并发控制通过 MVCC + 批量导入原子性实现。
+--
+-- Primary Key 模型的并发特性:
+--   写入时通过内存 HashIndex 定位旧行 → Delete + Insert
+--   多个导入并发写入同一个 Key → Last Write Wins
+--   不支持 Doris 的 sequence_col(无版本冲突解决)
 
 -- ============================================================
--- 事务
+-- 2. MVCC 快照读
 -- ============================================================
-
--- StarRocks 3.0+ 支持显式事务
-BEGIN;
-    INSERT INTO orders VALUES (1, 'new', 100.00);
-    INSERT INTO orders VALUES (2, 'new', 200.00);
-COMMIT;
-
--- 导入事务原子性
--- Stream Load / Broker Load / Routine Load 都是原子操作
+-- 查询看到导入完成时的一致性快照。
+-- 导入未完成时，新旧数据对查询不可见(原子性)。
 
 -- ============================================================
--- Primary Key 表（实时更新）
+-- 3. 表级元数据锁
 -- ============================================================
+ALTER TABLE orders ADD COLUMN new_col INT;  -- 获取表锁
 
--- Primary Key 表支持实时更新和删除
+-- Fast Schema Evolution(3.0+): 毫秒级完成，锁持有时间极短。
+
+-- ============================================================
+-- 4. 乐观锁 (应用层)
+-- ============================================================
 CREATE TABLE orders (
     id      BIGINT,
     status  VARCHAR(50),
     amount  DECIMAL(10,2),
     version INT
-)
-PRIMARY KEY (id)
+) PRIMARY KEY(id)
 DISTRIBUTED BY HASH(id) BUCKETS 8;
 
--- UPDATE/DELETE 支持
-UPDATE orders SET status = 'shipped' WHERE id = 100;
-DELETE FROM orders WHERE status = 'cancelled';
+INSERT INTO orders VALUES (100, 'shipped', 99.99, 6);
 
 -- ============================================================
--- 乐观锁（应用层）
+-- 5. 监控与诊断
 -- ============================================================
-
--- 使用 version 列
-UPDATE orders SET status = 'shipped', version = version + 1
-WHERE id = 100 AND version = 5;
-
--- ============================================================
--- 并发控制
--- ============================================================
-
--- Schema Change 与导入互斥
--- 多个导入任务可以并发执行（不同的 tablet）
--- 同一 tablet 的写入串行化
-
--- ============================================================
--- 监控
--- ============================================================
-
 SHOW LOAD;
 SHOW PROCESSLIST;
-KILL connection_id;
-
--- 查看 BE (Backend) 状态
--- 通过 FE/BE Web UI 监控
+KILL query_id;
 
 -- ============================================================
--- 注意事项
+-- 6. StarRocks vs Doris 并发控制差异
 -- ============================================================
-
--- 1. 不支持 SELECT FOR UPDATE / FOR SHARE
--- 2. 不支持 LOCK TABLE
--- 3. Primary Key 表支持 UPDATE/DELETE
--- 4. MVCC 提供快照读
--- 5. 适合实时分析场景
+-- Primary Key 并发更新:
+--   StarRocks: Last Write Wins(按写入顺序)
+--   Doris:     可配置 sequence_col(按版本列)——更灵活
+--
+-- DDL 锁:
+--   StarRocks 3.0+: Fast Schema Evolution(毫秒级锁)
+--   Doris 1.2+:     Light Schema Change(秒级锁)
+--
+-- 对引擎开发者的启示:
+--   多源并发写入同一 Key 的冲突解决是 OLAP 引擎的实际挑战。
+--   Doris 的 sequence_col 和 StarRocks 的 Last Write Wins 是两种路径:
+--     sequence_col: 更可控(用户定义"最新")但配置复杂
+--     Last Write Wins: 更简单但依赖写入顺序(可能不确定)

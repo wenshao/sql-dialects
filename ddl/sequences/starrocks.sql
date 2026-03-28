@@ -1,62 +1,80 @@
--- StarRocks: Sequences & Auto-Increment
+-- StarRocks: 序列与自增
 --
 -- 参考资料:
 --   [1] StarRocks Documentation - AUTO_INCREMENT
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/data-definition/CREATE_TABLE/
---   [2] StarRocks Documentation - UUID
---       https://docs.starrocks.io/docs/sql-reference/sql-functions/utility-functions/uuid/
+--       https://docs.starrocks.io/docs/sql-reference/sql-statements/
 
--- ============================================
--- StarRocks 不支持 CREATE SEQUENCE
--- ============================================
+-- ============================================================
+-- 1. AUTO_INCREMENT (3.0+)
+-- ============================================================
+-- StarRocks 3.0+ 支持 AUTO_INCREMENT，实现方案与 Doris 类似(段分配)。
+--
+-- 对比 Doris:
+--   StarRocks 3.0+: AUTO_INCREMENT，段分配方案
+--   Doris 2.1+:     AUTO_INCREMENT，段分配方案
+--   两者实现独立(分叉后各自开发)，但方案一致。
 
--- ============================================
--- AUTO_INCREMENT（StarRocks 3.0+）
--- ============================================
 CREATE TABLE users (
-    id       BIGINT NOT NULL AUTO_INCREMENT,
-    username VARCHAR(64) NOT NULL,
+    id       BIGINT       NOT NULL AUTO_INCREMENT,
+    username VARCHAR(64)  NOT NULL,
     email    VARCHAR(255) NOT NULL
 ) PRIMARY KEY(id)
 DISTRIBUTED BY HASH(id) BUCKETS 8
 PROPERTIES ("replication_num" = "3");
 
--- AUTO_INCREMENT 特点：
--- 1. 全局唯一，但不保证连续
--- 2. 各 BE 节点预分配 ID 段
--- 3. 每个 AUTO_INCREMENT 列自动创建内部序列
+INSERT INTO users (username, email) VALUES ('alice', 'alice@example.com');
 
--- ============================================
--- UUID 生成
--- ============================================
+-- 特点:
+--   1. 唯一但不连续(跨 BE 有间隙)
+--   2. 段分配: 每个 BE 预分配一批 ID
+--   3. 仅 Primary Key / Unique Key 模型支持
+--
+-- 对比:
+--   MySQL:     AUTO_INCREMENT，单机连续
+--   ClickHouse: 无自增
+--   BigQuery:  无自增(推荐 GENERATE_UUID)
+--   TiDB:     AUTO_RANDOM(推荐，避免写入热点)
+
+-- ============================================================
+-- 2. UUID 生成
+-- ============================================================
 SELECT uuid();
--- 返回标准 UUID 字符串
+-- 结果: '7f1b7e42-3a1c-4b5d-8f2e-9c0d1e2f3a4b'
 
 SELECT uuid_numeric();
--- 返回 LARGEINT 类型的 UUID 数值
+-- 返回 LARGEINT 类型
 
--- ============================================
--- 替代方案
--- ============================================
--- 方法 1：ROW_NUMBER()
-SELECT
-    ROW_NUMBER() OVER (ORDER BY created_at) AS row_id,
-    username, email
-FROM users;
+-- ============================================================
+-- 3. StarRocks vs Doris 自增差异
+-- ============================================================
+-- AUTO_INCREMENT 版本:
+--   StarRocks: 3.0+
+--   Doris:     2.1+
+--
+-- SEQUENCE 列(版本控制):
+--   StarRocks: 不支持 function_column.sequence_col
+--   Doris:     支持(确定相同 Key 的哪条记录最新)
+--   StarRocks Primary Key 按写入顺序覆盖(后写入的为准)
+--
+-- 适用模型:
+--   StarRocks: Primary Key / Unique Key 模型
+--   Doris:     Unique Key(MoW) 模型
+--
+-- 对引擎开发者的启示:
+--   段分配方案的关键参数:
+--     段大小: 太大 → ID 间隙大，太小 → BE 频繁向 FE 请求新段
+--     默认 100000 是合理的折中(适合批量写入场景)。
+--   SEQUENCE 列(Doris 独有)解决了多源写入的"哪条更新"问题——
+--   StarRocks 没有等价功能，用户需要保证写入顺序。
 
--- 方法 2：在 ETL 管道中生成 ID
--- StarRocks 主要通过批量导入数据，ID 在上游生成
-
--- ============================================
--- 序列 vs 自增 权衡
--- ============================================
--- 1. AUTO_INCREMENT（3.0+推荐）：分布式唯一，简单
--- 2. uuid()：全局唯一，无需协调
--- 3. uuid_numeric()：适合需要数值类型的场景
--- 4. ETL 生成 ID：批量导入场景的传统方式
-
--- 限制：
+-- ============================================================
+-- 4. 自增策略选择
+-- ============================================================
+-- AUTO_INCREMENT(3.0+):  简单，分布式唯一，适合主键
+-- uuid():               全局唯一，128 位
+-- Snowflake ID:          应用层生成，时间有序，可拆解
+--
+-- 限制:
 -- 不支持 CREATE SEQUENCE
 -- 不支持 IDENTITY / SERIAL
--- AUTO_INCREMENT 需要 StarRocks 3.0+
--- AUTO_INCREMENT 值可能不连续
+-- 不支持 Doris 的 SEQUENCE 列(版本控制机制)

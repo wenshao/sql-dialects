@@ -1,91 +1,63 @@
 -- Apache Doris: JOIN
 --
 -- 参考资料:
---   [1] Doris SQL Manual
+--   [1] Doris Documentation - JOIN
 --       https://doris.apache.org/docs/sql-manual/sql-statements/
---   [2] Doris Data Types
---       https://doris.apache.org/docs/sql-manual/data-types/
---   [3] Doris Functions
---       https://doris.apache.org/docs/sql-manual/sql-functions/
 
--- INNER JOIN
-SELECT u.username, o.amount
-FROM users u
-INNER JOIN orders o ON u.id = o.user_id;
+-- ============================================================
+-- 1. 标准 JOIN 类型
+-- ============================================================
+SELECT u.username, o.amount FROM users u INNER JOIN orders o ON u.id = o.user_id;
+SELECT u.username, o.amount FROM users u LEFT JOIN orders o ON u.id = o.user_id;
+SELECT u.username, o.amount FROM users u RIGHT JOIN orders o ON u.id = o.user_id;
+SELECT u.username, o.amount FROM users u FULL OUTER JOIN orders o ON u.id = o.user_id;
+SELECT u.username, r.role_name FROM users u CROSS JOIN roles r;
 
--- LEFT JOIN
-SELECT u.username, o.amount
-FROM users u
-LEFT JOIN orders o ON u.id = o.user_id;
+-- SEMI JOIN / ANTI JOIN (Doris/StarRocks 独有语法)
+SELECT u.* FROM users u LEFT SEMI JOIN orders o ON u.id = o.user_id;
+SELECT u.* FROM users u LEFT ANTI JOIN orders o ON u.id = o.user_id;
 
--- RIGHT JOIN
-SELECT u.username, o.amount
-FROM users u
-RIGHT JOIN orders o ON u.id = o.user_id;
-
--- FULL OUTER JOIN
-SELECT u.username, o.amount
-FROM users u
-FULL OUTER JOIN orders o ON u.id = o.user_id;
-
--- CROSS JOIN
-SELECT u.username, r.role_name
-FROM users u
-CROSS JOIN roles r;
-
--- 自连接
-SELECT e.username AS employee, m.username AS manager
-FROM users e
-LEFT JOIN users m ON e.manager_id = m.id;
-
--- USING
-SELECT * FROM users JOIN orders USING (user_id);
-
--- SEMI JOIN（左半连接）
-SELECT u.*
-FROM users u
-LEFT SEMI JOIN orders o ON u.id = o.user_id;
-
--- ANTI JOIN（反连接）
-SELECT u.*
-FROM users u
-LEFT ANTI JOIN orders o ON u.id = o.user_id;
-
--- BROADCAST JOIN hint（广播小表到所有 BE 节点）
-SELECT /*+ SET_VAR(exec_mem_limit=8589934592) */ u.username, o.amount
-FROM users u
+-- ============================================================
+-- 2. 分布式 JOIN 策略 (核心设计决策)
+-- ============================================================
+-- BROADCAST: 小表广播到所有 BE 节点
+SELECT u.username, o.amount FROM users u
 JOIN [broadcast] orders o ON u.id = o.user_id;
 
--- SHUFFLE JOIN hint（重分布连接）
-SELECT u.username, o.amount
-FROM users u
+-- SHUFFLE: 按 JOIN 键重分布两表
+SELECT u.username, o.amount FROM users u
 JOIN [shuffle] orders o ON u.id = o.user_id;
 
--- BUCKET SHUFFLE JOIN hint（利用数据分布优化，2.0+）
-SELECT u.username, o.amount
-FROM users u
+-- BUCKET SHUFFLE: 利用分桶信息(2.0+)
+SELECT u.username, o.amount FROM users u
 JOIN [bucket] orders o ON u.id = o.user_id;
 
--- Colocate JOIN（利用 Colocate Group 本地连接）
--- 前提：两表属于同一 Colocate Group 且按 JOIN 列分桶
--- 建表时设置 "colocate_with" = "group_name"
-SELECT u.username, o.amount
-FROM users u
-JOIN orders o ON u.id = o.user_id;
+-- Colocate JOIN: 同组表本地 JOIN(零网络开销)
+-- 前提: 两表属于同一 Colocate Group 且按 JOIN 列分桶
+-- 建表时: PROPERTIES ("colocate_with" = "group_name")
 
--- 多表 JOIN
-SELECT u.username, o.amount, p.product_name
-FROM users u
-JOIN orders o ON u.id = o.user_id
-JOIN order_items oi ON o.id = oi.order_id
-JOIN products p ON oi.product_id = p.id;
+-- 设计分析:
+--   分布式 JOIN 的网络开销:
+--     Broadcast: O(小表 × 节点数) — 小表 < 100MB 时最优
+--     Shuffle:   O(两表数据量) — 大表 JOIN 大表
+--     Colocate:  O(0) — 数据已按 JOIN 键共置
 
--- Runtime Filter（优化大表 JOIN）
--- Doris 自动生成 Runtime Filter，可通过 Session 变量调整
+-- ============================================================
+-- 3. Runtime Filter
+-- ============================================================
+-- Doris 自动生成 Runtime Filter(Bloom Filter / IN 谓词)。
+-- 在 Build 侧构建 Filter → 推送到 Probe 侧扫描 → 减少 JOIN 数据量。
 -- SET runtime_filter_type = 'IN_OR_BLOOM_FILTER';
 -- SET runtime_filter_wait_time_ms = 1000;
 
--- 注意：Doris 兼容 MySQL 协议，支持标准 JOIN 语法
--- 注意：Doris 不支持 NATURAL JOIN
--- 注意：支持 LEFT SEMI JOIN 和 LEFT ANTI JOIN
--- 注意：Colocate JOIN 需要建表时规划好 Colocate Group
+-- 对比:
+--   StarRocks: Global Runtime Filter(跨 Fragment 广播，更强)
+--   ClickHouse: 无 Runtime Filter
+--   BigQuery:  自动 Filter 推送(用户无感知)
+
+-- ============================================================
+-- 4. 限制
+-- ============================================================
+-- 不支持 NATURAL JOIN
+-- 不支持 ASOF JOIN(StarRocks 4.0+ 支持)
+-- 不支持 LATERAL JOIN(部分支持 LATERAL VIEW)

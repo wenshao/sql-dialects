@@ -1,131 +1,61 @@
 -- StarRocks: 事务
 --
 -- 参考资料:
---   [1] StarRocks SQL Reference
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/
---   [2] StarRocks Documentation
---       https://docs.starrocks.io/docs/
-
--- StarRocks 提供有限的事务支持
+--   [1] StarRocks Documentation - Transaction
+--       https://docs.starrocks.io/docs/data-operate/transaction
 
 -- ============================================================
--- 导入事务（Load Transaction）
+-- 1. Import 事务模型 (与 Doris 同源)
 -- ============================================================
-
--- Stream Load 是原子的
--- 每次 Stream Load 是一个事务，要么全部成功要么全部失败
-
--- Broker Load 是原子的
-LOAD LABEL mydb.load_20240115 (
-    DATA INFILE ('hdfs://path/to/data/*')
-    INTO TABLE orders
-    COLUMNS TERMINATED BY ','
-    (id, user_id, amount, order_date)
-)
-WITH BROKER 'broker_name'
-PROPERTIES (
-    "timeout" = "3600"
-);
-
--- 查看导入状态
-SHOW LOAD WHERE LABEL = 'load_20240115';
-
--- 取消导入
-CANCEL LOAD WHERE LABEL = 'load_20240115';
+-- 每个导入任务是一个原子操作。Label 机制保证幂等。
+-- 与 Doris 的事务模型完全相同。
 
 -- ============================================================
--- INSERT 事务
+-- 2. Label 机制
 -- ============================================================
+INSERT INTO users WITH LABEL insert_20240115
+(username, email, age) VALUES ('alice', 'alice@example.com', 25);
 
--- 单个 INSERT 是原子的
-INSERT INTO users VALUES (1, 'alice', 'alice@example.com');
-
--- INSERT INTO SELECT 是原子的
-INSERT INTO users_backup SELECT * FROM users WHERE status = 1;
+-- Stream Load: curl -H "label:txn_20240115" ...
 
 -- ============================================================
--- 显式事务（3.0+）
+-- 3. BEGIN/COMMIT
 -- ============================================================
-
--- StarRocks 3.0+ 支持有限的显式事务
 BEGIN;
-INSERT INTO orders VALUES (1, 100, 50.00, '2024-01-15');
-INSERT INTO order_items VALUES (1, 1, 50.00);
+INSERT INTO users (id, username, email) VALUES (1, 'alice', 'a@e.com');
+INSERT INTO users (id, username, email) VALUES (2, 'bob', 'b@e.com');
 COMMIT;
 
--- 回滚
 BEGIN;
-INSERT INTO orders VALUES (2, 200, 30.00, '2024-01-15');
+INSERT INTO users (id, username, email) VALUES (3, 'charlie', 'c@e.com');
 ROLLBACK;
 
 -- ============================================================
--- Primary Key 模型的原子更新
+-- 4. Pipe 事务 (3.2+，StarRocks 独有)
 -- ============================================================
-
--- Primary Key 模型支持原子的 UPSERT
--- 插入相同主键的数据时自动覆盖
-INSERT INTO users VALUES (1, 'alice_new', 'new@example.com');
-
--- 部分列更新（3.0+）
--- 通过 Stream Load 的 partial_update 功能
--- 只更新指定的列，其他列保持不变
+-- CREATE PIPE my_pipe AS INSERT INTO target
+-- SELECT * FROM FILES('path'='s3://bucket/data/');
+-- 每个文件的加载是一个原子事务。
+-- 失败自动重试，成功文件不会重复加载。
 
 -- ============================================================
--- DELETE
+-- 5. 隔离级别与 MVCC
 -- ============================================================
+-- 默认 Read Committed。MVCC 快照读。
+-- 不支持 Repeatable Read / Serializable。
 
--- Primary Key 模型支持 DELETE
-DELETE FROM users WHERE id = 1;
-
--- 条件 DELETE
-DELETE FROM users WHERE status = 0 AND last_login < '2023-01-01';
-
--- ============================================================
--- UPDATE（Primary Key 模型，2.3+）
--- ============================================================
-
-UPDATE users SET email = 'new@example.com' WHERE id = 1;
+SHOW TRANSACTION WHERE label = 'txn_20240115';
+SHOW LOAD WHERE label = 'insert_20240115';
 
 -- ============================================================
--- Label 机制（幂等导入）
+-- 6. StarRocks vs Doris 事务差异
 -- ============================================================
-
--- 每次导入都有一个 Label
--- 相同 Label 的导入只会执行一次（幂等性保证）
-
--- Stream Load: 通过 HTTP Header 指定 Label
--- curl -H "label:load_20240115_001" ...
-
--- INSERT 也可以指定 Label
-INSERT INTO users WITH LABEL 'insert_20240115_001'
-VALUES (1, 'alice', 'alice@example.com');
-
--- 重复的 Label 会返回 LABEL_ALREADY_EXISTS 错误
-
--- ============================================================
--- 并发控制
--- ============================================================
-
--- Primary Key 模型：行级并发控制
--- 其他模型：导入级别的并发控制
-
--- 同一表可以并行导入多个批次
--- 不同 Tablet 可以并行写入
-
--- ============================================================
--- Swap 表（原子替换）
--- ============================================================
-
--- 原子地交换两个表的数据
-ALTER TABLE users SWAP WITH users_new;
-
--- 常用于全量数据更新：
--- 1. 将新数据写入临时表 users_new
--- 2. 原子交换 users 和 users_new
--- 3. 删除旧数据表
-
--- 注意：单个导入/INSERT 是原子的
--- 注意：3.0+ 支持有限的显式事务（BEGIN/COMMIT/ROLLBACK）
--- 注意：Label 机制保证导入的幂等性
--- 注意：Primary Key 模型支持行级 UPDATE/DELETE
--- 注意：不支持 SAVEPOINT 和隔离级别设置
+-- 核心相同: Import 事务 + Label 幂等 + BEGIN/COMMIT
+-- StarRocks 独有: Pipe 持续加载(3.2+)的文件级事务
+-- Doris 独有: BEGIN WITH LABEL(带标签事务)
+--
+-- 对引擎开发者的启示:
+--   Pipe 的文件级事务是"持续加载"场景的优雅设计:
+--     每个文件独立事务 → 失败不影响其他文件
+--     记录已加载文件 → 重启后不重复加载
+--   类似 Snowpipe，但集成在引擎内部(无需外部组件)。

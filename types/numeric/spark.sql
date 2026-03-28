@@ -1,16 +1,14 @@
--- Spark SQL: Numeric Types (Spark 2.0+)
+-- Spark SQL: 数值类型 (Numeric Types)
 --
 -- 参考资料:
---   [1] Spark SQL Reference
---       https://spark.apache.org/docs/latest/sql-ref.html
---   [2] Spark SQL - Built-in Functions
---       https://spark.apache.org/docs/latest/sql-ref-functions.html
---   [3] Spark SQL - Data Types
+--   [1] Spark SQL - Data Types
 --       https://spark.apache.org/docs/latest/sql-ref-datatypes.html
 
--- Integer types
+-- ============================================================
+-- 1. 整数类型
+-- ============================================================
 -- TINYINT / BYTE:   1 byte,  -128 ~ 127
--- SMALLINT / SHORT: 2 bytes, -32768 ~ 32767
+-- SMALLINT / SHORT: 2 bytes, -32,768 ~ 32,767
 -- INT / INTEGER:    4 bytes, -2^31 ~ 2^31-1
 -- BIGINT / LONG:    8 bytes, -2^63 ~ 2^63-1
 
@@ -21,73 +19,121 @@ CREATE TABLE examples (
     big_val   BIGINT
 ) USING PARQUET;
 
--- No unsigned integer types in Spark
+-- 无 UNSIGNED 整数类型（Spark 基于 JVM，使用 Java 的有符号整数）
+-- 无 HUGEINT / 128-bit 整数（对比: DuckDB 支持 HUGEINT）
 
--- Floating point
--- FLOAT / REAL:   4 bytes, ~6 decimal digits precision
--- DOUBLE:         8 bytes, ~15 decimal digits precision
+-- ============================================================
+-- 2. 浮点类型
+-- ============================================================
+-- FLOAT / REAL:   4 bytes, ~6 位有效数字（IEEE 754 单精度）
+-- DOUBLE:         8 bytes, ~15 位有效数字（IEEE 754 双精度）
+
 CREATE TABLE measurements (
     temperature FLOAT,
     precise_val DOUBLE
 ) USING PARQUET;
 
--- Decimal (exact numeric)
--- DECIMAL(p, s) / DEC(p, s) / NUMERIC(p, s): Exact precision
--- p: total digits (max 38), s: decimal digits
+-- 特殊值
+SELECT DOUBLE('NaN');                                    -- Not a Number
+SELECT DOUBLE('Infinity');                               -- 正无穷
+SELECT DOUBLE('-Infinity');                              -- 负无穷
+
+-- 浮点精度陷阱:
+--   SELECT 0.1 + 0.2 = 0.3;  -- false! (浮点精度问题)
+--   金融计算必须使用 DECIMAL
+
+-- ============================================================
+-- 3. DECIMAL (精确数值)
+-- ============================================================
+-- DECIMAL(p, s) / DEC(p, s) / NUMERIC(p, s)
+-- p: 总位数（最大 38），s: 小数位数
+
 CREATE TABLE prices (
-    price   DECIMAL(10, 2),           -- Up to 99999999.99
-    rate    DECIMAL(5, 4),            -- Up to 9.9999
-    any_num DECIMAL                   -- Default: DECIMAL(10, 0)
+    price   DECIMAL(10, 2),                      -- 最大 99999999.99
+    rate    DECIMAL(5, 4),                       -- 最大 9.9999
+    any_num DECIMAL                              -- 默认 DECIMAL(10, 0)
 ) USING PARQUET;
 
--- Boolean
-CREATE TABLE flags (
-    active BOOLEAN                    -- TRUE / FALSE / NULL
-) USING PARQUET;
+-- DECIMAL 的精度规则:
+--   加法: DECIMAL(p1,s1) + DECIMAL(p2,s2) -> DECIMAL(max(s1,s2)+max(p1-s1,p2-s2)+1, max(s1,s2))
+--   乘法: DECIMAL(p1,s1) * DECIMAL(p2,s2) -> DECIMAL(p1+p2+1, s1+s2)
+--   除法: 复杂规则，可能导致精度损失
+--
+-- 对比:
+--   MySQL:      DECIMAL(65, 30) — 最大精度 65 位
+--   PostgreSQL: NUMERIC(1000, ...) — 任意精度
+--   Oracle:     NUMBER — 最大 38 位（与 Spark 相同）
+--   BigQuery:   NUMERIC(38, 9) / BIGNUMERIC(76, 38)
+--   Spark:      DECIMAL(38, *) — 最大 38 位（受 JVM long 限制）
 
--- Numeric literals
-SELECT 42;                            -- INT
-SELECT 42L;                           -- BIGINT (L suffix)
-SELECT 42S;                           -- SMALLINT (S suffix)
-SELECT 42Y;                           -- TINYINT (Y suffix)
-SELECT 3.14;                          -- DECIMAL
-SELECT 3.14D;                         -- DOUBLE (D suffix)
-SELECT 3.14F;                         -- FLOAT (F suffix)
-SELECT 3.14BD;                        -- DECIMAL (BD suffix, Spark 3.0+)
-SELECT 1e10;                          -- DOUBLE (scientific notation)
-SELECT 0xFF;                          -- Hexadecimal INT
+-- ============================================================
+-- 4. BOOLEAN
+-- ============================================================
+CREATE TABLE flags (active BOOLEAN) USING PARQUET;
+-- 值: TRUE / FALSE / NULL
 
--- Type casting
+-- ============================================================
+-- 5. 数值字面量（Spark 特色后缀语法）
+-- ============================================================
+SELECT 42;                                               -- INT
+SELECT 42L;                                              -- BIGINT (L 后缀)
+SELECT 42S;                                              -- SMALLINT (S 后缀)
+SELECT 42Y;                                              -- TINYINT (Y 后缀)
+SELECT 3.14;                                             -- DECIMAL
+SELECT 3.14D;                                            -- DOUBLE (D 后缀)
+SELECT 3.14F;                                            -- FLOAT (F 后缀)
+SELECT 3.14BD;                                           -- DECIMAL (BD 后缀, 3.0+)
+SELECT 1e10;                                             -- DOUBLE (科学计数法)
+SELECT 0xFF;                                             -- INT (十六进制)
+
+-- 数值后缀是 Spark/Scala 特色语法:
+--   大多数 SQL 引擎不支持 L/S/Y/D/F/BD 后缀
+--   迁移到其他引擎时需要改为 CAST
+
+-- ============================================================
+-- 6. 类型转换与安全转换
+-- ============================================================
 SELECT CAST('123' AS INT);
-SELECT INT('123');                     -- Function-style cast (Spark-specific)
+SELECT INT('123');                                       -- 函数式（Spark 特色）
 SELECT DOUBLE('3.14');
-SELECT DECIMAL(123.456);
+SELECT TRY_CAST('abc' AS INT);                           -- NULL (3.0+)
 
--- Safe casting (Spark 3.4+)
-SELECT TRY_CAST('abc' AS INT);        -- Returns NULL on failure
-
--- Special values
-SELECT DOUBLE('NaN');                  -- Not a Number
-SELECT DOUBLE('Infinity');             -- Positive infinity
-SELECT DOUBLE('-Infinity');            -- Negative infinity
-
--- Auto-increment alternatives
--- No SERIAL or IDENTITY; use these instead:
-SELECT monotonically_increasing_id() AS id, username FROM users;
--- Note: monotonically_increasing_id() is not sequential, but unique per partition
-
--- Type widening rules
+-- ============================================================
+-- 7. 类型提升规则
+-- ============================================================
 -- TINYINT -> SMALLINT -> INT -> BIGINT -> DECIMAL -> FLOAT -> DOUBLE
--- Spark automatically widens types in operations
+-- 混合运算自动向上提升:
+--   INT + BIGINT -> BIGINT
+--   INT + DOUBLE -> DOUBLE
+--   DECIMAL + DOUBLE -> DOUBLE (注意: DECIMAL 到 DOUBLE 可能损失精度!)
 
--- Overflow handling (Spark 3.0+)
--- SET spark.sql.ansi.enabled = true;
--- With ANSI mode: arithmetic overflow throws error
--- Without ANSI: overflow wraps around silently
+-- ============================================================
+-- 8. 溢出处理
+-- ============================================================
+-- ANSI=false (3.x 默认): 溢出静默回绕
+--   SELECT CAST(300 AS TINYINT);  -- 44 (300 mod 256 = 44)
+-- ANSI=true (4.0 默认): 溢出抛出异常
+--   SELECT CAST(300 AS TINYINT);  -- ARITHMETIC_OVERFLOW 异常
 
--- Note: Spark uses JVM types internally (Byte, Short, Int, Long, Float, Double)
--- Note: No unsigned integer types
--- Note: No HUGEINT or 128-bit integers
--- Note: DECIMAL max precision is 38 digits
--- Note: Numeric suffix literals (L, S, Y, D, F, BD) are Spark-specific
--- Note: No MONEY type (use DECIMAL for currency)
+-- try_* 安全函数:
+SELECT try_add(2147483647, 1);                           -- NULL (不抛异常)
+SELECT try_multiply(2147483647, 2);                      -- NULL
+
+-- 自增替代:
+SELECT monotonically_increasing_id() AS id, username FROM users;
+
+-- ============================================================
+-- 9. 版本演进
+-- ============================================================
+-- Spark 2.0: 基本数值类型（继承 Hive/JVM 类型体系）
+-- Spark 3.0: ANSI 模式溢出检测, BD 后缀, try_* 函数
+-- Spark 3.4: 类型提升规则改进
+-- Spark 4.0: ANSI 模式默认开启
+--
+-- 限制:
+--   无 UNSIGNED 整数类型
+--   DECIMAL 最大精度 38 位（受 JVM 限制）
+--   无 MONEY 类型（用 DECIMAL 处理货币）
+--   无 HUGEINT（128-bit 整数）
+--   数值后缀（L/S/Y/D/F/BD）是 Spark 特有的非标准语法
+--   JVM 浮点: 使用 IEEE 754 标准，与 C/C++ 引擎行为一致

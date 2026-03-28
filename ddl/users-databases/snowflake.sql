@@ -1,187 +1,167 @@
--- Snowflake: 数据库、模式与用户管理
+-- Snowflake: 数据库 / Schema / 用户管理
 --
 -- 参考资料:
---   [1] Snowflake Documentation - CREATE DATABASE
+--   [1] Snowflake SQL Reference - CREATE DATABASE
 --       https://docs.snowflake.com/en/sql-reference/sql/create-database
---   [2] Snowflake Documentation - CREATE USER / ROLE
---       https://docs.snowflake.com/en/sql-reference/sql/create-user
---   [3] Snowflake Documentation - Access Control
---       https://docs.snowflake.com/en/user-guide/security-access-control
+--   [2] Snowflake SQL Reference - CREATE SCHEMA
+--       https://docs.snowflake.com/en/sql-reference/sql/create-schema
+--   [3] Snowflake SQL Reference - Access Control
+--       https://docs.snowflake.com/en/user-guide/security-access-control-overview
 
 -- ============================================================
--- Snowflake 命名层级: account > database > schema > object
--- 完整引用: database.schema.object
+-- 1. 三级命名空间: Database.Schema.Object
 -- ============================================================
 
--- ============================================================
--- 1. 数据库管理
--- ============================================================
+-- Snowflake 使用 Account > Database > Schema > Object 四层层次结构
+-- 完全限定名: database_name.schema_name.object_name
+SELECT * FROM analytics_db.public.users;
 
-CREATE DATABASE myapp;
-CREATE DATABASE IF NOT EXISTS myapp;
-
-CREATE DATABASE myapp
-    DATA_RETENTION_TIME_IN_DAYS = 30             -- Time Travel 保留天数
-    MAX_DATA_EXTENSION_TIME_IN_DAYS = 10
-    COMMENT = 'Main application database';
+-- 创建数据库
+CREATE DATABASE analytics_db;
+CREATE DATABASE IF NOT EXISTS analytics_db
+    DATA_RETENTION_TIME_IN_DAYS = 30
+    COMMENT = 'Core analytics data warehouse';
 
 -- 瞬态数据库（无 Fail-safe）
 CREATE TRANSIENT DATABASE staging;
 
--- 从共享创建数据库
-CREATE DATABASE shared_db FROM SHARE provider_account.my_share;
+-- 创建 Schema
+CREATE SCHEMA analytics_db.staging;
+CREATE SCHEMA analytics_db.production
+    WITH MANAGED ACCESS             -- 仅 schema owner 和被授权者可管理
+    COMMENT = 'Production schema';
 
--- 克隆数据库（零拷贝）
-CREATE DATABASE myapp_clone CLONE myapp;
-CREATE DATABASE myapp_clone CLONE myapp AT (TIMESTAMP => '2024-06-01 10:00:00'::TIMESTAMP);
-
--- 修改数据库
-ALTER DATABASE myapp SET DATA_RETENTION_TIME_IN_DAYS = 90;
-ALTER DATABASE myapp SET COMMENT = 'Updated comment';
-ALTER DATABASE myapp RENAME TO myapp_v2;
-
--- 删除数据库
-DROP DATABASE myapp;
-DROP DATABASE IF EXISTS myapp;
-UNDROP DATABASE myapp;                          -- 恢复（在 Time Travel 期内）
-
--- 切换数据库
-USE DATABASE myapp;
+-- 设置当前上下文
+USE DATABASE analytics_db;
+USE SCHEMA staging;
 
 -- ============================================================
--- 2. 模式管理
+-- 2. 语法设计分析（对 SQL 引擎开发者）
 -- ============================================================
 
-CREATE SCHEMA myapp.myschema;
-CREATE SCHEMA IF NOT EXISTS myschema;
+-- 2.1 Account 层: Snowflake 独有的顶层隔离
+-- Account 是最顶层的隔离单元:
+--   - 独立的 URL、用户体系、角色体系、计费
+--   - 跨 Account 数据共享通过 Data Sharing（不复制数据）
+--
+-- 对比:
+--   MySQL:       Server > Database > Table（Database = Schema）
+--   PostgreSQL:  Cluster > Database > Schema > Table（跨 DB 不能 JOIN）
+--   Oracle:      CDB > PDB > Schema > Table（多租户，12c+）
+--   BigQuery:    Project > Dataset > Table（Dataset = Schema）
+--   Redshift:    Cluster > Database > Schema > Table
+--   Databricks:  Catalog > Schema > Table（Unity Catalog 三层）
+--   MaxCompute:  Project > Schema > Table
+--
+-- 对引擎开发者的启示:
+--   命名空间层次决定了多租户隔离粒度。
+--   Snowflake Account 层提供最强隔离（独立存储/计算/网络）。
+--   现代趋势: 三层命名空间 (Catalog + Schema + Object) 成为标配。
 
-CREATE SCHEMA myschema
-    DATA_RETENTION_TIME_IN_DAYS = 14
-    WITH MANAGED ACCESS                         -- 仅 schema owner 和被授权者可管理
-    COMMENT = 'Application schema';
-
--- 瞬态模式
-CREATE TRANSIENT SCHEMA staging;
-
--- 克隆模式
-CREATE SCHEMA myschema_clone CLONE myschema;
-
--- 修改模式
-ALTER SCHEMA myschema RENAME TO myschema_v2;
-ALTER SCHEMA myschema SET DATA_RETENTION_TIME_IN_DAYS = 30;
-
--- 删除模式
-DROP SCHEMA myschema;
-DROP SCHEMA myschema CASCADE;
-UNDROP SCHEMA myschema;                         -- 恢复
-
--- 切换模式
-USE SCHEMA myapp.myschema;
-USE myapp.myschema;
-
--- ============================================================
--- 3. 用户管理
--- ============================================================
-
-CREATE USER myuser
-    PASSWORD = 'Secret123!'
-    DEFAULT_ROLE = analyst
-    DEFAULT_WAREHOUSE = compute_wh
-    DEFAULT_NAMESPACE = myapp.public
-    MUST_CHANGE_PASSWORD = TRUE
-    COMMENT = 'Application user';
-
--- 修改用户
-ALTER USER myuser SET PASSWORD = 'NewSecret456!';
-ALTER USER myuser SET DEFAULT_ROLE = developer;
-ALTER USER myuser SET DISABLED = TRUE;          -- 禁用
-ALTER USER myuser SET DAYS_TO_EXPIRY = 90;
-
--- 删除用户
-DROP USER myuser;
-DROP USER IF EXISTS myuser;
+-- 2.2 Database CLONE: 零拷贝克隆整个数据库
+CREATE DATABASE analytics_dev CLONE analytics_db;
+-- 克隆整个数据库（所有 Schema、表、视图、存储过程等）
+-- 基于 COW (Copy-on-Write)，秒级完成
+-- 典型用途: 为开发/测试创建生产数据的完整副本
+-- 类似 Git branch 概念但应用于数据库
+--
+-- 对比: 其他数据库无等价功能（需备份+恢复，耗时数小时/天）
+--       Neon (PostgreSQL) 实现了类似的 Database Branching
 
 -- ============================================================
--- 4. 角色管理（RBAC）
+-- 3. 用户与角色管理 (RBAC)
 -- ============================================================
 
-CREATE ROLE analyst;
-CREATE ROLE developer;
-CREATE ROLE IF NOT EXISTS data_engineer;
+CREATE USER analyst_alice
+    PASSWORD = 'StrongP@ss123'
+    DEFAULT_ROLE = analyst_role
+    DEFAULT_WAREHOUSE = analytics_wh
+    DEFAULT_NAMESPACE = analytics_db.public
+    MUST_CHANGE_PASSWORD = TRUE;
 
--- 角色层级
-GRANT ROLE analyst TO ROLE developer;           -- developer 继承 analyst
-GRANT ROLE developer TO USER myuser;
+CREATE ROLE analyst_role;
+CREATE ROLE data_engineer_role;
 
--- 系统角色：
+-- 角色层次
+GRANT ROLE analyst_role TO ROLE data_engineer_role;
+GRANT ROLE analyst_role TO USER analyst_alice;
+
+-- 系统角色层次:
 -- ACCOUNTADMIN > SECURITYADMIN > SYSADMIN > PUBLIC
--- ACCOUNTADMIN: 最高权限
--- SECURITYADMIN: 管理用户和角色
--- SYSADMIN: 管理数据库和仓库
--- PUBLIC: 所有用户默认角色
-
--- 切换角色
-USE ROLE analyst;
-
--- 删除角色
-DROP ROLE analyst;
 
 -- ============================================================
--- 5. 权限管理
+-- 4. 权限管理与 FUTURE GRANTS
 -- ============================================================
 
--- 数据库权限
-GRANT USAGE ON DATABASE myapp TO ROLE analyst;
-GRANT CREATE SCHEMA ON DATABASE myapp TO ROLE developer;
-GRANT ALL ON DATABASE myapp TO ROLE data_engineer;
+GRANT USAGE ON DATABASE analytics_db TO ROLE analyst_role;
+GRANT USAGE ON SCHEMA analytics_db.public TO ROLE analyst_role;
+GRANT SELECT ON ALL TABLES IN SCHEMA analytics_db.public TO ROLE analyst_role;
+GRANT USAGE ON WAREHOUSE analytics_wh TO ROLE analyst_role;
 
--- 模式权限
-GRANT USAGE ON SCHEMA myapp.public TO ROLE analyst;
-GRANT CREATE TABLE ON SCHEMA myapp.public TO ROLE developer;
-
--- 表权限
-GRANT SELECT ON ALL TABLES IN SCHEMA myapp.public TO ROLE analyst;
-GRANT SELECT ON FUTURE TABLES IN SCHEMA myapp.public TO ROLE analyst;  -- 未来表
-GRANT INSERT, UPDATE, DELETE ON TABLE myapp.public.users TO ROLE developer;
-
--- 仓库权限
-GRANT USAGE ON WAREHOUSE compute_wh TO ROLE analyst;
-
--- 收回权限
-REVOKE SELECT ON ALL TABLES IN SCHEMA myapp.public FROM ROLE analyst;
+-- FUTURE GRANTS: 自动授权新对象（Snowflake 独有的运维利器）
+GRANT SELECT ON FUTURE TABLES IN SCHEMA analytics_db.public TO ROLE analyst_role;
+GRANT SELECT ON FUTURE VIEWS IN SCHEMA analytics_db.public TO ROLE analyst_role;
+-- 对比: PostgreSQL ALTER DEFAULT PRIVILEGES 类似 | MySQL 无等价功能
 
 -- ============================================================
--- 6. 查询元数据
+-- 5. Virtual Warehouse（计算资源）
 -- ============================================================
 
+CREATE WAREHOUSE analytics_wh
+    WAREHOUSE_SIZE = 'MEDIUM'
+    AUTO_SUSPEND = 300
+    AUTO_RESUME = TRUE
+    MIN_CLUSTER_COUNT = 1
+    MAX_CLUSTER_COUNT = 3
+    SCALING_POLICY = 'STANDARD';
+
+ALTER WAREHOUSE analytics_wh SET WAREHOUSE_SIZE = 'LARGE';
+ALTER WAREHOUSE analytics_wh SUSPEND;
+ALTER WAREHOUSE analytics_wh RESUME;
+
+-- Warehouse 是三层架构的核心: 不同团队使用不同 Warehouse → 资源隔离 + 成本分摊
+-- 对比: BigQuery 无 Warehouse（按扫描量计费） | Redshift 集群固定大小
+
+-- ============================================================
+-- 6. Data Sharing
+-- ============================================================
+
+CREATE SHARE analytics_share;
+GRANT USAGE ON DATABASE analytics_db TO SHARE analytics_share;
+GRANT SELECT ON TABLE analytics_db.public.users TO SHARE analytics_share;
+ALTER SHARE analytics_share ADD ACCOUNTS = 'consumer_account';
+-- 消费方: CREATE DATABASE shared_analytics FROM SHARE provider.analytics_share;
+
+-- ============================================================
+-- 7. 安全与治理
+-- ============================================================
+
+-- 网络策略
+CREATE NETWORK POLICY office_only
+    ALLOWED_IP_LIST = ('203.0.113.0/24')
+    BLOCKED_IP_LIST = ('203.0.113.99');
+
+-- 列级数据脱敏
+CREATE MASKING POLICY email_mask AS (val STRING) RETURNS STRING ->
+    CASE WHEN CURRENT_ROLE() IN ('ADMIN_ROLE') THEN val
+    ELSE REGEXP_REPLACE(val, '.+@', '***@') END;
+ALTER TABLE users ALTER COLUMN email SET MASKING POLICY email_mask;
+
+-- 行访问策略
+CREATE ROW ACCESS POLICY region_filter AS (region_val VARCHAR) RETURNS BOOLEAN ->
+    CURRENT_ROLE() = 'ADMIN_ROLE' OR region_val = CURRENT_REGION();
+
+-- ============================================================
+-- 8. 元数据查询
+-- ============================================================
 SHOW DATABASES;
-SHOW SCHEMAS IN DATABASE myapp;
+SHOW SCHEMAS IN DATABASE analytics_db;
 SHOW USERS;
 SHOW ROLES;
-SHOW GRANTS TO USER myuser;
-SHOW GRANTS TO ROLE analyst;
-SHOW GRANTS ON DATABASE myapp;
-
--- 当前上下文
+SHOW GRANTS TO ROLE analyst_role;
 SELECT CURRENT_DATABASE(), CURRENT_SCHEMA(), CURRENT_ROLE(),
        CURRENT_USER(), CURRENT_WAREHOUSE();
 
--- ============================================================
--- 7. 仓库管理（计算资源）
--- ============================================================
-
-CREATE WAREHOUSE compute_wh
-    WAREHOUSE_SIZE = 'SMALL'
-    AUTO_SUSPEND = 300                          -- 5 分钟空闲自动挂起
-    AUTO_RESUME = TRUE
-    MIN_CLUSTER_COUNT = 1
-    MAX_CLUSTER_COUNT = 3                       -- 多集群仓库
-    SCALING_POLICY = 'STANDARD';
-
-ALTER WAREHOUSE compute_wh SET WAREHOUSE_SIZE = 'MEDIUM';
-ALTER WAREHOUSE compute_wh SUSPEND;
-ALTER WAREHOUSE compute_wh RESUME;
-
-DROP WAREHOUSE compute_wh;
-
-USE WAREHOUSE compute_wh;
+-- 数据库删除与恢复
+DROP DATABASE IF EXISTS staging;
+UNDROP DATABASE staging;                  -- Time Travel 期内可恢复

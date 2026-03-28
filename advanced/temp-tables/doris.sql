@@ -1,29 +1,44 @@
--- Apache Doris: 临时表与临时存储
+-- Apache Doris: 临时表
 --
 -- 参考资料:
 --   [1] Doris Documentation - CREATE TABLE
---       https://doris.apache.org/docs/sql-manual/sql-statements/Data-Definition-Statements/Create/CREATE-TABLE
-
--- Doris 不支持 CREATE TEMPORARY TABLE
--- 使用 CTE、子查询或 Staging 表
+--       https://doris.apache.org/docs/sql-manual/sql-statements/
 
 -- ============================================================
--- CTE
+-- 1. 不支持临时表: 使用 CTE 和 Staging 表替代
 -- ============================================================
+-- Doris 不支持 CREATE TEMPORARY TABLE。
+--
+-- 设计理由:
+--   临时表的核心价值: 存储中间结果，会话结束自动销毁。
+--   OLAP 引擎的中间结果处理:
+--     小数据量 → CTE(内存中，零成本)
+--     大数据量 → Staging 表(持久化，需手动删除)
+--
+-- 对比:
+--   StarRocks: 同样不支持(同源)
+--   ClickHouse: 不支持临时表
+--   MySQL:     CREATE TEMPORARY TABLE(会话级，自动销毁)
+--   PostgreSQL: CREATE TEMP TABLE(事务/会话级)
+--   BigQuery:  临时表(24 小时自动过期)
 
+-- ============================================================
+-- 2. CTE (推荐，适合中小数据量)
+-- ============================================================
 WITH stats AS (
     SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id
 )
-SELECT u.username, s.total FROM users u JOIN stats s ON u.id = s.user_id;
+SELECT u.username, s.total
+FROM users u JOIN stats s ON u.id = s.user_id;
 
 -- ============================================================
--- Staging 表
+-- 3. Staging 表 (适合大数据量)
 -- ============================================================
-
 CREATE TABLE staging_results (
-    user_id BIGINT, total DECIMAL(10,2)
+    user_id BIGINT,
+    total   DECIMAL(10,2)
 ) DISTRIBUTED BY HASH(user_id) BUCKETS 8
-PROPERTIES ("replication_num" = "1");
+PROPERTIES ("replication_num" = "1");   -- 单副本降低开销
 
 INSERT INTO staging_results
 SELECT user_id, SUM(amount) FROM orders GROUP BY user_id;
@@ -32,16 +47,14 @@ SELECT user_id, SUM(amount) FROM orders GROUP BY user_id;
 DROP TABLE staging_results;
 
 -- ============================================================
--- INSERT INTO SELECT（物化中间结果）
+-- 4. INSERT INTO SELECT (物化中间结果)
 -- ============================================================
-
--- 将中间结果写入持久表
 INSERT INTO result_table
 SELECT u.username, SUM(o.amount) AS total
 FROM users u JOIN orders o ON u.id = o.user_id
 GROUP BY u.username;
 
--- 注意：Doris 不支持临时表
--- 注意：CTE 是推荐的临时数据组织方式
--- 注意：Staging 表需要指定分桶策略
--- 注意：可以设置 replication_num = 1 减少 Staging 表的存储开销
+-- 对引擎开发者的启示:
+--   临时表需要 FE 元数据管理(创建/删除/会话绑定)。
+--   在分布式引擎中，"会话绑定"的实现复杂度高
+--   (会话可能跨多个 FE 节点)。CTE 是零成本替代。

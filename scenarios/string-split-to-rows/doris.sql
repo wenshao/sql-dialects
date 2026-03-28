@@ -1,36 +1,20 @@
--- Doris: 将分隔字符串拆分为多行 (String Split to Rows)
+-- Apache Doris: 字符串拆分为行
 --
 -- 参考资料:
---   [1] Apache Doris Documentation - explode_split
---       https://doris.apache.org/docs/sql-manual/sql-functions/table-functions/explode-split
---   [2] Apache Doris Documentation - LATERAL VIEW
---       https://doris.apache.org/docs/sql-manual/sql-statements/lateral-view
+--   [1] Doris - explode_split / LATERAL VIEW
+--       https://doris.apache.org/docs/sql-manual/sql-functions/table-functions/
 
--- ============================================================
--- 示例数据
--- ============================================================
-CREATE TABLE tags_csv (
-    id   INT,
-    name VARCHAR(100),
-    tags VARCHAR(500)
-) DISTRIBUTED BY HASH(id) BUCKETS 1
-PROPERTIES ("replication_num" = "1");
-
-INSERT INTO tags_csv VALUES
-    (1, 'Alice', 'python,java,sql'),
-    (2, 'Bob',   'go,rust'),
-    (3, 'Carol', 'sql,python,javascript,typescript');
-
--- ============================================================
--- 方法 1: LATERAL VIEW explode_split（推荐）
--- ============================================================
+-- LATERAL VIEW explode_split (推荐，Hive 风格)
 SELECT t.id, t.name, tag
-FROM   tags_csv t
-LATERAL VIEW explode_split(t.tags, ',') tmp AS tag;
+FROM tags_csv t LATERAL VIEW explode_split(t.tags, ',') tmp AS tag;
 
--- ============================================================
--- 方法 2: explode_split 作为表函数
--- ============================================================
+-- 表函数方式
 SELECT t.id, t.name, e.tag
-FROM   tags_csv t,
-       explode_split(t.tags, ',') AS e(tag);
+FROM tags_csv t, explode_split(t.tags, ',') AS e(tag);
+
+-- 对比:
+--   StarRocks:  UNNEST + SPLIT(SQL 标准风格)
+--   ClickHouse: arrayJoin(splitByChar(',', tags))
+--   BigQuery:   UNNEST(SPLIT(tags, ','))
+--   PostgreSQL: UNNEST(string_to_array(tags, ','))
+--   MySQL:      JSON_TABLE(需先转为 JSON 数组)

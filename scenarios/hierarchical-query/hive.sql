@@ -1,32 +1,24 @@
--- Hive: 层次查询与树形结构 (Hierarchical Query & Tree Traversal)
+-- Hive: 层级查询 (无递归 CTE, 替代方案)
 --
 -- 参考资料:
---   [1] Apache Hive Documentation - LanguageManual Select
+--   [1] Apache Hive Language Manual - SELECT
 --       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
---   [2] Apache Hive Documentation - Lateral View
+--   [2] Apache Hive - LATERAL VIEW
 --       https://cwiki.apache.org/confluence/display/Hive/LanguageManual+LateralView
 
 -- ============================================================
--- 准备数据
+-- 1. Hive 不支持递归 CTE / CONNECT BY
 -- ============================================================
+-- 这是 Hive 作为批处理引擎的限制:
+-- 递归的迭代次数不确定，与 MapReduce/Tez 的固定 DAG 不兼容。
+-- 替代方案: 多层自连接 / 路径枚举 / 闭包表 / 外部处理
 
-CREATE TABLE employees (id INT, name STRING, parent_id INT, dept STRING);
-INSERT INTO employees VALUES
-    (1,'CEO',NULL,'总裁办'),(2,'CTO',1,'技术部'),(3,'CFO',1,'财务部'),
-    (4,'VP工程',2,'技术部'),(5,'VP产品',2,'技术部'),
-    (6,'开发经理',4,'技术部'),(7,'测试经理',4,'技术部'),
-    (8,'开发工程师A',6,'技术部'),(9,'开发工程师B',6,'技术部'),
-    (10,'测试工程师',7,'技术部'),(11,'会计主管',3,'财务部'),
-    (12,'出纳',11,'财务部');
+-- 示例数据:
+-- CREATE TABLE employees (id INT, name STRING, parent_id INT);
 
 -- ============================================================
--- Hive 不支持递归 CTE，层次查询需要替代方案
+-- 2. 多层自连接 (固定深度)
 -- ============================================================
-
--- ============================================================
--- 1. 多层自连接方法（固定深度）
--- ============================================================
-
 SELECT
     e1.name AS level_0,
     e2.name AS level_1,
@@ -38,15 +30,13 @@ LEFT JOIN employees e3 ON e3.parent_id = e2.id
 LEFT JOIN employees e4 ON e4.parent_id = e3.id
 WHERE e1.parent_id IS NULL;
 
--- ============================================================
--- 2. 路径枚举模型（推荐方案）
--- ============================================================
+-- 限制: 深度固定，需要提前知道最大层级
 
-CREATE TABLE categories (id INT, name STRING, path STRING);
-INSERT INTO categories VALUES
-    (1,'电子产品','1'),(2,'手机','1/2'),(3,'电脑','1/3'),
-    (4,'苹果手机','1/2/4'),(5,'安卓手机','1/2/5'),
-    (6,'笔记本','1/3/6');
+-- ============================================================
+-- 3. 路径枚举模型 (推荐)
+-- ============================================================
+CREATE TABLE categories (id INT, name STRING, path STRING) STORED AS ORC;
+-- path 存储从根到当前节点的路径: '1/2/4'
 
 -- 查询子孙
 SELECT * FROM categories WHERE path LIKE '1/2%';
@@ -55,61 +45,20 @@ SELECT * FROM categories WHERE path LIKE '1/2%';
 SELECT *, SIZE(SPLIT(path, '/')) - 1 AS depth FROM categories;
 
 -- 查询祖先路径中的所有节点
-SELECT c2.*
-FROM categories c1
-LATERAL VIEW explode(split(c1.path, '/')) t AS ancestor_id
+SELECT c2.* FROM categories c1
+LATERAL VIEW EXPLODE(SPLIT(c1.path, '/')) t AS ancestor_id
 JOIN categories c2 ON c2.id = CAST(t.ancestor_id AS INT)
 WHERE c1.id = 4;
 
--- ============================================================
--- 3. 使用 Hive UDF 实现层次查询
--- ============================================================
-
--- 可以通过自定义 UDF/UDTF 实现递归遍历
--- 或使用多次迭代的 INSERT OVERWRITE 模拟递归
-
--- 迭代方法（需要多次执行）
-CREATE TABLE tree_result (id INT, name STRING, level INT, path STRING);
-
--- 第一次迭代：插入根节点
-INSERT INTO tree_result
-SELECT id, name, 0, CAST(id AS STRING) FROM employees WHERE parent_id IS NULL;
-
--- 第二次迭代：插入第一层子节点
-INSERT INTO tree_result
-SELECT e.id, e.name, 1, CONCAT(t.path, '/', CAST(e.id AS STRING))
-FROM employees e JOIN tree_result t ON e.parent_id = t.id WHERE t.level = 0;
-
--- 继续迭代直到没有新行...
+-- 路径枚举的设计 trade-off:
+-- 优点: 查询简单高效（LIKE 前缀匹配）
+-- 缺点: 路径需要在写入时维护，节点移动需要更新所有子孙的路径
 
 -- ============================================================
--- 4. 使用 GraphX（Spark on Hive）
+-- 4. 闭包表模型 (Closure Table)
 -- ============================================================
-
--- 对于复杂的图遍历，推荐使用 Spark GraphX
--- 或将数据导出到支持递归 CTE 的引擎中处理
-
--- ============================================================
--- 5. 闭包表模型（Closure Table）
--- ============================================================
-
-CREATE TABLE tree_closure (
-    ancestor   INT,
-    descendant INT,
-    depth      INT
-);
+CREATE TABLE tree_closure (ancestor INT, descendant INT, depth INT) STORED AS ORC;
 -- 预计算所有祖先-后代关系
-INSERT INTO tree_closure VALUES
-    (1,1,0),(1,2,1),(1,3,1),(1,4,2),(1,5,2),
-    (1,6,3),(1,7,3),(1,8,4),(1,9,4),(1,10,4),
-    (1,11,2),(1,12,3),
-    (2,2,0),(2,4,1),(2,5,1),(2,6,2),(2,7,2),
-    (2,8,3),(2,9,3),(2,10,3),
-    (3,3,0),(3,11,1),(3,12,2),
-    (4,4,0),(4,6,1),(4,7,1),(4,8,2),(4,9,2),(4,10,2),
-    (5,5,0),(6,6,0),(6,8,1),(6,9,1),
-    (7,7,0),(7,10,1),(8,8,0),(9,9,0),(10,10,0),
-    (11,11,0),(11,12,1),(12,12,0);
 
 -- 查询某节点的所有子孙
 SELECT e.* FROM tree_closure tc
@@ -121,19 +70,43 @@ SELECT e.* FROM tree_closure tc
 JOIN employees e ON e.id = tc.ancestor
 WHERE tc.descendant = 8 AND tc.depth > 0;
 
--- ============================================================
--- 6. 子树聚合
--- ============================================================
-
+-- 子树聚合
 SELECT tc.ancestor, e.name, COUNT(*) - 1 AS subordinate_count
-FROM tree_closure tc
-JOIN employees e ON e.id = tc.ancestor
-GROUP BY tc.ancestor, e.name
-HAVING COUNT(*) > 1
-ORDER BY subordinate_count DESC;
+FROM tree_closure tc JOIN employees e ON e.id = tc.ancestor
+GROUP BY tc.ancestor, e.name HAVING COUNT(*) > 1;
 
--- 注意：Hive 不支持递归 CTE
--- 注意：Hive 不支持 CONNECT BY
--- 注意：推荐使用路径枚举或闭包表模型
--- 注意：复杂层次查询建议使用 Spark SQL 或其他支持递归 CTE 的引擎
--- 注意：多层自连接方法受限于固定深度
+-- ============================================================
+-- 5. 迭代方法 (多次 INSERT)
+-- ============================================================
+-- 通过调度工具（Airflow）多次执行 INSERT 模拟递归
+CREATE TABLE tree_result (id INT, name STRING, level INT, path STRING) STORED AS ORC;
+
+-- 第0层: 根节点
+INSERT INTO tree_result
+SELECT id, name, 0, CAST(id AS STRING) FROM employees WHERE parent_id IS NULL;
+
+-- 第1层
+INSERT INTO tree_result
+SELECT e.id, e.name, 1, CONCAT(t.path, '/', CAST(e.id AS STRING))
+FROM employees e JOIN tree_result t ON e.parent_id = t.id WHERE t.level = 0;
+
+-- 重复直到无新行...（由调度工具控制循环）
+
+-- ============================================================
+-- 6. 跨引擎对比: 层级查询
+-- ============================================================
+-- 引擎          递归 CTE    CONNECT BY    替代方案
+-- MySQL(8.0+)   支持        不支持        递归 CTE
+-- PostgreSQL    支持        不支持        递归 CTE (最佳)
+-- Oracle        支持        支持(原创)    CONNECT BY
+-- Hive          不支持      不支持        路径枚举/闭包表/迭代
+-- Spark SQL     不支持      不支持        DataFrame 循环
+-- BigQuery      支持        不支持        递归 CTE
+
+-- ============================================================
+-- 7. 对引擎开发者的启示
+-- ============================================================
+-- 1. 递归 CTE 在大数据引擎中不实用: 迭代次数不确定，无法生成固定 DAG
+-- 2. 路径枚举是最实用的替代方案: 利用 LIKE 前缀匹配，查询简单
+-- 3. LATERAL VIEW EXPLODE 可以用来拆解路径: Hive 的嵌套类型处理能力在这里发挥作用
+-- 4. 闭包表适合频繁查询的场景: 空间换时间，预计算所有关系

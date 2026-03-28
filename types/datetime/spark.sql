@@ -1,106 +1,145 @@
--- Spark SQL: Date/Time Types (Spark 2.0+)
+-- Spark SQL: 日期时间类型 (Date/Time Types)
 --
 -- 参考资料:
---   [1] Spark SQL Reference
---       https://spark.apache.org/docs/latest/sql-ref.html
---   [2] Spark SQL - Built-in Functions
---       https://spark.apache.org/docs/latest/sql-ref-functions.html
---   [3] Spark SQL - Data Types
+--   [1] Spark SQL - Data Types
 --       https://spark.apache.org/docs/latest/sql-ref-datatypes.html
+--   [2] Spark SQL - Datetime Patterns
+--       https://spark.apache.org/docs/latest/sql-ref-datetime-pattern.html
 
--- DATE: Calendar date (days since epoch)
--- TIMESTAMP: Date + time with session timezone (microsecond precision)
--- TIMESTAMP_NTZ: Date + time without timezone (Spark 3.4+)
--- INTERVAL: Time interval (Spark 3.2+ has YEAR-MONTH and DAY-TIME subtypes)
+-- ============================================================
+-- 1. 类型概览
+-- ============================================================
+-- DATE:          日历日期（epoch 以来的天数），范围 0001-01-01 ~ 9999-12-31
+-- TIMESTAMP:     日期+时间+session时区，微秒精度
+-- TIMESTAMP_NTZ: 日期+时间，无时区（Spark 3.4+）
+-- INTERVAL:      时间间隔（3.2+ 区分 YEAR-MONTH 和 DAY-TIME）
+-- 无 TIME 类型: Spark 不支持纯时间类型（用 STRING 或 TIMESTAMP 替代）
 
 CREATE TABLE events (
     id         BIGINT,
     event_date DATE,
-    created_at TIMESTAMP,             -- With session timezone
-    updated_at TIMESTAMP_NTZ          -- Without timezone (Spark 3.4+)
+    created_at TIMESTAMP,                        -- 带 session 时区
+    updated_at TIMESTAMP_NTZ                     -- 无时区（3.4+）
 ) USING PARQUET;
 
--- No TIME type in Spark (use TIMESTAMP or STRING for time-only)
+-- ============================================================
+-- 2. TIMESTAMP vs TIMESTAMP_NTZ 的设计决策
+-- ============================================================
 
--- Current date/time
-SELECT CURRENT_DATE();                -- DATE (or CURRENT_DATE)
-SELECT CURRENT_TIMESTAMP();           -- TIMESTAMP (or CURRENT_TIMESTAMP)
-SELECT NOW();                         -- TIMESTAMP (Spark 3.4+)
+-- TIMESTAMP（默认）:
+--   存储: 内部存储 UTC 微秒数
+--   读取: 按 session timezone 转换显示
+--   适用: 全球化系统、跨时区数据
+--
+-- TIMESTAMP_NTZ（3.4+）:
+--   存储: 存储字面时间值，不做时区转换
+--   读取: 存什么显示什么
+--   适用: 业务时间（订单时间、预约时间）
+--
+-- 对比:
+--   PostgreSQL: TIMESTAMP vs TIMESTAMPTZ（推荐总是用 TIMESTAMPTZ）
+--   MySQL:      DATETIME（无时区）vs TIMESTAMP（UTC 存储+session 转换）
+--   Oracle:     TIMESTAMP vs TIMESTAMP WITH TIME ZONE vs TIMESTAMP WITH LOCAL TIME ZONE
+--   BigQuery:   DATETIME（无时区）vs TIMESTAMP（有时区）
+--
+-- 对引擎开发者的启示:
+--   至少需要两种时间类型: 带时区和不带时区。
+--   Spark 直到 3.4 才补齐 TIMESTAMP_NTZ——说明这一缺失造成了长期的用户困惑。
+--   推荐: 内部存 UTC + 显示时转换（PostgreSQL 的做法）。
 
--- Date/time literals
+-- ============================================================
+-- 3. 字面量与构造
+-- ============================================================
 SELECT DATE '2024-01-15';
 SELECT TIMESTAMP '2024-01-15 10:30:00';
-
--- Date construction
-SELECT MAKE_DATE(2024, 1, 15);                     -- DATE (Spark 3.0+)
-SELECT MAKE_TIMESTAMP(2024, 1, 15, 10, 30, 0);     -- TIMESTAMP (Spark 3.0+)
+SELECT MAKE_DATE(2024, 1, 15);                           -- 3.0+
+SELECT MAKE_TIMESTAMP(2024, 1, 15, 10, 30, 0);           -- 3.0+
 SELECT TO_DATE('2024-01-15', 'yyyy-MM-dd');
 SELECT TO_TIMESTAMP('2024-01-15 10:30:00', 'yyyy-MM-dd HH:mm:ss');
+SELECT CURRENT_DATE(), CURRENT_TIMESTAMP(), NOW();       -- NOW() 3.4+
 
--- Date arithmetic
-SELECT DATE_ADD(DATE '2024-01-15', 7);              -- Add 7 days
-SELECT DATE_SUB(DATE '2024-01-15', 7);              -- Subtract 7 days
-SELECT ADD_MONTHS(DATE '2024-01-15', 3);            -- Add 3 months
+-- ============================================================
+-- 4. 日期算术
+-- ============================================================
+SELECT DATE_ADD(DATE '2024-01-15', 7);
+SELECT DATE_SUB(DATE '2024-01-15', 7);
+SELECT ADD_MONTHS(DATE '2024-01-15', 3);
 SELECT DATE '2024-01-15' + INTERVAL 1 DAY;
 SELECT TIMESTAMP '2024-01-15 10:30:00' - INTERVAL 2 HOURS;
 
--- Date difference
-SELECT DATEDIFF(DATE '2024-12-31', DATE '2024-01-01');  -- 365 (days)
-SELECT MONTHS_BETWEEN(DATE '2024-12-31', DATE '2024-01-01');  -- Months as decimal
+-- 日期差
+SELECT DATEDIFF(DATE '2024-12-31', DATE '2024-01-01');   -- 365 天
+SELECT MONTHS_BETWEEN(DATE '2024-12-31', DATE '2024-01-01'); -- 小数月
 SELECT TIMESTAMPDIFF(HOUR, TIMESTAMP '2024-01-15 10:00:00',
-                          TIMESTAMP '2024-01-15 15:30:00');   -- Spark 3.3+
+                          TIMESTAMP '2024-01-15 15:30:00');  -- 3.3+
 
--- Extraction
-SELECT YEAR(DATE '2024-01-15');
-SELECT MONTH(DATE '2024-01-15');
-SELECT DAY(DATE '2024-01-15');
-SELECT DAYOFMONTH(DATE '2024-01-15');
-SELECT DAYOFWEEK(DATE '2024-01-15');    -- 1=Sunday
-SELECT DAYOFYEAR(DATE '2024-01-15');
+-- ============================================================
+-- 5. 提取与截断
+-- ============================================================
+SELECT YEAR(DATE '2024-01-15'), MONTH(DATE '2024-01-15'), DAY(DATE '2024-01-15');
+SELECT DAYOFWEEK(DATE '2024-01-15');                     -- 2 (1=Sunday!)
+SELECT DAYOFYEAR(DATE '2024-01-15');                     -- 15
 SELECT HOUR(TIMESTAMP '2024-01-15 10:30:00');
-SELECT MINUTE(TIMESTAMP '2024-01-15 10:30:00');
-SELECT SECOND(TIMESTAMP '2024-01-15 10:30:45');
-SELECT WEEKOFYEAR(DATE '2024-01-15');
 SELECT QUARTER(DATE '2024-01-15');
-SELECT EXTRACT(YEAR FROM DATE '2024-01-15');
+SELECT EXTRACT(YEAR FROM DATE '2024-01-15');             -- SQL 标准
 
--- Truncation
 SELECT DATE_TRUNC('MONTH', TIMESTAMP '2024-01-15 10:30:00');
-SELECT DATE_TRUNC('YEAR', CURRENT_TIMESTAMP);
-SELECT DATE_TRUNC('HOUR', CURRENT_TIMESTAMP);
-SELECT TRUNC(DATE '2024-01-15', 'MM');   -- Truncate to month
+SELECT TRUNC(DATE '2024-01-15', 'MM');
 
--- Formatting
+-- DAYOFWEEK 返回 1=Sunday 是重要的行为差异:
+--   Spark/MySQL: 1=Sunday, 2=Monday, ..., 7=Saturday
+--   PostgreSQL:  EXTRACT(DOW) 0=Sunday, 1=Monday
+--   ISO 标准:    1=Monday, 7=Sunday
+
+-- ============================================================
+-- 6. 格式化与解析
+-- ============================================================
 SELECT DATE_FORMAT(CURRENT_TIMESTAMP, 'yyyy-MM-dd HH:mm:ss');
 SELECT DATE_FORMAT(CURRENT_TIMESTAMP, 'EEEE, MMMM dd, yyyy');
 SELECT FROM_UNIXTIME(1705312200, 'yyyy-MM-dd HH:mm:ss');
+SELECT UNIX_TIMESTAMP();
+SELECT UNIX_TIMESTAMP('2024-01-15', 'yyyy-MM-dd');
 
--- Unix timestamp
-SELECT UNIX_TIMESTAMP();                              -- Current epoch seconds
-SELECT UNIX_TIMESTAMP('2024-01-15', 'yyyy-MM-dd');    -- Date string to epoch
-SELECT FROM_UNIXTIME(1705312200);                     -- Epoch to timestamp string
-SELECT TO_TIMESTAMP(1705312200);                      -- Epoch to TIMESTAMP
+-- Spark 使用 Java 格式模式:
+--   yyyy = 年, MM = 月, dd = 日, HH = 24h, mm = 分, ss = 秒
+--   注意: YYYY 是 week-based year（与 yyyy 不同!），这是常见 bug 来源
+-- 对比: PostgreSQL 使用 'YYYY-MM-DD HH24:MI:SS' 模式
 
--- Last day of month
-SELECT LAST_DAY(DATE '2024-02-15');                   -- 2024-02-29
+-- ============================================================
+-- 7. 时区处理
+-- ============================================================
+SELECT FROM_UTC_TIMESTAMP(TIMESTAMP '2024-01-15 10:00:00', 'Asia/Shanghai');
+SELECT TO_UTC_TIMESTAMP(TIMESTAMP '2024-01-15 18:00:00', 'Asia/Shanghai');
 
--- Next day
-SELECT NEXT_DAY(DATE '2024-01-15', 'Monday');         -- Next Monday
-
--- Generate date sequence (Spark 3.4+)
-SELECT EXPLODE(SEQUENCE(DATE '2024-01-01', DATE '2024-01-31', INTERVAL 1 DAY));
-
--- Interval types (Spark 3.2+)
+-- ============================================================
+-- 8. INTERVAL 类型（Spark 3.2+）
+-- ============================================================
 SELECT INTERVAL '1' YEAR;
 SELECT INTERVAL '2' MONTH;
 SELECT INTERVAL '3' DAY;
 SELECT INTERVAL '4' HOUR;
-SELECT INTERVAL '1-6' YEAR TO MONTH;                  -- 1 year 6 months
-SELECT INTERVAL '3 04:30:00' DAY TO SECOND;            -- 3 days 4h 30m
+SELECT INTERVAL '1-6' YEAR TO MONTH;                    -- 1 年 6 月
+SELECT INTERVAL '3 04:30:00' DAY TO SECOND;              -- 3 天 4 时 30 分
 
--- Note: Spark TIMESTAMP is always associated with session timezone
--- Note: TIMESTAMP_NTZ (no timezone) added in Spark 3.4+
--- Note: No TIME type; store time as STRING or use TIMESTAMP
--- Note: Date format uses Java SimpleDateFormat patterns (yyyy-MM-dd, not YYYY-MM-DD)
--- Note: DAYOFWEEK returns 1=Sunday (different from many databases)
--- Note: No generate_series; use EXPLODE(SEQUENCE(...)) (Spark 3.4+)
+-- ============================================================
+-- 9. 日期序列生成
+-- ============================================================
+SELECT EXPLODE(SEQUENCE(DATE '2024-01-01', DATE '2024-01-31', INTERVAL 1 DAY));
+SELECT EXPLODE(SEQUENCE(DATE '2024-01-01', DATE '2024-12-01', INTERVAL 1 MONTH));
+
+-- ============================================================
+-- 10. 版本演进
+-- ============================================================
+-- Spark 2.0: DATE, TIMESTAMP, 基本日期函数
+-- Spark 3.0: MAKE_DATE, MAKE_TIMESTAMP, EXTRACT
+-- Spark 3.2: INTERVAL 子类型（YEAR-MONTH / DAY-TIME）
+-- Spark 3.3: TIMESTAMPDIFF
+-- Spark 3.4: TIMESTAMP_NTZ, TRY_TO_TIMESTAMP, NOW()
+-- Spark 4.0: 时区处理改进
+--
+-- 限制:
+--   无 TIME 类型（用 STRING 或 TIMESTAMP 存纯时间）
+--   日期格式使用 Java 模式（yyyy-MM-dd，不是 YYYY-MM-DD）
+--   DAYOFWEEK 返回 1=Sunday（与 ISO 不一致）
+--   TIMESTAMP 精度: 微秒（不是纳秒——对比 ClickHouse 支持纳秒）
+--   无 generate_series（使用 EXPLODE(SEQUENCE(...))）

@@ -1,151 +1,109 @@
--- StarRocks: 数据库、模式与用户管理
+-- StarRocks: 数据库、Schema 与用户管理
 --
 -- 参考资料:
---   [1] StarRocks Documentation - CREATE DATABASE
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/database/CREATE_DATABASE/
---   [2] StarRocks Documentation - CREATE USER
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/account-management/CREATE_USER/
+--   [1] StarRocks Documentation - CREATE DATABASE / USER
+--       https://docs.starrocks.io/docs/sql-reference/sql-statements/
 
 -- ============================================================
--- StarRocks 兼容 MySQL 协议
--- 命名层级: cluster > database > table
--- 没有独立的 schema 层
+-- 1. 命名层级: MySQL 协议兼容
 -- ============================================================
+-- 层级: cluster > database > table (与 Doris 相同)。
+-- 无独立 schema 层。database = schema(MySQL 兼容)。
 
 -- ============================================================
--- 1. 数据库管理
+-- 2. 数据库管理
 -- ============================================================
-
 CREATE DATABASE myapp;
 CREATE DATABASE IF NOT EXISTS myapp;
 
-CREATE DATABASE myapp
-PROPERTIES (
-    'replication_num' = '3'                     -- 副本数
-);
-
--- 修改数据库
-ALTER DATABASE myapp SET PROPERTIES ('replication_num' = '2');
 ALTER DATABASE myapp RENAME new_myapp;
 
--- 删除数据库
 DROP DATABASE myapp;
 DROP DATABASE IF EXISTS myapp;
 DROP DATABASE myapp FORCE;
 
--- 恢复数据库
+-- 回收站恢复
 RECOVER DATABASE myapp;
 
--- 切换数据库
 USE myapp;
-
 SHOW DATABASES;
 
 -- ============================================================
--- 2. 用户管理
+-- 3. 用户管理
 -- ============================================================
-
 CREATE USER 'myuser'@'%' IDENTIFIED BY 'secret123';
-CREATE USER IF NOT EXISTS 'myuser' IDENTIFIED BY 'secret123';
 CREATE USER 'myuser'@'10.0.0.%' IDENTIFIED BY 'secret123';
 
-CREATE USER 'myuser' IDENTIFIED BY 'secret123'
-    DEFAULT ROLE 'analyst';
-
--- 修改用户
 ALTER USER 'myuser' IDENTIFIED BY 'newsecret';
 SET PASSWORD FOR 'myuser' = PASSWORD('newsecret');
-
--- 删除用户
 DROP USER 'myuser';
 
 -- ============================================================
--- 3. 角色管理
+-- 4. 角色管理 (RBAC)
 -- ============================================================
-
 CREATE ROLE analyst;
 CREATE ROLE developer;
 
--- 系统角色: root, db_admin, cluster_admin, user_admin
-
 GRANT analyst TO 'myuser'@'%';
-SET DEFAULT ROLE analyst TO 'myuser';
-
+SET DEFAULT ROLE analyst TO 'myuser'@'%';
 REVOKE analyst FROM 'myuser'@'%';
 DROP ROLE analyst;
 
 -- ============================================================
--- 4. 权限管理
+-- 5. 权限管理
 -- ============================================================
+GRANT SELECT ON myapp.* TO 'myuser'@'%';
+GRANT INSERT ON myapp.* TO 'myuser'@'%';
+GRANT ALL ON myapp.* TO 'myuser'@'%';
 
--- 全局权限
-GRANT CREATE DATABASE ON CATALOG default_catalog TO 'myuser';
+-- 表级权限
+GRANT SELECT ON myapp.users TO 'myuser'@'%';
+GRANT ALTER ON myapp.users TO 'myuser'@'%';
 
--- 数据库权限
-GRANT ALL ON DATABASE myapp TO 'myuser';
+-- External Catalog 权限(2.3+)
+GRANT USAGE ON CATALOG hive_catalog TO 'myuser'@'%';
 
--- 表权限
-GRANT SELECT ON myapp.users TO 'myuser';
-GRANT INSERT, DELETE ON myapp.users TO ROLE 'developer';
-
--- External Catalog 权限（StarRocks 3.0+）
-GRANT USAGE ON CATALOG hive_catalog TO 'myuser';
-GRANT SELECT ON ALL TABLES IN DATABASE hive_catalog.mydb TO ROLE 'analyst';
-
--- 查看权限
-SHOW GRANTS FOR 'myuser';
-
--- 收回权限
-REVOKE SELECT ON myapp.users FROM 'myuser';
+SHOW GRANTS FOR 'myuser'@'%';
+REVOKE SELECT ON myapp.* FROM 'myuser'@'%';
 
 -- ============================================================
--- 5. 资源管理
+-- 6. Resource Group (资源隔离)
 -- ============================================================
+CREATE RESOURCE GROUP rg_report TO (user='myuser')
+WITH ('cpu_core_limit'='10', 'mem_limit'='30%');
 
--- 资源组（StarRocks 2.2+）
-CREATE RESOURCE GROUP rg_report
-    TO (user='analyst', role='analyst', query_type in ('SELECT'))
-    WITH (
-        'cpu_core_limit' = '10',
-        'mem_limit' = '30%',
-        'concurrency_limit' = '20'
-    );
-
-ALTER RESOURCE GROUP rg_report
-    WITH ('concurrency_limit' = '30');
-
-DROP RESOURCE GROUP rg_report;
+-- 设计分析:
+--   StarRocks Resource Group vs Doris Workload Group:
+--     语法差异: StarRocks 用 RESOURCE GROUP，Doris 用 WORKLOAD GROUP
+--     功能类似: CPU/内存/并发控制
+--
+-- 对比:
+--   Snowflake: Virtual Warehouse(独立计算资源，最彻底的隔离)
+--   BigQuery:  Reservation + Assignment(Slot 级别隔离)
 
 -- ============================================================
--- 6. Catalog 管理（StarRocks 3.0+ 多源查询）
+-- 7. StarRocks vs Doris 用户管理差异
 -- ============================================================
-
-CREATE EXTERNAL CATALOG hive_catalog
-PROPERTIES (
-    'type' = 'hive',
-    'hive.metastore.uris' = 'thrift://metastore:9083'
-);
-
-CREATE EXTERNAL CATALOG iceberg_catalog
-PROPERTIES (
-    'type' = 'iceberg',
-    'iceberg.catalog.type' = 'rest',
-    'iceberg.catalog.uri' = 'http://rest-catalog:8181'
-);
-
-SET CATALOG hive_catalog;
-DROP CATALOG hive_catalog;
-
-SHOW CATALOGS;
+-- 权限语法:
+--   StarRocks: GRANT SELECT ON db.* TO user
+--   Doris:     GRANT SELECT_PRIV ON db.*.* TO user
+--   (StarRocks 更接近 SQL 标准，Doris 保留了 _PRIV 后缀)
+--
+-- 行级权限:
+--   Doris 2.1+: 支持 Row Policy(行级权限)
+--   StarRocks:   不支持行级权限
+--
+-- 对引擎开发者的启示:
+--   MySQL 协议兼容让 Doris/StarRocks 可以使用现有 MySQL 工具和驱动。
+--   但权限模型的差异(Doris 用 _PRIV 后缀)说明协议兼容 != 语法兼容。
+--   迁移时需要注意 GRANT 语法的差异。
 
 -- ============================================================
--- 7. 查询元数据
+-- 8. 查询元数据
 -- ============================================================
-
 SELECT DATABASE(), USER(), CURRENT_USER();
-
 SHOW DATABASES;
+SHOW TABLES FROM myapp;
 SHOW GRANTS;
 SHOW ROLES;
-
 SELECT * FROM information_schema.schemata;

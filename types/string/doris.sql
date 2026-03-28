@@ -1,41 +1,60 @@
 -- Apache Doris: 字符串类型
 --
 -- 参考资料:
---   [1] Doris SQL Manual
---       https://doris.apache.org/docs/sql-manual/sql-statements/
---   [2] Doris Data Types
+--   [1] Doris Documentation - String Types
 --       https://doris.apache.org/docs/sql-manual/data-types/
---   [3] Doris Functions
---       https://doris.apache.org/docs/sql-manual/sql-functions/
 
--- CHAR(n): 定长，1 ~ 255 字节，尾部补空格
--- VARCHAR(n): 变长，最大 65533 字节
--- STRING: 变长，最大 2147483643 字节（2.0+）
--- TEXT: STRING 的别名
+-- ============================================================
+-- 1. 类型体系
+-- ============================================================
+-- CHAR(n):    定长, 1~255 字节, 尾部补空格
+-- VARCHAR(n): 变长, 最大 65533 字节
+-- STRING:     变长, 最大 2GB (2.0+)
+-- TEXT:       STRING 的别名
 
 CREATE TABLE examples (
-    code       CHAR(10),                  -- 定长
-    name       VARCHAR(255),              -- 变长（推荐）
-    content    STRING                     -- 大文本（2.0+）
-)
-DUPLICATE KEY(code)
-DISTRIBUTED BY HASH(code);
+    code CHAR(10), name VARCHAR(255), content STRING
+) DUPLICATE KEY(code) DISTRIBUTED BY HASH(code);
 
--- 注意：VARCHAR(n) 中 n 是字节数（UTF-8 下一个中文 3 字节）
--- 注意：STRING 类型不能作为 Key 列、分区列或分桶列
--- 注意：CHAR 类型也不能作为分区列
+-- ============================================================
+-- 2. 关键限制
+-- ============================================================
+-- VARCHAR(n) 的 n 是字节数(UTF-8 中文 3 字节):
+--   VARCHAR(255) 最多存 85 个中文字符
+--
+-- STRING 不能作为 Key 列、分区列或分桶列
+-- CHAR 不能作为分区列
+-- 必须指定 VARCHAR 的长度(不像 PG 的 TEXT 无长度限制)
+-- 不支持 COLLATION(默认 UTF-8 字节比较)
+-- 不支持 ENUM / SET 类型
 
--- 类型转换
-SELECT CAST('123' AS INT);
-SELECT CAST(123 AS VARCHAR);
+-- ============================================================
+-- 3. 字符串字面量
+-- ============================================================
+SELECT 'hello world';    -- 单引号
+SELECT "hello world";    -- 双引号(MySQL 兼容)
 
--- 字符串字面量
-SELECT 'hello world';                     -- 单引号
-SELECT "hello world";                     -- 双引号也可以（MySQL 兼容）
-
--- 注意：与 MySQL 类型兼容，但有存储差异
--- 注意：没有 TEXT / MEDIUMTEXT / LONGTEXT 区分（统一用 STRING）
--- 注意：没有 ENUM / SET 类型
--- 注意：VARCHAR 必须指定长度
--- 注意：不支持 COLLATION 设置，默认 UTF-8 字节比较
--- 注意：2.0+ STRING 类型最大支持 2GB
+-- ============================================================
+-- 4. 对比其他引擎
+-- ============================================================
+-- VARCHAR(n) 的 n:
+--   Doris:     字节数(UTF-8)
+--   MySQL:     字符数
+--   PostgreSQL: 字符数
+--
+-- 大文本:
+--   Doris:     STRING(统一，2.0+)
+--   MySQL:     TEXT/MEDIUMTEXT/LONGTEXT(分级)
+--   PostgreSQL: TEXT(无大小限制)
+--   ClickHouse: String(无大小限制)
+--   BigQuery:  STRING(无大小限制)
+--
+-- COLLATION:
+--   Doris/StarRocks: 不支持(UTF-8 字节比较)
+--   MySQL:   utf8mb4_unicode_ci 等(丰富)
+--   PostgreSQL: ICU collation(12+)
+--
+-- 对引擎开发者的启示:
+--   统一的 STRING 类型(不分级)是现代引擎的趋势。
+--   MySQL 的 TEXT 分级增加了用户认知负担。
+--   列存引擎不需要分级——列内压缩自动处理长短字符串。

@@ -1,118 +1,89 @@
 -- Apache Doris: 执行计划与查询分析
 --
 -- 参考资料:
---   [1] Doris Documentation - EXPLAIN
---       https://doris.apache.org/docs/sql-manual/sql-statements/Utility-Statements/EXPLAIN
---   [2] Doris Documentation - Query Analysis
---       https://doris.apache.org/docs/admin-manual/query-profile
+--   [1] Doris Documentation - EXPLAIN / Query Profile
+--       https://doris.apache.org/docs/sql-manual/sql-statements/
 
 -- ============================================================
--- EXPLAIN 基本用法
+-- 1. EXPLAIN 体系: MPP 分布式执行计划
 -- ============================================================
+-- Doris 的 EXPLAIN 输出与 MySQL 完全不同——因为它是分布式 MPP 引擎。
+-- 执行计划展示的是 Fragment(执行片段) 和 Exchange(数据交换) 的拓扑。
+--
+-- 对比:
+--   MySQL:      单机计划——Table Access/Nested Loop/Hash Join
+--   Doris:      分布式计划——Fragment/Exchange/Shuffle/Broadcast
+--   StarRocks:  与 Doris 类似(同源)，但 CBO 优化器更强
+--   ClickHouse: 单机计划(Distributed 引擎透明处理分布式)
+--   BigQuery:   EXPLAIN 显示 Stage(类似 Fragment)
 
+-- ============================================================
+-- 2. EXPLAIN 级别
+-- ============================================================
 EXPLAIN SELECT * FROM users WHERE age > 25;
-
--- ============================================================
--- EXPLAIN 详细级别
--- ============================================================
-
--- 普通计划
-EXPLAIN SELECT * FROM users WHERE age > 25;
-
--- 详细计划
 EXPLAIN VERBOSE SELECT * FROM users WHERE age > 25;
-
--- 显示分布式执行计划
 EXPLAIN GRAPH SELECT * FROM users WHERE age > 25;
 
--- ============================================================
--- EXPLAIN ANALYZE（2.0+）
--- ============================================================
-
--- 实际执行并收集统计
+-- EXPLAIN ANALYZE (2.0+): 实际执行并收集统计
 EXPLAIN ANALYZE SELECT * FROM users WHERE age > 25;
 
 -- ============================================================
--- 执行计划关键操作
+-- 3. 执行计划关键算子
 -- ============================================================
-
--- OlapScanNode         OLAP 表扫描（前缀索引、Zone Map 等）
--- Exchange             数据交换（节点间传输）
--- HashJoinNode         哈希连接
--- AggregationNode      聚合
--- SortNode             排序
--- AnalyticEvalNode     分析函数
--- UnionNode            联合
--- AssertNumRowsNode    断言行数
--- SelectNode           选择/过滤
--- DataStreamSink       数据流输出
-
--- 分布方式：
--- BROADCAST            广播
--- HASH_PARTITIONED     哈希分区
--- UNPARTITIONED        不分区（汇集）
+-- OlapScanNode:       OLAP 表扫描(前缀索引、Zone Map 过滤)
+-- Exchange:           数据交换(BROADCAST/HASH_PARTITIONED/UNPARTITIONED)
+-- HashJoinNode:       哈希连接
+-- AggregationNode:    聚合
+-- SortNode:           排序
+-- AnalyticEvalNode:   窗口函数
+-- DataStreamSink:     数据流输出
+--
+-- 分布方式(Exchange 类型):
+--   BROADCAST:         小表广播到所有节点(适合小表 JOIN)
+--   HASH_PARTITIONED:  按 Hash 重分布(大表 JOIN)
+--   UNPARTITIONED:     汇集到单节点(最终结果)
 
 -- ============================================================
--- Query Profile
+-- 4. Query Profile (性能分析)
 -- ============================================================
-
--- 启用 Profile
 SET enable_profile = true;
 
--- 执行查询后查看 Profile
--- 方式 1：Doris FE Web UI（默认端口 8030）
--- 方式 2：API
--- curl http://fe_host:8030/api/profile?query_id=xxx
+-- 执行查询后查看 Profile:
+-- FE Web UI: http://fe_host:8030
+-- API: curl http://fe_host:8030/api/profile?query_id=xxx
 
--- Profile 包含：
--- - 每个 Fragment 的执行时间
--- - 每个操作符的行数、时间
--- - I/O 统计
--- - 内存使用
--- - 网络传输
+SHOW PROCESSLIST;                       -- 正在执行的查询
+SHOW QUERY PROFILE "/";                 -- Profile 列表
+SHOW QUERY PROFILE "/query_id";         -- 特定查询
 
 -- ============================================================
--- 查询统计
+-- 5. 统计信息 (Nereids 优化器，2.0+)
 -- ============================================================
-
--- 查看正在执行的查询
-SHOW PROCESSLIST;
-
--- 查看查询 Profile 列表
-SHOW QUERY PROFILE "/";
-
--- 查看特定查询的 Profile
-SHOW QUERY PROFILE "/query_id";
-
--- ============================================================
--- 统计信息
--- ============================================================
-
--- 收集统计信息
 ANALYZE TABLE users;
-ANALYZE TABLE users WITH SYNC;  -- 同步收集
-ANALYZE TABLE users (username, age);  -- 指定列
-
--- 查看统计信息
+ANALYZE TABLE users WITH SYNC;
+ANALYZE TABLE users (username, age);
 SHOW COLUMN STATS users;
 SHOW TABLE STATS users;
 
--- ============================================================
--- 关键优化指标
--- ============================================================
+-- 设计分析:
+--   Doris 2.0 引入 Nereids 优化器(CBO)，统计信息的质量直接影响执行计划。
+--   对比 StarRocks: CBO(Cascades 框架)从 1.x 就有，更成熟。
+--   对比 MySQL:    ANALYZE TABLE 更新 InnoDB 统计信息。
+--   对比 ClickHouse: 无 CBO，依赖规则优化器(RBO)。
 
--- 1. 前缀索引命中：OlapScanNode 的 shortKeyFilterRatio
--- 2. Zone Map 过滤：通过 MIN/MAX 跳过数据块
--- 3. Bloom Filter：用于精确匹配过滤
--- 4. 物化视图命中：自动选择最佳物化视图
+-- ============================================================
+-- 6. 关键优化指标
+-- ============================================================
+-- 前缀索引命中:    OlapScanNode 的 shortKeyFilterRatio
+-- Zone Map 过滤:   通过 MIN/MAX 跳过数据块
+-- Bloom Filter:    用于精确匹配过滤
+-- 物化视图命中:    自动选择最佳 MV/ROLLUP
 
 -- 检查物化视图命中
 EXPLAIN SELECT user_id, SUM(amount) FROM orders GROUP BY user_id;
--- 查看 rollup 是否被选中
 
--- 注意：Doris EXPLAIN 显示分布式执行计划
--- 注意：EXPLAIN GRAPH 以图形化方式展示执行计划
--- 注意：2.0+ 支持 EXPLAIN ANALYZE 获取实际执行统计
--- 注意：FE Web UI 提供 Query Profile 的图形化展示
--- 注意：前缀索引和 Zone Map 是 Doris 最重要的优化手段
--- 注意：自动物化视图选择可以显著加速聚合查询
+-- 对引擎开发者的启示:
+--   MPP 执行计划的核心是 Exchange 策略选择:
+--   Broadcast: O(小表大小 × 节点数) 网络开销
+--   Shuffle:   O(大表大小) 网络开销
+--   CBO 需要准确的表大小统计才能做出正确选择。

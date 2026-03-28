@@ -1,112 +1,103 @@
 -- StarRocks: 执行计划与查询分析
 --
 -- 参考资料:
---   [1] StarRocks Documentation - EXPLAIN
---       https://docs.starrocks.io/docs/sql-reference/sql-statements/Administration/EXPLAIN/
---   [2] StarRocks Documentation - Query Profile
---       https://docs.starrocks.io/docs/administration/query_profile_overview/
+--   [1] StarRocks Documentation - EXPLAIN / Query Profile
+--       https://docs.starrocks.io/docs/sql-reference/sql-statements/
 
 -- ============================================================
--- EXPLAIN 基本用法
+-- 1. CBO 优化器: StarRocks 的核心竞争力
 -- ============================================================
+-- StarRocks 的 CBO 优化器基于 Cascades 框架(Columbia 变体)，
+-- 从 1.x 版本开始就是核心功能——比 Doris 的 Nereids(2.0)早约 2 年。
+--
+-- CBO 关键能力:
+--   Join Reorder:        多表 JOIN 顺序优化(NP-hard，启发式搜索)
+--   子查询去关联:        将关联子查询改写为 JOIN
+--   聚合下推:            将聚合推到 Scan 侧(减少数据传输)
+--   分区裁剪:            基于 WHERE 条件跳过无关分区
+--   物化视图改写:        自动路由到 MV
+--
+-- 对比:
+--   Doris:      Nereids CBO(2.0+)，追赶中
+--   ClickHouse: RBO(规则优化)，无 CBO(设计选择)
+--   BigQuery:   CBO(Google Dremel 引擎)
 
+-- ============================================================
+-- 2. EXPLAIN 级别
+-- ============================================================
 EXPLAIN SELECT * FROM users WHERE age > 25;
-
--- ============================================================
--- EXPLAIN 选项
--- ============================================================
-
--- 普通计划
-EXPLAIN SELECT * FROM users WHERE age > 25;
-
--- 详细计划
 EXPLAIN VERBOSE SELECT * FROM users WHERE age > 25;
-
--- 成本信息
 EXPLAIN COSTS SELECT * FROM users WHERE age > 25;
 
--- 逻辑计划
-EXPLAIN LOGICAL SELECT * FROM users WHERE age > 25;
-
--- ============================================================
--- EXPLAIN ANALYZE（3.0+）
--- ============================================================
-
+-- EXPLAIN ANALYZE: 实际执行并收集统计
 EXPLAIN ANALYZE SELECT * FROM users WHERE age > 25;
 
 -- ============================================================
--- 执行计划关键操作
+-- 3. Pipeline 执行引擎
 -- ============================================================
-
--- OlapScanNode         OLAP 表扫描
--- ExchangeNode         数据交换
--- HashJoinNode         哈希连接
--- AggregationNode      聚合
--- SortNode             排序
--- AnalyticEvalNode     窗口函数
--- ProjectNode          投影
--- DecodeNode           字典解码
--- TopNNode             Top N
-
--- 分布方式：
--- BROADCAST            广播
--- SHUFFLE              按键 Shuffle
--- GATHER               汇集到一个节点
--- BUCKET_SHUFFLE       按桶 Shuffle（colocation）
+-- StarRocks 使用 Pipeline 执行引擎(vs Doris 的传统 Volcano 模型)。
+-- Pipeline 将执行计划拆分为多个 PipelineDriver，共享线程池。
+--
+-- 优势:
+--   减少线程上下文切换(Volcano 模型每个 Fragment 一个线程)
+--   更好的 CPU 利用率
+--   自适应并行度
+--
+-- 对比:
+--   Doris:     传统 Fragment + 线程模型(2.0 引入 Pipeline 实验性)
+--   ClickHouse: Pipeline 执行(类似概念)
+--   BigQuery:  Dremel 执行引擎(树形 Shuffle)
 
 -- ============================================================
--- Query Profile
+-- 4. 统计信息
 -- ============================================================
+ANALYZE TABLE users;
+ANALYZE TABLE users WITH SYNC;
+ANALYZE TABLE users (username, age);
+SHOW COLUMN STATS users;
+SHOW TABLE STATS users;
 
--- 启用 Profile
+-- ============================================================
+-- 5. Query Profile
+-- ============================================================
 SET enable_profile = true;
 
--- 执行查询后在 FE Web UI 查看
--- http://fe_host:8030/query
-
--- Profile 内容：
--- - Fragment 执行详情
--- - 各操作符的计时和统计
--- - Pipeline 调度信息
--- - 内存和 I/O 统计
+SHOW PROCESSLIST;
+-- FE Web UI: http://fe_host:8030
 
 -- ============================================================
--- 向量化引擎分析
+-- 6. 执行计划关键算子
 -- ============================================================
-
--- StarRocks 使用全面向量化引擎
--- Pipeline 执行模型（3.0+）
--- Profile 中的 Pipeline 信息：
--- - DriverTotalTime   驱动器总时间
--- - ScheduleTime      调度时间
--- - PendingTime       挂起时间
-
--- ============================================================
--- 物化视图命中分析
--- ============================================================
-
--- 检查是否命中物化视图
-EXPLAIN SELECT user_id, SUM(amount) FROM orders GROUP BY user_id;
-
--- 如果命中：OlapScanNode 的 TABLE 显示物化视图名
+-- OlapScanNode:       表扫描
+-- Exchange:           数据交换(BROADCAST/SHUFFLE/BUCKET_SHUFFLE)
+-- HashJoinNode:       哈希连接
+-- AggregateNode:      聚合
+-- SortNode:           排序
+-- AnalyticNode:       窗口函数
+-- ProjectNode:        投影
+--
+-- StarRocks 特有:
+--   BUCKET_SHUFFLE:    利用分桶信息的本地 Shuffle(比全局 Shuffle 高效)
+--   COLOCATE_JOIN:     同组表本地 JOIN(零网络开销)
 
 -- ============================================================
--- 统计信息
+-- 7. StarRocks vs Doris 执行计划差异
 -- ============================================================
-
--- 手动收集
-ANALYZE TABLE users;
-ANALYZE FULL TABLE users;  -- 全量收集
-
--- 自动收集（默认启用）
-SHOW ANALYZE STATUS;
-
--- 查看统计信息
-SHOW COLUMN STATS users;
-
--- 注意：StarRocks EXPLAIN 显示向量化执行计划
--- 注意：3.0+ 使用 Pipeline 执行引擎，Profile 更详细
--- 注意：EXPLAIN COSTS 显示优化器的成本估算
--- 注意：BUCKET_SHUFFLE 利用 Colocation 避免网络传输
--- 注意：物化视图自动改写可以加速聚合查询
--- 注意：自动统计信息收集默认启用
+-- CBO 优化器:
+--   StarRocks: Cascades CBO(1.x+，更成熟)
+--   Doris:     Nereids CBO(2.0+，追赶中)
+--
+-- 执行引擎:
+--   StarRocks: Pipeline 执行引擎(线程共享，高效)
+--   Doris:     传统 Fragment 模型(2.0 引入 Pipeline)
+--
+-- Runtime Filter:
+--   StarRocks: Global Runtime Filter(跨 Fragment 广播 BF)
+--   Doris:     Local Runtime Filter(Fragment 内)
+--
+-- 对引擎开发者的参考:
+--   Cascades 框架的实现要点:
+--   1. Memo(等价类存储): 存储所有等价的逻辑/物理计划
+--   2. Rule(变换规则): 探索计划空间的搜索策略
+--   3. Cost Model: 基于统计信息估算代价
+--   StarRocks 的实现在 fe/optimizer/ 目录，值得深入研究。

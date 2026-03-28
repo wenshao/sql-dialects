@@ -1,25 +1,47 @@
--- Spark SQL: Transactions
+-- Spark SQL: 事务 (Transactions)
 --
 -- 参考资料:
---   [1] Spark SQL Reference
+--   [1] Delta Lake - ACID Transactions
+--       https://docs.delta.io/latest/concurrency-control.html
+--   [2] Apache Iceberg - Reliability
+--       https://iceberg.apache.org/docs/latest/reliability/
+--   [3] Spark SQL Reference
 --       https://spark.apache.org/docs/latest/sql-ref.html
---   [2] Spark SQL - Built-in Functions
---       https://spark.apache.org/docs/latest/sql-ref-functions.html
---   [3] Spark SQL - Data Types
---       https://spark.apache.org/docs/latest/sql-ref-datatypes.html
 
--- Standard Spark SQL does NOT support multi-statement transactions
--- Each SQL statement is an independent operation
+-- ============================================================
+-- 1. 核心设计: 原生 Spark SQL 没有事务
+-- ============================================================
 
--- Delta Lake provides ACID transactions (Databricks / open source Delta Lake)
+-- 标准 Spark SQL（Parquet/ORC/CSV 表）不支持 ACID 事务:
+--   无 BEGIN / COMMIT / ROLLBACK
+--   每个 SQL 语句是独立操作，失败可能留下部分写入的文件
+--   没有隔离级别——并发写入可能导致数据损坏
+--
+-- 这是批处理引擎的通病: 数据以文件形式存储，文件系统不提供事务语义。
+-- Delta Lake 和 Iceberg 通过"事务日志"在文件系统之上构建了 ACID 事务层。
+--
+-- 对比:
+--   MySQL InnoDB:   完整 ACID（redo log + undo log + MVCC）
+--   PostgreSQL:     完整 ACID（WAL + MVCC，DDL 也是事务性的！）
+--   Oracle:         完整 ACID（redo log + undo tablespace + read consistency）
+--   Hive:           Hive 3.0+ ACID（基于 Delta 文件，性能差，限制多）
+--   Flink SQL:      两阶段提交（sink 端 exactly-once）
+--   ClickHouse:     无 ACID（最终一致性，MergeTree 合并保证数据一致）
+--   BigQuery:       DML 语句级事务 + 多语句事务（preview）
+--   Snowflake:      完整 ACID（每个 DML 是隐式事务）
 
--- Delta Lake: Implicit transactions
--- Each INSERT, UPDATE, DELETE, MERGE is an atomic transaction
+-- ============================================================
+-- 2. Delta Lake: 每个 DML 都是原子事务
+-- ============================================================
+
+-- Delta Lake 的每个 INSERT/UPDATE/DELETE/MERGE 自动构成一个原子事务
 INSERT INTO delta_users VALUES (1, 'alice', 'alice@example.com');
--- This is a complete ACID transaction
+-- 这是一个完整的 ACID 事务: 要么完全成功，要么完全回滚
 
--- Delta Lake: Multi-table atomic operations (not natively multi-statement)
--- Use MERGE for complex operations within a single table
+UPDATE delta_users SET email = 'new@example.com' WHERE username = 'alice';
+DELETE FROM delta_users WHERE status = 'deleted';
+
+-- MERGE: 复杂操作也是单个原子事务
 MERGE INTO users AS t
 USING updates AS s
 ON t.id = s.id
@@ -27,66 +49,119 @@ WHEN MATCHED AND s.delete_flag THEN DELETE
 WHEN MATCHED THEN UPDATE SET *
 WHEN NOT MATCHED THEN INSERT *;
 
--- Delta Lake: Optimistic concurrency control
--- If two transactions conflict, one will fail and needs retry
--- Conflicts are detected at the file level
+-- Delta Lake 事务的实现机制:
+--   1. 每次写入创建新的 Parquet 数据文件（不修改已有文件）
+--   2. 在 _delta_log/ 目录下写入一个 JSON 提交文件（原子操作）
+--   3. 提交文件记录: 添加了哪些文件、删除了哪些文件、Schema 变更等
+--   4. 读取时根据事务日志确定哪些文件构成表的"当前版本"
+--
+-- 这类似于数据库的 WAL（Write-Ahead Log），但操作粒度是文件而非行。
 
--- Delta Lake: Time travel (access previous versions)
-SELECT * FROM users VERSION AS OF 5;                   -- By version number
-SELECT * FROM users TIMESTAMP AS OF '2024-01-15 10:00:00'; -- By timestamp
-SELECT * FROM users@v5;                                -- Short syntax (Databricks)
+-- ============================================================
+-- 3. Time Travel: 访问历史版本
+-- ============================================================
 
--- Delta Lake: Restore to previous version
-RESTORE TABLE users TO VERSION AS OF 5;
-RESTORE TABLE users TO TIMESTAMP AS OF '2024-01-15 10:00:00';
+-- 按版本号访问
+SELECT * FROM users VERSION AS OF 5;
 
--- Delta Lake: History (view all transactions)
+-- 按时间戳访问
+SELECT * FROM users TIMESTAMP AS OF '2024-01-15 10:00:00';
+
+-- Databricks 简写语法
+-- SELECT * FROM users@v5;
+
+-- 查看表的完整事务历史
 DESCRIBE HISTORY users;
 DESCRIBE HISTORY users LIMIT 10;
 
--- Delta Lake: Vacuum (clean up old versions)
-VACUUM users;                                          -- Default: 7-day retention
-VACUUM users RETAIN 168 HOURS;                         -- Explicit retention
+-- 回退到历史版本
+RESTORE TABLE users TO VERSION AS OF 5;
+RESTORE TABLE users TO TIMESTAMP AS OF '2024-01-15 10:00:00';
 
--- Delta Lake: Schema evolution (transactional schema changes)
--- SET spark.databricks.delta.schema.autoMerge.enabled = true;
--- ALTER TABLE users ADD COLUMNS (phone STRING);
+-- Time Travel 的设计价值:
+--   1. 数据审计: 查看表在任意时间点的状态
+--   2. 错误恢复: 误操作后 RESTORE 回到正确版本（类似数据库 PITR）
+--   3. 可重现性: 机器学习训练可以引用固定版本的数据集
+--   4. 零成本读取: 不需要锁——直接读取历史快照
+--
+-- 对比:
+--   Oracle:     Flashback Query（AS OF TIMESTAMP/SCN）——最相似的设计
+--   PostgreSQL: 无内建 Time Travel（需要 temporal tables 扩展）
+--   SQL Server: 时态表（Temporal Tables）——自动记录行级历史
+--   BigQuery:   Time Travel（7 天保留，与 Delta Lake 类似）
+--   Snowflake:  Time Travel（1-90 天保留，按版本收费）
 
--- Iceberg: ACID transactions
--- Each write operation is atomic in Iceberg
--- Iceberg uses snapshot isolation
--- SELECT * FROM catalog.db.users.snapshots;           -- View snapshots
--- SELECT * FROM catalog.db.users.history;             -- View history
--- CALL catalog.system.rollback_to_snapshot('db.users', 123456);
+-- ============================================================
+-- 4. VACUUM: 清理过期数据文件
+-- ============================================================
 
--- Savepoint-like behavior with Delta Lake:
--- 1. Check current version: DESCRIBE HISTORY users LIMIT 1;
--- 2. Make changes
--- 3. If something goes wrong: RESTORE TABLE users TO VERSION AS OF <saved_version>;
+VACUUM users;                                    -- 删除超过 7 天的旧文件
+VACUUM users RETAIN 168 HOURS;                   -- 显式指定保留期限
 
--- Write isolation levels in Delta Lake:
--- Serializable (default): Full conflict detection
--- WriteSerializable: Less strict, allows some concurrent writes
+-- VACUUM 之后，超过保留期的历史版本将不可访问（Time Travel 失效）
+-- 这是存储成本和历史可追溯性之间的 trade-off
 
--- SET delta.isolationLevel = 'Serializable';
+-- ============================================================
+-- 5. 隔离级别
+-- ============================================================
 
--- Optimistic concurrency control pattern:
--- 1. Read version N
--- 2. Compute changes based on version N
--- 3. Write changes -- Delta checks if version N is still current
--- 4. If conflict: retry from step 1
+-- Delta Lake 支持两种隔离级别:
+-- WriteSerializable（默认）: 写操作串行化，读操作快照隔离
+ALTER TABLE users SET TBLPROPERTIES ('delta.isolationLevel' = 'WriteSerializable');
 
--- Databricks: Multi-statement transactions (Unity Catalog, preview)
+-- Serializable: 更严格，读写都检查冲突
+ALTER TABLE users SET TBLPROPERTIES ('delta.isolationLevel' = 'Serializable');
+
+-- ============================================================
+-- 6. 多语句事务（Databricks，Preview）
+-- ============================================================
+
+-- Databricks 正在开发多语句事务支持:
 -- BEGIN TRANSACTION;
 -- UPDATE accounts SET balance = balance - 100 WHERE id = 1;
 -- UPDATE accounts SET balance = balance + 100 WHERE id = 2;
 -- COMMIT;
+--
+-- 这将使 Spark SQL 具备传统数据库的事务能力，但实现复杂度极高:
+-- 需要在分布式环境中协调多个表的读写集（read set / write set）
 
--- Note: Standard Spark SQL has no transaction support
--- Note: Delta Lake provides ACID through optimistic concurrency control
--- Note: Each DML operation on Delta tables is an atomic transaction
--- Note: Multi-statement transactions are NOT supported (except Databricks preview)
--- Note: Time travel allows "undo" by restoring previous versions
--- Note: Iceberg provides similar ACID guarantees with snapshots
--- Note: Hive ACID transactions exist but have significant limitations
--- Note: For cross-table atomicity, use application-level coordination
+-- ============================================================
+-- 7. Iceberg 的事务模型
+-- ============================================================
+
+-- Iceberg 也提供 ACID 事务，实现机制与 Delta Lake 不同:
+--   Delta Lake: 事务日志是 JSON 文件序列，通过文件系统原子重命名保证一致性
+--   Iceberg:    元数据通过 Catalog 的 CAS（Compare-And-Swap）操作保证一致性
+--
+-- Iceberg 的 Snapshot 隔离:
+-- SELECT * FROM catalog.db.users.snapshots;
+-- SELECT * FROM catalog.db.users.history;
+-- CALL catalog.system.rollback_to_snapshot('db.users', 123456);
+
+-- ============================================================
+-- 8. Savepoint 模拟（Delta Lake）
+-- ============================================================
+
+-- 1. 记录当前版本号
+-- DESCRIBE HISTORY users LIMIT 1;  -> version = 10
+-- 2. 执行一系列操作
+-- UPDATE users SET ...;  -- version = 11
+-- DELETE FROM users ...;  -- version = 12
+-- 3. 如果需要回退: RESTORE TABLE users TO VERSION AS OF 10;
+
+-- ============================================================
+-- 9. 版本演进
+-- ============================================================
+-- Spark 2.0: 无事务支持
+-- Delta 0.1: 单表 ACID 事务（乐观并发控制）
+-- Delta 1.0: Time Travel, RESTORE, 隔离级别
+-- Delta 2.0: Deletion Vectors（行级删除优化）
+-- Iceberg 1.0: 快照隔离, WAP 模式
+-- Databricks: 多语句事务（Preview）
+--
+-- 限制:
+--   原生 Spark SQL（Parquet/ORC）无任何事务保证
+--   Delta Lake / Iceberg 仅提供单表原子事务（无跨表事务）
+--   多语句事务仅 Databricks Preview
+--   并发写入冲突需要应用层重试
+--   VACUUM 后历史版本不可恢复

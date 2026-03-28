@@ -1,21 +1,12 @@
--- Spark SQL: 窗口函数实战分析
+-- Spark SQL: 窗口函数实战分析 (Window Analytics)
 --
 -- 参考资料:
---   [1] Apache Spark SQL Reference - Window Functions
+--   [1] Spark SQL - Window Functions
 --       https://spark.apache.org/docs/latest/sql-ref-syntax-qry-select-window.html
---   [2] Apache Spark SQL - Built-in Functions
---       https://spark.apache.org/docs/latest/api/sql/index.html
-
--- 假设表结构:
---   daily_sales(sale_date DATE, product_id INT, region STRING,
---               amount DECIMAL(10,2), quantity INT)
---   user_events(user_id BIGINT, event_time TIMESTAMP, event_type STRING, page STRING)
---   employee_salaries(emp_id INT, department STRING, salary DECIMAL(10,2), hire_date DATE)
 
 -- ============================================================
--- 1. 移动平均
+-- 1. 移动平均（Moving Average）
 -- ============================================================
-
 SELECT sale_date, amount,
        ROUND(AVG(amount) OVER (
            ORDER BY sale_date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
@@ -29,14 +20,12 @@ SELECT sale_date, amount,
 FROM daily_sales;
 
 -- ============================================================
--- 2. 同比/环比
+-- 2. 同比/环比（MoM / YoY）
 -- ============================================================
-
 WITH monthly AS (
     SELECT TRUNC(sale_date, 'MM') AS sale_month,
            SUM(amount) AS total_amount
-    FROM daily_sales
-    GROUP BY TRUNC(sale_date, 'MM')
+    FROM daily_sales GROUP BY TRUNC(sale_date, 'MM')
 )
 SELECT sale_month, total_amount,
        LAG(total_amount) OVER (ORDER BY sale_month) AS prev_month,
@@ -48,9 +37,8 @@ SELECT sale_month, total_amount,
 FROM monthly;
 
 -- ============================================================
--- 3. 占比
+-- 3. 占比分析
 -- ============================================================
-
 SELECT product_id,
        SUM(amount) AS product_total,
        ROUND(SUM(amount) / SUM(SUM(amount)) OVER () * 100, 2) AS pct_of_total
@@ -58,9 +46,8 @@ FROM daily_sales
 GROUP BY product_id;
 
 -- ============================================================
--- 4. 百分位数 / 中位数
+-- 4. 百分位数与中位数
 -- ============================================================
-
 SELECT department,
        PERCENTILE_APPROX(salary, 0.5) AS median_salary,
        PERCENTILE_APPROX(salary, ARRAY(0.25, 0.5, 0.75, 0.9, 0.99)) AS percentiles,
@@ -68,10 +55,14 @@ SELECT department,
 FROM employee_salaries
 GROUP BY department;
 
--- ============================================================
--- 5. 会话化
--- ============================================================
+-- PERCENTILE_APPROX vs PERCENTILE:
+--   PERCENTILE_APPROX: 近似算法，适合大数据集（内存 O(1)）
+--   PERCENTILE:        精确计算，需要全量排序（内存 O(n)）
+--   BigQuery 和 Snowflake 使用 APPROX_QUANTILES 提供类似功能
 
+-- ============================================================
+-- 5. 会话化分析（Sessionization）
+-- ============================================================
 WITH event_gaps AS (
     SELECT user_id, event_time, event_type,
            CASE
@@ -97,10 +88,13 @@ SELECT user_id, session_num,
 FROM sessions
 GROUP BY user_id, session_num;
 
--- ============================================================
--- 6. FIRST_VALUE / LAST_VALUE
--- ============================================================
+-- 会话化是 Spark SQL 的经典用例:
+--   30 分钟无活动 = 新会话（可配置阈值）
+--   COLLECT_LIST(event_type) 收集用户行为路径——Spark 独有能力
 
+-- ============================================================
+-- 6. FIRST_VALUE / LAST_VALUE / NTH_VALUE
+-- ============================================================
 SELECT emp_id, department, salary, hire_date,
        FIRST_VALUE(salary) OVER (
            PARTITION BY department ORDER BY hire_date
@@ -116,9 +110,8 @@ SELECT emp_id, department, salary, hire_date,
 FROM employee_salaries;
 
 -- ============================================================
--- 7. LEAD / LAG
+-- 7. LAG / LEAD 变化检测
 -- ============================================================
-
 SELECT sale_date, amount,
        LAG(amount, 1, 0) OVER (ORDER BY sale_date) AS prev_day,
        LEAD(amount, 1, 0) OVER (ORDER BY sale_date) AS next_day,
@@ -128,7 +121,6 @@ FROM daily_sales;
 -- ============================================================
 -- 8. 累计分布
 -- ============================================================
-
 SELECT emp_id, salary,
        RANK() OVER (ORDER BY salary) AS salary_rank,
        DENSE_RANK() OVER (ORDER BY salary) AS dense_rank,
@@ -138,7 +130,25 @@ SELECT emp_id, salary,
        NTILE(10) OVER (ORDER BY salary) AS decile
 FROM employee_salaries;
 
--- Spark SQL 支持 WINDOW 子句
--- 支持 ROWS, RANGE 帧
--- PERCENTILE_APPROX 适合大数据集
--- COLLECT_LIST / COLLECT_SET 用于数组聚合
+-- ============================================================
+-- 9. 命名窗口简化复杂查询
+-- ============================================================
+SELECT sale_date, amount,
+       SUM(amount) OVER w AS running_total,
+       AVG(amount) OVER w AS running_avg,
+       COUNT(*) OVER w AS running_count
+FROM daily_sales
+WINDOW w AS (ORDER BY sale_date ROWS UNBOUNDED PRECEDING);
+
+-- ============================================================
+-- 10. 版本演进
+-- ============================================================
+-- Spark 1.4: 基本窗口函数
+-- Spark 3.0: 命名窗口 (WINDOW w AS), GROUPS 帧
+-- Spark 3.1: NTH_VALUE
+-- Spark 3.3: 窗口函数性能优化
+--
+-- Spark 窗口函数的核心特色:
+--   COLLECT_LIST/COLLECT_SET 可在窗口函数上下文中使用（聚合为数组）
+--   PERCENTILE_APPROX 适合 TB 级数据的近似分位数计算
+--   分布式执行: PARTITION BY 决定 Shuffle，应尽量使用
