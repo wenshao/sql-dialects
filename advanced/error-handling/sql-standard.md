@@ -1,0 +1,58 @@
+# SQL 标准: 错误处理
+
+> 参考资料:
+> - [ISO/IEC 9075 - SQL/PSM (Persistent Stored Modules)](https://www.iso.org/standard/76584.html)
+> - [SQL:2016 Foundation - Diagnostics and Condition Handling](https://www.iso.org/standard/63556.html)
+
+## DECLARE HANDLER (SQL/PSM 标准)
+
+SQL 标准定义了 3 种处理器类型
+DECLARE CONTINUE HANDLER   -- 处理后继续执行
+DECLARE EXIT HANDLER       -- 处理后退出当前块
+DECLARE UNDO HANDLER       -- 处理后回滚并退出（很少实现）
+
+## SQLSTATE 和 SQLCODE
+
+SQL 标准使用 SQLSTATE（5 字符代码）表示状态
+'00000' = 成功
+'01xxx' = 警告
+'02000' = NOT FOUND
+'23000' = 完整性约束违反
+'40001' = 序列化失败
+'42000' = 语法错误或访问规则违反
+
+## SIGNAL / RESIGNAL (抛出/重抛异常)
+
+SIGNAL 用于主动抛出异常
+SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Custom error message';
+
+RESIGNAL 用于在处理器中修改并重新抛出异常
+RESIGNAL SET MESSAGE_TEXT = 'Modified error message';
+
+## GET DIAGNOSTICS (获取错误诊断信息)
+
+GET DIAGNOSTICS @row_count = ROW_COUNT;
+GET DIAGNOSTICS CONDITION 1
+    @sqlstate = RETURNED_SQLSTATE,
+    @message = MESSAGE_TEXT;
+
+## 标准错误处理示例 (SQL/PSM)
+
+CREATE PROCEDURE safe_insert(IN p_name VARCHAR(100))
+BEGIN
+    DECLARE duplicate_key CONDITION FOR SQLSTATE '23000';
+    DECLARE CONTINUE HANDLER FOR duplicate_key
+    BEGIN
+        -- 处理重复键
+        SIGNAL SQLSTATE '45001'
+            SET MESSAGE_TEXT = 'Duplicate entry detected';
+    END;
+
+    INSERT INTO users(name) VALUES(p_name);
+END;
+
+- **注意：SQL 标准定义了 HANDLER, SIGNAL, RESIGNAL, GET DIAGNOSTICS**
+- **注意：SQLSTATE 是标准的错误代码（5 字符字符串）**
+- **注意：各数据库对标准的实现差异较大**
+- **注意：SQL Server 使用 TRY/CATCH 而非标准的 HANDLER**
+- **注意：Oracle 使用 EXCEPTION WHEN 而非标准的 HANDLER**
