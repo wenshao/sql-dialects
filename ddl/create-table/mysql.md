@@ -6,7 +6,48 @@
 > - [MySQL 8.0 Reference Manual - AUTO_INCREMENT](https://dev.mysql.com/doc/refman/8.0/en/example-auto-increment.html)
 > - [MySQL Internals - InnoDB Row Formats](https://dev.mysql.com/doc/refman/8.0/en/innodb-row-format.html)
 
-## 基本语法
+## 语法定义 (BNF)
+
+```bnf
+CREATE [TEMPORARY] TABLE [IF NOT EXISTS] tbl_name
+    ( create_definition [, create_definition] ... )
+    [table_options]
+    [partition_options]
+
+create_definition:
+    col_name column_definition
+  | {INDEX | KEY} [index_name] (key_part, ...) [index_option] ...
+  | {FULLTEXT | SPATIAL} [INDEX | KEY] [index_name] (key_part, ...) [index_option] ...
+  | [CONSTRAINT [symbol]] PRIMARY KEY (key_part, ...) [index_option] ...
+  | [CONSTRAINT [symbol]] UNIQUE [INDEX | KEY] [index_name] (key_part, ...) [index_option] ...
+  | [CONSTRAINT [symbol]] FOREIGN KEY [index_name] (col_name, ...) reference_definition
+  | [CONSTRAINT [symbol]] CHECK (expr) [[NOT] ENFORCED]
+
+column_definition:
+    data_type [NOT NULL | NULL] [DEFAULT {literal | (expr)}]
+      [VISIBLE | INVISIBLE]
+      [AUTO_INCREMENT] [UNIQUE [KEY]] [[PRIMARY] KEY]
+      [COMMENT 'string']
+      [COLLATE collation_name]
+      [COLUMN_FORMAT {FIXED | DYNAMIC | DEFAULT}]
+      [ENGINE_ATTRIBUTE [=] 'string']
+      [reference_definition]
+      [check_constraint_definition]
+      [GENERATED ALWAYS AS (expr) [VIRTUAL | STORED]]
+
+table_options:
+    ENGINE [=] engine_name
+  | AUTO_INCREMENT [=] value
+  | [DEFAULT] CHARACTER SET [=] charset_name
+  | [DEFAULT] COLLATE [=] collation_name
+  | COMMENT [=] 'string'
+  | ROW_FORMAT [=] {DEFAULT | DYNAMIC | FIXED | COMPRESSED | REDUNDANT | COMPACT}
+  | TABLESPACE tablespace_name
+```
+
+**对引擎开发者**: 上面的 BNF 是 MySQL CREATE TABLE 的核心语法骨架。实现 MySQL 兼容 parser 时，`table_options` 中的 `ENGINE` 子句和 `column_definition` 中的 `AUTO_INCREMENT` 是 MySQL 独有的，标准 SQL 没有这些产生式。`[NOT] ENFORCED` 用于 CHECK 约束（8.0.16+）。
+
+## 基本示例
 
 ```sql
 CREATE TABLE users (
