@@ -1,305 +1,386 @@
-# 隐式与显式类型转换：引擎设计中最具争议的决策
+# 隐式与显式类型转换：各 SQL 方言转换矩阵全对比
 
 > 参考资料:
 > - [MySQL 8.0 - Type Conversion in Expression Evaluation](https://dev.mysql.com/doc/refman/8.0/en/type-conversion.html)
-> - [PostgreSQL - Type Conversion](https://www.postgresql.org/docs/current/typeconv.html)
 > - [PostgreSQL - pg_cast System Catalog](https://www.postgresql.org/docs/current/catalog-pg-cast.html)
+> - [PostgreSQL - Type Conversion](https://www.postgresql.org/docs/current/typeconv.html)
+> - [SQL Server - Data Type Conversion](https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-type-conversion-database-engine)
 > - [SQL Server - Data Type Precedence](https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-type-precedence-transact-sql)
-> - [Oracle - Datatype Comparison Rules](https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements002.htm)
+> - [Oracle - Implicit and Explicit Data Conversion](https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements002.htm)
 > - [BigQuery - Conversion Rules](https://cloud.google.com/bigquery/docs/reference/standard-sql/conversion_rules)
-> - [Spark SQL - ANSI Compliance](https://spark.apache.org/docs/latest/sql-ref-ansi-compliance.html)
-> - [ClickHouse - Type Conversion Functions](https://clickhouse.com/docs/sql-reference/functions/type-conversion-functions)
 > - [Snowflake - Data Type Conversion](https://docs.snowflake.com/en/sql-reference/data-type-conversion)
+> - [ClickHouse - Type Conversion Functions](https://clickhouse.com/docs/sql-reference/functions/type-conversion-functions)
+> - [Hive - Language Manual Types](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types)
+> - [Spark SQL - ANSI Compliance](https://spark.apache.org/docs/latest/sql-ref-ansi-compliance.html)
 
-隐式类型转换的宽松程度是 SQL 引擎设计中最具争议的决策之一。MySQL 的 `'abc' = 0` 返回 TRUE 是臭名昭著的安全隐患，PostgreSQL 的 `'1' + 2` 直接报错又让初学者困惑。每个引擎都在"方便"和"安全"之间做出了不同的取舍，理解这些取舍是引擎开发者的必修课。
+隐式类型转换的宽松程度是 SQL 引擎设计中最具争议的决策之一。本文为每个主要 SQL 方言提供完整的二维类型转换矩阵，方便横向对比各引擎的差异。
 
-## 隐式转换的危险：真实的生产事故
+**图例说明**（适用于所有矩阵）:
 
-### MySQL `'abc' = 0` 返回 TRUE
-
-MySQL 最臭名昭著的行为：当字符串和数字比较时，MySQL 将字符串转为 DOUBLE。非数字字符串转为 `0`。
-
-```sql
--- MySQL
-SELECT 0 = 'abc';     -- 1 (TRUE! 'abc' 转为 0.0)
-SELECT 1 > '6x';      -- 0 ('6x' 转为 6.0)
-SELECT 0 = 'x6';      -- 1 ('x6' 转为 0.0)
-SELECT '42abc' + 0;    -- 42 (取前导数字部分)
-```
-
-MySQL 8.0 官方文档（Section 14.3）明确说明规则：*"In all other cases, the arguments are compared as floating-point (double-precision) numbers."*
-
-**安全漏洞实例**：如果表有 `session_id INT` 列，查询 `WHERE session_id = '929f9152-78aa-4a56-be59-...'`（UUID），MySQL 将 UUID 字符串转为数字 `929`（解析到第一个非数字字符停止），匹配到 session ID 929。这是一个已被记录的真实认证绕过向量。
-
-> 来源: [Implicit type conversion in MySQL - tom.vg](https://tom.vg/2013/04/mysql-implicit-type-conversion/)
-
-### 索引失效：隐式转换的性能陷阱
-
-当 WHERE 子句比较 VARCHAR 列和数字字面量时：
-
-```sql
--- MySQL / SQL Server / Oracle
-WHERE varchar_col = 12345
-```
-
-引擎将每行的 `varchar_col` 转为数字进行比较（因为多个不同字符串可能转为同一个数字：`'1'`、`' 1'`、`'1a'` 都变成 `1`）。这意味着 `varchar_col` 上的索引**无法使用**，强制全表扫描。
-
-SQL Server 的数据类型优先级规则也会导致同样的问题：INT 优先级高于 VARCHAR，所以 `WHERE varchar_col = 123` 会将列值转为 INT——索引失效。
-
-> 来源: [MySQL Bug #83857](https://bugs.mysql.com/bug.php?id=83857), [SQL Server Data Type Precedence and Implicit Conversions](https://bertwagner.com/posts/data-type-precedence-and-implicit-conversions)
-
-### Oracle `'' = NULL`：迁移噩梦
-
-Oracle 将零长度 VARCHAR2 字符串视为 NULL，这违反 SQL 标准（标准明确定义 `''` 和 NULL 是不同的值）。
-
-```sql
--- Oracle
-SELECT CASE WHEN '' IS NULL THEN 'YES' ELSE 'NO' END FROM DUAL;  -- YES
-```
-
-Oracle 文档中至今保留着这句警告：*"Oracle Database currently treats a character value with a length of zero as null. However, this may not continue to be true in future releases."* 这个警告从 Oracle 7 开始就存在了——20 多年没改。
-
-**迁移影响**：从 Oracle 迁移到 PostgreSQL / MySQL 时，每个 `WHERE col = ''` 都必须重写为 `WHERE col IS NULL`，每个 `WHERE col != ''` 都必须重写为 `WHERE col IS NOT NULL`。
-
-### 大整数精度丢失
-
-```sql
--- MySQL
-SELECT '9223372036854775807' = 9223372036854775806;  -- 1 (TRUE, 错误!)
--- 两个值都转为 DOUBLE，超过 2^53 精度丢失
-```
-
-MySQL 文档明确警告此问题，建议使用 `CAST(... AS UNSIGNED)` 进行大整数比较。
-
-## 各引擎隐式转换严格度谱系
-
-从最宽松到最严格：
-
-| 严格度 | 引擎 | `'abc'+0` | `0='abc'` | `'42'+1` | 设计哲学 |
-|--------|------|-----------|-----------|----------|---------|
-| 1 最松 | **SQLite** | `0` | `FALSE`* | `43` | 动态类型，类型属于值而非列 |
-| 2 | **MySQL** | `0` | `TRUE` | `43` | 方便优先，极度宽松 |
-| 3 | **Hive** | `0.0` | — | `43.0` | 隐式转为 DOUBLE |
-| 4 | **SQL Server** | `ERROR` | `ERROR` | `43` | 有优先级规则，但字符串可转数字 |
-| 5 | **Oracle** | `ERROR` | `ERROR` | `43` | VARCHAR2→NUMBER 隐式转换 |
-| 6 | **Snowflake** | `ERROR` | `ERROR` | `43` | 可隐式转换但非数字字符串报错 |
-| 7 | **Spark (ANSI)** | `ERROR` | `ERROR` | `ERROR` | 4.0 起默认 ANSI 严格模式 |
-| 8 | **BigQuery** | `ERROR` | `ERROR` | `ERROR` | 超类型推导，不做跨类算术隐式转换 |
-| 9 | **ClickHouse** | `ERROR` | `ERROR` | `ERROR` | 无隐式 STRING→NUMBER 转换 |
-| 10 最严 | **PostgreSQL** | `ERROR` | `ERROR` | `ERROR` | 8.3 起移除了大量隐式转换 |
-
-*注：SQLite 的 `0='abc'` 返回 FALSE 是因为 SQLite 的跨类型比较规则（数字 < 文本 < blob），而非类型转换。
-
-**关键历史事件**：PostgreSQL 8.3（2008）是分水岭——移除了之前存在的 `text → integer` 等隐式转换。虽然导致大量应用报错，但长期来看大幅减少了隐式转换导致的 bug。
-
-> 来源: [Peter Eisentraut - Readding implicit casts in PostgreSQL 8.3](http://petereisentraut.blogspot.com/2008/03/readding-implicit-casts-in-postgresql.html)
-
-## 类型提升规则对比
-
-类型提升（type promotion）决定了两个不同类型参与运算时结果是什么类型。
-
-### INT + FLOAT
-
-| 引擎 | `1 + 1.5` 的结果类型 | 说明 |
-|------|---------------------|------|
-| PostgreSQL | `NUMERIC` | INT 提升为 NUMERIC（不是 FLOAT，避免精度丢失） |
-| MySQL | `DOUBLE` | 混合算术统一转 DOUBLE |
-| Oracle | `NUMBER` | Oracle NUMBER 是任意精度 |
-| SQL Server | `NUMERIC` | DECIMAL/NUMERIC 优先级高于 INT |
-| BigQuery | `FLOAT64` | INT64 提升为 FLOAT64 |
-| ClickHouse | `Float64` | 小类型提升为大类型 |
-| Spark SQL | `DOUBLE` | Float 被跳过，直接到 DOUBLE 避免精度丢失 |
-| Snowflake | `NUMBER` | 所有整数内部都是 NUMBER(38,0) |
-
-### INT / INT 整数除法——最大的跨引擎陷阱
-
-| 引擎 | `SELECT 1/3` | 结果 | 说明 |
-|------|-------------|------|------|
-| **PostgreSQL** | `0` | 整数截断 | 需要 `1::float/3` 得到 0.333 |
-| **SQL Server** | `0` | 整数截断 | 需要 `CAST(1 AS FLOAT)/3` |
-| **Spark SQL** | `0` | 整数截断（ANSI 模式） | INT/INT = INT |
-| **MySQL** | `0.3333` | 返回 DECIMAL | `/` 做十进制除法；`DIV` 做整数除法 |
-| **Oracle** | `0.333...` | NUMBER 除法 | Oracle NUMBER 处理 |
-| **BigQuery** | `0.333...` | FLOAT64 | 除法总是返回 FLOAT64 |
-| **Snowflake** | `0.333...` | NUMBER | 十进制除法 |
-| **ClickHouse** | `0.333...` | Float64 | 除法返回浮点 |
-
-这是**最危险的跨引擎差异之一**。从 MySQL/BigQuery 迁移到 PostgreSQL/SQL Server 时，所有整数除法的结果都会变化。金融计算中这可能导致严重的精度问题。
-
-### STRING + INT
-
-| 行为 | 引擎 |
+| 符号 | 含义 |
 |------|------|
-| 返回 `43` | MySQL, Oracle, SQL Server, Snowflake, Hive |
-| 报错 | PostgreSQL, BigQuery, ClickHouse, Spark (ANSI) |
-| 返回 NULL | Spark (Hive 模式，转换失败时) |
-
-**引擎开发者的选择**：推荐报错。MySQL 的 `'abc' + 0 = 0` 行为已经被证明是安全隐患。
-
-## 转换矩阵设计：PostgreSQL 的三级体系
-
-PostgreSQL 通过 `pg_cast` 系统表定义了最正式的类型转换架构。每个类型转换注册时指定 `castcontext`：
-
-| 级别 | castcontext | 触发条件 | 设计原则 | 示例 |
-|------|-------------|---------|---------|------|
-| **隐式 (Implicit)** | `'i'` | 任何表达式上下文自动触发 | 仅限**无损**转换，同类型族内 | `int2 → int4`, `int4 → int8` |
-| **赋值 (Assignment)** | `'a'` | 仅在 INSERT/UPDATE 赋值时自动触发 | 可能截断但语义合理 | `varchar(10) → varchar(5)`, `timestamp → date` |
-| **显式 (Explicit)** | `'e'` | 必须使用 `CAST()` 或 `::` | 可能丢失信息或格式变化 | `text → integer`, `float8 → int4` |
-
-```sql
--- 查看 integer 类型的所有注册转换
-SELECT castsource::regtype, casttarget::regtype, castcontext
-FROM pg_cast
-WHERE castsource = 'integer'::regtype;
-```
-
-PostgreSQL 官方准则：*"A good rule of thumb is that implicit casts should never have surprising behaviors... information-preserving transformations between types in the same general type category."*
-
-**可扩展性**：自定义类型（PostGIS `GEOMETRY`、pgvector `VECTOR`）通过 `CREATE CAST ... AS IMPLICIT/ASSIGNMENT` 注册自己的转换规则。这是 PostgreSQL 类型系统的核心架构优势。
-
-> 来源: [PostgreSQL pg_cast Catalog](https://www.postgresql.org/docs/current/catalog-pg-cast.html), [PostgreSQL CREATE CAST](https://www.postgresql.org/docs/current/sql-createcast.html)
-
-### SQL Server 的数据类型优先级
-
-SQL Server 使用线性优先级列表决定隐式转换方向（高优先级部分）：
-
-```
-datetimeoffset > datetime2 > datetime > date > time
-> float > real > decimal > money
-> bigint > int > smallint > tinyint > bit
-> nvarchar > nchar > varchar > char
-```
-
-当两个不同类型参与运算时，低优先级类型转为高优先级类型。这就是为什么 `WHERE varchar_col = 123` 会将 varchar 列转为 int（int 优先级高于 varchar）——导致索引失效。
-
-> 来源: [SQL Server Data Type Precedence](https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-type-precedence-transact-sql)
-
-### Spark SQL 的双模式系统
-
-Spark SQL 通过 `spark.sql.ansi.enabled` 切换两套转换规则（4.0 起默认 `true`）：
-
-| 行为 | ANSI 模式（严格） | Hive 模式（宽松） |
-|------|------------------|------------------|
-| `CAST('a' AS INT)` | 抛出 `SparkNumberFormatException` | 返回 `NULL` |
-| `2147483647 + 1` | 抛出 `SparkArithmeticException` | 返回 `-2147483648`（静默溢出） |
-| 类型提升 | 严格的类型优先级列表 | 宽松，自动提升 |
-
-**类型提升优先级**（ANSI 模式）：
-
-```
-Byte → Short → Int → Long → Decimal → Float* → Double
-Date → Timestamp_NTZ → Timestamp
-```
-
-*注：Float 在最小公共类型推导中被跳过，直接到 Double，避免精度丢失。
-
-> 来源: [Spark SQL ANSI Compliance](https://spark.apache.org/docs/latest/sql-ref-ansi-compliance.html)
-
-## TRY_CAST / SAFE_CAST：安全转换设计
-
-转换失败时返回 NULL 而非报错——ETL / 数据清洗场景中必不可少。
-
-| 引擎 | 语法 | 引入版本 |
-|------|------|---------|
-| **SQL Server** | `TRY_CAST(expr AS type)`, `TRY_CONVERT(type, expr)` | 2012 |
-| **BigQuery** | `SAFE_CAST(expr AS type)`, `SAFE.函数名()` | 标准 SQL 发布即支持 |
-| **Snowflake** | `TRY_CAST(expr AS type)`, `TRY_TO_NUMBER()`, `TRY_TO_DATE()` | GA |
-| **Trino** | `TRY_CAST(expr AS type)`, `TRY(expression)` | 早期版本（继承自 Presto） |
-| **DuckDB** | `TRY_CAST(expr AS type)` | 0.8.0+ |
-| **Databricks** | `TRY_CAST(expr AS type)`, `TRY_TO_NUMBER()` | Runtime 11.2+ |
-| **Spark** | `TRY_CAST(expr AS type)` | 4.0（Databricks 更早支持） |
-| **Flink** | `TRY_CAST(expr AS type)` | 1.15+ |
-| **ClickHouse** | `toInt32OrNull(expr)`, `toInt32OrZero(expr)` | 早期版本 |
-| **Oracle** | `VALIDATE_CONVERSION(expr AS type)` 返回 0/1 | 12c Release 2 |
-| **PostgreSQL** | 无内置，需自定义 PL/pgSQL 函数 + `EXCEPTION WHEN` | — |
-| **MySQL** | 无内置，需 `CASE + REGEXP` 模拟 | — |
-
-**设计对比:**
-
-- **BigQuery `SAFE.` 前缀**是最优雅的设计——作为通用修饰符适用于任何函数：`SAFE.PARSE_DATE(...)`、`SAFE.LOG(0)` 等。不仅限于类型转换
-- **Trino `TRY(expression)`** 类似，但用函数语法：`TRY(CAST(x AS INT))` 等价于 `TRY_CAST(x AS INT)`
-- **ClickHouse `OrNull/OrZero` 后缀**风格独特：`toInt32OrNull('abc')` 返回 NULL，`toInt32OrZero('abc')` 返回 0
-
-**对引擎开发者**：推荐从第一天就支持 TRY_CAST——后期添加需要在整个表达式求值路径中加入错误捕获机制，改造成本高。BigQuery 的 `SAFE.` 前缀模式值得借鉴，但实现复杂度更高。
-
-## 已知的生产陷阱
-
-### 1. MySQL UUID 匹配——认证绕过
-
-```sql
--- 表: session_id INT
-WHERE session_id = '929f9152-78aa-4a56-be59-df3241e4a16e'
--- MySQL 将 UUID 转为 929，匹配到 session_id = 929
-```
-
-### 2. Hive DECIMAL-STRING 比较 Bug
-
-Apache Hive JIRA [HIVE-24528](https://issues.apache.org/jira/browse/HIVE-24528) 记录了 DECIMAL 和 STRING 隐式转换产生错误比较结果的 bug。
-
-### 3. Spark Hive 模式静默溢出
-
-```sql
--- spark.sql.ansi.enabled=false
-SELECT 2147483647 + 1;  -- 返回 -2147483648 (静默整数溢出)
--- spark.sql.ansi.enabled=true (4.0 默认)
--- 抛出 SparkArithmeticException
-```
-
-### 4. SQL Server 参数嗅探 + 隐式转换
-
-当 `WHERE nvarchar_col = @varchar_param` 时，SQL Server 将参数转为 nvarchar（高优先级），索引可用。但 `WHERE varchar_col = @nvarchar_param` 时，列被转换，索引失效。参数类型的微小差异导致执行计划巨变。
-
-## 对引擎开发者的设计建议
-
-### 1. 推荐的转换规则设计
-
-```
-               三级分类（借鉴 PostgreSQL）
-               ┌─────────────────────────────┐
-  隐式 (Implicit)  │ 仅限同族无损转换              │
-  ─────────────────┤ int8→int16→int32→int64→decimal │
-                   │ float32→float64               │
-               ├─────────────────────────────┤
-  赋值 (Assignment)│ INSERT/UPDATE 时允许          │
-  ─────────────────┤ varchar(100)→varchar(50)       │
-                   │ timestamp→date                 │
-               ├─────────────────────────────┤
-  显式 (Explicit)  │ 必须 CAST()                   │
-  ─────────────────┤ string→int, float→int          │
-                   │ date→string                    │
-               └─────────────────────────────┘
-```
-
-### 2. 核心原则
-
-| 原则 | 说明 | 反面教材 |
-|------|------|---------|
-| **隐式转换必须无损** | 只在同类型族内提升，不允许跨类型族隐式转换 | MySQL `STRING→DOUBLE` |
-| **比较时转常量，不转列** | `WHERE int_col = '123'` 应转 `'123'` 为 int，而非 `int_col` 转 string | SQL Server 按优先级转列值，索引失效 |
-| **除法行为必须明确** | INT/INT 的结果类型在设计之初就确定，不能模糊 | PostgreSQL 返回 0，MySQL 返回 0.33——迁移灾难 |
-| **TRY_CAST 从第一天支持** | 后期添加需要改造整个表达式求值路径 | PostgreSQL/MySQL 至今无原生 TRY_CAST |
-| **转换矩阵完整文档化** | 每对类型组合都有明确分类：隐式/赋值/显式/禁止 | 未文档化的边界情况导致不可预测行为 |
-
-### 3. 推荐的数值类型提升路径
-
-```
-INT8 → INT16 → INT32 → INT64 → DECIMAL → FLOAT32 → FLOAT64
-                                   ↑
-                              推荐在这里截断隐式提升
-                              DECIMAL→FLOAT 应该需要显式 CAST
-                              （因为浮点精度丢失不可逆）
-```
-
-### 4. 关于兼容模式
-
-如果引擎需要兼容 MySQL（如 TiDB、OceanBase），隐式转换行为必须可通过 SQL 模式切换：
-
-- **严格模式**（推荐默认）：类似 PostgreSQL，跨类型比较报错
-- **兼容模式**：复现 MySQL 的 `STRING→DOUBLE` 隐式转换，用于迁移过渡
-- 每条 SQL 执行时的 `sql_mode` 应影响类型转换行为
-
-TiDB 的实践值得参考：默认开启严格模式，但提供 `tidb_enable_strict_double_type_check` 等细粒度开关。
+| **I** | 隐式转换（Implicit）——自动完成，无需 CAST |
+| **A** | 赋值转换（Assignment）——仅在 INSERT/UPDATE 时自动，表达式中需要 CAST |
+| **E** | 显式转换（Explicit）——必须使用 CAST / :: / TO_*() |
+| **X** | 不允许转换 |
+| **I!** | 隐式但有陷阱（数据丢失、精度损失、或行为诡异） |
 
 ---
 
-*注：本页信息均来自各引擎官方文档和已发表的技术分析。具体行为可能随版本变化，建议以目标版本的官方文档为准。*
+## 一、各方言转换矩阵
+
+### 1. MySQL 8.0
+
+MySQL 是**最宽松**的传统 RDBMS。核心规则：当字符串和数字比较时，双方都转为 DOUBLE——这是 `'abc' = 0` 返回 TRUE 的根源。
+
+> 来源: [MySQL 8.0 Type Conversion in Expression Evaluation](https://dev.mysql.com/doc/refman/8.0/en/type-conversion.html)
+
+| Source ↓ \ Target → | INT | BIGINT | FLOAT | DOUBLE | DECIMAL | VARCHAR | DATE | DATETIME | TIMESTAMP | BOOL | JSON |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| **INT** | - | I | I | I | I | I! | X | X | X | I! | E |
+| **BIGINT** | I! | - | I! | I! | I | I! | X | X | X | I! | E |
+| **FLOAT** | I! | I! | - | I | I! | I! | X | X | X | I! | E |
+| **DOUBLE** | I! | I! | I! | - | I! | I! | X | X | X | I! | E |
+| **DECIMAL** | I! | I! | I! | I | - | I! | X | X | X | I! | E |
+| **VARCHAR** | **I!** | **I!** | **I!** | **I!** | **I!** | - | I! | I! | I! | I! | E |
+| **DATE** | X | X | X | X | X | I | - | I | I | X | E |
+| **DATETIME** | X | X | X | X | X | I | I! | - | I | X | E |
+| **TIMESTAMP** | X | X | X | X | X | I | I! | I | - | X | E |
+| **BOOL** | I | I | I | I | I | I! | X | X | X | - | E |
+| **JSON** | E | E | E | E | E | E | E | E | E | E | - |
+
+**MySQL 的关键陷阱:**
+
+- **VARCHAR → 数字 = I!（危险的隐式转换）**: `'abc'` 转为 `0`，`'42abc'` 转为 `42`。`SELECT 0 = 'abc'` 返回 `1`（TRUE）
+- **BOOL = TINYINT(1)**: 不是真正的布尔类型，`42` 也是合法的 BOOLEAN 值
+- **大整数精度丢失**: `'9223372036854775807' = 9223372036854775806` 返回 TRUE（两边都转为 DOUBLE，超过 2^53 精度丢失）
+- **DATE + 0 = 数字**: `CURDATE() + 1` 返回 `20240116`（不是"明天"，只是数字+1）
+- **JSON 是孤岛**: 进出都需要显式转换，这反而是好设计
+- **严格模式影响 INSERT**: `STRICT_TRANS_TABLES` 下 `INSERT INTO t(int_col) VALUES('abc')` 报错；非严格模式下静默插入 `0`
+
+### 2. PostgreSQL
+
+PostgreSQL 是**最严格**的传统 RDBMS。8.3 版本（2008）是分水岭——移除了 `text → integer` 等隐式转换。通过 `pg_cast` 系统表的 `castcontext` 字段定义三级转换。
+
+> 来源: [PostgreSQL pg_cast Catalog](https://www.postgresql.org/docs/current/catalog-pg-cast.html)
+
+| Source ↓ \ Target → | INTEGER | BIGINT | FLOAT8 | NUMERIC | TEXT | DATE | TIMESTAMP | BOOLEAN | JSONB |
+|---|---|---|---|---|---|---|---|---|---|
+| **INTEGER** | - | **I** | **I** | **I** | A | X | X | E | X |
+| **BIGINT** | A | - | **I** | **I** | A | X | X | E | X |
+| **FLOAT8** | A | A | - | A | A | X | X | X | X |
+| **NUMERIC** | A | A | **I** | - | A | X | X | X | X |
+| **TEXT** | **E** | **E** | **E** | **E** | - | **E** | **E** | **E** | **E** |
+| **DATE** | X | X | X | X | A | - | **I** | X | X |
+| **TIMESTAMP** | X | X | X | X | A | A | - | X | X |
+| **BOOLEAN** | E | E | X | X | A | X | X | - | X |
+| **JSONB** | X | X | X | X | A | X | X | X | - |
+
+**PostgreSQL 的关键规则:**
+
+- **TEXT → 任何类型 = E（始终需要显式 CAST）**: `SELECT '1' + 2` 直接报错 `ERROR: operator does not exist: text + integer`
+- **数字族内无损提升 = I**: `int → bigint → numeric → float8` 都是隐式的
+- **可能丢失精度 = A**: `bigint → int`、`float8 → int` 只在 INSERT/UPDATE 时允许
+- **DATE → TIMESTAMP = I**: 加上午夜时间，无损
+- **TIMESTAMP → DATE = A**: 截断时间部分，仅赋值时允许
+- **BOOLEAN ↔ INTEGER = E**: 不像 C 语言自动转换
+- **可扩展**: 自定义类型通过 `CREATE CAST ... AS IMPLICIT/ASSIGNMENT` 注册转换规则
+
+### 3. Oracle
+
+Oracle 介于 MySQL 和 PostgreSQL 之间。VARCHAR2 → NUMBER 在比较中是隐式的，但非数字字符串运行时报错（不像 MySQL 静默转为 0）。
+
+> 来源: [Oracle SQL Language Reference - Data Type Comparison Rules](https://docs.oracle.com/cd/B19306_01/server.102/b14200/sql_elements002.htm)
+
+| Source ↓ \ Target → | NUMBER | BINARY_FLOAT | VARCHAR2 | DATE | TIMESTAMP | BOOLEAN(23c) |
+|---|---|---|---|---|---|---|
+| **NUMBER** | - | I | **I** | X | X | X |
+| **BINARY_FLOAT** | I | - | **I** | X | X | X |
+| **VARCHAR2** | **I** | **I** | - | **I** | **I** | X |
+| **DATE** | X | X | **I** | - | I | X |
+| **TIMESTAMP** | X | X | **I** | I | - | X |
+| **BOOLEAN(23c)** | I | X | I | X | X | - |
+
+**Oracle 的关键特性:**
+
+- **VARCHAR2 → NUMBER = I**: `WHERE number_col = '42'` 无需 CAST。但 `'abc'` 运行时抛 ORA-01722
+- **VARCHAR2 → DATE = I**: 依赖 `NLS_DATE_FORMAT` 会话参数，格式因环境而异——强大但危险
+- **'' = NULL**: Oracle 将零长度 VARCHAR2 视为 NULL。`WHERE col = ''` 等价于 `WHERE col IS NULL`——违反 SQL 标准
+- **NUMBER 是统一类型**: INTEGER、BIGINT、DECIMAL 都是 `NUMBER(p,s)` 的别名，内部转换始终隐式
+
+### 4. SQL Server
+
+SQL Server 使用**数据类型优先级**决定转换方向：低优先级类型转为高优先级类型。几乎所有数字↔字符串转换都是隐式的。
+
+> 来源: [SQL Server Data Type Precedence](https://learn.microsoft.com/en-us/sql/t-sql/data-types/data-type-precedence-transact-sql)
+
+| Source ↓ \ Target → | INT | BIGINT | FLOAT | DECIMAL | VARCHAR | DATE | DATETIME2 | BIT |
+|---|---|---|---|---|---|---|---|---|
+| **INT** | - | I | I | I | **I** | X | X | I |
+| **BIGINT** | I | - | I | I | **I** | X | X | I |
+| **FLOAT** | I | I | - | I | **I** | X | X | I |
+| **DECIMAL** | I | I | I | - | **I** | X | X | I |
+| **VARCHAR** | **I** | **I** | **I** | **I** | - | **I** | **I** | **I** |
+| **DATE** | X | X | X | X | **I** | - | I | X |
+| **DATETIME2** | X | X | X | X | **I** | I | - | X |
+| **BIT** | I | I | I | I | **I** | X | X | - |
+
+**SQL Server 的关键陷阱:**
+
+- **VARCHAR → INT = I（按优先级转列值）**: `WHERE varchar_col = 123`，INT 优先级高于 VARCHAR，所以列值被转为 INT——**索引失效**
+- **VARCHAR ↔ DATE = I**: 识别多种日期格式（`'2024-01-15'`、`'Jan 15 2024'`、`'20240115'`）
+- **BIT 即 BOOLEAN**: 与所有数字和字符串类型隐式互转
+- **NVARCHAR vs VARCHAR**: `WHERE varchar_col = N'text'`（NVARCHAR 参数），NVARCHAR 优先级更高，但此时是参数被转换，索引可用
+
+### 5. BigQuery
+
+BigQuery 非常严格——只有数字族内的向上提升是隐式的，跨类型一律需要 CAST。
+
+> 来源: [BigQuery Conversion Rules](https://cloud.google.com/bigquery/docs/reference/standard-sql/conversion_rules)
+
+| Source ↓ \ Target → | INT64 | FLOAT64 | NUMERIC | STRING | BOOL | DATE | TIMESTAMP | JSON |
+|---|---|---|---|---|---|---|---|---|
+| **INT64** | - | E | E | E | E | X | X | E |
+| **FLOAT64** | E | - | E | E | X | X | X | E |
+| **NUMERIC** | E | E | - | E | X | X | X | E |
+| **STRING** | E | E | E | - | E | E | E | E |
+| **BOOL** | E | X | X | E | - | X | X | X |
+| **DATE** | X | X | X | E | X | - | E | X |
+| **TIMESTAMP** | X | X | X | E | X | E | - | X |
+| **JSON** | E | E | E | E | E | X | X | - |
+
+**隐式提升（仅限超类型解析，用于 UNION/CASE/IF/COALESCE）:**
+
+| 类型 A | 类型 B | 超类型 |
+|--------|--------|--------|
+| INT64 | FLOAT64 | FLOAT64 |
+| INT64 | NUMERIC | NUMERIC |
+| NUMERIC | FLOAT64 | FLOAT64 |
+| STRING | 任何非 STRING | **无超类型（报错）** |
+
+**BigQuery 的关键特性:**
+
+- **几乎全部需要显式 CAST**: `'42' + 1` 报错，必须 `CAST('42' AS INT64) + 1`
+- **SAFE_CAST**: 转换失败返回 NULL。`SAFE.` 前缀可用于任何函数（如 `SAFE.PARSE_DATE(...)`）——最优雅的安全转换设计
+- **STRING ↔ 任何非 STRING 无超类型**: UNION 中 `SELECT 1 UNION ALL SELECT 'a'` 直接报错
+
+### 6. Snowflake
+
+Snowflake 介于中等严格度。VARIANT 类型是"万能供体"，可隐式转为几乎所有标量类型。
+
+> 来源: [Snowflake Data Type Conversion](https://docs.snowflake.com/en/sql-reference/data-type-conversion)
+
+| Source ↓ \ Target → | NUMBER | FLOAT | VARCHAR | BOOLEAN | DATE | TIMESTAMP_NTZ | VARIANT |
+|---|---|---|---|---|---|---|---|
+| **NUMBER** | - | E | E | E | X | X | E |
+| **FLOAT** | E | - | E | E | X | X | E |
+| **VARCHAR** | E | E | - | E | E | E | E |
+| **BOOLEAN** | E | **I** | **I** | - | X | X | **I** |
+| **DATE** | X | X | **I** | X | - | **I** | E |
+| **TIMESTAMP_NTZ** | X | X | **I** | X | I | - | E |
+| **VARIANT** | **I** | **I** | **I** | **I** | **I** | **I** | - |
+
+**Snowflake 的关键特性:**
+
+- **VARIANT 隐式转出**: 运行时根据实际值类型自动转换，值不兼容时报错
+- **BOOLEAN → FLOAT/VARCHAR = I**: `TRUE` → `1.0` / `'true'`
+- **DATE → TIMESTAMP = I**: 添加午夜时间
+- **VARCHAR → NUMBER = E**: 不像 MySQL/Oracle 那样隐式转换
+- **TRY_CAST / TRY_TO_*()**: 失败返回 NULL
+- **三种语法**: `CAST(x AS type)` / `x::type` / `TO_TYPE(x)` 等价
+
+### 7. ClickHouse
+
+ClickHouse 是**最严格的分析引擎**。隐式转换仅限算术运算中的数字族提升，遵循 C++ 类型提升规则。
+
+> 来源: [ClickHouse Type Conversion Functions](https://clickhouse.com/docs/sql-reference/functions/type-conversion-functions)
+
+| Source ↓ \ Target → | Int32 | Int64 | Float64 | Decimal | String | Date | DateTime | Bool |
+|---|---|---|---|---|---|---|---|---|
+| **Int32** | - | I(算术) | I(算术) | E | E | X | X | E |
+| **Int64** | E | - | I(算术) | E | E | X | X | E |
+| **Float64** | E | E | - | **X!** | E | X | X | E |
+| **Decimal** | E | E | **X!** | - | E | X | X | X |
+| **String** | E | E | E | E | - | E | E | E |
+| **Date** | X | X | X | X | E | - | E | X |
+| **DateTime** | X | X | X | X | E | E | - | X |
+| **Bool** | E | E | E | X | E | X | X | - |
+
+**X!** = **Decimal ↔ Float 被禁止**: `SELECT toDecimal64(1.5, 2) + toFloat64(1.0)` 直接报错，必须先显式转换一侧。
+
+**ClickHouse 的关键特性:**
+
+- **无隐式 STRING ↔ 数字转换**: `'42' + 1` 报错
+- **算术提升遵循 C++ 规则**: `Int8 + Int32 → Int64`，`Int32 + Float32 → Float64`
+- **首选语法**: `toInt64(x)` / `toFloat64(x)` / `toString(x)` 而非 CAST
+- **安全变体**: 每个 `toType()` 都有 `toTypeOrNull()` 和 `toTypeOrZero()` 版本
+- **Decimal ↔ Float 禁止隐式**: 必须显式选择精度模型，防止意外精度丢失
+
+### 8. Hive
+
+Hive 在大数据引擎中相对宽松。隐式转换沿着数字提升链单向进行。CAST 失败返回 NULL（不报错），因此不需要 TRY_CAST。
+
+> 来源: [Hive Language Manual - Types](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Types)
+
+| Source ↓ \ Target → | TINYINT | INT | BIGINT | FLOAT | DOUBLE | DECIMAL | STRING | DATE | TIMESTAMP | BOOLEAN |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **TINYINT** | - | I | I | I | I | I | I | X | X | X |
+| **INT** | X | - | I | I | I | I | I | X | X | X |
+| **BIGINT** | X | X | - | I | I | I | I | X | X | X |
+| **FLOAT** | X | X | X | - | I | I | I | X | X | X |
+| **DOUBLE** | X | X | X | X | - | I | I | X | X | X |
+| **DECIMAL** | X | X | X | X | X | - | I | X | X | X |
+| **STRING** | X | X | X | X | **I** | **I** | - | X | X | X |
+| **DATE** | X | X | X | X | X | X | I | - | X | X |
+| **TIMESTAMP** | X | X | X | X | X | X | I | X | - | X |
+| **BOOLEAN** | X | X | X | X | X | X | X | X | X | - |
+
+**Hive 的关键特性:**
+
+- **单向提升链**: `TINYINT → SMALLINT → INT → BIGINT → FLOAT → DOUBLE → DECIMAL → STRING`
+- **STRING → DOUBLE/DECIMAL = I**: 字符串在算术上下文隐式转为 DOUBLE
+- **STRING → INT/BIGINT = X**: 不能直接隐式转为整数（必须先到 DOUBLE 再截断）
+- **BOOLEAN 完全孤立**: 不能隐式转为任何其他类型
+- **CAST 失败 = NULL**: Hive 的 CAST 永远不会报错，失败直接返回 NULL
+- **DATE ↛ TIMESTAMP**: 日期不能隐式转为时间戳（与 PostgreSQL/Snowflake 不同）
+
+### 9. Spark SQL（ANSI 模式 vs Hive 模式）
+
+Spark SQL 有两套转换规则。4.0 起默认 ANSI 严格模式。
+
+> 来源: [Spark SQL ANSI Compliance](https://spark.apache.org/docs/latest/sql-ref-ansi-compliance.html)
+
+**ANSI 模式**（`spark.sql.ansi.enabled=true`，4.0 默认）:
+
+| Source ↓ \ Target → | Int | Long | Float | Double | Decimal | String | Date | Timestamp | Boolean |
+|---|---|---|---|---|---|---|---|---|---|
+| **Int** | - | I | I | I | I | A | X | X | X |
+| **Long** | A | - | I | I | I | A | X | X | X |
+| **Float** | A | A | - | I | A | A | X | X | X |
+| **Double** | A | A | A | - | A | A | X | X | X |
+| **Decimal** | A | A | A | A | - | A | X | X | X |
+| **String** | **X** | **X** | **X** | **X** | **X** | - | X | X | X |
+| **Date** | X | X | X | X | X | A | - | I | X |
+| **Timestamp** | X | X | X | X | X | A | A | - | X |
+| **Boolean** | X | X | X | X | X | A | X | X | - |
+
+**Hive 模式**（`spark.sql.ansi.enabled=false`）——关键差异:
+
+| 行为 | ANSI 模式 | Hive 模式 |
+|------|----------|----------|
+| `CAST('abc' AS INT)` | 抛出 `SparkNumberFormatException` | 返回 `NULL` |
+| `2147483647 + 1`（溢出） | 抛出 `SparkArithmeticException` | 返回 `-2147483648`（静默溢出） |
+| `INSERT INTO int_table VALUES('1')` | 报错（String → Int 禁止） | 成功（隐式转换） |
+| `'42' + 0` | 报错 | 返回 `42.0` |
+| String → 数字隐式 | **禁止** | **允许**（类似 Hive） |
+
+**Spark ANSI 类型提升链**:
+
+```
+Byte → Short → Int → Long → Decimal → Float* → Double
+                                         ↑
+                                   Float 被跳过（避免精度丢失）
+                                   Int + Float → Double（不是 Float）
+```
+
+---
+
+## 二、关键场景横向对比
+
+### `'abc' + 0` 的行为
+
+| 引擎 | 结果 | 说明 |
+|------|------|------|
+| MySQL | `0` | `'abc'` 隐式转为 DOUBLE `0.0` |
+| PostgreSQL | **ERROR** | `operator does not exist: text + integer` |
+| Oracle | **ERROR** | `ORA-01722: invalid number` |
+| SQL Server | **ERROR** | `Conversion failed` |
+| BigQuery | **ERROR** | 无隐式 STRING → INT64 |
+| Snowflake | **ERROR** | 非数字字符串不能转换 |
+| ClickHouse | **ERROR** | 无隐式 String → 数字 |
+| Hive | `0.0` | STRING → DOUBLE 隐式，`'abc'` → `NULL` → `0.0` |
+| Spark ANSI | **ERROR** | 禁止 String → 数字隐式转换 |
+| Spark Hive | `NULL` | CAST 失败返回 NULL |
+
+### `SELECT 1/3` 整数除法
+
+| 引擎 | 结果 | 结果类型 |
+|------|------|---------|
+| **PostgreSQL** | `0` | INTEGER（截断） |
+| **SQL Server** | `0` | INT（截断） |
+| **Spark (ANSI)** | `0` | INT（截断） |
+| **MySQL** | `0.3333` | DECIMAL |
+| **Oracle** | `0.333...` | NUMBER |
+| **BigQuery** | `0.333...` | FLOAT64 |
+| **Snowflake** | `0.333...` | NUMBER |
+| **ClickHouse** | `0.333...` | Float64 |
+| **Hive** | `0.333...` | DOUBLE |
+
+### VARCHAR 列与数字比较的索引影响
+
+```sql
+WHERE varchar_col = 123
+```
+
+| 引擎 | 转换方向 | 索引是否可用 |
+|------|---------|-------------|
+| MySQL | 列值转为 DOUBLE | **索引失效** |
+| PostgreSQL | **报错**（类型不匹配） | — |
+| Oracle | 列值转为 NUMBER | **索引失效** |
+| SQL Server | 列值转为 INT（INT 优先级更高） | **索引失效** |
+| BigQuery | **报错** | — |
+| Snowflake | **报错** | — |
+
+### TRY_CAST / SAFE_CAST 支持
+
+| 引擎 | 语法 | 引入版本 |
+|------|------|---------|
+| SQL Server | `TRY_CAST(x AS type)` | 2012 |
+| BigQuery | `SAFE_CAST(x AS type)` / `SAFE.func()` | GA |
+| Snowflake | `TRY_CAST(x AS type)` / `TRY_TO_*()` | GA |
+| Trino | `TRY_CAST(x AS type)` / `TRY(expr)` | 早期版本 |
+| DuckDB | `TRY_CAST(x AS type)` | 0.8.0+ |
+| Databricks | `TRY_CAST(x AS type)` | Runtime 11.2+ |
+| Spark | `TRY_CAST(x AS type)` | 4.0 |
+| Flink | `TRY_CAST(x AS type)` | 1.15+ |
+| ClickHouse | `toTypeOrNull(x)` / `toTypeOrZero(x)` | 早期版本 |
+| Oracle | `VALIDATE_CONVERSION(x AS type)` 返回 0/1 | 12c R2 |
+| PostgreSQL | **无内置**（需自定义 PL/pgSQL 函数） | — |
+| MySQL | **无内置**（需 CASE + REGEXP 模拟） | — |
+| Hive | **不需要**（CAST 失败已经返回 NULL） | — |
+
+---
+
+## 三、对引擎开发者的设计建议
+
+### 推荐的三级转换模型（借鉴 PostgreSQL）
+
+| 级别 | 触发条件 | 设计原则 | 示例 |
+|------|---------|---------|------|
+| **隐式 (I)** | 任何表达式自动触发 | 仅限同族**无损**转换 | `int → bigint`, `float32 → float64` |
+| **赋值 (A)** | 仅 INSERT/UPDATE 时自动 | 可能截断但语义合理 | `varchar(100) → varchar(50)`, `timestamp → date` |
+| **显式 (E)** | 必须 CAST | 可能丢失信息 | `text → integer`, `float → int` |
+
+### 推荐的数字类型提升路径
+
+```
+INT8 → INT16 → INT32 → INT64 → DECIMAL ─┬→ FLOAT32 → FLOAT64
+                                          │
+                                    在这里截断隐式提升
+                                    DECIMAL → FLOAT 应需要显式 CAST
+                                    （浮点精度丢失不可逆）
+```
+
+### 核心原则
+
+| 原则 | 说明 | 反面教材 |
+|------|------|---------|
+| 隐式转换必须无损 | 只在同类型族内提升 | MySQL `STRING → DOUBLE` |
+| 比较时转常量不转列 | `WHERE int_col = '123'` 转 `'123'` 为 int | SQL Server 按优先级转列值致索引失效 |
+| 整数除法行为必须明确 | INT/INT 结果类型在设计之初确定 | PG 返回 `0`，MySQL 返回 `0.33` |
+| TRY_CAST 从第一天支持 | 后期添加需改造整个求值路径 | PostgreSQL/MySQL 至今无原生 TRY_CAST |
+| 转换矩阵完整文档化 | 每对类型都有明确分类 | 未文档化的边界 case 导致不可预测行为 |
+
+---
+
+*注：本页信息均来自各引擎官方文档。具体行为可能随版本变化，建议以目标版本的官方文档为准。*
