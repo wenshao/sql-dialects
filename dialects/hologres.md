@@ -35,6 +35,7 @@ Hologres 是阿里云自主研发的实时交互式分析引擎，兼容 Postgre
 | **Distribution Key** | `CALL set_table_property('t', 'distribution_key', 'col')` 指定数据分布键，等值查询和 JOIN 可利用本地化避免 Shuffle。 |
 | **Clustering Key** | 数据在存储中按 Clustering Key 排序存储，范围查询可利用物理排序高效过滤。 |
 | **Segment Key** | 文件级分段键，基于时间列实现文件级剪枝，适合时序数据场景。 |
+| **JSONB 列存** | V1.3+ 支持 JSONB 数据的列式存储——系统自动将 JSONB 列拆分为多个强 schema 子列存储，查询时直接定位目标子列，分析性能接近原生列存。存储效率与结构化数据相当（列式压缩生效）。仅列存表支持，需 ≥1000 行触发。对比 Snowflake VARIANT 自动列化、ClickHouse JSON 类型(25.3+) 的列式推断。 |
 
 ## 已知不足
 

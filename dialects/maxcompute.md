@@ -107,6 +107,7 @@ CREATE TABLE logs (...) LIFECYCLE 90;  -- 90 天后自动删除
 | **MCQA 加速** | 对小查询自动使用交互式引擎 | 类似 BigQuery BI Engine |
 | **Quota Group** | 多租户计算资源配额隔离 | 类似 Snowflake Virtual Warehouse |
 | **Script Mode** | 多语句脚本模式，支持变量和流程控制 | 类似 BigQuery Scripting |
+| **JSON 列存** | JSON 类型数据自动推断公共 schema，按列式存储各字段。查询时自动列裁剪——只读取被引用的 JSON 字段。非公共 schema 部分用 BINARY 存储。需开启 `odps.sql.type.json.enable=true`。 | 类似 Snowflake VARIANT 自动列化、Hologres JSONB 列存 |
 | **AliORC + 谓词下推** | 存储层自适应编码 + I/O 优化 | 超越标准 ORC 的读取性能 |
 
 ## 已知的设计不足与历史包袱
