@@ -67,7 +67,7 @@ Chamberlin 是 ACM Fellow，获得过多项 IBM 内部奖项。
 
 ---
 
-## Raymond Boyce (1946-1974)
+## Raymond Boyce (1947-1974)
 
 ### SEQUEL 联合设计者
 
