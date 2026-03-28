@@ -188,3 +188,92 @@ SQL:2016 标准发布
 在 2025 年的今天，SQL 标准的意义不在于"统一所有引擎的语法"——这已经证明不可能。它的意义在于提供**共同的概念框架**：窗口函数的语义、JSON 路径表达式的规范、事务隔离级别的定义。
 
 对引擎开发者来说，SQL 标准是一份**设计参考手册**，而非必须遵守的法律。理解标准的历史和政治，能帮助你做出更好的语法设计决策。
+
+## 8. SQL 设计中的理论争议
+
+### Codd vs SQL：发明者的不满
+
+SQL 的设计**偏离了 Codd 的关系模型**，这是数据库理论界最大的争议之一：
+
+| 关系模型（Codd） | SQL 的偏离 | 后果 |
+|-----------------|-----------|------|
+| 表是元组的**集合**（无重复） | SQL 表是行的**列表**（允许重复行） | 需要 DISTINCT 去重，COUNT(*) 计入重复行 |
+| 不存在 NULL | SQL 引入 NULL 和三值逻辑 | `NULL = NULL` 为 UNKNOWN，NOT IN + NULL 返回空集 |
+| 关系运算基于集合代数 | SQL 基于"结构化英语"语法 | 语法冗长，歧义多（NATURAL JOIN 的危险性） |
+| 列顺序无意义 | SQL 的 `SELECT *` 依赖列顺序 | 表结构变更可能破坏应用代码 |
+
+**Codd 自己的反思**（1990 年）：Codd 在他最后的著作中承认单一 NULL 是不够的，建议用两种 NULL——A-Mark（适用但缺失）和 I-Mark（不适用）。这将需要**四值逻辑**而非三值逻辑。但这个建议从未被 SQL 标准采纳。
+
+### Chris Date 和 The Third Manifesto
+
+Chris Date（Codd 的学生和合作者）和 Hugh Darwen 是 SQL 最激烈的批评者。他们的**第三宣言**（The Third Manifesto）主张：
+
+1. **彻底消除 NULL**——用默认值或类型级 OPTION<T> 替代
+2. **强制集合语义**——禁止重复行
+3. **关系赋值**（relational assignment）替代 INSERT/UPDATE/DELETE
+
+虽然学术上有道理，但实际影响极小——已有的 SQL 生态不可能重写。**对引擎开发者的启示**：了解这些理论批评有助于理解为什么 NULL 处理是所有引擎中 bug 最密集的区域。
+
+### 三值逻辑的实际代价
+
+SQL 的 NULL 三值逻辑导致了无数反直觉的行为：
+
+```sql
+-- NOT IN 的 NULL 陷阱（所有引擎都有，SQL 标准行为）
+SELECT * FROM users WHERE id NOT IN (1, 2, NULL);
+-- 返回空集！因为 id <> NULL 对所有 id 为 UNKNOWN
+
+-- NULL 在聚合中的行为
+SELECT COUNT(col) FROM t;   -- 不计算 NULL
+SELECT COUNT(*) FROM t;     -- 计算所有行（含 NULL）
+SELECT AVG(col) FROM t;     -- 忽略 NULL（分母不含 NULL 行）
+
+-- CASE WHEN 中的 NULL
+SELECT CASE NULL WHEN NULL THEN 'match' ELSE 'no match' END;
+-- 返回 'no match'！因为 NULL = NULL 是 UNKNOWN
+```
+
+> **Markus Winand 的观点**：SQL 的三值逻辑是"语言中最大的认知负担"——开发者需要在每一个比较操作中考虑 NULL 的可能性。IS DISTINCT FROM（SQL:1999）是部分解决方案，但大多数引擎实现得很晚（MySQL 至今不支持）。
+
+## 9. 标准文档的访问壁垒
+
+### 付费标准的讽刺
+
+SQL 标准文档**不免费**——这是 ISO 标准体系的通病：
+
+| 部分 | 页数（约） | 单独购买价格（约） |
+|------|-----------|------------------|
+| Part 1: Framework | ~90 页 | CHF 60 (~$70) |
+| Part 2: Foundation | ~1,500 页 | CHF 330 (~$370) |
+| Part 4: SQL/PSM | ~200 页 | CHF 100 (~$110) |
+| Part 9: SQL/MED | ~250 页 | CHF 130 (~$150) |
+| Part 14: SQL/XML | ~500 页 | CHF 200 (~$220) |
+| Part 16: SQL/PGQ | ~300 页 | CHF 150 (~$170) |
+| **全套** | **~4,000+ 页** | **~$1,000+** |
+
+**讽刺**：一个声称要统一全世界数据库语言的标准，大多数数据库开发者从未读过——因为太贵了。
+
+**替代资源**（对引擎开发者）：
+- [modern-sql.com](https://modern-sql.com/) — Markus Winand 的免费在线参考，是了解 SQL 标准特性的最佳资源
+- [PostgreSQL 文档](https://www.postgresql.org/docs/current/features.html) — PG 文档明确标注了每个特性对应的 SQL 标准条款
+- [SQL:1999 草案](https://web.cecs.pdx.edu/~len/sql1999.pdf) — 旧版标准草案可公开获取
+- [jOOQ SQL Feature Comparison](https://www.jooq.org/diff) — 各引擎标准合规度对比
+
+## 10. MySQL 为什么不支持 MERGE？——一个标准政治的案例
+
+MySQL 是唯一不支持 SQL:2003 MERGE 语句的主流 RDBMS。这个缺失背后有深层原因：
+
+**时间线**：
+- 2001: Oracle 9i 实现 MERGE（比标准早 2 年）
+- 2003: SQL:2003 标准化 MERGE
+- 2005: SQL Server 2008 实现 MERGE
+- 2015: PostgreSQL 15 实现 MERGE（2022 年发布）
+- 至今: **MySQL 仍未实现 MERGE**
+
+**可能的原因分析**：
+1. **Oracle 的利益冲突**：Oracle 于 2010 年收购了 MySQL。MERGE 是 Oracle Database 的强势特性，在 MySQL 中实现 MERGE 可能削弱 Oracle Database 的差异化优势
+2. **ON DUPLICATE KEY UPDATE 已有**：MySQL 认为 INSERT ... ON DUPLICATE KEY UPDATE 已经解决了 UPSERT 需求（虽然功能弱于 MERGE）
+3. **实现复杂度**：MERGE 的 WHEN MATCHED/NOT MATCHED/NOT MATCHED BY SOURCE 多分支语义比 ON DUPLICATE KEY UPDATE 复杂得多
+4. **SQL Server 的前车之鉴**：SQL Server 的 MERGE 实现有[大量已知 Bug](https://www.mssqltips.com/sqlservertip/3074/use-caution-with-sql-servers-merge-statement/)，多位 MVP 公开建议避免使用。MySQL 团队可能因此更加谨慎
+
+**对引擎开发者的启示**：MERGE 的标准化是一个典型案例——标准定义了语义，但实现质量参差不齐。如果要实现 MERGE，参考 PostgreSQL 15 的实现（最新最干净），而非 SQL Server 的实现（Bug 多）。
