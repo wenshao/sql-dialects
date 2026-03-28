@@ -1,8 +1,19 @@
 # Snowflake 创始人 - Dageville, Cruanes, Żukowski
 
+> 信息来源：
+> - [Wikipedia: Snowflake Inc.](https://en.wikipedia.org/wiki/Snowflake_Inc.)
+> - [The Snowflake Elastic Data Warehouse (SIGMOD 2016)](https://dl.acm.org/doi/10.1145/2882903.2903741)
+> - [Marcin Żukowski LinkedIn](https://www.linkedin.com/in/marcinzukowski/)
+> - [Benoit Dageville LinkedIn](https://www.linkedin.com/in/benoit-dageville-b512823/)
+> - [Sutter Hill Ventures: Snowflake origin](https://www.sutterhillventures.com/portfolio/snowflake)
+
+---
+
 Snowflake 是全球最成功的云数据仓库公司之一，
 由三位数据库领域的资深专家于 2012 年在加利福尼亚州圣马特奥创立。
-2020 年 Snowflake 完成了软件行业史上最大的 IPO。
+2020 年 9 月 Snowflake 在纽约证券交易所上市（NYSE: SNOW），完成了当时软件行业史上最大的 IPO。
+
+> 来源：[Wikipedia: Snowflake Inc.](https://en.wikipedia.org/wiki/Snowflake_Inc.)
 
 ## Benoit Dageville - 联合创始人
 
@@ -12,6 +23,8 @@ Benoit Dageville 是法国人，在加入 Snowflake 之前，
 他在 Oracle 工作了约 15 年，是 Oracle 数据库内核团队的精英架构师。
 他在 Oracle 期间深度参与了查询优化器和自动调优相关的核心模块开发，
 是 Oracle 自动工作负载仓库（AWR）和自动数据库诊断监控器（ADDM）的关键设计者。
+
+> 来源：[Benoit Dageville LinkedIn](https://www.linkedin.com/in/benoit-dageville-b512823/)
 
 ### Snowflake 架构
 
@@ -48,6 +61,8 @@ Marcin Żukowski 来自波兰，学术背景与前两位截然不同。
 MonetDB/X100 研究项目，是向量化执行引擎的先驱。
 VectorWise 后来被 Actian 收购。
 
+> 来源：Żukowski 的博士论文 *Balancing Vectorized Query Execution with Bandwidth-Optimized Storage* (CWI, 2009)
+
 ### 向量化执行引擎
 
 Żukowski 将向量化执行的核心理念带入了 Snowflake 的查询引擎设计。
@@ -62,6 +77,14 @@ Dageville 和 Cruanes 于 2012 年联合创立 Snowflake，
 公司在 2014 年发布了第一个公开版本，
 运行在 Amazon Web Services 之上。
 
+> 来源：[Wikipedia: Snowflake Inc.](https://en.wikipedia.org/wiki/Snowflake_Inc.)
+
+### SIGMOD 2016 论文
+
+Snowflake 的架构在 SIGMOD 2016 论文 *The Snowflake Elastic Data Warehouse* 中有详细描述。该论文由 Dageville、Cruanes、Żukowski 等人合著。
+
+> 来源：[SIGMOD 2016](https://dl.acm.org/doi/10.1145/2882903.2903741)
+
 ### 技术架构
 
 Snowflake 的核心架构创新包括：
@@ -73,11 +96,13 @@ Snowflake 的核心架构创新包括：
 
 ### 史上最大软件 IPO (2020)
 
-2020 年 9 月，Snowflake 在纽约证券交易所上市。
-IPO 首日股价翻倍，市值一度超过 700 亿美元，
+2020 年 9 月 16 日，Snowflake 在纽约证券交易所上市（NYSE: SNOW）。
+IPO 定价 120 美元/股，首日收盘价 253.93 美元，市值一度超过 700 亿美元，
 成为当时软件行业有史以来规模最大的 IPO。
 沃伦·巴菲特的伯克希尔·哈撒韦公司也参与了 IPO 前的投资，
 这在科技股投资中极为罕见。
+
+> 来源：[Wikipedia: Snowflake Inc.](https://en.wikipedia.org/wiki/Snowflake_Inc.)
 
 ## 影响
 
@@ -88,3 +113,7 @@ IPO 首日股价翻倍，市值一度超过 700 亿美元，
 
 Snowflake 的成功深刻改变了数据仓库市场的格局，
 推动了整个行业向云原生架构的转型。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

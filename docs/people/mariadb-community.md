@@ -1,5 +1,15 @@
 # MariaDB 社区关键人物
 
+> 信息来源：
+> - [MariaDB Foundation](https://mariadb.org/)
+> - [MariaDB Foundation: About](https://mariadb.org/about/)
+> - [Sergei Golubchik GitHub](https://github.com/sergei)
+> - [MariaDB Server GitHub](https://github.com/MariaDB/server)
+> - [MariaDB Knowledge Base: Contributors](https://mariadb.com/kb/en/contributors/)
+> - [Codership (Galera Cluster)](https://galeracluster.com/)
+
+---
+
 本文作为 [monty-widenius.md](monty-widenius.md) 的补充，
 介绍 MariaDB 项目中除 Michael "Monty" Widenius 之外的核心贡献者。
 MariaDB 的成功不仅源于其创始人的远见，
@@ -15,6 +25,8 @@ Sergei Golubchik 是 MariaDB Server 的首席架构师（Chief Architect），
 他最早在 MySQL AB 公司工作，是 MySQL 数据库的核心开发者之一。
 在 MySQL 时期，Golubchik 参与了多个关键模块的开发，
 包括全文搜索引擎（FULLTEXT search）和可插拔认证框架等功能。
+
+> 来源：[Sergei Golubchik GitHub](https://github.com/sergei)、[MariaDB Knowledge Base](https://mariadb.com/kb/en/contributors/)
 
 ### 在 MariaDB 的角色
 
@@ -52,9 +64,11 @@ MariaDB 基金会（MariaDB Foundation）是一个非营利组织，
 负责 MariaDB Server 的治理和社区协调。
 基金会确保 MariaDB Server 保持开源和社区驱动的开发模式。
 
-基金会与 MariaDB Corporation（商业公司）是独立的实体。
+基金会与 MariaDB Corporation（后更名为 MariaDB plc）是独立的实体。
 基金会关注开源项目本身的健康发展，
 而商业公司负责企业版产品和云服务的开发与销售。
+
+> 来源：[MariaDB Foundation: About](https://mariadb.org/about/)
 
 ### 社区贡献
 
@@ -78,9 +92,11 @@ MariaDB 社区在 MySQL 基础上引入了多项独有的技术特性：
 ### Galera Cluster
 
 值得特别提及的是 Galera Cluster，
-由芬兰公司 Codership 的 Seppo Jaakola 开发。
+由芬兰公司 Codership Oy 的 Seppo Jaakola 开发。
 Galera 为 MariaDB 提供了同步多主复制能力，
 这是 MariaDB 区别于 MySQL 的重要特性之一。
+
+> 来源：[Codership / Galera Cluster](https://galeracluster.com/)
 
 ## 影响
 
@@ -89,3 +105,7 @@ MariaDB 社区的核心贡献者们共同确保了项目的健康发展：
 - 基金会的治理结构保障了项目的独立性和开放性
 - 来自不同公司和个人的贡献者丰富了 MariaDB 的功能生态
 - 社区驱动的开发模式使 MariaDB 成为 MySQL 之外最重要的分支
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

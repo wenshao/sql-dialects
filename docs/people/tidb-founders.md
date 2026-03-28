@@ -1,7 +1,19 @@
 # TiDB 创始人 - 刘奇、黄东旭、崔秋
 
+> 信息来源：
+> - [PingCAP 官网: About](https://www.pingcap.com/about/)
+> - [TiDB GitHub](https://github.com/pingcap/tidb)
+> - [TiKV GitHub](https://github.com/tikv/tikv)
+> - [TiKV CNCF Graduation (2020-09)](https://www.cncf.io/announcements/2020/09/02/cloud-native-computing-foundation-announces-tikv-graduation/)
+> - [Wikipedia: TiDB](https://en.wikipedia.org/wiki/TiDB)
+> - [Chaos Mesh CNCF](https://www.cncf.io/projects/chaos-mesh/)
+
+---
+
 TiDB 是一个开源的分布式 NewSQL 数据库，兼容 MySQL 协议，
 由 PingCAP 公司开发。PingCAP 由三位联合创始人于 2015 年在中国创立。
+
+> 来源：[PingCAP: About](https://www.pingcap.com/about/)
 
 ## 刘奇 (Max Liu) - CEO
 
@@ -82,10 +94,10 @@ TiDB 从第一天起就是开源项目：
 
 ### TiKV 进入 CNCF
 
-TiKV 作为独立的分布式 KV 存储，于 2018 年被 CNCF 接受为沙箱项目，
-2020 年成为 CNCF 毕业项目。这是对 TiKV 技术成熟度和社区健康度的认可。
+TiKV 作为独立的分布式 KV 存储，于 2018 年 8 月被 CNCF 接受为沙箱项目，
+2020 年 9 月成为 CNCF 毕业项目（Graduated）。这是对 TiKV 技术成熟度和社区健康度的认可。
 
-TiKV 是第一个进入 CNCF 的分布式数据库存储引擎。
+> 来源：[CNCF: TiKV Graduation Announcement](https://www.cncf.io/announcements/2020/09/02/cloud-native-computing-foundation-announces-tikv-graduation/)
 
 ## 技术创新
 
@@ -115,7 +127,9 @@ PingCAP 还开发了多个相关的开源工具：
 - **TiUP**：一键部署工具
 - **BR**：备份恢复工具
 - **DM**：数据迁移工具（从 MySQL 迁移到 TiDB）
-- **Chaos Mesh**：混沌工程平台（CNCF 项目）
+- **Chaos Mesh**：混沌工程平台（CNCF 孵化项目，2022 年进入 Incubating）
+
+> 来源：[TiDB GitHub](https://github.com/pingcap/tidb)、[Chaos Mesh CNCF](https://www.cncf.io/projects/chaos-mesh/)
 
 ## 影响
 
@@ -124,3 +138,7 @@ PingCAP 的三位创始人推动了中国在数据库基础软件领域的重要
 - TiKV 成为 CNCF 毕业项目，获得全球社区认可
 - 证明了用开源模式开发世界级数据库系统的可行性
 - 推动了国内数据库行业的技术进步和人才培养
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

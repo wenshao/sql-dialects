@@ -1,8 +1,19 @@
 # Trino/Presto 创始人
 
+> 信息来源：
+> - [Wikipedia: Trino (SQL query engine)](https://en.wikipedia.org/wiki/Trino_(SQL_query_engine))
+> - [Facebook Engineering Blog: Presto: Interacting with petabytes of data at Facebook (2013)](https://engineering.fb.com/2013/11/06/core-infra/presto-interacting-with-petabytes-of-data-at-facebook/)
+> - [Trino 官方网站](https://trino.io/)
+> - [Starburst 公司官网](https://www.starburst.io/)
+> - [Presto: SQL on Everything (ICDE 2019)](https://research.facebook.com/publications/presto-sql-on-everything/)
+
+---
+
 Trino（原名 PrestoSQL）是一个分布式 SQL 查询引擎，
 能够对多种数据源进行交互式分析查询。
-它由 Facebook 的四位工程师创建，后来独立发展为 Trino。
+它由 Facebook 的四位工程师于 2012 年创建，2013 年开源，后来独立发展为 Trino。
+
+> 来源：[Wikipedia: Trino](https://en.wikipedia.org/wiki/Trino_(SQL_query_engine))
 
 ## 创始团队
 
@@ -10,11 +21,13 @@ Trino（原名 PrestoSQL）是一个分布式 SQL 查询引擎，
 
 Martin Traverso 是 Presto 的核心创建者之一。
 他在 Facebook 工作期间主导了 Presto 的设计和开发。
-离开 Facebook 后，他联合创立了 Starburst 公司，
+离开 Facebook 后，他联合创立了 Starburst Data 公司，
 继续领导 Trino 的技术方向。
 
 Traverso 在分布式系统和查询引擎方面有深厚的工程经验，
 是 Trino 项目的主要技术决策者之一。
+
+> 来源：[Starburst 官网](https://www.starburst.io/)
 
 ### Dain Sundstrom
 
@@ -62,7 +75,9 @@ Presto 在 Facebook 内部迅速获得了广泛采用：
 - 被数据科学家、产品分析师和工程师使用
 - 查询性能比 Hive 快 5-10 倍
 
-2013 年，Facebook 将 Presto 开源。
+2013 年 11 月，Facebook 将 Presto 开源。
+
+> 来源：[Facebook Engineering Blog: Presto (2013-11-06)](https://engineering.fb.com/2013/11/06/core-infra/presto-interacting-with-petabytes-of-data-at-facebook/)
 
 ## 从 Presto 到 Trino
 
@@ -77,10 +92,12 @@ Presto 在 Facebook 内部迅速获得了广泛采用：
 
 ### 更名为 Trino (2020)
 
-2020 年 12 月，PrestoSQL 正式更名为 Trino。
-更名的原因是避免与 Facebook 的 Presto 项目产生商标和品牌上的混淆。
+2020 年 12 月 27 日，PrestoSQL 正式更名为 Trino。
+更名的原因是避免与 Facebook 的 PrestoDB 项目产生商标和品牌上的混淆。
 
 Trino 这个名字是社区投票选出的。
+
+> 来源：[Wikipedia: Trino](https://en.wikipedia.org/wiki/Trino_(SQL_query_engine))、[Trino 官方博客](https://trino.io/blog/2020/12/27/announcing-trino.html)
 
 ## Starburst (2018)
 
@@ -121,3 +138,7 @@ Presto/Trino 对数据分析领域产生了深远影响：
 Traverso、Sundstrom 和 Phillips 通过 Presto/Trino 的工作，
 证明了一个通用的 SQL 查询引擎可以覆盖多种数据源，
 极大地简化了企业数据分析的技术栈。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*

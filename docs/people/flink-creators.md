@@ -1,8 +1,20 @@
 # Apache Flink 创始人
 
+> 信息来源：
+> - [Wikipedia: Apache Flink](https://en.wikipedia.org/wiki/Apache_Flink)
+> - [Stratosphere 项目页面](http://stratosphere.eu/)
+> - [Apache Flink 官网](https://flink.apache.org/)
+> - [Ververica (原 DataArtisans) 官网](https://www.ververica.com/)
+> - [Fabian Hueske & Vasiliki Kalavri, *Stream Processing with Apache Flink* (O'Reilly, 2019)](https://www.oreilly.com/library/view/stream-processing-with/9781491974285/)
+> - [DFG Stratosphere 项目资助页](https://gepris.dfg.de/gepris/projekt/198052798)
+
+---
+
 Apache Flink 是一个分布式流处理框架，支持有状态的流计算和批处理。
 它起源于 TU Berlin（柏林工业大学）的 Stratosphere 研究项目，
 由多位研究人员共同创建。
+
+> 来源：[Wikipedia: Apache Flink](https://en.wikipedia.org/wiki/Apache_Flink)
 
 ## 核心创始人
 
@@ -12,8 +24,10 @@ Stephan Ewen 是 Flink 最核心的创始人和架构师。
 他在 TU Berlin 攻读博士期间参与了 Stratosphere 项目，
 此后一直主导 Flink 的技术方向。
 
-Ewen 是 DataArtisans（后更名为 Ververica）的联合创始人和 CTO。
-2019 年阿里巴巴收购 Ververica 后，他继续在阿里巴巴领导 Flink 的开发工作。
+Ewen 是 Data Artisans（后于 2019 年更名为 Ververica）的联合创始人和 CTO。
+2019 年 1 月阿里巴巴收购 Data Artisans 后，他继续领导 Flink 的开发工作。
+
+> 来源：[Ververica 官网](https://www.ververica.com/)、[Wikipedia: Apache Flink](https://en.wikipedia.org/wiki/Apache_Flink)
 
 他在流处理系统的架构设计方面有极深的造诣，
 主导了 Flink 的状态管理、检查点机制和时间语义等核心功能的设计。
@@ -40,8 +54,10 @@ Metzger 是 Flink 社区的活跃贡献者和 PMC 成员，
 Fabian Hueske 是 Flink 的另一位核心创始人，
 同样来自 TU Berlin 的 Stratosphere 研究组。
 
-Hueske 与 Vasiliki Kalavri 合著了 "Stream Processing with Apache Flink"
-（O'Reilly, 2019），这是 Flink 领域的重要参考书。
+Hueske 与 Vasiliki Kalavri 合著了 *Stream Processing with Apache Flink*
+（O'Reilly, 2019, ISBN 978-1-491-97429-2），这是 Flink 领域的重要参考书。
+
+> 来源：[O'Reilly: Stream Processing with Apache Flink](https://www.oreilly.com/library/view/stream-processing-with/9781491974285/)
 
 他在 Flink 的查询优化和 Table API/SQL 层面做出了重要贡献。
 
@@ -54,21 +70,27 @@ Stratosphere 项目始于 2010 年，由 TU Berlin 的研究人员发起。
 能够统一批处理和流处理。
 
 项目得到了德国科学基金会（DFG）的资助，
-由 Volker Markl 教授领导的数据库和信息管理研究组支持。
+由 Volker Markl 教授领导的数据库和信息管理研究组（DIMA）支持。
+
+> 来源：[DFG Stratosphere 项目](https://gepris.dfg.de/gepris/projekt/198052798)、[Stratosphere 项目页面](http://stratosphere.eu/)
 
 ### 进入 Apache (2014)
 
-2014 年 4 月，Stratosphere 项目被捐赠给 Apache 软件基金会，
-更名为 Apache Flink。"Flink" 在德语中意为"敏捷"。
+2014 年 4 月，Stratosphere 项目进入 Apache 软件基金会孵化器，
+更名为 Apache Flink。"Flink" 在德语中意为"敏捷/灵活"。
 
-同年 12 月，Flink 成为 Apache 顶级项目，
+同年 12 月，Flink 从孵化器毕业成为 Apache 顶级项目（TLP），
 标志着它获得了 Apache 社区的认可和独立地位。
 
-### DataArtisans / Ververica (2014)
+> 来源：[Wikipedia: Apache Flink](https://en.wikipedia.org/wiki/Apache_Flink)
 
-2014 年，几位核心创始人成立了 DataArtisans 公司
+### Data Artisans / Ververica (2014)
+
+2014 年，Ewen、Tzoumas 等核心创始人在柏林成立了 Data Artisans GmbH
 （2019 年更名为 Ververica），
 提供基于 Flink 的商业产品和技术支持。
+
+> 来源：[Ververica 官网](https://www.ververica.com/)
 
 ## 阿里巴巴与 Blink
 
@@ -88,8 +110,10 @@ Stratosphere 项目始于 2010 年，由 TU Berlin 的研究人员发起。
 
 ### 合并回社区 (Flink 1.9)
 
-2019 年，阿里巴巴收购了 Ververica，
-并将 Blink 的大量改进合并回 Flink 主分支（1.9 版本）。
+2019 年 1 月，阿里巴巴宣布收购 Data Artisans（后更名 Ververica），
+并将 Blink 的大量改进合并回 Flink 主分支（1.9 版本，2019 年 8 月发布）。
+
+> 来源：[Wikipedia: Apache Flink](https://en.wikipedia.org/wiki/Apache_Flink)
 
 这次合并是 Flink 历史上最重要的技术升级之一：
 - 全新的 Blink SQL Planner
@@ -121,3 +145,7 @@ Flink 的创始人们对流处理领域产生了深远影响：
 从 TU Berlin 的学术项目到全球广泛使用的流处理引擎，
 Flink 的发展历程体现了欧洲数据库学术界向工业界
 成功转化的传统。
+
+---
+
+*注：本页信息均来自公开渠道。如有不准确之处欢迎指正。*
