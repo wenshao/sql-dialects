@@ -94,7 +94,7 @@ CREATE TABLE logs (...) LIFECYCLE 90;  -- 90 天后自动删除
 **设计分析**：将 TTL 作为表级 DDL 属性是 MaxCompute 的独创。对比其他引擎：
 - ClickHouse：TTL 在表引擎中定义（`TTL timestamp + INTERVAL 90 DAY`）
 - BigQuery：`partition_expiration_days` 选项
-- Hive：无内置 TTL，依赖外部调度删除旧分区
+- Hive：无内置 LIFECYCLE 语法，仅有 `partition.retention.period` TBLPROPERTIES（分区级），整表 TTL 需外部调度
 - MaxCompute 的 LIFECYCLE 对整个表或分区生效，是数据治理最简洁的方案
 
 ## 独特特色
