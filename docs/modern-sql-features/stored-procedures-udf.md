@@ -564,8 +564,8 @@ END;
 | 引擎 | IN | OUT | INOUT | 默认方向 | DEFAULT 值 |
 |------|:---:|:---:|:---:|---------|:---:|
 | Oracle | ✅ | ✅ | ✅ | IN | ✅ |
-| PostgreSQL | ✅ | ✅ (FUNCTION) / INOUT (PROCEDURE) | ✅ | IN | ✅ |
-| MySQL | ✅ | ✅ | ✅ | IN (显式标注) | ❌ (5.x), ✅ (8.0+) |
+| PostgreSQL | ✅ | ✅ (11+) | ✅ | IN | ✅ |
+| MySQL | ✅ | ✅ | ✅ | IN (显式标注) | ❌ |
 | SQL Server | ✅ (隐式) | ✅ `OUTPUT` | ✅ `OUTPUT` | IN | ✅ |
 | DB2 | ✅ | ✅ | ✅ | IN | ✅ |
 | Snowflake | ✅ | ❌ (用 RETURNS) | ❌ | IN | ✅ |
@@ -585,7 +585,7 @@ EXEC my_proc @x = 10, @result = @r OUTPUT;
 EXECUTE my_proc(10, v_result);
 ```
 
-PostgreSQL 的特殊处理——PROCEDURE 不支持 OUT 参数，需用 INOUT 模拟：
+PostgreSQL 11+ 的 PROCEDURE 支持 OUT 参数（也可用 INOUT 模拟）：
 
 ```sql
 -- PostgreSQL 11+
