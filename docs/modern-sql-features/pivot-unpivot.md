@@ -1263,7 +1263,65 @@ CROSS JOIN LATERAL (
 | PIVOT FOR 列有 NULL 值 | 忽略（NULL 不生成列） |
 | PIVOT 值列表中含特殊字符 | 自动转义为合法列名 |
 
-### 8. 元数据与 INFORMATION_SCHEMA
+### 8. PIVOT XML: 动态列的替代方案 (Oracle 风格)
+
+硬编码 `IN ('A', 'B', 'C')` 的根本问题在于列名在编译期必须确定。Oracle 提供了 `PIVOT XML` 语法绕过这一限制:
+
+```sql
+-- Oracle PIVOT XML: 将动态列编码为 XML 而非关系列
+SELECT * FROM sales
+PIVOT XML (SUM(amount) FOR region IN (ANY));
+-- 返回单个 XML 列, 包含所有 region 值及其聚合结果
+```
+
+**引擎实现要点**:
+- `PIVOT XML` 不改变输出列数量——始终返回一个 XML/JSON 类型的列，从而避免编译期确定列名的难题
+- 这是"返回 MAP/JSON"策略的工业实现，比 `IN (ANY)` 更容易实现，因为不需要打破规划与执行的边界
+- 缺点: 下游消费者需要解析 XML/JSON，性能和易用性不如关系列
+- **建议**: 如果引擎已支持 JSON/MAP 类型，优先考虑 `PIVOT ... RETURNING MAP<VARCHAR, agg_type>` 语法而非 XML，更符合现代引擎的类型系统
+
+### 9. UNPIVOT 类型同质性强制
+
+UNPIVOT 将多列合并为单个值列，这要求所有源列具有兼容类型。引擎必须在编译期严格检查:
+
+```
+-- 类型检查流程
+UNPIVOT (val FOR name IN (col_int, col_varchar, col_date))
+  → 尝试寻找 least common supertype(INT, VARCHAR, DATE)
+  → 如果不存在公共超类型 → 编译期报错 (不应静默转换)
+
+-- 正确的实现行为:
+UNPIVOT (val FOR name IN (price, discount, tax))
+  → 类型: DECIMAL(10,2), DECIMAL(8,2), DECIMAL(6,2)
+  → 公共类型: DECIMAL(10,2) ← 取最大精度
+```
+
+**常见陷阱**:
+- 隐式转换可能丢失精度或产生意外结果 (如 INT → FLOAT 的浮点精度损失)
+- 某些引擎 (SQL Server) 对类型不兼容仅发出警告而非错误，导致运行时数据问题
+- **建议**: 默认行为为严格模式 (不兼容即报错)，可选提供 `UNPIVOT ... WITH TYPE COERCION` 允许隐式转换
+
+### 10. 动态 PIVOT SQL 的注入风险审计
+
+当使用动态 SQL 构建 PIVOT 查询时 (尤其是在不支持 `IN (ANY)` 的引擎上)，SQL 注入风险极高:
+
+```sql
+-- 危险模式: 值直接拼接进 SQL
+EXECUTE IMMEDIATE
+  'SELECT * FROM t PIVOT (SUM(val) FOR cat IN ('
+  || v_dynamic_list   -- 如果 v_dynamic_list 来自用户输入或数据表，存在注入风险
+  || '))';
+
+-- v_dynamic_list 可能包含: 'A'')) ; DROP TABLE t; --
+```
+
+**引擎开发者的防护建议**:
+1. **引擎层防护**: 如果提供 `IN (ANY)` 或 `IN (SELECT ...)` 语法，动态列发现在引擎内部完成，天然避免注入
+2. **参数化支持**: 考虑支持 `IN (:param_list)` 绑定变量形式，由引擎负责转义
+3. **安全审计点**: 如果引擎提供 `EXECUTE IMMEDIATE` / `sp_executesql`，应在文档和审计日志中明确标记动态 PIVOT 为高风险模式
+4. **引用标识符强制**: 动态生成的列名必须通过引擎的标识符引用函数处理 (如 `QUOTENAME()` / `quote_ident()`)，防止列名中的特殊字符被解释为 SQL 语法
+
+### 11. 元数据与 INFORMATION_SCHEMA
 
 PIVOT 查询的输出列名是动态生成的，在以下场景需要注意:
 - 视图定义: `CREATE VIEW v AS SELECT * FROM t PIVOT (...)` 需要在视图创建时固定 schema
