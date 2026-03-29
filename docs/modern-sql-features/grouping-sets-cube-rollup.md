@@ -796,6 +796,99 @@ Expand 阶段将"被聚合掉"的列设为 NULL，但原始数据可能已经是
 - **分组列排序**: Expand 方案中，将分组列集合类似的行放在一起，有利于下游 GROUP BY 的局部性
 - **共享前缀优化条件**: 仅当分组集合形成严格层级关系时可应用（ROLLUP 满足，CUBE 不满足）
 
+### 8. GROUPING() 返回值的位顺序一致性
+
+GROUPING() 函数的返回值依赖于参数列在分组集合中的位掩码编码顺序，不同引擎的位分配可能不一致，导致跨引擎迁移时结果不同：
+
+```
+PostgreSQL 的位掩码生成规则 (推荐遵循):
+  GROUPING(a, b, c) 中:
+    a 对应最高有效位 (MSB), c 对应最低有效位 (LSB)
+    分组集合 (a, b)    → GROUPING(a,b,c) = 0b001 = 1  (c 被聚合)
+    分组集合 (a)       → GROUPING(a,b,c) = 0b011 = 3  (b,c 被聚合)
+    分组集合 ()        → GROUPING(a,b,c) = 0b111 = 7  (全部被聚合)
+
+  SQL Server 也遵循相同的 MSB 优先规则。
+
+  注意:
+    - 参数顺序决定位顺序: GROUPING(a,b) 与 GROUPING(b,a) 结果不同
+    - GROUPING_ID() 在 Oracle 中是独立函数，行为与
+      PostgreSQL 的多参数 GROUPING() 一致
+    - 引擎实现时必须在文档中明确位分配规则，避免用户依赖隐含行为
+```
+
+### 9. DISTINCT 聚合与共享扫描的兼容性
+
+当不同分组集合中包含不兼容的 DISTINCT 聚合时，共享扫描（Shared Scan）优化可能失效，导致执行计划退化：
+
+```sql
+-- 问题示例: 两个分组集合使用不同列的 DISTINCT 聚合
+SELECT
+    GROUPING(region, product) AS gid,
+    region, product,
+    COUNT(DISTINCT customer_id) AS distinct_customers,
+    SUM(DISTINCT amount) AS distinct_amount_sum
+FROM sales
+GROUP BY GROUPING SETS ((region), (product));
+```
+
+```
+执行计划影响:
+  Expand + 单次 GroupBy 方案依赖所有分组集合共享同一聚合逻辑。
+  但 DISTINCT 聚合要求按 distinct 列排序或 hash 去重，
+  不同分组集合中的 DISTINCT 操作可能需要不同的去重上下文。
+
+  场景 1: COUNT(DISTINCT x) 在所有分组集合中一致
+    → 可以共享去重 hash 表，Expand 方案正常工作
+
+  场景 2: 不同分组集合有不兼容的 DISTINCT 列或聚合
+    → 无法共享单个去重上下文
+    → 必须退化为多遍聚合 (每个分组集合独立执行)
+
+引擎实现建议:
+  1. 在 planner 阶段检测 DISTINCT 聚合的兼容性
+  2. 兼容时: 使用 Expand + 共享去重的单遍方案
+  3. 不兼容时: 自动降级为多遍聚合 + UNION ALL
+  4. 在 EXPLAIN 输出中标明是否使用了共享扫描
+```
+
+### 10. 中间结果物化的代价评估
+
+GROUPING SETS 的执行策略选择（Expand 单遍 vs 多遍聚合 vs 共享前缀）需要对中间结果的物化代价做准确评估，避免不必要的全表重复扫描：
+
+```
+代价模型要素:
+  N = 原始表行数
+  G = 分组集合数量
+  K = 每个分组集合的分组键基数 (不同值数量)
+
+  Expand 方案:
+    膨胀后行数 = N × G
+    内存/磁盘代价 = O(N × G × row_size)
+    聚合代价 = O(N × G)  (单次聚合，但数据量膨胀)
+    适用场景: G 较小 (≤ 5~10), N 不太大
+
+  多遍聚合:
+    扫描代价 = G × O(N)  (每个分组集合扫描一次原表)
+    聚合代价 = Σ O(N)
+    无数据膨胀，但多次扫描原表
+    适用场景: 原表有缓存或索引，G 较大
+
+  共享前缀 (ROLLUP 专用):
+    最细粒度聚合: O(N)
+    逐级再聚合: O(K_fine) + O(K_coarse) + ...
+    总代价 ≈ O(N) + O(总分组键数)
+    适用场景: ROLLUP 且分组键基数远小于 N
+
+优化器决策建议:
+  1. 估算各方案的总代价 (I/O + CPU + 内存)
+  2. 考虑原表是否已物化在内存中 (buffer pool hit rate)
+  3. 如果 N × G 远大于可用内存，Expand 方案会导致大量溢出，
+     应优先选择多遍聚合
+  4. ROLLUP 场景下，如果分组键基数 << N，
+     共享前缀方案几乎总是最优的
+```
+
 ## 参考资料
 
 - SQL:1999 标准: ISO/IEC 9075-2:1999, Section 7.9 (GROUP BY clause)
