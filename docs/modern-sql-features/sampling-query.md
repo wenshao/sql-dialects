@@ -745,7 +745,97 @@ ReservoirSampleScan {
 4. 分布式：BERNOULLI 各节点独立采样；RESERVOIR(k) 需全局协调
 ```
 
-### 6. 向量化与测试建议
+### 6. BERNOULLI 的 O(N) 全扫描本质
+
+BERNOULLI 采样经常被误认为可以减少 I/O，但它的本质是**全表扫描 + 逐行概率过滤**:
+
+```
+BERNOULLI(1) 对 1 亿行表的执行过程:
+  1. 读取第 1 行 → 生成随机数 → 1% 概率保留 → 继续
+  2. 读取第 2 行 → 生成随机数 → 1% 概率保留 → 继续
+  ...
+  100,000,000. 读取最后一行 → 生成随机数 → 判断
+
+总 I/O: 读取全部 100M 行 = 全表扫描
+总 CPU: 100M 次随机数生成 + 比较
+输出: ~1M 行 (预期)
+
+对比 SYSTEM(1):
+  总 I/O: 仅读取 ~1% 的数据页 = 大幅减少 I/O
+  总 CPU: 每个块一次随机数生成
+  输出: ~1M 行 (预期, 但方差更大)
+```
+
+**引擎实现建议**:
+- 优化器的代价估算中，BERNOULLI 的 I/O 代价 = 全表扫描代价 (不可减少)
+- 仅在输出行数估计上使用 `N * probability`，不可在 I/O 估计上使用
+- 在 EXPLAIN 输出中明确标注 "Full Scan (Bernoulli filter)" 避免用户误解
+- 如果用户只需要快速预览，应推荐 SYSTEM 采样而非 BERNOULLI
+
+### 7. 谓词下推与采样的交互悖论
+
+采样与 WHERE 过滤的执行顺序会显著影响结果的统计分布:
+
+```
+方案 A: 先采样后过滤 (大多数引擎的默认行为)
+  SELECT * FROM orders TABLESAMPLE BERNOULLI(10)
+  WHERE status = 'completed';
+  -- 先从全表随机选 10% 行，再过滤 status
+  -- 结果: 全表的均匀随机子集中状态为 completed 的行
+  -- 如果 completed 占 50%，预期输出 = N * 10% * 50% = 5% of N
+
+方案 B: 先过滤后采样 (需要子查询实现)
+  SELECT * FROM (SELECT * FROM orders WHERE status = 'completed')
+  TABLESAMPLE BERNOULLI(10);
+  -- 先过滤 completed 行，再从中随机选 10%
+  -- 结果: completed 行的均匀随机 10% 子集
+  -- 预期输出 = N * 50% * 10% = 5% of N (数量相同但分布不同!)
+```
+
+**关键区别**:
+- 方案 A 中 completed 行的选中概率 = 10% (与 pending 行相同)
+- 方案 B 中 completed 行的选中概率 = 10%，但仅从 completed 中选，保证了分层均匀性
+- 当 WHERE 过滤条件与分析目标相关时，两种方案的统计推断结论可能不同
+
+**引擎实现建议**:
+- SQL 标准规定 TABLESAMPLE 在 FROM 子句中，语义上在 WHERE 之前执行
+- 优化器**不应**将 WHERE 谓词下推到采样算子之前 (会改变语义)
+- BERNOULLI 是特例: 可以交换 (因为逐行独立概率)，但仅限于不影响采样概率的谓词
+- SYSTEM 不可交换: 块级选择与行级过滤不可互换
+
+### 8. 块级采样的 I/O 优化与高并发 PRNG 调优
+
+**块级采样 (SYSTEM) 的 I/O 优化**:
+```
+行存引擎 (页级跳过):
+  - InnoDB: B+ 树叶子页链表连接 → 可以跳过未选中的页
+  - PostgreSQL heap: 直接按页号跳过 → 随机 I/O 变为稀疏顺序 I/O
+  - 关键: skip_block() 必须是真正的 I/O 跳过，不能读取后丢弃
+
+列存引擎 (row group 级跳过):
+  - Parquet/ORC: 每个 row group 有独立的元数据 → 跳过整个 row group 的 I/O
+  - 效率: 单个 row group 通常 1M 行 → SYSTEM(1) 在 100M 行表上仅读 ~1 个 row group
+  - 优势: 列存的 row group 粒度天然适合 SYSTEM 采样
+```
+
+**高并发场景的 PRNG 性能调优**:
+```
+问题: 多线程并行扫描时，共享 PRNG 成为热点
+  - 锁竞争: 全局 PRNG + mutex → 采样算子成为瓶颈
+  - 线程安全: AtomicU64 CAS 循环 → 高竞争下性能退化
+
+解决方案:
+  1. 线程本地 PRNG: 每个扫描线程独立的 PRNG 实例
+     seed_i = hash(user_seed, thread_id)  -- 确保可重复性
+  2. 批量生成: 一次生成整个 batch 的随机数 (如 1024 个)
+     减少 PRNG 调用频率，利于 CPU 流水线和分支预测
+  3. PRNG 算法选择:
+     - PCG/Xoshiro256: 高性能，适合采样 (非密码学安全)
+     - 避免 Mersenne Twister: 状态大 (2.5KB)，缓存不友好
+     - 避免 /dev/urandom: 系统调用开销过高
+```
+
+### 9. 向量化与测试建议
 
 向量化实现：对整个 batch 生成随机数数组，用 SIMD 比较生成选择向量。SYSTEM 方法可按 batch 级别决定是否跳过 I/O。
 
