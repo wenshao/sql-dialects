@@ -388,7 +388,7 @@ SELECT CURRENT_TIMESTAMP;     -- 正确（SQL 标准，无括号）
 | SQL Server | `CONVERT(VARCHAR, d, style)` | `CONVERT(VARCHAR, d, 120)` | 样式编号 |
 | BigQuery | `FORMAT_DATE(fmt, d)` | `'%Y-%m-%d'` | strftime 系 |
 | BigQuery | `FORMAT_TIMESTAMP(fmt, ts)` | `'%Y-%m-%d %H:%M:%S'` | strftime 系 |
-| ClickHouse | `formatDateTime(d, fmt)` | `'%Y-%m-%d %H:%M:%S'` | strftime 系 |
+| ClickHouse | `formatDateTime(d, fmt)` | `'%Y-%m-%d %H:%i:%S'` | MySQL 格式系（⚠️ %M=月份名，%i=分钟） |
 | DuckDB | `strftime(fmt, d)` | `'%Y-%m-%d %H:%M:%S'` | strftime 系 |
 | Trino | `DATE_FORMAT(d, fmt)` | `'%Y-%m-%d %H:%i:%s'` | MySQL 兼容(strftime 变体) |
 | SQLite | `strftime(fmt, d)` | `'%Y-%m-%d %H:%M:%S'` | strftime |
@@ -411,7 +411,7 @@ SELECT CURRENT_TIMESTAMP;     -- 正确（SQL 标准，无括号）
 | 秒 | `SS` | `%S` | `ss` |
 | AM/PM | `AM` | `%p` | `a` |
 
-> **注意**: strftime 体系内部也有差异！MySQL 用 `%i` 表示分钟，标准 strftime 用 `%M`。BigQuery/ClickHouse 用标准 `%M`。
+> **注意**: strftime 体系内部也有差异！MySQL 用 `%i` 表示分钟，标准 strftime 用 `%M`。BigQuery 用标准 `%M`。**ClickHouse v23.4+ 的 `%M` 输出完整月份名（January 等），分钟应用 `%i`**——与 MySQL 格式系一致。
 
 ### 解析函数对比（字符串 → 日期）
 
