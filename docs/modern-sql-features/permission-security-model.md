@@ -79,9 +79,10 @@ DENY SELECT ON dbo.employees(salary) TO intern;                   -- 列级 DENY
 DENY DELETE ON dbo.critical_data TO PUBLIC;                       -- 全局禁止删除
 
 -- Snowflake: 权限授予角色, 角色分配给用户
-GRANT SELECT ON DATABASE analytics TO ROLE analyst;
+GRANT USAGE ON DATABASE analytics TO ROLE analyst;
 GRANT USAGE ON SCHEMA analytics.public TO ROLE analyst;
 GRANT SELECT ON ALL TABLES IN SCHEMA analytics.public TO ROLE analyst;
+-- ⚠️ Snowflake 中 DATABASE/SCHEMA 级别用 USAGE，TABLE/VIEW 级别用 SELECT
 GRANT SELECT ON FUTURE TABLES IN SCHEMA analytics.public TO ROLE analyst;  -- 未来对象
 
 -- ClickHouse: 类似标准 SQL, 但有特殊权限
