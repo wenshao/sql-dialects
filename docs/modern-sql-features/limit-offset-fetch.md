@@ -212,7 +212,7 @@ WHERE rn BETWEEN 21 AND 30;  -- 第 3 页，每页 10 行
 | MySQL | ❌ | 语法错误，OFFSET 必须搭配 LIMIT |
 | SQLite | ❌ | OFFSET 必须搭配 LIMIT |
 | Oracle | ✅ | 仅 FETCH 语法支持 |
-| SQL Server | ❌ | OFFSET 必须搭配 FETCH |
+| SQL Server | ✅ | 跳过 N 行，返回剩余全部（2012+，需 ORDER BY） |
 | DuckDB | ✅ | 跳过 N 行，返回剩余全部 |
 | ClickHouse | ❌ | OFFSET 必须搭配 LIMIT |
 | Snowflake | ❌ | OFFSET 必须搭配 LIMIT |
