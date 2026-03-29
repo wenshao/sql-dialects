@@ -211,7 +211,8 @@ WHEN MATCHED THEN UPDATE SET t.name = s.name
 WHEN NOT MATCHED THEN INSERT (id, name) VALUES (s.id, s.name);
 
 -- 额外步骤: 删除源中不存在的行
-DELETE FROM target WHERE id NOT IN (SELECT id FROM source);
+DELETE FROM target WHERE NOT EXISTS (SELECT 1 FROM source WHERE source.id = target.id);
+-- ⚠️ 不要用 NOT IN：source.id 含 NULL 时会返回空集！
 ```
 
 ### Oracle MERGE 的特殊行为
