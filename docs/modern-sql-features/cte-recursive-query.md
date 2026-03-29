@@ -33,10 +33,10 @@ JOIN dept_stats d ON e.dept_id = d.dept_id;
 | SQL Server | ✅ | ✅ | 不需要 | 2005+ | 隐式递归 |
 | SQLite | ✅ | ✅ | 必须 | 3.8.3+ (2014) | - |
 | BigQuery | ✅ | ✅ | 必须 | GA | 有深度限制 |
-| Snowflake | ✅ | ✅ | 必须 | GA | - |
-| ClickHouse | ✅ | ⚠️ | 必须 | 20.6+ (CTE) / 21.8+ (递归) | 递归为实验性功能 (allow_experimental_analyzer) |
+| Snowflake | ✅ | ✅ | 可选 (推荐使用) | GA | - |
+| ClickHouse | ✅ | ⚠️ | 必须 | 20.6+ (CTE) / 24.3+ (递归实验性) / 24.8+ (递归生产) | 递归为实验性功能 (allow_experimental_analyzer) |
 | Hive | ✅ | ❌ | N/A | 0.13+ | 不支持递归 |
-| Spark SQL | ✅ | ❌ | N/A | 2.0+ | 不支持递归 CTE |
+| Spark SQL | ✅ | ❌ | N/A | 2.2+ | 不支持递归 CTE |
 | Flink SQL | ✅ | ❌ | N/A | 1.12+ | 流式场景不适合递归 |
 | MaxCompute | ✅ | ❌ | N/A | GA | 不支持递归 |
 | Hologres | ✅ | ❌ | N/A | GA | 不支持递归 |
@@ -225,7 +225,7 @@ SELECT * FROM r;
 | SQLite | ✅ | ✅ | - |
 | MariaDB | ✅ | ✅ | 10.3+ 支持 UNION |
 | BigQuery | ✅ | ✅ | - |
-| Snowflake | ✅ | ✅ | - |
+| Snowflake | ✅ | ❌ | 仅 UNION ALL |
 | DuckDB | ✅ | ✅ | - |
 | TiDB | ✅ | ❌ | 仅 UNION ALL |
 | CockroachDB | ✅ | ✅ | - |
@@ -539,8 +539,8 @@ SEARCH BREADTH FIRST BY name SET ordercol
 
 | 限制项 | MySQL | PostgreSQL | Oracle | SQL Server | SQLite |
 |--------|-------|-----------|--------|-----------|--------|
-| 递归成员中使用 GROUP BY | ❌ | ✅ | ❌ | ❌ | ✅ |
-| 递归成员中使用子查询 | ❌ | ✅ | ❌ | ❌ | ✅ |
+| 递归成员中使用 GROUP BY | ❌ | ❌ | ❌ | ❌ | ✅ |
+| 递归成员中使用子查询 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | 递归成员中使用 LIMIT/TOP | ❌ | ❌ | ❌ | ❌ | ✅ |
 | 递归成员中使用聚合函数 | ❌ | ❌ | ❌ | ❌ | ✅ |
 | 递归成员中使用窗口函数 | ❌ | ❌ | ❌ | ❌ | ❌ |
