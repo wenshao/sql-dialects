@@ -324,18 +324,13 @@ PIVOT (
     FOR quarter IN ('Q1', 'Q2', 'Q3', 'Q4')
 );
 
--- 省略 IN 列表（Spark 特有）
-SELECT *
-FROM sales
-PIVOT (
-    SUM(revenue)
-    FOR quarter IN ()           -- 空括号，不推荐
-);
--- Spark 会自动计算不同值，但 performance 开销大
--- 实际中建议显式列出或使用配置 spark.sql.pivotMaxValues 限制
+-- 注意: Spark SQL 语法要求显式 IN 列表，不能省略
+-- 省略 IN 列表仅在 DataFrame API 中可用:
+--   df.groupBy("year").pivot("quarter").agg(sum("revenue"))
+-- DataFrame API 会自动发现不同值（额外 job，受 spark.sql.pivotMaxValues 限制，默认 10000）
 ```
 
-**注意**: Spark 在 IN 列表为空时进行值发现，但与 Snowflake 的 `ANY` 不同——Spark 需要额外的 job 来收集不同值，开销较大。默认 `spark.sql.pivotMaxValues = 10000`，超出会报错。
+**注意**: Spark SQL 的 PIVOT 语法**必须提供显式 IN 列表**。自动值发现（省略 IN 列表）仅在 DataFrame API 中可用，不适用于纯 SQL 语法。
 
 ### Databricks
 
@@ -605,7 +600,7 @@ SELECT * FROM crosstab(
 - 结果类型必须在函数调用外通过 `AS ct(...)` 显式定义——无法动态确定列
 - 源查询必须恰好返回 3 列（行标识, 类别, 值）
 - 性能不如原生 PIVOT（涉及函数调用和字符串 SQL）
-- 兼容 PostgreSQL 的引擎（YugabyteDB, Greenplum, TimescaleDB, CockroachDB 部分支持）也可使用
+- 兼容 PostgreSQL 的引擎（YugabyteDB, Greenplum, TimescaleDB）也可使用（CockroachDB 不支持 tablefunc 扩展，无法使用 crosstab）
 
 ---
 
@@ -620,7 +615,7 @@ SELECT * FROM crosstab(
 | Snowflake | `PIVOT ... IN (ANY)` | 极简 | 安全 |
 | DuckDB | `PIVOT table ON col USING agg()` | 极简 | 安全 |
 | Snowflake | `PIVOT ... IN (SELECT ...)` | 简单 | 安全 |
-| Spark SQL | 省略 IN 列表 | 简单 | 有限制 (pivotMaxValues) |
+| Spark SQL | DataFrame API 自动发现（SQL 语法需显式 IN 列表） | 简单 | 有限制 (pivotMaxValues) |
 | Oracle | `PIVOT XML ... IN (ANY)` | 中等 | 安全（但输出为 XML） |
 | SQL Server | 动态 SQL + sp_executesql | 复杂 | SQL 注入风险 |
 | Oracle | 动态 SQL + EXECUTE IMMEDIATE | 复杂 | SQL 注入风险 |
