@@ -651,7 +651,58 @@ Phase 4: 物化控制
 - 监控指标: 迭代次数、WorkTable 大小、累积行数
 ```
 
-### 11.4 MPP 架构下的递归 CTE
+### 11.4 锚成员的显式 CAST 与类型截断防护
+
+递归 CTE 的输出列类型由锚成员（Anchor Member）决定。如果锚成员推导出的类型宽度不足，后续迭代中生成的值可能被静默截断，导致数据丢失或路径计算错误：
+
+```sql
+-- 问题示例: 锚成员中 path 被推导为 VARCHAR(10)
+WITH RECURSIVE tree AS (
+    SELECT id, name AS path FROM nodes WHERE parent_id IS NULL
+    UNION ALL
+    SELECT n.id, tree.path || '/' || n.name FROM nodes n JOIN tree ON n.parent_id = tree.id
+)
+SELECT * FROM tree;
+-- 第 3~4 层迭代时 path 可能超过 10 字符被截断
+
+-- 正确做法: 显式 CAST 确保足够宽度
+WITH RECURSIVE tree AS (
+    SELECT id, CAST(name AS VARCHAR(4000)) AS path FROM nodes WHERE parent_id IS NULL
+    UNION ALL
+    SELECT n.id, CAST(tree.path || '/' || n.name AS VARCHAR(4000)) FROM nodes n JOIN tree ON n.parent_id = tree.id
+)
+SELECT * FROM tree;
+```
+
+实现建议：
+- 引擎应在 binder/analyzer 阶段检测递归 CTE 中可能增长的字符串/数值列，当锚成员未使用显式 CAST 时发出警告
+- 对于 VARCHAR 类型，如果锚成员未指定长度且递归成员中存在字符串拼接操作，建议自动提升为最大长度或发出诊断提示
+- 数值列同理：锚成员为 INTEGER 但递归成员中存在累加，应提示可能溢出
+
+### 11.5 CYCLE 检测的内存开销与优化
+
+CYCLE 子句要求为每行维护一条从根到当前节点的访问路径（visit path），用于检测环。在深度递归场景下，路径存储会消耗大量内存：
+
+```
+内存开销分析:
+  设 N = 每层平均节点数, D = 递归深度
+  每行路径存储 = O(D × key_size)
+  总路径内存 = O(N^D × D × key_size)  （最坏情况，完全展开树）
+
+  实际案例:
+    - 100 万节点的图，平均深度 20，key 为 BIGINT (8 bytes)
+    - 每行路径 ≈ 160 bytes
+    - 如果某层产生 10 万行 → 仅路径数据就占 15 MB
+    - 深度 50、宽度大的图可轻松达到 GB 级别
+```
+
+优化策略：
+- **Bloom Filter 预检测**：在精确路径匹配前用 Bloom Filter 快速排除非环路径，减少字符串/数组比较开销。误判率可接受（false positive 只是触发额外精确检查）
+- **路径压缩**：对访问路径做 hash 摘要而非存储完整路径，代价是极低概率的 hash 碰撞导致误判环（可配置为严格模式时回退到完整路径）
+- **分层溢出**：路径数据超过内存阈值时溢出到磁盘，与 WorkTable 的溢出机制复用
+- **深度截断策略**：当递归深度超过 CYCLE 路径的最大允许长度时，直接标记为环并终止该分支，避免无限制的内存增长
+
+### 11.6 MPP 架构下的递归 CTE
 
 大数据引擎不支持递归 CTE 的根本原因：
 
@@ -674,7 +725,7 @@ Trino 的实现参考:
 - 每次迭代都是一次完整的分布式查询执行
 ```
 
-### 11.5 RECURSIVE 关键字的取舍
+### 11.7 RECURSIVE 关键字的取舍
 
 ```
 推荐: 要求 WITH RECURSIVE 关键字
@@ -690,7 +741,7 @@ Trino 的实现参考:
 - 当检测到隐式递归时可发出 NOTICE 提示用户添加 RECURSIVE 关键字
 ```
 
-### 11.6 CTE 物化决策
+### 11.8 CTE 物化决策
 
 ```
 优化器自动选择物化策略的参考规则:
