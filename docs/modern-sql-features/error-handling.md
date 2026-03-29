@@ -33,7 +33,7 @@ TiDB               ✗          ✗                 ✓(4)             ✗      
 OceanBase (MySQL)  ✗          ✗                 ✓                ✗         ✗           V3.x+
 OceanBase (Oracle) ✗          ✓                 ✗                ✗         ✓           V3.x+
 Teradata           ✗          ✗                 ✓                ✓(嵌入)   ✗           V14+
-SAP HANA           ✗          ✓                 ✓                ✗         ✓           SPS09+
+SAP HANA           ✗          ✗                 ✓                ✗         ✓           SPS09+
 Informix           ✗          ✓                 ✗                ✓(嵌入)   ✗           11.50+
 Firebird           ✗          ✓                 ✗                ✗         ✓           2.0+
 SQLite             ✗          ✗                 ✗                ✗         ✗(5)        -
@@ -1305,12 +1305,13 @@ BEGIN
 END;
 ```
 
-## SAP HANA 的双模式错误处理
+## SAP HANA 的错误处理 (DECLARE HANDLER 模型)
 
 ```sql
--- SAP HANA SQLScript: 支持 EXCEPTION 块和 DECLARE HANDLER 两种模式
+-- SAP HANA SQLScript: 使用 DECLARE EXIT/CONTINUE HANDLER 模型 (类似 MySQL/Db2)
+-- 注意: SAP HANA 不使用 PostgreSQL/Oracle 风格的 BEGIN...EXCEPTION...END 块
 
--- 模式 1: EXCEPTION 块 (推荐)
+-- 模式 1: DECLARE EXIT HANDLER (推荐)
 CREATE PROCEDURE transfer_funds(
     IN p_from INT, IN p_to INT, IN p_amount DECIMAL(10,2))
 LANGUAGE SQLSCRIPT
