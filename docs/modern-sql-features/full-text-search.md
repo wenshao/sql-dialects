@@ -117,7 +117,7 @@ SELECT *, MATCH(title, body) AGAINST('database optimization') AS relevance
 FROM articles
 WHERE MATCH(title, body) AGAINST('database optimization');
 -- 返回按相关性排序的结果
--- 使用 BM25 变体评分 (MySQL 8.0)
+-- 使用专有相关性评分公式 (MySQL 8.0, 基于词频、逆文档频率、文档长度，可与 BM25 家族类比，但非官方标准 BM25 实现)
 
 -- 2. 布尔模式
 SELECT * FROM articles
@@ -159,9 +159,9 @@ ORDER BY score DESC;
 -- 重要: WHERE 和 SELECT 中的 MATCH AGAINST 只会执行一次 (MySQL 优化器识别)
 -- 但参数必须完全一致，否则会执行两次
 
--- MySQL 8.0 InnoDB 使用的评分算法:
--- 基于 BM25 的变体: score = IDF * TF / (TF + k1 * (1 - b + b * DL/AVDL))
--- k1 = 1.2, b = 0.75 (默认)
+-- MySQL 8.0 InnoDB 使用专有相关性评分公式:
+-- 基于词频(TF)、逆文档频率(IDF)、文档长度归一化，可与 BM25 家族类比
+-- 但 MySQL 官方未声明其为标准 BM25 实现，具体参数和公式为内部实现细节
 ```
 
 ### 配置参数
@@ -1407,7 +1407,7 @@ ParadeDB:
 ┌──────────────────┬───────────────────────────────────────────┐
 │ 引擎             │ 评分算法                                  │
 ├──────────────────┼───────────────────────────────────────────┤
-│ MySQL 8.0        │ BM25 变体                                 │
+│ MySQL 8.0        │ 专有评分公式（基于 TF-IDF 思想，可类比 BM25 但非标准实现）│
 │ MySQL 5.7        │ TF-IDF 变体                               │
 │ PostgreSQL       │ ts_rank: 自定义权重模型 (非 BM25)         │
 │                  │ ts_rank_cd: Cover Density 算法            │
