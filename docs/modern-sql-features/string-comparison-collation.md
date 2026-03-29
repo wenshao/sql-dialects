@@ -192,6 +192,14 @@ SELECT CONCAT_WS('', 'Hello', NULL, ' World'); -- 结果: 'Hello World'
 -- SQL Server: CONCAT 跳过 NULL (2012+)
 SELECT CONCAT('Hello', NULL, ' World');  -- 结果: 'Hello World'
 SELECT 'Hello' + NULL + ' World';        -- 结果: NULL
+
+-- Oracle 特殊: || 和 CONCAT 都不传播 NULL (视 NULL 为空字符串)
+SELECT 'Hello' || NULL || ' World' FROM DUAL;  -- 结果: 'Hello World' (非 NULL!)
+SELECT CONCAT('Hello', NULL) FROM DUAL;         -- 结果: 'Hello'
+
+-- Spark SQL: concat() 传播 NULL, concat_ws() 跳过 NULL
+SELECT concat('Hello', NULL, ' World');          -- 结果: NULL
+SELECT concat_ws('', 'Hello', NULL, ' World');   -- 结果: 'Hello World'
 ```
 
 ## 正则表达式支持
@@ -359,7 +367,7 @@ SELECT * FROM t WHERE COLLATE(name, 'en-ci') = 'john';
 [ ] 审计所有 UNIQUE 约束，大小写敏感后 'ABC' 和 'abc' 是两条不同记录
 [ ] 审计所有 GROUP BY，大小写敏感后分组数可能增加
 [ ] 检查尾部空格: SELECT COUNT(*) FROM t WHERE col != RTRIM(col)
-[ ] 替换 CONCAT() 为 || (注意 NULL 处理差异)
+[ ] 统一拼接方式: Oracle 迁出时用 CONCAT() 而非 ||（避免 NULL 行为变化）; Spark/SQLite 中 concat() 和 || 的 NULL 行为不同
 [ ] 替换 + 拼接 (SQL Server) 为 || 或 CONCAT()
 [ ] 将 REGEXP/RLIKE 转换为目标方言的正则语法
 [ ] 重新评估 Collation 设置，确保排序行为一致
