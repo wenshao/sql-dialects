@@ -95,8 +95,8 @@
 | **SQL Server** | ERROR（Arithmetic overflow） | ERROR | `TRY_CAST` |
 | **BigQuery** | N/A（只有 INT64，无 INT32） | ERROR | `SAFE_ADD()` 返回 NULL |
 | **Snowflake** | N/A（NUMBER(38,0)，范围极大） | N/A | 不存在此问题 |
-| **ClickHouse** | **静默回绕**（模运算，返回 -2147483648） | **静默回绕** | 无 |
-| **Hive** | 返回 NULL | 返回 NULL | 内置 NULL 行为 |
+| **ClickHouse** | N/A（≤32 位自动提升到 Int64） | **静默回绕**（Int64 边界） | 无 |
+| **Hive** | **静默回绕**（Java 原生整数运算） | **静默回绕** | 无 |
 | **Spark SQL** | **静默回绕**（ANSI=off）/ ERROR（ANSI=on） | 同左 | `try_add()` 返回 NULL |
 | **MaxCompute** | **静默回绕**（1.0）/ ERROR（2.0） | 同左 | 取决于版本 |
 | **StarRocks** | ERROR | ERROR | 无 |
@@ -110,9 +110,9 @@
 
 | 始终 ERROR | 静默回绕（危险!） | 返回 NULL | 不存在问题（大范围类型） |
 |---|---|---|---|
-| PostgreSQL, SQL Server, BigQuery, Trino, DuckDB, Redshift, StarRocks, Doris | ClickHouse, Spark 3.x（ANSI=off）, Flink, MaxCompute 1.0 | Hive | Oracle（NUMBER）, Snowflake（NUMBER(38,0)） |
+| PostgreSQL, SQL Server, BigQuery, Trino, DuckDB, Redshift, StarRocks, Doris | Hive, ClickHouse（Int64 边界）, Spark 3.x（ANSI=off）, Flink, MaxCompute 1.0 | — | Oracle（NUMBER）, Snowflake（NUMBER(38,0)）, ClickHouse（≤32 位自动提升） |
 
-**⚠️ ClickHouse 的静默回绕是最危险的行为** —— `2147483647 + 1` 返回 `-2147483648`，没有任何警告。这在累加/计数场景中可能导致灾难性的数据错误。
+**⚠️ 静默回绕是最危险的行为** —— Hive/Flink 中 `2147483647 + 1` 返回 `-2147483648`（Java 整数回绕），ClickHouse 对 ≤32 位类型自动提升到 Int64 避免了此问题，但 Int64 边界 `9223372036854775807 + 1` 仍然静默回绕。
 
 ---
 
