@@ -374,7 +374,7 @@ FROM scores;
 | DuckDB | ✅ | ✅ | ✅ | 0.3.0+ |
 | MySQL | ❌ | ❌ | ❌ | - |
 | MariaDB | ❌ | ❌ | ❌ | - |
-| Oracle | ❌ | ❌ | ❌ | - |
+| Oracle | ✅ | ✅ | ✅ | 21c+ |
 | SQL Server | ❌ | ❌ | ❌ | - |
 | BigQuery | ❌ | ❌ | ❌ | - |
 | Snowflake | ❌ | ❌ | ❌ | - |
@@ -387,7 +387,7 @@ FROM scores;
 | Redshift | ❌ | ❌ | ❌ | - |
 | Teradata | ❌ | ❌ | ❌ | - |
 
-**关键发现**: EXCLUDE 子句是窗口函数中支持率最低的特性，全行业仅 3 个引擎支持（PostgreSQL、SQLite、DuckDB）。不支持的引擎需要通过自连接或子查询手动排除行。
+**关键发现**: EXCLUDE 子句是窗口函数中支持率最低的特性，全行业仅 4 个引擎完整支持（PostgreSQL、SQLite、DuckDB、Oracle 21c+）。不支持的引擎需要通过自连接或子查询手动排除行。
 
 ### 不支持引擎的替代方案
 
@@ -473,7 +473,7 @@ FROM employees;
 | QUALIFY | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | WINDOW 子句 | ✅ | ✅ 8.0+ | ❌ | ❌ | ✅ 3.28+ | ✅ 10.2+ | ✅ | ❌ |
 | GROUPS 帧 | ✅ 11+ | ❌ | ❌ | ❌ | ✅ 3.28+ | ✅ 10.9+ | ❌ | ❌ |
-| EXCLUDE | ✅ 11+ | ❌ | ❌ | ❌ | ✅ 3.28+ | ❌ | ❌ | ❌ |
+| EXCLUDE | ✅ 11+ | ❌ | ✅ 21c+ | ❌ | ✅ 3.28+ | ❌ | ❌ | ❌ |
 | FILTER (窗口) | ✅ 9.4+ | ❌ | ❌ | ❌ | ✅ 3.30+ | ❌ | ❌ | ❌ |
 | NTH_VALUE | ✅ | ✅ 8.0+ | ✅ | ❌ | ✅ 3.25+ | ✅ 10.2+ | ✅ | ❌ |
 | IGNORE NULLS | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ |
