@@ -790,7 +790,7 @@ ALTER PARTITION eu OF TABLE orders
 引擎            静态裁剪    动态裁剪    支持的谓词
 ─────────────  ─────────  ─────────  ──────────────────────────────
 MySQL           ✓          ✗          =, IN, <, >, BETWEEN, IS NULL
-PostgreSQL      ✓          ✓ (14+)    =, IN, <, >, BETWEEN, IS NULL
+PostgreSQL      ✓          ✓ (11+)    =, IN, <, >, BETWEEN, IS NULL
 Oracle          ✓          ✓          =, IN, <, >, BETWEEN, LIKE prefix
 SQL Server      ✓          ✓          =, IN, <, >, BETWEEN
 BigQuery        ✓          ✓          =, IN, <, >, BETWEEN
@@ -812,7 +812,7 @@ OceanBase       ✓          ✓          =, IN, <, >, BETWEEN
 SELECT * FROM orders WHERE order_date = '2025-01-15';
 -- 优化器直接定位到 p2025 分区
 
--- 动态裁剪示例 (PostgreSQL 14+, Oracle, Spark 3.0+)
+-- 动态裁剪示例 (PostgreSQL 11+, Oracle, Spark 3.0+)
 SELECT o.* FROM orders o
 JOIN dim_date d ON o.order_date = d.dt
 WHERE d.is_holiday = TRUE;
@@ -946,8 +946,8 @@ INTERVAL (NUMTODSINTERVAL(1, 'DAY')) (
 
 引擎            ADD     DROP    TRUNCATE  EXCHANGE  SPLIT   MERGE   RENAME
 ─────────────  ─────   ─────   ────────  ────────  ─────   ─────   ──────
-MySQL           ✓       ✓       ✓         ✓(5.7+)   ✓(8.0+) ✓(8.0+) ✗
-PostgreSQL      ✓       ✓(*)    ✓         ✓(ATTACH) ✓(17+)  ✓(17+)  ✗
+MySQL           ✓       ✓       ✓         ✓(5.7+)   ✓(5.1+) ✓(5.1+) ✗
+PostgreSQL      ✓       ✓(*)    ✓         ✓(ATTACH) ✗       ✗       ✗
 Oracle          ✓       ✓       ✓         ✓         ✓       ✓       ✓
 SQL Server      ✓(**)   ✓(**)   ✓         ✓(***)    ✓(**)   ✓(**)   ✗
 BigQuery        ✗(自动)  ✓       ✗         ✗         ✗       ✗       ✗
@@ -959,7 +959,7 @@ TiDB            ✓       ✓       ✓         ✓(6.0+)   ✗       ✗       
 OceanBase       ✓       ✓       ✓         ✗         ✗       ✗       ✗
 CockroachDB     ✗       ✗       ✗         ✗         ✗       ✗       ✗
 
-✓(*)   PostgreSQL DROP = DETACH (分区变为独立表, 数据不丢失)
+✓(*)   PostgreSQL: DETACH 解绑分区（变为独立表，数据不丢失）；DROP 会连带数据删除
 ✓(**)  SQL Server 通过 MERGE/SPLIT Partition Function 实现
 ✓(***) SQL Server SWITCH = EXCHANGE
 ```
