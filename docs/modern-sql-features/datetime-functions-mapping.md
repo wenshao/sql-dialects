@@ -251,7 +251,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 | BigQuery | 是 | 否(用 EXTRACT) | 否 | 否 | 否(FORMAT_DATE) |
 | Snowflake | 是 | 是 | 是 | 否 | 是 |
 | ClickHouse | 是 | 是(toYear等) | 否 | 否 | 否(formatDateTime) |
-| DuckDB | 是 | 是 | 是 | 是(date_part) | 否 |
+| DuckDB | 是 | 是 | 是(date_part) | 是(strftime) | 否 |
 | Trino | 是 | 是 | 否 | 否 | 否(DATE_FORMAT) |
 | Hive | 是(2.2+) | 是 | 否 | 否 | 否(DATE_FORMAT) |
 | Spark SQL | 是 | 是 | 否 | 否 | 否(DATE_FORMAT) |
