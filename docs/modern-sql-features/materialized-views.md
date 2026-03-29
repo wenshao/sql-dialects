@@ -16,7 +16,7 @@
 | Db2 | `MATERIALIZED QUERY TABLE` | REFRESH IMMEDIATE / DEFERRED | 自动 | 暂存表 | 8.1+ |
 | Db2 (z/OS) | `MATERIALIZED QUERY TABLE` | REFRESH / ENABLE QUERY OPTIMIZATION | 自动 | 支持 | V8+ |
 | Informix | `MATERIALIZED VIEW` | REFRESH COMPLETE / FAST | 部分 | 支持 | 14+ |
-| SAP HANA | `MATERIALIZED VIEW` | 自动 / 手动 | 不支持 | 支持 | 2.0+ |
+| SAP HANA | `MATERIALIZED VIEW` | 自动 / 手动 | 支持 | 支持 | 2.0+ |
 | Teradata | `JOIN INDEX / HASH INDEX` | 自动同步 | 自动 | 同步 | V2R5+ |
 | SQLite | 不支持 | - | - | - | - |
 
