@@ -275,7 +275,7 @@ DROP COLUMN:   非阻塞, GC job 清理
 MODIFY TYPE:   非阻塞 (有类型限制)
 ADD INDEX:     非阻塞, 后台回填
 
-状态机与 TiDB 类似:
+CockroachDB schema 变更状态路径:
   delete-and-write-only -> backfill -> public
   所有节点通过 schema lease 机制同步
 
@@ -472,7 +472,7 @@ MaxCompute 是全托管批处理平台:
 | **Oracle** | 即时 (12c+含默认值) | SET UNUSED (即时) | DBMS_REDEF (不阻塞) | ONLINE (不阻塞) |
 | **SQL Server** | 即时 (元数据) | 即时 (标记删除) | ONLINE (Enterprise) | ONLINE (Enterprise) |
 | **TiDB** | 非阻塞 (F1) | 非阻塞 (F1) | 非阻塞 (5.0+) | 非阻塞 (F1) |
-| **CockroachDB** | 非阻塞 (F1) | 非阻塞 (F1) | 非阻塞 (有限制) | 非阻塞 (F1) |
+| **CockroachDB** | 非阻塞 (类F1) | 非阻塞 (类F1) | 非阻塞 (有限制) | 非阻塞 (类F1) |
 | **OceanBase** | 非阻塞 | 非阻塞 | 视类型而定 | 非阻塞 |
 | **BigQuery** | 即时 (元数据) | 即时 (元数据) | 有限支持 | N/A (无索引) |
 | **Snowflake** | 即时 (元数据) | 即时 (元数据) | 有限支持 | N/A (无索引) |
@@ -482,7 +482,7 @@ MaxCompute 是全托管批处理平台:
 | **Spark SQL** | 元数据 | Delta Lake 支持 | Delta (类型扩宽) | N/A |
 | **StarRocks** | Fast Schema Evo (3.0+) | Fast Schema Evo (3.0+) | SchemaChange job | 后台构建 |
 | **Doris** | Light Schema Change (2.0+) | Light Schema Change (2.0+) | SchemaChange job | 后台构建 |
-| **MaxCompute** | 元数据 | 元数据 | 不支持 | N/A |
+| **MaxCompute** | 元数据 | 不支持 | 不支持 | N/A |
 
 ## Atomic DDL
 
@@ -691,7 +691,7 @@ Expand-Migrate-Contract 模式 (适用于所有引擎):
 |------|:-----------:|:-----------:|:-----------------:|:----------------:|--------|
 | **PostgreSQL** | YES | NO | 即时 (11+) | CONCURRENTLY | ShareUpdateExclusive (DDL 期间); AccessExclusive (短暂, commit 阶段) |
 | **SQL Server** | YES | NO | 即时 | ONLINE=ON (Enterprise) | Sch-M (Schema Modification) 或 ONLINE 模式 |
-| **CockroachDB** | YES | NO | 非阻塞 (F1) | 非阻塞 (F1) | 无表锁; 分布式 lease-based schema |
+| **CockroachDB** | YES | NO | 非阻塞 (类F1) | 非阻塞 (类F1) | 无表锁; 分布式 lease-based schema |
 | **Redshift** | YES | NO | 即时 | N/A | AccessExclusiveLock (短暂) |
 | **DuckDB** | YES | NO | 即时 | 即时 (小规模) | 进程内锁 (嵌入式单进程) |
 | **MySQL** | NO | YES | INSTANT (8.0.12+) | INPLACE (5.6+) | MDL (Metadata Lock) + InnoDB 行锁; INSTANT 无锁 |
