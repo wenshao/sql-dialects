@@ -198,7 +198,7 @@ SQL 标准规则（大多数引擎遵循）:
 | 排名 | 差异 | 影响 | 受影响方言 |
 |------|------|------|-----------|
 | 1 | 整数除法结果类型 | 金融计算错误 | PG/SS: `5/2=2`（截断），MySQL/Oracle: `5/2=2.5`（真除法） |
-| 2 | 整数溢出静默回绕 | 累加器/计数器翻转为负数 | ClickHouse、Spark 3.x、Flink |
+| 2 | 整数溢出静默回绕 | 累加器/计数器翻转为负数 | Hive、ClickHouse（Int64 边界）、Spark 3.x、Flink、MaxCompute 1.0 |
 | 3 | 除零静默返回 NULL | 错误被掩盖 | MySQL、Hive、StarRocks、Doris |
 | 4 | 裸字面量 `0.1` 的类型 | `0.1+0.2≠0.3` | BigQuery、ClickHouse、Hive |
 | 5 | DECIMAL 精度上限 | 乘法连锁后精度溢出 | 除 PG 外所有引擎（p=38 上限） |
@@ -209,7 +209,7 @@ SQL 标准规则（大多数引擎遵循）:
 
 1. **整数除法**: 推荐 PostgreSQL 方式（INT/INT=INT），与编程语言一致。提供 `DIV` 或 `IDIV` 函数作为显式选择
 2. **除零**: 推荐 ERROR（SQL 标准），提供 `SAFE_DIVIDE()` 安全变体（BigQuery 模式）
-3. **溢出**: **绝不静默回绕**——这是 ClickHouse/Flink 的设计缺陷。推荐 ERROR + 提供 `try_add()` 安全变体
+3. **溢出**: **绝不静默回绕**——这是 Hive/Flink 的设计缺陷（Java 原生整数运算）。ClickHouse 通过自动类型提升（≤32 位→Int64）缓解了此问题，但 Int64 边界仍有风险。推荐 ERROR + 提供 `try_add()` 安全变体
 4. **裸字面量**: 推荐 `0.1` 解析为 DECIMAL（精确），避免 `0.1+0.2≠0.3` 的用户困惑
 5. **DECIMAL 精度**: p=38 是合理上限，但乘法链溢出时应报错而非静默截断
 
