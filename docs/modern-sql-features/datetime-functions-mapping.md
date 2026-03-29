@@ -90,6 +90,8 @@ SELECT addMonths(toDate('2024-01-01'), 3);
 SELECT SYSDATE + 7 FROM DUAL;                       -- 加 7 天
 SELECT SYSDATE + INTERVAL '3' MONTH FROM DUAL;
 SELECT ADD_MONTHS(SYSDATE, 3) FROM DUAL;
+-- ⚠️ Oracle ADD_MONTHS 月末对齐：2月28日+1月=3月31日（输入为月末则结果也为月末）
+-- MySQL/PG/SQL Server 使用 Clamping：2月28日+1月=3月28日（财务系统致命差异！）
 
 -- SQLite: DATE 函数 + modifier
 SELECT DATE('2024-01-01', '+7 days');
@@ -151,6 +153,7 @@ SELECT DATEDIFF(DAY, '2024-01-01', '2024-01-08');   -- 7
 SELECT DATEDIFF(MONTH, '2024-01-01', '2024-04-01'); -- 3
 SELECT DATEDIFF(YEAR, '2020-12-31', '2021-01-01');  -- 1（跨年即算！）
 -- ⚠️ SQL Server DATEDIFF 是 "边界跨越" 语义，不是完整间隔
+-- ⚠️ DATEDIFF 返回 INT（4 字节），毫秒差超过 ~24.8 天会溢出！用 DATEDIFF_BIG (2016+) 替代
 
 -- Snowflake: 同 SQL Server 语法
 SELECT DATEDIFF(DAY, '2024-01-01', '2024-01-08');  -- 7
@@ -258,7 +261,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 | MaxCompute | 是 | 是 | 否 | 否 | 否 |
 
 > 注1: PostgreSQL 有 `EXTRACT(YEAR FROM d)` 但没有独立的 `YEAR(d)` 函数。
-> 注2: Oracle 的 EXTRACT 仅支持从 DATE/TIMESTAMP 提取 YEAR/MONTH/DAY/HOUR/MINUTE/SECOND。
+> 注2: Oracle EXTRACT 从 DATE 仅支持 YEAR/MONTH/DAY；提取 HOUR/MINUTE/SECOND 需要 TIMESTAMP 类型。
 
 ```sql
 -- EXTRACT 标准语法（大多数引擎）
@@ -304,6 +307,8 @@ SELECT EXTRACT(YEAR FROM date_col);  -- 也支持 EXTRACT
 | BigQuery | EXTRACT(DAYOFWEEK) | 1 | 2 | 7 |
 
 > *SQL Server 和 Oracle 的星期几起始日受 `SET DATEFIRST` / `NLS_TERRITORY` 影响。
+>
+> **⚠️ 周数计算（WEEK OF YEAR）是另一个灾难**：MySQL `WEEK()` 有 8 种 mode（`default_week_format` 控制），SQL Server `DATEPART(wk)` 受 `@@DATEFIRST` 影响，PostgreSQL 默认 ISO 周（周一起始，第 1 周含 1 月 4 日）。跨引擎迁移周统计报表时，**必须显式对齐一周的起始日和第 1 周的定义**。
 
 ---
 
@@ -467,9 +472,9 @@ SELECT CURRENT_TIMESTAMP AT TIME ZONE 'UTC';
 SELECT GETDATE() AT TIME ZONE 'China Standard Time';
 SELECT CONVERT(DATETIME, SYSDATETIMEOFFSET() AT TIME ZONE 'UTC');
 
--- MySQL: CONVERT_TZ
-SELECT CONVERT_TZ('2024-01-01 12:00:00', '+08:00', 'UTC');
-SELECT CONVERT_TZ(NOW(), @@session.time_zone, 'US/Eastern');
+-- MySQL: CONVERT_TZ（⚠️ 命名时区需已加载时区表，否则返回 NULL）
+SELECT CONVERT_TZ('2024-01-01 12:00:00', '+08:00', 'UTC');           -- offset 形式始终可用
+SELECT CONVERT_TZ(NOW(), @@session.time_zone, 'US/Eastern');         -- 命名时区需 mysql_tzinfo_to_sql
 
 -- Oracle: FROM_TZ + AT TIME ZONE
 SELECT FROM_TZ(TIMESTAMP '2024-01-01 12:00:00', 'Asia/Shanghai')
@@ -681,8 +686,8 @@ SELECT DATE_TRUNC('month', date_col);  -- unit 在前
 -- BigQuery:
 SELECT DATE_TRUNC(date_col, MONTH);    -- date 在前
 
--- 从 PostgreSQL 迁移到 BigQuery 时，如果只改函数名不改参数顺序，编译可能通过
--- （因为 BigQuery 可能把字符串 'month' 解释为表达式），但结果错误
+-- 从 PostgreSQL 迁移到 BigQuery 时，如果只改函数名不改参数顺序，
+-- BigQuery 通常会直接报类型错误（首参期望 date 表达式而非字符串）
 ```
 
 ### 迁移安全检查清单
