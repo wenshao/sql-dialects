@@ -84,7 +84,7 @@ SELECT DATE '2024-01-01' + INTERVAL 7 DAY;
 SELECT toDate('2024-01-01') + INTERVAL 7 DAY;
 SELECT addDays(toDate('2024-01-01'), 7);      -- 专用函数
 SELECT addMonths(toDate('2024-01-01'), 3);
-SELECT date_add(DAY, 7, toDate('2024-01-01'));  -- SQL 兼容语法
+-- 注意: ClickHouse 不支持 SQL Server 风格的 DATEADD(unit, delta, date) 三参数形式
 
 -- Oracle: date + integer（天数）或 INTERVAL
 SELECT SYSDATE + 7 FROM DUAL;                       -- 加 7 天
