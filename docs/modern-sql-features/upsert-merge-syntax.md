@@ -241,7 +241,7 @@ Oracle MERGE 中的 DELETE 只能删除被 MATCHED 且 UPDATE 过的行，无法
 | SQL Server 2008+ | `OUTPUT` | **MERGE 支持** | `MERGE ... OUTPUT $action, inserted.*, deleted.*` |
 | Oracle | `RETURNING INTO` | **仅 PL/SQL** | 需要在过程块中使用 |
 | MySQL | **不支持** | - | 只能用 `ROW_COUNT()` 和 `LAST_INSERT_ID()` |
-| MariaDB | `RETURNING` (10.5+) | 仅 DELETE | INSERT RETURNING 不支持 |
+| MariaDB | `RETURNING` (10.5+) | **支持** | INSERT/REPLACE/DELETE/ON DUPLICATE KEY UPDATE 均支持 RETURNING |
 | BigQuery | **不支持** | - | - |
 | Snowflake | **不支持** | - | 但 MERGE 返回行数统计 |
 
