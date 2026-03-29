@@ -301,11 +301,14 @@ PARTITION BY RANGE_BUCKET(user_id, GENERATE_ARRAY(0, 1000000, 10000));
 -- 按 user_id 每 10000 一个分区
 
 -- 摄入时间分区 (按数据到达时间)
+-- 注意: 摄入时间分区表无需在 DDL 中指定分区列，BigQuery 自动按加载时间分区
+-- 查询时使用 _PARTITIONTIME / _PARTITIONDATE 伪列过滤:
+-- SELECT * FROM raw_logs WHERE _PARTITIONDATE = '2024-01-15'
 CREATE TABLE project.dataset.raw_logs (
     data STRING
 )
-PARTITION BY _PARTITIONDATE;
--- _PARTITIONDATE 是伪列, 记录数据被写入 BigQuery 的日期
+PARTITION BY DATE(_PARTITIONTIME);
+-- _PARTITIONTIME 是 TIMESTAMP 伪列；DATE(_PARTITIONTIME) 按天分区
 
 -- 分区过期: 自动删除旧分区
 CREATE TABLE project.dataset.temp_events (
