@@ -651,6 +651,78 @@ x NOT IN (a, b, NULL)  =  x<>a AND x<>b AND x<>NULL  =  UNKNOWN
 
 4. **性能回退机制**：当去关联化后的计划比原始关联子查询更差时（例如右表极小但左表极大），应有回退机制。Oracle 和 SQL Server 的优化器会通过代价模型比较两种方案。
 
+### 12.7 窗口函数替代复杂关联子查询
+
+许多关联子查询可以通过窗口函数改写，将多次表扫描降为单次扫描。引擎优化器应识别这类等价模式，或至少在文档中引导用户优先使用窗口函数：
+
+```sql
+-- 关联子查询: 每行触发一次内层查询 → O(N × M) 扫描
+SELECT e.id, e.name, e.salary,
+    (SELECT AVG(salary) FROM employees e2 WHERE e2.dept_id = e.dept_id) AS dept_avg
+FROM employees e;
+
+-- 窗口函数等价改写: 单次扫描 + 分区聚合 → O(N)
+SELECT id, name, salary,
+    AVG(salary) OVER (PARTITION BY dept_id) AS dept_avg
+FROM employees;
+```
+
+优化器改写建议：
+- 检测 SELECT 列表中的关联标量子查询，判断其是否可改写为 `AGG() OVER (PARTITION BY correlated_columns)`
+- 条件：子查询引用外层表的列仅出现在等值关联条件中，且子查询为简单聚合（无 HAVING、无额外过滤）
+- 改写后消除嵌套循环执行，显著降低大表上的查询延迟
+
+### 12.8 IN 列表的物理限制与防护
+
+不同引擎对 IN 子句中的字面量元素数有硬性限制，超限时报语法错误或内部错误。这对 ORM 和代码生成工具尤其危险：
+
+```
+各引擎 IN 列表限制:
+  Oracle:         1000 元素 (ORA-01795: maximum number of expressions in a list is 1000)
+  SQL Server:     无硬限制，但解析器在 ~65,000 元素时显著变慢
+  MySQL:          无硬限制，受 max_allowed_packet 间接约束
+  PostgreSQL:     无硬限制，但超大 IN 列表的计划时间会急剧上升
+  SQLite:         默认 SQLITE_MAX_VARIABLE_NUMBER = 999
+
+防护策略:
+  1. 引擎层面: 对 IN 列表设定明确的上限阈值，超限时提供清晰错误信息
+  2. 优化器层面: 超过阈值自动改写为临时表 JOIN
+     WHERE id IN (1, 2, ..., 2000)
+     → WHERE id IN (SELECT id FROM VALUES (1), (2), ..., (2000))
+     → 或改写为 JOIN (VALUES ...) AS t(id) ON main.id = t.id
+  3. SQL 生成工具建议: 分批拆分为多个 IN 列表用 OR 连接，
+     或改用临时表批量加载后 JOIN
+```
+
+### 12.9 去关联化的代价评估与回退
+
+去关联化（Decorrelation）并非总是有益的。当关联子查询的内层表很小但外层表很大时，去关联化改写为 JOIN 后可能导致代价爆炸：
+
+```
+危险场景:
+  SELECT * FROM large_table l
+  WHERE EXISTS (
+      SELECT 1 FROM small_lookup s
+      WHERE s.key = l.key AND s.complex_condition(l.value)
+  )
+
+  去关联化后:
+    large_table JOIN small_lookup ON key = key
+    → 如果 complex_condition 无法下推为 JOIN 条件，
+      优化器可能选择 Nested Loop Join，
+      对 large_table 的每一行都扫描 small_lookup
+    → 代价从 O(N × 索引查找) 变为 O(N × M) 的笛卡尔积风险
+
+代价评估要点:
+  1. 去关联化前: 估算关联子查询的执行次数 × 单次代价
+  2. 去关联化后: 估算 JOIN 的代价 (考虑 JOIN 类型、基数、索引可用性)
+  3. 比较两者，选择代价更低的方案
+  4. 对于嵌套多层的关联子查询，递归去关联化可能导致指数级的
+     中间结果膨胀，必须在每层都进行代价评估
+```
+
+引擎应提供 `/*+ NO_UNNEST */` 类似的优化器 hint，允许用户在去关联化产生回归时手动禁用该变换。
+
 ---
 
 ## 参考资料
