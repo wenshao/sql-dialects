@@ -330,7 +330,8 @@ PostgreSQL 安全注意：恶意用户可创建同名临时对象劫持查询。
 ```
 MySQL SBR: 临时表 DDL/DML 被复制 → 主库异常断开时从库残留临时表
 MySQL RBR: 临时表操作不复制 → 安全
-PostgreSQL: 临时表不参与逻辑复制；物理复制中 WAL 包含临时表操作
+PostgreSQL: 临时表不参与逻辑复制；物理复制中 WAL 包含临时表操作（仅实现层面，
+           临时表数据不会以用户可见方式复制到 standby，临时表始终是会话本地的）
 SQL Server: tempdb 节点本地，不参与复制和 AG
 ```
 
