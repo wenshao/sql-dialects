@@ -15,7 +15,7 @@
 | 能力 | MySQL | PostgreSQL | Oracle | SQL Server | SQLite | MariaDB | Db2 |
 |------|-------|-----------|--------|-----------|--------|---------|-----|
 | EXPLAIN | `EXPLAIN SELECT ...` | `EXPLAIN SELECT ...` | `EXPLAIN PLAN FOR SELECT ...` | `SET SHOWPLAN_ALL ON`（无 EXPLAIN 关键字） | `EXPLAIN QUERY PLAN SELECT ...` | `EXPLAIN SELECT ...` | `EXPLAIN SELECT ...` |
-| 实际执行统计 | `EXPLAIN ANALYZE` (8.0.18+) | `EXPLAIN ANALYZE` | `DBMS_XPLAN.DISPLAY_CURSOR` | `SET STATISTICS TIME/IO ON` | 不支持 | `ANALYZE` 关键字 | `db2exfmt` |
+| 实际执行统计 | `EXPLAIN ANALYZE` (8.0.18+) | `EXPLAIN ANALYZE` | `DBMS_XPLAN.DISPLAY_CURSOR` | `SET STATISTICS TIME/IO ON` | 不支持 | `ANALYZE` 语句 (10.1.0+, 非 EXPLAIN ANALYZE) | `db2exfmt` |
 | FORMAT JSON | 5.6+ | 支持 | 不支持 | 不支持 | 不支持 | 10.1+ | 不支持 |
 | FORMAT TREE | 8.0.16+ | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | FORMAT XML | 不支持 | 支持 | 不支持 | `SET SHOWPLAN_XML ON` | 不支持 | 不支持 | 不支持 |
@@ -532,6 +532,7 @@ OPTION (HASH JOIN, MAXDOP 4);             -- 查询 Hint
 
 -- SQL Server 常用 Hint:
 -- 表 Hint:   INDEX, NOLOCK, ROWLOCK, TABLOCK, FORCESEEK, FORCESCAN
+--            ⚠️ 注意: NOLOCK 允许脏读, 生产环境慎用
 -- 查询 Hint: HASH JOIN, LOOP JOIN, MERGE JOIN, FORCE ORDER
 --            MAXDOP, OPTIMIZE FOR, RECOMPILE, USE PLAN
 
@@ -545,11 +546,18 @@ FROM orders o JOIN customers c ON o.customer_id = c.id;
 -- MPP_1PHASE_AGG, MPP_2PHASE_AGG           -- TiFlash MPP 聚合策略
 -- SHUFFLE_JOIN, BROADCAST_JOIN              -- TiFlash MPP JOIN 策略
 
--- StarRocks / Doris: 通过 session 变量控制, 无 SQL-level Hint
--- StarRocks:
+-- StarRocks: session 变量 + SQL Hint (3.1+)
+-- StarRocks 3.1+ 支持 /*+ SET_VAR(...) */ SQL Hint:
+SELECT /*+ SET_VAR(enable_sort_merge_join=true) */ o.*, c.name
+FROM orders o JOIN customers c ON o.customer_id = c.id;
+-- 旧版本通过 session 变量控制:
 SET enable_hash_join = true;
 SET new_planner_optimize_timeout = 3000;
--- Doris:
+-- Doris: session 变量 + SQL Hint (2.0+)
+-- Doris 2.0+ 支持 /*+ hint */ 语法:
+SELECT /*+ SET_VAR(exec_mem_limit=8589934592) */ o.*, c.name
+FROM orders o JOIN customers c ON o.customer_id = c.id;
+-- 旧版本通过 session 变量控制:
 SET enable_nereids_planner = true;
 SET exec_mem_limit = 8589934592;
 
@@ -597,7 +605,7 @@ SET SESSION join_reordering_strategy = 'AUTOMATIC';
 │                  │ Oracle: SORT MERGE JOIN                              │
 │                  │ SQL Server: Merge Join                               │
 │                  │ TiDB: MergeJoin                                      │
-│                  │ StarRocks: 不支持                                     │
+│                  │ StarRocks: MERGE JOIN (2.2+, enable_sort_merge_join)   │
 │                  │ Trino: 不支持                                         │
 │                  │ CockroachDB: merge join                              │
 └──────────────────┴──────────────────────────────────────────────────────┘
@@ -628,7 +636,8 @@ SET SESSION join_reordering_strategy = 'AUTOMATIC';
 ├─────────────────┼──────────────────────────────────────────────────────┤
 │ 仅索引扫描      │ MySQL: Index scan (covering index)                   │
 │ (覆盖索引)      │ PostgreSQL: Index Only Scan                          │
-│                 │ Oracle: INDEX FAST FULL SCAN                         │
+│                 │ Oracle: INDEX RANGE SCAN / INDEX FULL SCAN /          │
+│                 │         INDEX FAST FULL SCAN (无 TABLE ACCESS BY ROWID)│
 │                 │ SQL Server: Index Scan (非聚簇, covering)             │
 │                 │ TiDB: IndexFullScan (covering)                       │
 ├─────────────────┼──────────────────────────────────────────────────────┤
