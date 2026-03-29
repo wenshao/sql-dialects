@@ -160,7 +160,7 @@ SELECT * FROM users WHERE name ILIKE '%john%'; -- 不敏感匹配
 | BigQuery | **支持** | 不支持 | CONCAT() | 均 NULL 传播 | - |
 | ClickHouse | **支持** | 不支持 | concat() | concat: **NULL 传播** | `\|\|` 是 concat 别名；`concatAssumeNotNull()` 跳过 NULL |
 | Trino | **支持** | 不支持 | CONCAT() | 均 NULL 传播 | CONCAT 可变参数 |
-| Spark SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: **跳过 NULL** | CONCAT 和 `\|\|` NULL 行为不同！ |
+| Spark SQL | **支持** | 不支持 | CONCAT() | `\|\|` 和 CONCAT: **均 NULL 传播** | `concat_ws()` 才跳过 NULL |
 | Hive | **支持 (2.2.0+)** | 不支持 | CONCAT() | `\|\|` 和 CONCAT: NULL 传播 | `\|\|` 是 CONCAT 简写 (2.2.0+) |
 | Flink SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: **NULL 传播** | CONCAT_WS 才跳过 NULL |
 | DuckDB | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: 跳过 NULL | 与 PostgreSQL 兼容 |
@@ -171,7 +171,7 @@ SELECT * FROM users WHERE name ILIKE '%john%'; -- 不敏感匹配
 **关键发现**:
 - MySQL/MariaDB/TiDB/StarRocks/Doris 中 `||` 默认是逻辑 OR，**不是**字符串拼接，这是最常见的迁移陷阱
 - SQL Server 是唯一使用 `+` 做拼接的方言
-- `CONCAT()` 的 NULL 处理分三派：**跳过 NULL**: PostgreSQL/SQL Server/Snowflake/DuckDB/Spark/SQLite(3.44+)；**不传播（视为空字符串）**: Oracle（`||` 和 CONCAT 均不传播）；**传播 NULL**: MySQL/MariaDB/DB2/BigQuery/ClickHouse/Trino/Flink/Hive/TiDB/StarRocks/Doris
+- `CONCAT()` 的 NULL 处理分三派：**跳过 NULL**: PostgreSQL/SQL Server/Snowflake/DuckDB/SQLite(3.44+)；**不传播（视为空字符串）**: Oracle（`||` 和 CONCAT 均不传播）；**传播 NULL**: MySQL/MariaDB/DB2/BigQuery/ClickHouse/Trino/Spark/Flink/Hive/TiDB/StarRocks/Doris
 
 ### NULL 处理对比
 
