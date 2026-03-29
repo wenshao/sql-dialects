@@ -266,7 +266,7 @@ SQL 标准规定 `INTERSECT` 的优先级高于 `UNION` 和 `EXCEPT`，但并非
 | SQL Server | 是 | 遵循标准 |
 | SQLite | **否**——从左到右 | 同优先级 |
 | DuckDB | 是 | 遵循标准 |
-| BigQuery | **否**——从左到右 | 同优先级；推荐用括号明确 |
+| BigQuery | **否**——要求括号 | 混合不同 SET 操作符时必须用括号明确优先级，否则报错 |
 | Snowflake | **否**——从左到右 | 同优先级 |
 | Trino | 是 | 遵循标准 |
 | Spark SQL | 是 | 遵循标准 |
@@ -636,7 +636,8 @@ SELECT id FROM b
 INTERSECT
 SELECT id FROM c;
 -- 标准解释: a UNION (b INTERSECT c)
--- Oracle/SQLite/BigQuery/Snowflake: (a UNION b) INTERSECT c  ← 从左到右
+-- Oracle/SQLite/Snowflake: (a UNION b) INTERSECT c  ← 从左到右
+-- BigQuery: 混合不同操作符时报错，必须用括号
 
 -- 推荐写法: 始终用括号
 (SELECT id FROM a)
