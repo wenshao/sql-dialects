@@ -50,7 +50,7 @@ WHERE rn = 1;
 | SQL Server | ❌ | - | 需子查询改写 |
 | SQLite | ❌ | - | 需子查询改写 |
 | MariaDB | ❌ | - | 需子查询改写 |
-| Trino | ✅ (411+) |
+| Trino | ✅ | 411+ | 完整支持 |
 | Db2 | ❌ | - | 需子查询改写 |
 | Redshift | ❌ | - | 需子查询改写 |
 | SAP HANA | ❌ | - | 需子查询改写 |
@@ -61,7 +61,7 @@ WHERE rn = 1;
 | TiDB | ❌ | - | 需子查询改写 |
 | OceanBase | ❌ | - | 需子查询改写 |
 
-**趋势**: QUALIFY 的采纳在加速。支持 QUALIFY 的引擎数量已从 2020 年的 3 个（Teradata、Snowflake、BigQuery）增长到 2025 年的 9 个。不支持的引擎需要通过子查询或 CTE 包装来实现等价逻辑。
+**趋势**: QUALIFY 的采纳在加速。支持 QUALIFY 的引擎数量已从 2020 年的 3 个（Teradata、Snowflake、BigQuery）增长到 2025 年的 10 个。不支持的引擎需要通过子查询或 CTE 包装来实现等价逻辑。
 
 ---
 
@@ -117,7 +117,7 @@ WINDOW w AS (ORDER BY age);
 | SQL Server | ❌ | - | - |
 | Redshift | ❌ | - | - |
 | ClickHouse | ❌ | - | - |
-| Hive | ❌ | - | - |
+| Hive | ✅ | ✅ | 2.2+ |
 | SAP HANA | ❌ | - | - |
 | Doris | ❌ | - | - |
 | TiDB | ❌ | - | - |
@@ -312,7 +312,7 @@ FIRST_VALUE(col IGNORE NULLS) OVER (PARTITION BY grp ORDER BY id)
 | 引擎 | IGNORE NULLS |
 |------|-------------|
 | Oracle | ✅ |
-| SQL Server | ✅ 2012+ |
+| SQL Server | ❌ |
 | BigQuery | ✅ |
 | Snowflake | ✅ |
 | Db2 | ✅ |
@@ -326,7 +326,7 @@ FIRST_VALUE(col IGNORE NULLS) OVER (PARTITION BY grp ORDER BY id)
 | SQLite | ❌ |
 | MariaDB | ❌ |
 | Hive | ❌ |
-| ClickHouse | ❌ |
+| ClickHouse | ✅ 23.8+ |
 | Flink | ❌ |
 
 ---
@@ -387,7 +387,7 @@ FROM scores;
 | Redshift | ❌ | ❌ | ❌ | - |
 | Teradata | ❌ | ❌ | ❌ | - |
 
-**关键发现**: EXCLUDE 子句是窗口函数中支持率最低的特性，全行业仅 4 个引擎完整支持（PostgreSQL、SQLite、DuckDB、Oracle 21c+）。不支持的引擎需要通过自连接或子查询手动排除行。
+**关键发现**: EXCLUDE 子句是窗口函数中支持率最低的特性，全行业仅 4 个引擎完整支持（PostgreSQL、SQLite、DuckDB、Oracle 21c+），Trino 411+ 部分支持（仅 EXCLUDE CURRENT ROW）。不支持的引擎需要通过自连接或子查询手动排除行。
 
 ### 不支持引擎的替代方案
 
@@ -483,12 +483,12 @@ FROM employees;
 | 特性 | BigQuery | Snowflake | DuckDB | ClickHouse | Trino | Spark | Flink | Hive |
 |------|---------|-----------|--------|-----------|-------|-------|-------|------|
 | QUALIFY | ✅ | ✅ | ✅ | ✅ 22.7+ | ✅ 411+ | ✅ 3.4+ | ❌ | ❌ |
-| WINDOW 子句 | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ |
+| WINDOW 子句 | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ 2.2+ |
 | GROUPS 帧 | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
-| EXCLUDE | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| EXCLUDE | ❌ | ❌ | ✅ | ❌ | ⚠️ 411+ | ❌ | ❌ | ❌ |
 | FILTER (窗口) | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
 | NTH_VALUE | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ |
-| IGNORE NULLS | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| IGNORE NULLS | ✅ | ✅ | ✅ | ✅ 23.8+ | ✅ | ❌ | ❌ | ❌ |
 
 ### 云数据仓库
 
