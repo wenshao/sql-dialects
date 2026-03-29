@@ -17,14 +17,14 @@
 | Snowflake | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | 自动 |
 | BigQuery | 脚本内临时表 | 不支持 | 不支持 | 不支持 | 自动 |
 | Redshift | `CREATE TEMP TABLE` | 不支持 | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
-| Databricks | `CREATE TEMPORARY VIEW` | `CREATE GLOBAL TEMP VIEW` | 不支持 | 不支持 | 自动 |
+| Databricks | `CREATE TEMPORARY VIEW`² | `CREATE GLOBAL TEMP VIEW`² | 不支持 | 不支持 | 自动 |
 | DuckDB | `CREATE TEMP TABLE` | 不支持 | 不支持 | 不支持 | 自动 |
 | ClickHouse | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | Memory 引擎 |
-| CockroachDB | `CREATE TEMP TABLE` | 不支持 | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
+| CockroachDB | `CREATE TEMP TABLE` | 不支持 | 不支持 | PRESERVE ROWS（仅） | 不支持 |
 | TiDB | `CREATE TEMPORARY TABLE` | `CREATE GLOBAL TEMPORARY TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | OceanBase | `CREATE TEMPORARY TABLE` | `CREATE GLOBAL TEMPORARY TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | Hive | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | 不支持 |
-| Spark SQL | `CREATE TEMPORARY VIEW` | `CREATE GLOBAL TEMP VIEW` | 不支持 | 不支持 | 自动 |
+| Spark SQL | `CREATE TEMPORARY VIEW`² | `CREATE GLOBAL TEMP VIEW`² | 不支持 | 不支持 | 自动 |
 | Presto/Trino | memory connector | 不支持 | 不支持 | 不支持 | 内存连接器 |
 | Vertica | `CREATE LOCAL TEMP TABLE` | `CREATE GLOBAL TEMP TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | Greenplum | `CREATE TEMP TABLE` | 不支持 | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
@@ -49,6 +49,8 @@
 | MaxCompute | 脚本变量 `@var` | 不支持 | 不支持 | 不支持 | 自动 |
 | ByConity | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | 自动 |
 | Umbra | `CREATE TEMP TABLE` | 不支持 | 不支持 | 不支持 | 自动 |
+
+² Spark SQL 和 Databricks 的临时视图 (TEMPORARY VIEW) 不是临时表。临时视图只是命名的查询别名，不物化数据、不支持索引、不支持 DML 操作（INSERT/UPDATE/DELETE）。它们在此矩阵中列出是因为功能上用于替代临时表存放中间结果，但本质上是不同的机制。
 
 ## 核心概念
 
@@ -226,8 +228,8 @@ SELECT * FROM global_temp.global_orders;  -- 通过 global_temp 数据库访问
 
 | 行为 | 含义 | 支持引擎 |
 |------|------|---------|
-| `ON COMMIT DELETE ROWS` | 提交后清空数据 | Oracle, PostgreSQL, Db2, Teradata, Firebird, CockroachDB, TiDB, Redshift, Vertica, H2, HSQLDB, SAP HANA, OceanBase, GaussDB |
-| `ON COMMIT PRESERVE ROWS` | 保留到会话结束 | 同上 |
+| `ON COMMIT DELETE ROWS` | 提交后清空数据 | Oracle, PostgreSQL, Db2, Teradata, Firebird, TiDB, Redshift, Vertica, H2, HSQLDB, SAP HANA, OceanBase, GaussDB |
+| `ON COMMIT PRESERVE ROWS` | 保留到会话结束 | 同上 + CockroachDB（仅支持 PRESERVE ROWS） |
 | `ON COMMIT DROP` | 提交后删除整个表 | PostgreSQL, Oracle PTT |
 | 不支持 ON COMMIT | 数据始终保留到会话结束 | SQL Server, MySQL, MariaDB, SQLite, ClickHouse, Snowflake, BigQuery, DuckDB |
 
