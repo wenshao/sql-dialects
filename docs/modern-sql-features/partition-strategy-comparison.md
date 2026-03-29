@@ -506,7 +506,8 @@ CREATE TABLE delta_events (
 )
 USING DELTA
 PARTITIONED BY (region);
--- Delta 支持 partition evolution (更改分区列, 无需重写数据)
+-- ⚠️ Delta partition evolution: 新写入数据按新分区列组织，但已有数据不自动重写
+-- 要完全按新分区布局需要 OPTIMIZE / ZORDER 或重建表
 ```
 
 ### MaxCompute
