@@ -43,7 +43,7 @@ SELECT city FROM suppliers;
 | SQLite | 支持 | 支持 | UNION = 去重 | 全版本 |
 | Db2 | 支持 | 支持 | UNION = 去重 | 全版本 |
 | DuckDB | 支持 | 支持 | UNION = 去重 | 0.1+ |
-| ClickHouse | 支持 | 支持 | **UNION = UNION ALL**（默认不去重） | 20.3+ |
+| ClickHouse | 支持 | 支持 | **裸 UNION 默认不合法**（需设置 `union_default_mode`） | 20.3+ |
 | BigQuery | 支持 | 支持 | UNION 必须显式写 ALL 或 DISTINCT | 全版本 |
 | Snowflake | 支持 | 支持 | UNION = 去重 | 全版本 |
 | Trino | 支持 | 支持 | UNION = 去重 | 全版本 |
@@ -73,7 +73,7 @@ SELECT city FROM suppliers;
 | Derby | 支持 | 支持 | UNION = 去重 | 全版本 |
 
 注意事项：
-- **ClickHouse**: 裸 `UNION` 默认等价于 `UNION ALL`（不去重），需显式写 `UNION DISTINCT` 才去重。可通过 `union_default_mode` 设置修改默认行为。
+- **ClickHouse**: 裸 `UNION`（不带 ALL/DISTINCT）默认不合法（`union_default_mode` 默认为空字符串）。需显式写 `UNION ALL` 或 `UNION DISTINCT`，或通过设置 `union_default_mode` 为 `'ALL'` 或 `'DISTINCT'` 来允许裸 `UNION`。
 - **BigQuery**: 裸 `UNION` 不合法，必须显式写 `UNION ALL` 或 `UNION DISTINCT`——这是最严格的设计，杜绝歧义。
 - **Hive**: 早期版本（< 1.2.0）只支持 `UNION ALL`，不支持去重的 `UNION`。
 
@@ -84,7 +84,7 @@ SELECT city FROM suppliers;
 | PostgreSQL | 支持 | 支持 | 不支持 | 支持 | 支持 | 8.4+ (ALL) |
 | MySQL | 支持 | 支持 | 不支持 | 支持 | 支持 | **8.0.31+** |
 | MariaDB | 支持 | 支持 | 不支持 | 支持 | 支持 | 10.3+ / 10.5+ (ALL) |
-| Oracle | 支持 | 不支持 | **MINUS** | 支持 | 不支持 | 21c+ (EXCEPT) |
+| Oracle | 支持 | **21c+** | **MINUS** | 支持 | 不支持 | MINUS 全版本; EXCEPT 21c+ |
 | SQL Server | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 2005+ |
 | SQLite | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 3.x+ |
 | Db2 | 支持 | 支持 | 不支持 | 支持 | 支持 | 9.x+ |
@@ -95,7 +95,7 @@ SELECT city FROM suppliers;
 | Trino | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
 | Presto | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
 | Spark SQL | 支持 | 支持 | **MINUS** | 支持 | 支持 | 2.0+ / 3.0+ (ALL) |
-| Hive | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | — |
+| Hive | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 2.1.0+ |
 | Flink SQL | 支持 | 支持 | 支持(别名) | 支持 | 支持 | 1.12+ |
 | Redshift | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 全版本 |
 | Teradata | 支持 | 支持 | **MINUS** | 支持 | 支持 | 全版本 |
@@ -161,7 +161,7 @@ SELECT id FROM t2;
 | PostgreSQL | 寻找公共超类型；失败则报错 | INT ∪ TEXT → TEXT |
 | MySQL | 宽松隐式转换 | INT ∪ VARCHAR → VARCHAR |
 | Oracle | 仅允许兼容类型 | NUMBER ∪ VARCHAR2 → 报错 |
-| SQL Server | 类型优先级规则 | INT ∪ VARCHAR → 报错（需显式 CAST） |
+| SQL Server | 类型优先级规则 | INT ∪ VARCHAR → 隐式转 INT（值不兼容时运行时报错） |
 | SQLite | 动态类型，无强制约束 | 任意类型均可合并 |
 | DuckDB | 寻找公共超类型 | INT ∪ VARCHAR → VARCHAR |
 | BigQuery | 严格类型匹配 | INT64 ∪ STRING → 报错 |
@@ -469,7 +469,7 @@ SELECT * FROM graph;
 | 引擎 | UNION ALL | UNION (去重) | 其他集合操作 | 循环检测 |
 |------|-----------|-------------|-------------|---------|
 | PostgreSQL | 支持 | 支持 | 不支持 | `CYCLE` 子句（14+） |
-| MySQL | 支持 | 支持 | 不支持 | `max_recursive_iterations` |
+| MySQL | 支持 | 支持 | 不支持 | `cte_max_recursion_depth` |
 | SQL Server | 支持 | 不支持 | 不支持 | `OPTION (MAXRECURSION n)` |
 | Oracle | 支持 | 支持 | 不支持 | `CYCLE` 子句 |
 | SQLite | 支持 | 支持 | 不支持 | 深度限制 |
@@ -477,7 +477,7 @@ SELECT * FROM graph;
 | BigQuery | 支持 | 支持 | 不支持 | 深度限制 |
 | Snowflake | 支持 | 不支持 | 不支持 | 深度限制 |
 | Trino | 支持 | 不支持 | 不支持 | 深度限制 |
-| Spark SQL | 不支持递归 CTE | — | — | 使用 `spark.sql.connect.grpc.maxRecursions` |
+| Spark SQL | 支持（3.4+） | — | — | `spark.sql.cte.maxIterations`（3.4+） |
 | ClickHouse | 不支持递归 CTE | — | — | — |
 
 注意：SQL Server 在递归 CTE 中**不允许使用 UNION**（仅 UNION ALL），因此需要在递归成员中手动过滤已访问节点来避免无限循环。
@@ -532,14 +532,17 @@ SELECT val FROM (
 ### ClickHouse: UNION 默认行为可配置
 
 ```sql
--- 默认 UNION 等价于 UNION ALL（不去重！）
-SET union_default_mode = 'ALL';  -- 默认值
-SELECT 1 UNION SELECT 1;         -- 返回两行
+-- 默认 union_default_mode = ''（空字符串），裸 UNION 是语法错误！
+SELECT 1 UNION SELECT 1;         -- 语法错误（默认设置下）
+
+-- 可配置为允许裸 UNION
+SET union_default_mode = 'ALL';
+SELECT 1 UNION SELECT 1;         -- 返回两行（等价于 UNION ALL）
 
 SET union_default_mode = 'DISTINCT';
-SELECT 1 UNION SELECT 1;         -- 返回一行
+SELECT 1 UNION SELECT 1;         -- 返回一行（等价于 UNION DISTINCT）
 
--- 推荐: 始终显式写明 ALL 或 DISTINCT
+-- 推荐: 始终显式写明 ALL 或 DISTINCT，不依赖 union_default_mode 设置
 SELECT 1 UNION ALL SELECT 1;
 SELECT 1 UNION DISTINCT SELECT 1;
 ```
