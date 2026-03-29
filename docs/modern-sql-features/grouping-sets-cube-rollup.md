@@ -20,7 +20,7 @@
 | Databricks | 支持 | 支持 | 支持 | Runtime 7.0+ | 标准语法 |
 | Hive | 支持 | 支持 | 支持 | 0.10+ | 部分使用 WITH CUBE/ROLLUP |
 | ClickHouse | 支持 | 支持 | 支持 | 19.13+ | 同时支持 WITH ROLLUP/CUBE |
-| MySQL | 不支持 | 不支持 | 仅 ROLLUP | 8.0.1+ | 8.0 前仅 WITH ROLLUP；无 GROUPING SETS/CUBE |
+| MySQL | 支持 (8.0.31+) | 支持 (8.0.1+) | 支持 | 8.0.1+ | 8.0.1 起支持 CUBE/ROLLUP 标准语法；8.0.31 起支持 GROUPING SETS |
 | MariaDB | 不支持 | 不支持 | 仅 ROLLUP | 10.0+ | 仅 WITH ROLLUP 语法 |
 | SQLite | 不支持 | 不支持 | 不支持 | - | 需 UNION ALL 模拟 |
 | Redshift | 支持 | 支持 | 支持 | GA | 标准语法 |
@@ -54,7 +54,7 @@
 | Firebird | 不支持 | 不支持 | 不支持 | - | - |
 | Synapse | 支持 | 支持 | 支持 | GA | 继承 SQL Server |
 
-> 注意: MySQL/MariaDB/TiDB/PolarDB 只支持 ROLLUP（且早期版本仅支持 WITH ROLLUP 语法），不支持 GROUPING SETS 和 CUBE，这是一个显著的功能缺口。
+> 注意: MariaDB/TiDB/PolarDB 只支持 ROLLUP（且仅支持 WITH ROLLUP 语法），不支持 GROUPING SETS 和 CUBE。MySQL 8.0.1 起支持 CUBE 和标准 ROLLUP 语法，8.0.31 起补齐了 GROUPING SETS。
 
 ## 设计动机: 多粒度聚合的问题
 
@@ -328,7 +328,7 @@ GROUP BY ROLLUP(region, city, year)
 | DuckDB | 支持 | 完整支持 |
 | Trino | 支持 | 完整支持 |
 | Spark SQL | 支持 | 完整支持 |
-| MySQL | 不支持 | 无 GROUPING SETS |
+| MySQL | 支持 (8.0.31+) | 8.0.31 起支持 GROUPING SETS |
 | ClickHouse | 不支持 | 不支持复合列 |
 | Hive | 部分支持 | 取决于版本 |
 
@@ -366,7 +366,7 @@ GROUP BY ROLLUP(category, product), GROUPING SETS ((year), ());
 
 ### 支持情况
 
-大部分支持 GROUPING SETS 的引擎都支持串联分组，因为它只是多个分组子句的笛卡尔积——语义清晰，实现直接。MySQL/MariaDB 不支持（因为不支持 GROUPING SETS）。
+大部分支持 GROUPING SETS 的引擎都支持串联分组，因为它只是多个分组子句的笛卡尔积——语义清晰，实现直接。MariaDB 不支持（因为不支持 GROUPING SETS）。MySQL 8.0.31+ 支持。
 
 ## CUBE/ROLLUP 作为 GROUPING SETS 的简写
 
@@ -534,7 +534,19 @@ SELECT region, city, SUM(revenue),
 FROM sales
 GROUP BY ROLLUP(region, city);
 
--- 注意: MySQL 不支持 CUBE 和 GROUPING SETS，需要 UNION ALL 模拟
+-- CUBE (8.0.1+)
+SELECT region, city, SUM(revenue)
+FROM sales
+GROUP BY CUBE(region, city);
+
+-- GROUPING SETS (8.0.31+)
+SELECT region, city, SUM(revenue)
+FROM sales
+GROUP BY GROUPING SETS (
+    (region, city),
+    (region),
+    ()
+);
 ```
 
 ### ClickHouse
