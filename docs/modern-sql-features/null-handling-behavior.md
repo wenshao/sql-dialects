@@ -46,7 +46,7 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 | **MySQL** | ❌ | ✅ (3.23+) | - | 最早实现 NULL 安全比较 |
 | **MariaDB** | ✅ (10.3+) | ✅ | - | 两种语法都支持 |
 | **PostgreSQL** | ✅ (8.0+) | ❌ | - | 完全符合 SQL 标准 |
-| **Oracle** | ❌ | ❌ | `DECODE(a,b,1,0)=1` | 需手写复合条件或用 DECODE 变通 |
+| **Oracle** | ✅ (23c+) | ❌ | `DECODE(a,b,1,0)=1`（23c 前） | 23c 引入 IS [NOT] DISTINCT FROM；23c 前用 DECODE 变通 |
 | **SQL Server** | ✅ (2022+) | ❌ | - | 2022 版才支持标准语法 |
 | **SQLite** | ❌ | ❌ | `a IS b` | SQLite 的 `IS` 相当于 NULL 安全等于 |
 | **BigQuery** | ✅ | ❌ | - | 完整支持标准语法 |
@@ -248,7 +248,7 @@ SELECT COUNT(id)   FROM demo;  -- 3 (id 没有 NULL)
 | **SQL Server** | FIRST | LAST | 最小值 |
 | **SQLite** | FIRST | LAST | 最小值 |
 | **BigQuery** | LAST | FIRST | 最大值 |
-| **Snowflake** | FIRST | LAST | 最小值 |
+| **Snowflake** | LAST | FIRST | 最大值 |
 | **ClickHouse** | FIRST | LAST | 最小值 |
 | **Hive** | LAST | FIRST | 最大值 |
 | **Spark SQL** | LAST | FIRST | 最大值 |
@@ -271,8 +271,8 @@ SELECT COUNT(id)   FROM demo;  -- 3 (id 没有 NULL)
 
 | NULL 排序行为 | 方言 |
 |---|---|
-| **NULL = 最小值**（ASC 时在最前） | MySQL, MariaDB, SQL Server, SQLite, Snowflake, ClickHouse, StarRocks, Doris, TiDB, OceanBase(MySQL) |
-| **NULL = 最大值**（ASC 时在最后） | PostgreSQL, CockroachDB (v20.2+), Oracle, BigQuery, Hive, Spark, Trino, DuckDB, Flink, Redshift, MaxCompute, DamengDB, KingbaseES, openGauss, DB2 |
+| **NULL = 最小值**（ASC 时在最前） | MySQL, MariaDB, SQL Server, SQLite, ClickHouse, StarRocks, Doris, TiDB, OceanBase(MySQL) |
+| **NULL = 最大值**（ASC 时在最后） | PostgreSQL, CockroachDB (v20.2+), Oracle, Snowflake, BigQuery, Hive, Spark, Trino, DuckDB, Flink, Redshift, MaxCompute, DamengDB, KingbaseES, openGauss, DB2 |
 
 ### 5.2 `NULLS FIRST` / `NULLS LAST` 语法支持
 
