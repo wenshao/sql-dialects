@@ -63,7 +63,7 @@ NO PAD:     比较时保留尾部空格  →  'a' = 'a  '  为 FALSE
 
 | 方言 | `'a' = 'a  '` (VARCHAR) | `'a' = 'a  '` (CHAR) | 模式 | 说明 |
 |------|:---:|:---:|------|------|
-| MySQL | **TRUE** | **TRUE** | PAD SPACE (VARCHAR + CHAR) | `_bin` collation 除外；8.0 `_0900` 系列对 VARCHAR 为 NO PAD |
+| MySQL | 取决于 collation | **TRUE** | 8.0 `_0900` 系列: NO PAD（FALSE）；`_general_ci` 等: PAD SPACE（TRUE） | 8.0 默认 `utf8mb4_0900_ai_ci` = NO PAD |
 | SQL Server | **TRUE** | **TRUE** | PAD SPACE (VARCHAR + CHAR) | ANSI_PADDING ON 存储时保留，但比较时忽略 |
 | PostgreSQL | FALSE | **TRUE** | NO PAD (VARCHAR) / PAD SPACE (CHAR) | 符合 SQL 标准 |
 | Oracle | FALSE | **TRUE** | NO PAD (VARCHAR2) / PAD SPACE (CHAR) | 使用 `RPAD` 处理对齐 |
@@ -171,7 +171,7 @@ SELECT * FROM users WHERE name ILIKE '%john%'; -- 不敏感匹配
 **关键发现**:
 - MySQL/MariaDB/TiDB/StarRocks/Doris 中 `||` 默认是逻辑 OR，**不是**字符串拼接，这是最常见的迁移陷阱
 - SQL Server 是唯一使用 `+` 做拼接的方言
-- `CONCAT()` 的 NULL 处理分三派：**跳过 NULL**: PostgreSQL/SQL Server/Snowflake/DuckDB/Spark/SQLite(3.44+)；**不传播（视为空字符串）**: Oracle（`||` 和 CONCAT 均不传播）；**传播 NULL**: MySQL/MariaDB/BigQuery/ClickHouse/Trino/Flink/Hive/TiDB/StarRocks/Doris
+- `CONCAT()` 的 NULL 处理分三派：**跳过 NULL**: PostgreSQL/SQL Server/Snowflake/DuckDB/Spark/SQLite(3.44+)；**不传播（视为空字符串）**: Oracle（`||` 和 CONCAT 均不传播）；**传播 NULL**: MySQL/MariaDB/DB2/BigQuery/ClickHouse/Trino/Flink/Hive/TiDB/StarRocks/Doris
 
 ### NULL 处理对比
 
