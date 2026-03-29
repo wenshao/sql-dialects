@@ -44,7 +44,7 @@ Doris            ✓            ✓          ✗        ✗        ✓        �
 
 ```
 1. MySQL: 没有 Schema 概念 (Schema = Database), 用 db.* 语法授权
-2. Oracle: 列级权限仅对 INSERT 有效, 不支持列级 SELECT 权限; 使用 VPD/Fine-Grained 替代
+2. Oracle: 支持列级 GRANT (SELECT/INSERT/UPDATE), 但实践中更常用 VPD/Fine-Grained Access Control
 3. SQL Server: 唯一支持 DENY 的主流引擎, DENY 优先于 GRANT
 4. SQLite/DuckDB: 嵌入式数据库, 无多用户权限系统
 5. BigQuery: 完全依赖 GCP IAM, 无传统 GRANT SQL 语句
