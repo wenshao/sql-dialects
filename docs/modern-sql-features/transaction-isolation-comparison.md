@@ -47,7 +47,7 @@ MariaDB            ✓     ✓     ✓     ✓             RR           与 MySQ
 
 TiDB               ✗     ✓(4)  ✓(5)  ✗(6)          RR (SI)      RR = SI, 无 gap lock
 CockroachDB        ✗     ✓(7)  ✗     ✓             SERIALIZABLE SSI 实现, RC 自 v23.1 可选
-OceanBase          ✓     ✓     ✓     ✓             RC           MySQL 模式默认 RR; Oracle 模式默认 RC
+OceanBase          ✓     ✓     ✓     ✓             RC           两种模式默认均为 RC（与原生 MySQL 的 RR 不同！）
 YugabyteDB         ✗     ✓     ✓(8)  ✓             RR (SI)      SERIALIZABLE = SSI
 
 Snowflake          ✗     ✓     ✗     ✗             RC           SI 实现; 无用户可选隔离级别
