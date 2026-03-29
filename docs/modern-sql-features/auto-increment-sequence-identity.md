@@ -630,6 +630,10 @@ SEQUENCE CACHE 的核心是预分配:
   TiDB 的答案: AUTO_RANDOM（牺牲连续性换取分散性）
   CockroachDB 的答案: unique_rowid()（牺牲连续性换取无协调）
   BigQuery 的答案: 不提供自增（从设计层面拒绝全局序列）
+
+  ⚠️ 金律: 分布式场景下接受"最终有序"而非"严格单调"
+  强求绝对递增 → 单点写入热点 → 丧失分布式并发优势
+  推荐: AUTO_RANDOM（TiDB）或 UUID v7（时间有序 + 全局唯一）
 ```
 
 ## 参考资料
