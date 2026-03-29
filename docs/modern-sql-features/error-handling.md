@@ -24,38 +24,38 @@ Db2 (LUW)         ✗          ✗                 ✓                ✓(嵌入
 Db2 (z/OS)        ✗          ✗                 ✓                ✓(嵌入)   ✓           V7+
 Db2 (iSeries)     ✗          ✗                 ✓                ✓(嵌入)   ✓           V5+
 Snowflake          ✗          ✓                 ✗                ✗         ✗           Scripting GA
-BigQuery           ✓(1)       ✓(2)              ✗                ✗         ✗           2023+
-Databricks         ✗          ✗                 ✓(3)             ✗         ✓           Runtime 14+
+BigQuery           ✗          ✓(1)              ✗                ✗         ✗           2023+
+Databricks         ✗          ✗                 ✓(2)             ✗         ✓           Runtime 14+
 Redshift           ✗          ✓                 ✗                ✗         ✗           GA
 CockroachDB        ✗          ✓                 ✗                ✗         ✓           v20.1+
 YugabyteDB         ✗          ✓                 ✗                ✗         ✓           2.6+
-TiDB               ✗          ✗                 ✓(4)             ✗         ✗           6.1+
+TiDB               ✗          ✗                 ✓(3)             ✗         ✗           6.1+
 OceanBase (MySQL)  ✗          ✗                 ✓                ✗         ✗           V3.x+
 OceanBase (Oracle) ✗          ✓                 ✗                ✗         ✓           V3.x+
 Teradata           ✗          ✗                 ✓                ✓(嵌入)   ✗           V14+
 SAP HANA           ✗          ✗                 ✓                ✗         ✓           SPS09+
 Informix           ✗          ✓                 ✗                ✓(嵌入)   ✗           11.50+
 Firebird           ✗          ✓                 ✗                ✗         ✓           2.0+
-SQLite             ✗          ✗                 ✗                ✗         ✗(5)        -
-DuckDB             ✗          ✗                 ✗                ✗         ✗(5)        -
-ClickHouse         ✗          ✗                 ✗                ✗         ✗(5)        -
-Trino              ✗          ✗                 ✗                ✗         ✗(5)        -
-Presto             ✗          ✗                 ✗                ✗         ✗(5)        -
-Spark SQL          ✗          ✗                 ✗                ✗         ✗(5)        -
-Hive               ✗          ✗                 ✗                ✗         ✗(5)        -
-StarRocks          ✗          ✗                 ✗                ✗         ✗(5)        -
-Doris              ✗          ✗                 ✗                ✗         ✗(5)        -
+SQLite             ✗          ✗                 ✗                ✗         ✗(4)        -
+DuckDB             ✗          ✗                 ✗                ✗         ✗(4)        -
+ClickHouse         ✗          ✗                 ✗                ✗         ✗(4)        -
+Trino              ✗          ✗                 ✗                ✗         ✗(4)        -
+Presto             ✗          ✗                 ✗                ✗         ✗(4)        -
+Spark SQL          ✗          ✗                 ✗                ✗         ✗(4)        -
+Hive               ✗          ✗                 ✗                ✗         ✗(4)        -
+StarRocks          ✗          ✗                 ✗                ✗         ✗(4)        -
+Doris              ✗          ✗                 ✗                ✗         ✗(4)        -
 Greenplum          ✗          ✓                 ✗                ✗         ✓           5.0+
-Vertica            ✗          ✗                 ✗                ✗         ✗(6)        -
+Vertica            ✗          ✗                 ✗                ✗         ✗(5)        -
 SingleStore        ✗          ✗                 ✓                ✗         ✗           7.0+
-Couchbase (N1QL)   ✗          ✗                 ✗                ✗         ✗(5)        -
-MongoDB (SQL)      ✗          ✗                 ✗                ✗         ✗(5)        -
+Couchbase (N1QL)   ✗          ✗                 ✗                ✗         ✗(4)        -
+MongoDB (SQL)      ✗          ✗                 ✗                ✗         ✗(4)        -
 Exasol             ✗          ✓                 ✗                ✗         ✓           6.0+
 NuoDB              ✗          ✗                 ✓                ✗         ✗           2.0+
-VoltDB             ✗          ✗                 ✗                ✗         ✗(7)        -
+VoltDB             ✗          ✗                 ✗                ✗         ✗(6)        -
 TimescaleDB        ✗          ✓                 ✗                ✗         ✓           继承PG
-QuestDB            ✗          ✗                 ✗                ✗         ✗(5)        -
-InfluxDB (SQL)     ✗          ✗                 ✗                ✗         ✗(5)        -
+QuestDB            ✗          ✗                 ✗                ✗         ✗(4)        -
+InfluxDB (SQL)     ✗          ✗                 ✗                ✗         ✗(4)        -
 AlloyDB            ✗          ✓                 ✗                ✗         ✓           继承PG
 Neon               ✗          ✓                 ✗                ✗         ✓           继承PG
 PolarDB (MySQL)    ✗          ✗                 ✓                ✗         ✗           继承MySQL
@@ -65,13 +65,14 @@ Aurora (PG)        ✗          ✓                 ✗                ✗      
 MSSQL on Linux     ✓          ✗                 ✗                ✗         ✓           2017+
 
 注:
-(1) BigQuery 过程语言中支持 BEGIN...EXCEPTION，语法接近 PG 但也可理解为 TRY/CATCH 语义
-(2) BigQuery 的 EXCEPTION WHEN ERROR THEN 实际上是 catch-all 模式
-(3) Databricks SQL 通过 PL 扩展支持 DECLARE HANDLER 风格的异常处理
-(4) TiDB 兼容 MySQL DECLARE HANDLER 语法，但存储过程功能仍在逐步完善中
-(5) 分析型/嵌入式引擎，无存储过程，错误直接返回客户端
-(6) Vertica 有存储过程但错误处理能力有限
-(7) VoltDB 使用 Java 存储过程，错误处理在 Java 层面
+(1) BigQuery 使用 BEGIN...EXCEPTION WHEN ERROR THEN...END，语法属于 BEGIN..EXCEPTION 模型（类似 PG），不是 TRY/CATCH。EXCEPTION WHEN ERROR THEN 实际上是 catch-all 模式
+(2) Databricks SQL 通过 PL 扩展支持 DECLARE HANDLER 风格的异常处理
+(3) TiDB 兼容 MySQL DECLARE HANDLER 语法，但存储过程功能仍在逐步完善中
+(4) 分析型/嵌入式引擎，无存储过程，错误直接返回客户端
+(5) Vertica 有存储过程但错误处理能力有限
+(6) VoltDB 使用 Java 存储过程，错误处理在 Java 层面
+
+关于 WHENEVER 列: 本矩阵的 WHENEVER 列仅反映存储过程/过程化 SQL 中的错误处理能力。Oracle (Pro*C) 和 PostgreSQL (ECPG) 均支持 WHENEVER SQLERROR，但这属于嵌入式 SQL (Embedded SQL) 预编译指令，不属于存储过程错误处理范畴，因此在本矩阵中标记为 ✗。详见下方"WHENEVER SQLERROR (嵌入式 SQL)"章节。
 ```
 
 ## 错误抛出机制对比
