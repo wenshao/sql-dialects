@@ -8,7 +8,7 @@
 
 | 引擎 | GROUPING SETS | CUBE | ROLLUP | 版本 | 备注 |
 |------|:---:|:---:|:---:|------|------|
-| Oracle | 支持 | 支持 | 支持 | 9i+ (2001) | **最早的完整实现** |
+| Oracle | 支持 | 支持 | 支持 | 8i+ (ROLLUP/CUBE), 9i+ (GROUPING SETS) | **最早的完整实现** |
 | SQL Server | 支持 | 支持 | 支持 | 2008+ | 2008 前仅 WITH ROLLUP/CUBE |
 | PostgreSQL | 支持 | 支持 | 支持 | 9.5+ (2016) | 标准语法 |
 | DB2 | 支持 | 支持 | 支持 | 7.1+ | 标准语法 |
@@ -28,7 +28,7 @@
 | Vertica | 支持 | 支持 | 支持 | 7.0+ | 标准语法 |
 | Greenplum | 支持 | 支持 | 支持 | 5.0+ | 继承 PostgreSQL |
 | CockroachDB | 不支持 | 不支持 | 不支持 | - | 计划中 |
-| Impala | 支持 | 不支持 | 支持 | 2.0+ | 无 CUBE 支持 |
+| Impala | 不支持 | 不支持 | 不支持 | - | 需 UNION ALL 模拟 |
 | Doris | 支持 | 支持 | 支持 | 1.1+ | 标准语法 |
 | StarRocks | 支持 | 支持 | 支持 | 2.0+ | 标准语法 |
 | Flink SQL | 支持 | 支持 | 支持 | 1.12+ | 标准语法 |
@@ -283,7 +283,7 @@ GROUP BY ROLLUP(region, city);
 | DB2 | 支持 | `GROUPING_ID(a, b)` | 与 Oracle 兼容 |
 | Hive | 支持 | `GROUPING__ID` — 内置特殊列 | 注意双下划线 |
 | Spark SQL | 支持 | `GROUPING_ID(a, b)` | - |
-| ClickHouse | 不支持 | 不支持 | 无 GROUPING 函数 |
+| ClickHouse | 支持 | 不支持 | 单列 GROUPING() |
 | DuckDB | 支持 | `GROUPING_ID(a, b)` | - |
 | Trino | 支持 | `GROUPING(a, b)` — 多参数 | - |
 | MariaDB | 不支持 | 不支持 | 无 GROUPING 函数 |
@@ -442,7 +442,7 @@ GROUP BY ROLLUP(region, city);
 
 ### Oracle
 
-Oracle 是 GROUPING SETS 系列语法的先驱（9i，2001年），功能最完整：
+Oracle 是 GROUPING SETS 系列语法的先驱（8i 引入 ROLLUP/CUBE，9i 引入 GROUPING SETS），功能最完整：
 
 ```sql
 -- 基本 ROLLUP
@@ -575,8 +575,10 @@ GROUP BY GROUPING SETS (
     ()
 );
 
--- 注意: ClickHouse 不支持 GROUPING() 函数
--- 需要用其他方式区分汇总行
+-- ClickHouse 支持 GROUPING() 函数来区分汇总行
+SELECT region, city, SUM(revenue), GROUPING(region), GROUPING(city)
+FROM sales
+GROUP BY CUBE(region, city);
 ```
 
 ### Snowflake / BigQuery / Trino / DuckDB
