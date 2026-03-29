@@ -99,7 +99,7 @@ SELECT * FROM emp e WHERE salary > (SELECT AVG(salary) FROM emp WHERE dept_id = 
 | **Snowflake** | ✅ | ✅ | ✅ | ⚠️ (FLATTEN) | ✅ |
 | **ClickHouse** | ✅ | ✅ | ✅ | ❌ | ⚠️ |
 | **Hive** | ⚠️ | ✅ | ❌ | ⚠️ | ❌ |
-| **Spark SQL** | ✅ | ✅ | ✅ | ✅ (3.0+) | ✅ |
+| **Spark SQL** | ✅ | ✅ | ✅ | ✅ (3.3+) | ✅ |
 | **DuckDB** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Trino** | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Flink SQL** | ⚠️ | ✅ | ❌ | ❌ | ❌ |
@@ -231,18 +231,18 @@ SELECT d.* FROM dept d ANTI JOIN emp e ON e.dept_id = d.dept_id;
 | 方言 | 标量子查询→JOIN | EXISTS→Semi-Join | NOT EXISTS→Anti-Join | IN→Semi-Join | NOT IN→Anti-Join | 嵌套关联子查询 | 备注 |
 |------|---------------|-----------------|---------------------|-------------|-----------------|-------------|------|
 | **PostgreSQL** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | 多层嵌套时有限 |
-| **MySQL** | ✅ (8.0+) | ✅ (8.0+) | ✅ (8.0+) | ✅ (5.6+) | ✅ (5.6+) | ⚠️ | 5.x 时期子查询优化较弱 |
+| **MySQL** | ✅ (8.0+) | ✅ (5.6+) | ✅ (8.0.17+) | ✅ (5.6+) | ✅ (8.0.17+) | ⚠️ | 5.6 引入 Semi-Join；Anti-Join 8.0.17 引入 |
 | **MariaDB** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | 10.0+ 优化大幅改进 |
 | **Oracle** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **最成熟的子查询优化器** |
 | **SQL Server** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 优化器非常成熟 |
 | **SQLite** | ❌ | ✅ (3.35+) | ✅ (3.35+) | ✅ | ❌ | ❌ | 优化能力有限 |
-| **BigQuery** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 分布式引擎，去关联化是必需 |
+| **BigQuery** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 自动去关联化大多数关联子查询 |
 | **Snowflake** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 同上 |
 | **ClickHouse** | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | 关联子查询整体支持较弱 |
 | **Hive** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | 依赖 MapReduce 模型 |
 | **Spark SQL** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | Catalyst 优化器 |
 | **Trino** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | - |
-| **DuckDB** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 基于论文的先进去关联化 |
+| **DuckDB** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 基于论文的先进去关联化 (Mark Join) |
 | **Flink SQL** | ⚠️ | ✅ | ✅ | ✅ | ❌ | ❌ | 流处理限制 |
 | **DB2** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 成熟优化器 |
 | **TiDB** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | 基于 Calcite 理论 |
@@ -271,7 +271,7 @@ LATERAL 允许 FROM 子句中的子查询引用同一 FROM 中前面表的列。
 | **Snowflake** | `LATERAL FLATTEN` | GA | 主要配合 FLATTEN |
 | **ClickHouse** | `ARRAY JOIN` | 早期 | 非标准语法 |
 | **Hive** | `LATERAL VIEW` | 早期 | 专用于 UDTF |
-| **Spark SQL** | `LATERAL VIEW` / `LATERAL` | 3.0+ | 3.0 引入标准 LATERAL |
+| **Spark SQL** | `LATERAL VIEW` / `LATERAL` | 3.3+ | 3.3 引入标准 LATERAL；LATERAL VIEW 早期已有 |
 | **DuckDB** | `LATERAL` | 0.6.0+ | SQL 标准 |
 | **Trino** | 隐式 (UNNEST) | 早期 | `CROSS JOIN UNNEST(...)` |
 | **Flink SQL** | `LATERAL TABLE(...)` | 早期 | 配合 UDTF |
@@ -336,7 +336,7 @@ HAVING COUNT(*) > (SELECT AVG(emp_count) FROM dept_stats);
 | 方言 | 自动物化 | 手动物化 (CTE) | IN 子查询物化 | Hint 控制 | 备注 |
 |------|---------|--------------|-------------|----------|------|
 | **PostgreSQL** | ✅ | ✅ (`MATERIALIZED`) | ✅ (Hash) | ❌ | CTE 12+ 可控制是否物化 |
-| **MySQL** | ✅ (5.6+) | ❌ (CTE 不物化) | ✅ | ⚠️ | `SUBQUERY=MATERIALIZATION` 优化器开关 |
+| **MySQL** | ✅ (5.6+) | ✅ (8.0+, 默认物化) | ✅ | ⚠️ | `SUBQUERY=MATERIALIZATION` 优化器开关 |
 | **MariaDB** | ✅ | ❌ | ✅ | ⚠️ | 类似 MySQL |
 | **Oracle** | ✅ | ✅ (`MATERIALIZE` hint) | ✅ | ✅ | `/*+ MATERIALIZE */` / `/*+ INLINE */` |
 | **SQL Server** | ✅ | ❌ | ✅ | ❌ | 自动决策 |
@@ -387,7 +387,7 @@ Anti-Join (反连接): 左表中的行，在右表中找不到任何匹配才保
 | 方言 | Semi-Join 物理算子 | Anti-Join 物理算子 | EXPLAIN 可见 | 显式语法 | 备注 |
 |------|------------------|------------------|-------------|---------|------|
 | **PostgreSQL** | ✅ | ✅ | ✅ | ❌ | EXPLAIN 显示 "Semi Join" / "Anti Join" |
-| **MySQL** | ✅ (5.6+) | ✅ (8.0+) | ✅ | ❌ | `semijoin=on` / `antijoin=on` |
+| **MySQL** | ✅ (5.6+) | ✅ (8.0.17+) | ✅ | ❌ | `semijoin=on` / `antijoin=on` |
 | **MariaDB** | ✅ | ✅ | ✅ | ❌ | - |
 | **Oracle** | ✅ | ✅ | ✅ | ❌ | `/*+ SEMIJOIN */` / `/*+ ANTI_JOIN */` hint |
 | **SQL Server** | ✅ | ✅ | ✅ | ❌ | EXPLAIN 显示 "Left Semi Join" 等 |
@@ -460,7 +460,7 @@ SELECT DISTINCT d.* FROM dept d JOIN emp e ON d.dept_id = e.dept_id;
 | 方言 | UPDATE 子查询可引用目标表 | DELETE 子查询可引用目标表 | 备注 |
 |------|----------------------|----------------------|------|
 | **PostgreSQL** | ✅ | ✅ | - |
-| **MySQL** | ❌ (8.0 前) / ✅ (8.0.14+) | ❌ (8.0 前) / ✅ (8.0.14+) | 8.0 前需用 JOIN 改写 |
+| **MySQL** | ❌ (8.0 前) / ✅ (8.0.19+) | ❌ (8.0 前) / ✅ (8.0.19+) | 8.0 前需用 JOIN 改写 |
 | **MariaDB** | ✅ (10.3+) | ✅ (10.3+) | - |
 | **Oracle** | ✅ | ✅ | - |
 | **SQL Server** | ✅ | ✅ | - |
@@ -483,7 +483,7 @@ WHERE dept_id IN (SELECT dept_id FROM (SELECT dept_id FROM emp WHERE salary > 10
 | 方言 | 最大关联嵌套深度 | 备注 |
 |------|---------------|------|
 | **PostgreSQL** | 无硬限制 | 受栈大小限制 |
-| **MySQL** | 63 层 | `max_subquery_depth` 变量 |
+| **MySQL** | 无硬限制 | 受 `thread_stack` 大小限制 |
 | **Oracle** | 255 层 | 实际受优化器能力限制 |
 | **SQL Server** | 32 层 | 嵌套超过 32 层报错 |
 | **SQLite** | 无硬限制 | 受编译选项限制 |
@@ -518,9 +518,9 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
 | 优化策略 | PostgreSQL | MySQL 8.0+ | Oracle | SQL Server |
 |---------|------------|------------|--------|------------|
-| Semi-Join (Hash) | `Hash Semi Join` | `hash_semijoin` | `HASH JOIN SEMI` | `Hash Match (Left Semi Join)` |
-| Semi-Join (NL) | `Nested Loop Semi Join` | `nested_loop_semijoin` | `NESTED LOOPS SEMI` | `Nested Loops (Left Semi Join)` |
-| Anti-Join (Hash) | `Hash Anti Join` | `hash_antijoin` | `HASH JOIN ANTI` | `Hash Match (Left Anti Semi Join)` |
+| Semi-Join (Hash) | `Hash Semi Join` | `Hash semijoin` | `HASH JOIN SEMI` | `Hash Match (Left Semi Join)` |
+| Semi-Join (NL) | `Nested Loop Semi Join` | `Nested loop semijoin` | `NESTED LOOPS SEMI` | `Nested Loops (Left Semi Join)` |
+| Anti-Join (Hash) | `Hash Anti Join` | `Hash antijoin` | `HASH JOIN ANTI` | `Hash Match (Left Anti Semi Join)` |
 | 物化 | `Materialize` | `Materialize` | `VIEW` (内部物化) | `Table Spool` |
 | 子查询扫描 | `SubPlan` | `Subquery` | `FILTER` | `Compute Scalar` |
 
