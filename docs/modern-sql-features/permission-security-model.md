@@ -20,7 +20,7 @@
 ──────────────  ──────────── ─────────  ───────  ───────  ───────  ──────  ─────────────────
 MySQL            ✓            ✓          ✓        ✗(*)     ✓        ✗       ✓
 PostgreSQL       ✓            ✓          ✓        ✓        ✓        ✗       ✓
-Oracle           ✓            ✓          ✗(*)     ✓(*)     ✗(*)     ✗       ✓ (WITH ADMIN OPTION)
+Oracle           ✓            ✓          ✗(*)     ✓(*)     ✗(*)     ✗       ✓ (对象: WITH GRANT OPTION; 系统/角色: WITH ADMIN OPTION)
 SQL Server       ✓            ✓          ✓        ✓        ✓        ✓       ✓
 SQLite           ✗            ✗          ✗        ✗        ✗        ✗       无权限系统(应用层控制)
 BigQuery         ✗(IAM)       ✓(IAM)     ✓(*)     ✓(IAM)   ✓(IAM)   ✗       IAM 条件绑定
