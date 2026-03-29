@@ -239,7 +239,7 @@ SELECT d.* FROM dept d ANTI JOIN emp e ON e.dept_id = d.dept_id;
 | **BigQuery** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 自动去关联化大多数关联子查询 |
 | **Snowflake** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 同上 |
 | **ClickHouse** | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | 关联子查询整体支持较弱 |
-| **Hive** | ❌ | ✅ | ✅ | ✅ | ✅ | ❌ | 依赖 MapReduce 模型 |
+| **Hive** | ❌ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | 无专用 Anti-Join 算子，依赖 MapReduce 模型 |
 | **Spark SQL** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | Catalyst 优化器 |
 | **Trino** | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ | - |
 | **DuckDB** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 基于论文的先进去关联化 (Mark Join) |
@@ -432,14 +432,14 @@ SELECT DISTINCT d.* FROM dept d JOIN emp e ON d.dept_id = e.dept_id;
 
 ### 9.2 各引擎实际行为
 
-| 场景 | MySQL 5.x | MySQL 8.0+ | PostgreSQL | Oracle | SQL Server |
+| 场景 | MySQL ≤ 5.5 | MySQL 8.0+ | PostgreSQL | Oracle | SQL Server |
 |------|-----------|------------|------------|--------|------------|
 | IN (小子查询) | ⚠️ 慢 | ✅ 物化 | ✅ Hash | ✅ Hash | ✅ Hash |
 | IN (大子查询) | ⚠️ 慢 | ✅ Semi-Join | ✅ Semi-Join | ✅ Semi-Join | ✅ Semi-Join |
 | EXISTS | ✅ | ✅ | ✅ | ✅ | ✅ |
 | JOIN + DISTINCT | ✅ | ✅ | ✅ | ✅ | ✅ |
 
-**MySQL 5.x 的历史问题**：在 5.6 之前，MySQL 对 IN 子查询的处理极差——会将其转换为 EXISTS 关联子查询逐行执行，导致 O(N*M) 复杂度。这是当年"IN 比 EXISTS 慢"的来源。从 5.6 开始引入子查询物化，8.0 进一步引入 Semi-Join 优化，这个问题已基本解决。
+**MySQL ≤ 5.5 的历史问题**：在 5.6 之前，MySQL 对 IN 子查询的处理极差——会将其转换为 EXISTS 关联子查询逐行执行，导致 O(N*M) 复杂度。这是当年"IN 比 EXISTS 慢"的来源。从 5.6 开始引入子查询物化，8.0 进一步引入 Semi-Join 优化，这个问题已基本解决。
 
 ### 9.3 现代引擎的推荐做法
 
@@ -469,7 +469,7 @@ SELECT DISTINCT d.* FROM dept d JOIN emp e ON d.dept_id = e.dept_id;
 **MySQL 8.0 前的经典限制**：
 
 ```sql
--- MySQL 5.x 报错: You can't specify target table for update in FROM clause
+-- MySQL ≤ 5.5 报错: You can't specify target table for update in FROM clause
 UPDATE emp SET salary = salary * 1.1
 WHERE dept_id IN (SELECT dept_id FROM emp WHERE salary > 10000);
 
