@@ -56,7 +56,7 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 | **Spark SQL** | ✅ (3.2+) | ✅ (2.0+) | - | 两种都支持 |
 | **Trino** | ✅ | ❌ | - | 完整支持标准语法 |
 | **DuckDB** | ✅ (0.3+) | ❌ | - | 完整支持标准语法 |
-| **Flink SQL** | ✅ (1.15+) | ❌ | - | 完整支持标准语法 |
+| **Flink SQL** | ✅ (1.11+, 经 Calcite) | ❌ | - | 通过 Calcite 引擎支持 |
 | **Redshift** | ❌ | ❌ | 手写复合条件 | 基于旧版 PG，尚未引入 |
 | **MaxCompute** | ❌ | ❌ | 手写复合条件 | 不支持 |
 | **StarRocks** | ✅ | ✅ | - | 两种都支持 |
@@ -80,7 +80,7 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 | 方言 | `NULL \|\| 'text'` 结果 | 备注 |
 |------|---|---|
 | **MySQL** | `0`（或 `NULL` 若 `PIPES_AS_CONCAT`） | `\|\|` 默认是逻辑 OR，不是拼接！ |
-| **MariaDB** | `NULL` | `\|\|` 是拼接（与 MySQL 不同） |
+| **MariaDB** | `NULL` | 10.2+ 默认启用 `PIPES_AS_CONCAT`（`\|\|` 是拼接）；10.2 前同 MySQL 为逻辑 OR |
 | **PostgreSQL** | `NULL` | NULL 传播 |
 | **Oracle** | `'text'` | **特殊**: Oracle 把 NULL 当空字符串处理 |
 | **SQL Server** | 不支持 `\|\|` | 用 `+` 运算符，`NULL + 'text'` = `NULL` |
@@ -264,17 +264,15 @@ SELECT COUNT(id)   FROM demo;  -- 3 (id 没有 NULL)
 | **DamengDB** | LAST | FIRST | 最大值（同 Oracle） |
 | **KingbaseES** | LAST | FIRST | 最大值（同 PostgreSQL） |
 | **openGauss** | LAST | FIRST | 最大值（同 PostgreSQL） |
-| **CockroachDB** | FIRST | LAST | 最小值（与 PG 不同！） |
+| **CockroachDB** | LAST | FIRST | 最大值（v20.2+ 同 PostgreSQL） |
 | **DB2** | LAST | FIRST | 最大值 |
 
 **总结**：
 
 | NULL 排序行为 | 方言 |
 |---|---|
-| **NULL = 最小值**（ASC 时在最前） | MySQL, MariaDB, SQL Server, SQLite, Snowflake, ClickHouse, StarRocks, Doris, TiDB, OceanBase(MySQL), CockroachDB |
-| **NULL = 最大值**（ASC 时在最后） | PostgreSQL, Oracle, BigQuery, Hive, Spark, Trino, DuckDB, Flink, Redshift, MaxCompute, DamengDB, KingbaseES, openGauss, DB2 |
-
-**注意 CockroachDB**：虽然号称兼容 PostgreSQL，但 NULL 排序默认行为与 PostgreSQL 相反（CRDB 视 NULL 为最小值）。
+| **NULL = 最小值**（ASC 时在最前） | MySQL, MariaDB, SQL Server, SQLite, Snowflake, ClickHouse, StarRocks, Doris, TiDB, OceanBase(MySQL) |
+| **NULL = 最大值**（ASC 时在最后） | PostgreSQL, CockroachDB (v20.2+), Oracle, BigQuery, Hive, Spark, Trino, DuckDB, Flink, Redshift, MaxCompute, DamengDB, KingbaseES, openGauss, DB2 |
 
 ### 5.2 `NULLS FIRST` / `NULLS LAST` 语法支持
 
