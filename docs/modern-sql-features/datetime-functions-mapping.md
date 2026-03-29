@@ -175,8 +175,9 @@ SELECT DATE_DIFF('month', DATE '2024-01-01', DATE '2024-04-01');  -- 3
 
 -- Hive / Spark SQL: DATEDIFF(end, start) —— 同 MySQL，仅天数
 SELECT DATEDIFF('2024-01-08', '2024-01-01');  -- 7
--- Spark 3.x 新增: SELECT DATEDIFF(MONTH, '2024-01-01', '2024-04-01');
--- 但 Hive 不支持 unit 参数
+-- Spark 3.4+: 按单位计算用 TIMESTAMPDIFF(unit, start, end)
+SELECT TIMESTAMPDIFF(MONTH, '2024-01-01', '2024-04-01');  -- 3
+-- 注意: DATEDIFF 本身始终只返回天数，不支持 unit 参数
 
 -- StarRocks / Doris: DATEDIFF(end, start) —— 同 MySQL，仅天数
 SELECT DATEDIFF('2024-01-08', '2024-01-01');  -- 7
