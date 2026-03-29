@@ -12,7 +12,7 @@
 ## 错误捕获机制支持矩阵
 
 ```
-引擎               TRY/CATCH  BEGIN..EXCEPTION  DECLARE HANDLER  WHENEVER  条件表达式  版本
+引擎               TRY..CATCH BEGIN..EXCEPTION  DECLARE HANDLER  WHENEVER  条件表达式  版本
 ─────────────────  ─────────  ────────────────  ───────────────  ────────  ──────────  ────────
 SQL Server         ✓          ✗                 ✗                ✗         ✓           2005+
 Azure SQL          ✓          ✗                 ✗                ✗         ✓           GA
@@ -24,38 +24,38 @@ Db2 (LUW)         ✗          ✗                 ✓                ✓(嵌入
 Db2 (z/OS)        ✗          ✗                 ✓                ✓(嵌入)   ✓           V7+
 Db2 (iSeries)     ✗          ✗                 ✓                ✓(嵌入)   ✓           V5+
 Snowflake          ✗          ✓                 ✗                ✗         ✗           Scripting GA
-BigQuery           ✓(1)       ✓(2)              ✗                ✗         ✗           2023+
-Databricks         ✗          ✗                 ✓(3)             ✗         ✓           Runtime 14+
+BigQuery           ✗          ✓(1)              ✗                ✗         ✗           2023+
+Databricks         ✗          ✗                 ✓(2)             ✗         ✓           Runtime 14+
 Redshift           ✗          ✓                 ✗                ✗         ✗           GA
 CockroachDB        ✗          ✓                 ✗                ✗         ✓           v20.1+
 YugabyteDB         ✗          ✓                 ✗                ✗         ✓           2.6+
-TiDB               ✗          ✗                 ✓(4)             ✗         ✗           6.1+
+TiDB               ✗          ✗                 ✓(3)             ✗         ✗           6.1+
 OceanBase (MySQL)  ✗          ✗                 ✓                ✗         ✗           V3.x+
 OceanBase (Oracle) ✗          ✓                 ✗                ✗         ✓           V3.x+
 Teradata           ✗          ✗                 ✓                ✓(嵌入)   ✗           V14+
 SAP HANA           ✗          ✓                 ✓                ✗         ✓           SPS09+
 Informix           ✗          ✓                 ✗                ✓(嵌入)   ✗           11.50+
 Firebird           ✗          ✓                 ✗                ✗         ✓           2.0+
-SQLite             ✗          ✗                 ✗                ✗         ✗(5)        -
-DuckDB             ✗          ✗                 ✗                ✗         ✗(5)        -
-ClickHouse         ✗          ✗                 ✗                ✗         ✗(5)        -
-Trino              ✗          ✗                 ✗                ✗         ✗(5)        -
-Presto             ✗          ✗                 ✗                ✗         ✗(5)        -
-Spark SQL          ✗          ✗                 ✗                ✗         ✗(5)        -
-Hive               ✗          ✗                 ✗                ✗         ✗(5)        -
-StarRocks          ✗          ✗                 ✗                ✗         ✗(5)        -
-Doris              ✗          ✗                 ✗                ✗         ✗(5)        -
+SQLite             ✗          ✗                 ✗                ✗         ✗(4)        -
+DuckDB             ✗          ✗                 ✗                ✗         ✗(4)        -
+ClickHouse         ✗          ✗                 ✗                ✗         ✗(4)        -
+Trino              ✗          ✗                 ✗                ✗         ✗(4)        -
+Presto             ✗          ✗                 ✗                ✗         ✗(4)        -
+Spark SQL          ✗          ✗                 ✗                ✗         ✗(4)        -
+Hive               ✗          ✗                 ✗                ✗         ✗(4)        -
+StarRocks          ✗          ✗                 ✗                ✗         ✗(4)        -
+Doris              ✗          ✗                 ✗                ✗         ✗(4)        -
 Greenplum          ✗          ✓                 ✗                ✗         ✓           5.0+
-Vertica            ✗          ✗                 ✗                ✗         ✗(6)        -
+Vertica            ✗          ✗                 ✗                ✗         ✗(5)        -
 SingleStore        ✗          ✗                 ✓                ✗         ✗           7.0+
-Couchbase (N1QL)   ✗          ✗                 ✗                ✗         ✗(5)        -
-MongoDB (SQL)      ✗          ✗                 ✗                ✗         ✗(5)        -
+Couchbase (N1QL)   ✗          ✗                 ✗                ✗         ✗(4)        -
+MongoDB (SQL)      ✗          ✗                 ✗                ✗         ✗(4)        -
 Exasol             ✗          ✓                 ✗                ✗         ✓           6.0+
 NuoDB              ✗          ✗                 ✓                ✗         ✗           2.0+
-VoltDB             ✗          ✗                 ✗                ✗         ✗(7)        -
+VoltDB             ✗          ✗                 ✗                ✗         ✗(6)        -
 TimescaleDB        ✗          ✓                 ✗                ✗         ✓           继承PG
-QuestDB            ✗          ✗                 ✗                ✗         ✗(5)        -
-InfluxDB (SQL)     ✗          ✗                 ✗                ✗         ✗(5)        -
+QuestDB            ✗          ✗                 ✗                ✗         ✗(4)        -
+InfluxDB (SQL)     ✗          ✗                 ✗                ✗         ✗(4)        -
 AlloyDB            ✗          ✓                 ✗                ✗         ✓           继承PG
 Neon               ✗          ✓                 ✗                ✗         ✓           继承PG
 PolarDB (MySQL)    ✗          ✗                 ✓                ✗         ✗           继承MySQL
@@ -65,13 +65,12 @@ Aurora (PG)        ✗          ✓                 ✗                ✗      
 MSSQL on Linux     ✓          ✗                 ✗                ✗         ✓           2017+
 
 注:
-(1) BigQuery 过程语言中支持 BEGIN...EXCEPTION，语法接近 PG 但也可理解为 TRY/CATCH 语义
-(2) BigQuery 的 EXCEPTION WHEN ERROR THEN 实际上是 catch-all 模式
-(3) Databricks SQL 通过 PL 扩展支持 DECLARE HANDLER 风格的异常处理
-(4) TiDB 兼容 MySQL DECLARE HANDLER 语法，但存储过程功能仍在逐步完善中
-(5) 分析型/嵌入式引擎，无存储过程，错误直接返回客户端
-(6) Vertica 有存储过程但错误处理能力有限
-(7) VoltDB 使用 Java 存储过程，错误处理在 Java 层面
+(1) BigQuery 的 BEGIN...EXCEPTION WHEN ERROR THEN 是 catch-all 模式，不支持按 SQLSTATE 过滤
+(2) Databricks SQL 通过 PL 扩展支持 DECLARE HANDLER 风格的异常处理
+(3) TiDB 兼容 MySQL DECLARE HANDLER 语法，但存储过程功能仍在逐步完善中
+(4) 分析型/嵌入式引擎，无存储过程，错误直接返回客户端
+(5) Vertica 有存储过程但错误处理能力有限
+(6) VoltDB 使用 Java 存储过程，错误处理在 Java 层面
 ```
 
 ## 错误抛出机制对比
@@ -257,8 +256,9 @@ PostgreSQL 与 Oracle EXCEPTION 块的关键差异：
 自定义异常          通过 RAISE EXCEPTION + SQLSTATE       PRAGMA EXCEPTION_INIT 绑定错误码
 调用栈              PG_EXCEPTION_CONTEXT                 DBMS_UTILITY.FORMAT_ERROR_BACKTRACE
 OTHERS 内获取错误   GET STACKED DIAGNOSTICS               SQLCODE / SQLERRM
-事务控制            不能在 EXCEPTION 块内 COMMIT/ROLLBACK 可以在 EXCEPTION 块内 COMMIT/ROLLBACK
-                    (函数内不允许事务控制)                 (过程内允许自治事务)
+事务控制            函数内不允许事务控制;                  可以在 EXCEPTION 块内 COMMIT/ROLLBACK
+                    过程内(11+)可 COMMIT/ROLLBACK          (过程内允许自治事务)
+                    但 EXCEPTION 块内不可用
 ```
 
 ### 模型三: DECLARE HANDLER (MySQL / MariaDB / Db2)
@@ -357,7 +357,7 @@ Handler 条件类型：
 ```
 条件                     含义                                  示例
 ──────────────────────  ────────────────────────────────────  ─────────────────────────
-SQLEXCEPTION            所有 SQLSTATE 以 '02' 和 '01' 以外    运行时错误、约束违反等
+SQLEXCEPTION            SQLSTATE 类别非 '00'/'01'/'02' 的错误  运行时错误、约束违反等
 SQLWARNING              SQLSTATE 以 '01' 开头                 截断警告、权限提示等
 NOT FOUND               SQLSTATE '02000'                      SELECT INTO 或 FETCH 无数据
 SQLSTATE 'xxxxx'        特定 SQLSTATE 值                       SQLSTATE '23000' (完整性约束)
@@ -459,10 +459,10 @@ THROW 与 RAISERROR 的区别：
 ```
 特性                  THROW                      RAISERROR
 ───────────────────  ─────────────────────────  ──────────────────────────
-最低版本              SQL Server 2012            SQL Server 7.0
+最低版本              SQL Server 2012            SQL Server 2000
 错误号范围            50000+                     50000+ (或已注册消息号)
 严重级别              始终为 16                   可指定 0-25
-SET XACT_ABORT 响应   始终响应（终止事务）        仅严重级别 >= 某阈值时响应
+SET XACT_ABORT 响应   始终响应（终止事务）        不触发 XACT_ABORT（仅中止批处理级错误时）
 无参数重新抛出         支持 (CATCH 块内)           不支持
 格式化参数            不支持                      支持 printf 风格 (%d, %s)
 ```
@@ -1346,15 +1346,15 @@ END;
 ```
 特性                  SQL Server   PostgreSQL  Oracle    MySQL     Db2       Snowflake  BigQuery
 ───────────────────  ───────────  ──────────  ────────  ────────  ────────  ─────────  ────────
-捕获机制              TRY/CATCH    EXCEPTION   EXCEPTION HANDLER   HANDLER   EXCEPTION  EXCEPTION
+捕获机制              TRY...CATCH  EXCEPTION   EXCEPTION HANDLER   HANDLER   EXCEPTION  EXCEPTION
 抛出机制              THROW        RAISE       RAISE     SIGNAL    SIGNAL    RAISE      RAISE
 重新抛出              THROW (无参) RAISE (无参) RAISE     RESIGNAL  RESIGNAL  RAISE      RAISE
 按SQLSTATE捕获        ✗            ✓           部分      ✓         ✓         ✗          ✗
-按错误号捕获          ✗(ERROR_NUM) ✗           ✓(PRAGMA) ✓(ERRNO)  ✓         ✗          ✗
+按错误号捕获          ✗(*)         ✗           ✓(PRAGMA) ✓(ERRNO)  ✓         ✗          ✗
 预定义异常名          ✗            ✓(40+个)    ✓(20+个)  ✗         ✗         ✓(3个)     ✓(1个)
 用户自定义异常        ✗            ✓(SQLSTATE) ✓(PRAGMA) ✓(COND)   ✓(COND)   ✓(EXCPT)   ✗
-获取错误号            ERROR_NUM()  SQLSTATE    SQLCODE   GET DIAG  GET DIAG  SQLCODE    @@error
-获取错误消息          ERROR_MSG()  SQLERRM     SQLERRM   GET DIAG  GET DIAG  SQLERRM    @@error
+获取错误号            ERROR_NUMBER() SQLSTATE   SQLCODE   GET DIAG  GET DIAG  SQLCODE    @@error
+获取错误消息          ERROR_MESSAGE() SQLERRM  SQLERRM   GET DIAG  GET DIAG  SQLERRM    @@error
 获取调用栈            ERROR_LINE() CONTEXT     BACKTRACE ✗         ✗         ✗          stack_trace
 子事务/Savepoint      手动         隐式创建    ✗         手动      UNDO      ✗          ✗
 嵌套捕获              ✓            ✓           ✓         ✓         ✓         ✓          ✓
