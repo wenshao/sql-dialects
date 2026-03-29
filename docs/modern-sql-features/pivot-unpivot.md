@@ -80,7 +80,7 @@
 | BigQuery | 支持 | 不支持 | **支持** | GA |
 | DuckDB | 支持 | **支持（自动检测）** | **支持** | 0.8.0+ |
 | Databricks | 支持 | 部分支持 | 不支持 | Runtime 11.0+ |
-| Spark SQL | 支持 | 不支持 | 不支持 | 1.6+ |
+| Spark SQL | 支持 | 不支持 | 不支持 | 2.4+ |
 | PostgreSQL | 不支持 | - | - | 用 crosstab / FILTER |
 | MySQL | 不支持 | - | - | 用 CASE WHEN |
 | MariaDB | 不支持 | - | - | 用 CASE WHEN |
@@ -125,7 +125,7 @@
 |------|-------------|---------------|-------------|---------|
 | SQL Server | 支持 (2005+) | 不支持 | 不支持 | CROSS APPLY + VALUES |
 | Oracle | 支持 (11g+) | **支持** | **支持** | - |
-| Snowflake | 支持 | 不支持 | 不支持 | LATERAL FLATTEN |
+| Snowflake | 支持 | **支持** | 不支持 | LATERAL FLATTEN |
 | BigQuery | 支持 | 不支持 | **支持** | CROSS JOIN + UNNEST |
 | DuckDB | 支持 (0.8+) | 不支持 | 支持 | COLUMNS(*) 语法 |
 | Databricks | 支持 (11.0+) | 不支持 | 支持 | LATERAL VIEW + STACK |
@@ -376,7 +376,7 @@ UNPIVOT (
 
 **限制**:
 - 默认排除 NULL 值（值列为 NULL 的行被过滤掉）
-- 不支持 `INCLUDE NULLS` 选项
+- 不支持 `INCLUDE NULLS` 选项（需用 `WHERE` 过滤或 `CROSS APPLY + VALUES` 保留 NULL）
 - 所有源列必须是相同类型（或可隐式转换）
 - 不支持多列 UNPIVOT（同时拆分多对列）
 
@@ -471,7 +471,7 @@ UNPIVOT (
     revenue FOR quarter IN (Q1, Q2, Q3, Q4)
 );
 -- Snowflake 的 UNPIVOT 默认排除 NULL 行
--- 目前不支持 INCLUDE NULLS
+-- 支持 INCLUDE NULLS: UNPIVOT INCLUDE NULLS (revenue FOR quarter IN (Q1, Q2, Q3, Q4))
 ```
 
 ### Spark SQL (3.4+)
