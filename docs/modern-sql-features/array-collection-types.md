@@ -6,7 +6,7 @@ ARRAY、MAP、STRUCT 及集合类型——从关系模型的"第一范式"到嵌
 
 | 引擎 | ARRAY | MAP | STRUCT/ROW | VARIANT/ANY | 嵌套类型 | 版本 |
 |------|-------|-----|-----------|-------------|---------|------|
-| PostgreSQL | ✅ 原生 | ❌ (hstore 扩展) | ✅ ROW / 复合类型 | ❌ | ✅ | 8.0+ |
+| PostgreSQL | ✅ 原生 | ❌ (hstore 扩展) | ✅ ROW / 复合类型 | ❌ | ✅ | 6.x+ |
 | MySQL | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | MariaDB | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | SQL Server | ❌ | ❌ | ❌ | sql_variant | ❌ | — |
@@ -600,7 +600,7 @@ SELECT * FROM users WHERE contains(roles, 'admin');
 | PostgreSQL | `UNNEST(arr)` | LEFT JOIN | `WITH ORDINALITY` |
 | BigQuery | `UNNEST(arr)` | LEFT JOIN | `WITH OFFSET` (0-based) |
 | Snowflake | `LATERAL FLATTEN(input => arr)` | `OUTER => TRUE` | `f.index` (0-based) |
-| DuckDB | `UNNEST(arr)` | LEFT JOIN | `generate_subscripts` |
+| DuckDB | `UNNEST(arr)` | LEFT JOIN | `WITH ORDINALITY` / `row_number()` |
 | ClickHouse | `arrayJoin(arr)` | ❌ | `arrayEnumerate` |
 | Trino | `UNNEST(arr)` | LEFT JOIN | `WITH ORDINALITY` |
 | Spark SQL | `EXPLODE(arr)` / `POSEXPLODE(arr)` | `EXPLODE_OUTER` | `POSEXPLODE` (0-based) |
