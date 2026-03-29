@@ -87,7 +87,7 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 | **SQLite** | `NULL` | NULL 传播 |
 | **BigQuery** | `NULL` | NULL 传播 |
 | **Snowflake** | `NULL` | NULL 传播 |
-| **ClickHouse** | 不支持 `\|\|` | 用 `concat()` 函数 |
+| **ClickHouse** | `NULL` | `\|\|` 映射到 `concat()`，NULL 传播 |
 | **Hive** | `NULL` | NULL 传播 |
 | **Spark SQL** | `NULL` | NULL 传播 |
 | **Trino** | `NULL` | NULL 传播 |
