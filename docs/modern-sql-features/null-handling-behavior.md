@@ -115,8 +115,8 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 | **SQL Server** | `'text'` | NULL 跳过 |
 | **SQLite** | `NULL` | NULL 传播 |
 | **BigQuery** | `NULL` | NULL 传播 |
-| **Snowflake** | `'text'` | NULL 跳过 |
-| **ClickHouse** | `'text'` | NULL 跳过 |
+| **Snowflake** | `NULL` | NULL 传播 |
+| **ClickHouse** | `NULL` | NULL 传播 |
 | **Hive** | `NULL` | NULL 传播 |
 | **Spark SQL** | `NULL` | NULL 传播（`concat_ws()` 才跳过 NULL） |
 | **Trino** | `NULL` | NULL 传播 |
@@ -131,8 +131,8 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 
 | 行为 | 方言 |
 |------|------|
-| **NULL 传播**（返回 NULL） | MySQL, MariaDB, Spark, SQLite, BigQuery, Trino, Hive, ClickHouse, Flink, Redshift, MaxCompute, StarRocks, Doris |
-| **NULL 跳过**（忽略 NULL） | PostgreSQL, Oracle, SQL Server, Snowflake, DuckDB |
+| **NULL 传播**（返回 NULL） | MySQL, MariaDB, Spark, SQLite, BigQuery, Snowflake, Trino, Hive, ClickHouse, Flink, Redshift, MaxCompute, StarRocks, Doris |
+| **NULL 跳过**（忽略 NULL） | PostgreSQL, Oracle, SQL Server, DuckDB |
 
 **引擎开发者要点**：跨引擎迁移时，`CONCAT()` 的 NULL 行为差异是最常见的静默 bug 来源之一。如果你的引擎是 NULL 传播型，应提供 `CONCAT_WS` 或类似函数让用户选择跳过 NULL。
 
