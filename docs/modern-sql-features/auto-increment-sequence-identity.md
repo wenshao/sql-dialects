@@ -90,7 +90,9 @@ CREATE OR REPLACE TRIGGER trg_users_id
     BEFORE INSERT ON users
     FOR EACH ROW
 BEGIN
-    :NEW.id := user_seq.NEXTVAL;
+    IF :NEW.id IS NULL THEN
+        :NEW.id := user_seq.NEXTVAL;  -- 仅在未显式传入 id 时自动填充
+    END IF;
 END;
 
 -- Oracle 12c+: IDENTITY 列
@@ -275,7 +277,7 @@ CREATE TABLE users (
 | Snowflake | 支持 | 不支持 | 不支持 | 支持 | 功能受限 |
 | CockroachDB | 支持 | 支持 | 支持 | 支持 | 兼容 PostgreSQL |
 | Spanner | 支持(位反转) | 不支持 | 不支持 | 支持 | 仅 bit_reversed_positive |
-| DuckDB | 支持 | 不支持 | 不支持 | 支持 | 基本 SEQUENCE 支持 |
+| DuckDB | 支持 | 支持 | 支持 | 支持 | 完整 SEQUENCE 支持 |
 | TiDB | 支持(6.4+) | 支持 | 支持 | 支持 | MySQL 扩展 |
 | OceanBase | 支持(4.0+) | 支持 | 支持 | 支持 | Oracle 兼容模式 |
 | MySQL | 不支持 | - | - | - | 无 SEQUENCE |
@@ -363,7 +365,7 @@ NOCACHE:
 | 事务回滚 | 产生间隙 | 产生间隙 | 产生间隙 | 产生间隙 | 产生间隙(AUTOINCREMENT) |
 | INSERT 失败 | 产生间隙 | 产生间隙 | 产生间隙 | 产生间隙 | 不产生(INTEGER PK) |
 | 批量插入 | 可能产生 | 可能产生 | CACHE 导致 | CACHE 导致 | 不产生 |
-| 服务器重启 | 5.7:产生 / 8.0:不产生 | 不产生 | CACHE 导致 | CACHE 导致 | 不产生 |
+| 服务器重启 | 5.7:产生 / 8.0:不产生 | 不回退(但 CACHE 值丢失可产生间隙) | CACHE 导致 | CACHE 导致 | 不产生 |
 | DELETE 后 | 不回填 | 不回填 | 不回填 | 不回填 | INTEGER PK 可复用 |
 | 行级冲突 | 产生间隙 | 产生间隙 | 产生间隙 | 产生间隙 | - |
 
