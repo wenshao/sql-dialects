@@ -766,6 +766,79 @@ EXECUTE stmt USING 10, 20;
     // 无需访问表、无需排序
 ```
 
+### 8. ORDER BY 唯一性保证与确定性分页
+
+分页查询的 ORDER BY 必须包含唯一性的 tie-breaker 列（通常是主键或唯一 ID），否则相同排序值的行在不同页之间的分配是不确定的：
+
+```sql
+-- 错误: created_at 不唯一，相同时间戳的行可能在翻页时重复或丢失
+SELECT * FROM orders ORDER BY created_at LIMIT 10 OFFSET 20;
+
+-- 正确: 追加主键作为 tie-breaker，保证全局唯一排序
+SELECT * FROM orders ORDER BY created_at, id LIMIT 10 OFFSET 20;
+```
+
+实现建议：
+- 在 planner 或 analyzer 阶段检测分页查询的 ORDER BY 是否包含唯一键
+- 如果 ORDER BY 列不能保证唯一性且存在 OFFSET，发出优化器警告（Warning）
+- 文档和错误提示中引导用户添加 tie-breaker 列
+
+### 9. 大 OFFSET 的 I/O 开销陷阱
+
+OFFSET 分页的本质缺陷在于数据库必须先扫描并丢弃 OFFSET 行，然后才返回 LIMIT 行。OFFSET 越大，浪费的 I/O 越多：
+
+```
+OFFSET 0,    LIMIT 10 → 扫描 10 行,     返回 10 行
+OFFSET 1000, LIMIT 10 → 扫描 1010 行,   返回 10 行
+OFFSET 100000, LIMIT 10 → 扫描 100010 行, 返回 10 行
+
+代价模型:
+  实际 I/O = O(offset + limit)
+  返回数据 = O(limit)
+  浪费比   = offset / (offset + limit) → 接近 100%（深页时）
+```
+
+这一问题在分布式引擎中更加严重，因为每个分片都必须返回 `offset + limit` 行到协调节点。对于深页场景，应明确向用户推荐 Seek/Keyset 分页方案。
+
+### 10. Seek/Keyset 分页推荐与索引利用
+
+Seek（又称 Keyset）分页通过记住上一页最后一行的排序键值来定位下一页的起始位置，完全避免了 OFFSET 的扫描浪费：
+
+```sql
+-- OFFSET 分页 (第 N 页): 必须扫描前 N×page_size 行
+SELECT * FROM orders ORDER BY created_at, id
+LIMIT 10 OFFSET 10000;
+
+-- Keyset 分页 (同等效果): 利用索引直接定位起始点
+SELECT * FROM orders
+WHERE (created_at, id) > (:last_created_at, :last_id)
+ORDER BY created_at, id
+LIMIT 10;
+```
+
+Keyset 分页的优势与实现要点：
+
+```
+性能对比:
+  OFFSET 分页: I/O = O(offset + limit), 随页数线性增长
+  Keyset 分页: I/O = O(limit),           恒定代价
+
+前提条件:
+  1. ORDER BY 列上必须有覆盖索引 (如 INDEX(created_at, id))
+  2. 排序键必须唯一 (需 tie-breaker)
+  3. 客户端需持有上一页最后一行的排序键值
+
+局限性:
+  - 不支持直接跳转到第 N 页 (只能向前/向后翻)
+  - 不适用于需要精确 total count 的 UI 场景
+  - 排序键变更时需要重新校准游标
+
+引擎层面建议:
+  - 优化器识别 WHERE (a, b) > (?, ?) ORDER BY a, b LIMIT N 模式
+  - 利用复合索引的 range scan 直接定位起始行
+  - 避免走全表排序路径
+```
+
 ## 参考资料
 
 - ISO/IEC 9075-2:2008 Section 7.17 (query expression - FETCH clause)
