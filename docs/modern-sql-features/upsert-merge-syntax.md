@@ -282,8 +282,8 @@ OUTPUT $action AS action,           -- 'INSERT' 或 'UPDATE'
 ```sql
 -- MySQL 没有 RETURNING，只能依赖函数
 INSERT INTO users (id, name, email)
-VALUES (1, 'Alice', 'alice@example.com')
-ON DUPLICATE KEY UPDATE name = VALUES(name);
+VALUES (1, 'Alice', 'alice@example.com') AS new_row
+ON DUPLICATE KEY UPDATE name = new_row.name;
 
 -- 然后检查:
 SELECT ROW_COUNT();        -- 1=INSERT, 2=UPDATE, 0=无变化
