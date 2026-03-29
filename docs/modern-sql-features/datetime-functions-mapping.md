@@ -234,7 +234,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 | 模式 | 语法 | 引擎 |
 |------|------|------|
 | A: EXTRACT(unit FROM date) | SQL 标准 | PostgreSQL, MySQL 5.5+, BigQuery, Snowflake, Trino, DuckDB, Hive, Spark, StarRocks, Doris, Redshift, ClickHouse |
-| B: YEAR()/MONTH()/DAY() | 专用函数 | MySQL, SQL Server, Oracle, Hive, Spark, Snowflake, StarRocks, Doris, ClickHouse |
+| B: YEAR()/MONTH()/DAY() | 专用函数 | MySQL, SQL Server, Hive, Spark, Snowflake, StarRocks, Doris, ClickHouse |
 | C: DATEPART(unit, date) | 微软风格 | SQL Server, Snowflake, Redshift |
 | D: TO_CHAR(date, 'YYYY') | 格式化提取 | Oracle, PostgreSQL |
 | E: strftime('%Y', date) | C 风格 | SQLite |
@@ -251,7 +251,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 | BigQuery | 是 | 否(用 EXTRACT) | 否 | 否 | 否(FORMAT_DATE) |
 | Snowflake | 是 | 是 | 是 | 否 | 是 |
 | ClickHouse | 是 | 是(toYear等) | 否 | 否 | 否(formatDateTime) |
-| DuckDB | 是 | 是 | 是 | 是 | 否 |
+| DuckDB | 是 | 是 | 是 | 是(date_part) | 否 |
 | Trino | 是 | 是 | 否 | 否 | 否(DATE_FORMAT) |
 | Hive | 是(2.2+) | 是 | 否 | 否 | 否(DATE_FORMAT) |
 | Spark SQL | 是 | 是 | 否 | 否 | 否(DATE_FORMAT) |
