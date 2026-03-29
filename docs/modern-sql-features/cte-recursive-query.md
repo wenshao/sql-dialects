@@ -610,7 +610,7 @@ Phase 2: UNION 去重 + 深度配置
   实现难度: ★★☆☆☆
 
 Phase 3: CYCLE / SEARCH 子句
-  - CYCLE 子句 (SQL:2011 循环检测)
+  - CYCLE 子句 (SQL:1999 循环检测)
   - SEARCH DEPTH/BREADTH FIRST 子句
   - 可在 planner 阶段改写为等价的手动路径维护
   实现难度: ★★★☆☆
