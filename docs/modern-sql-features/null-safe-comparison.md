@@ -14,8 +14,8 @@
 | SQLite | `IS` / `IS NOT` | 3.0+ | 非标准但语义等价 |
 | Trino | `IS NOT DISTINCT FROM` | 早期 | 完整支持 |
 | Spark SQL | `<=>` + `IS NOT DISTINCT FROM` | 2.0+ | 两种都支持 |
-| SQL Server | 不直接支持 | - | 需手写复合条件 |
-| Oracle | 不直接支持 | - | 用 `DECODE` 或 `NVL` 变通 |
+| SQL Server | `IS NOT DISTINCT FROM` | 2022+ | 2022 前需手写复合条件 |
+| Oracle | `IS NOT DISTINCT FROM` | 23c+ | 23c 前用 `DECODE` 或 `NVL` 变通 |
 | ClickHouse | 不直接支持 | - | 用 `isNotDistinctFrom` 函数 (23.2+) |
 | Snowflake | `IS NOT DISTINCT FROM` + `EQUAL_NULL` | GA | 两种都支持 |
 | DB2 | `IS NOT DISTINCT FROM` | 9.7+ | 标准语法 |
@@ -151,7 +151,9 @@ SELECT * FROM t WHERE col IS NOT 42;  -- NULL-safe not equals
 -- 注意: 非标准 SQL，标准 IS 只用于 IS NULL / IS NOT NULL
 ```
 
-### SQL Server / Oracle（无直接支持）
+### SQL Server 2022+ / Oracle 23c+（新版本已支持 IS NOT DISTINCT FROM）
+
+> **注意**: SQL Server 2022 前和 Oracle 23c 前需要以下变通方案：
 
 ```sql
 -- SQL Server 方案 1: 复合条件（最可靠）
