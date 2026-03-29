@@ -1846,6 +1846,85 @@ posting list 压缩:
    - 推荐方案: 可插拔分词器接口 + 内置 N-gram 默认实现
 ```
 
+### 同步与异步索引一致性
+
+全文索引的更新策略直接影响查询一致性:
+
+```
+同步更新 (MySQL InnoDB FTS, SQLite FTS5):
+  INSERT/UPDATE → 立即更新倒排索引 → 后续查询可见
+  + 强一致: 写入后立即可搜索
+  - 写放大: 每次 DML 都触发索引更新
+  - 写入延迟: 分词 + 索引更新在事务路径上
+
+异步更新 (SQL Server, Oracle Text, PostgreSQL GIN pending list):
+  INSERT/UPDATE → 写入 pending list → 后台线程合并到主索引
+  + 写入快: 主事务路径不含索引更新
+  - 幻读风险: 刚写入的数据可能无法被全文搜索命中 (stale results)
+  - 一致性窗口: 取决于后台合并频率 (通常毫秒到秒级)
+```
+
+**引擎实现建议**:
+- 明确文档化索引更新的一致性保证 (强一致 / 最终一致)
+- 如果使用异步更新，提供 `SYNC INDEX` 或 `FLUSH` 命令强制刷新 pending list
+- SQL Server 的 `CHANGE_TRACKING AUTO` vs `MANUAL` 是一个好的配置模型
+- 对于 OLTP 场景，考虑提供可选的同步模式 (牺牲写入性能换取一致性)
+
+### 向量搜索与全文检索的融合趋势
+
+现代搜索场景越来越需要混合搜索 (hybrid search): 结合关键词精确匹配 (FTS) 和语义相似性 (向量搜索):
+
+```
+混合搜索架构:
+
+查询 "如何优化数据库性能"
+  ├── FTS 通道: MATCH(body, '优化 数据库 性能') → 关键词精确匹配结果
+  └── 向量通道: vector_column <=> embedding('如何优化数据库性能') → 语义近似结果
+      ↓
+  融合排序 (Reciprocal Rank Fusion / 加权线性组合)
+      ↓
+  最终排序结果
+
+已支持混合搜索的引擎/扩展:
+  - PostgreSQL: pg_search (ParadeDB) 同时支持 BM25 + pgvector
+  - Elasticsearch 8.x: kNN + full-text 在同一查询中
+  - SingleStore: VECTOR INDEX + FULLTEXT 组合查询
+  - Google Spanner: 搜索索引 + 向量索引 (2024+)
+```
+
+**引擎实现建议**:
+- 如果引擎已支持全文索引，规划向量索引时应考虑查询优化器的统一: 全文评分和向量距离应能在同一 ORDER BY 中组合
+- 提供内置的融合排序函数 (如 `HYBRID_SCORE(fts_score, vector_distance, weight)`)
+- 索引存储上，倒排索引和向量索引可共享文档 ID 空间，简化 JOIN 操作
+
+### FTS 索引膨胀与在线维护
+
+全文索引随时间推移会出现严重膨胀，引擎必须提供在线维护机制:
+
+```
+索引膨胀的来源:
+  1. 标记删除累积: UPDATE/DELETE 后旧的 posting list entry 被标记删除但未物理回收
+  2. pending list 增长: 异步更新模式下，如果合并速度跟不上写入速度
+  3. 词典碎片: 频繁更新导致词典条目分散在不同页面
+
+膨胀程度评估:
+  PostgreSQL: SELECT pg_relation_size('idx_fts') -- 与逻辑数据量对比
+  MySQL:      SELECT * FROM INFORMATION_SCHEMA.INNODB_FT_DELETED -- 已删除文档数
+  Oracle:     CTX_REPORT.INDEX_SIZE / CTX_REPORT.TOKEN_INFO
+
+在线维护操作:
+  PostgreSQL: REINDEX CONCURRENTLY idx_fts      -- 不阻塞读写
+  MySQL:      OPTIMIZE TABLE articles            -- 重建 FTS 索引 (短暂锁表)
+  Oracle:     CTX_DDL.OPTIMIZE_INDEX('idx', 'FULL')  -- 后台优化
+  SQL Server: ALTER FULLTEXT CATALOG ... REORGANIZE   -- 合并碎片
+```
+
+**引擎实现建议**:
+- 提供在线 REINDEX / OPTIMIZE 操作，不阻塞并发读写 (参考 PostgreSQL 的 `REINDEX CONCURRENTLY`)
+- 实现自动膨胀检测: 当索引大小超过逻辑数据量的 N 倍时发出警告
+- 提供后台 compaction 线程 (类似 LSM-tree 的 compaction)，持续回收已删除条目的空间
+- 在系统视图中暴露索引健康指标: 膨胀率、pending list 大小、最后优化时间、已删除但未回收的文档数
+
 ### SQL 语法设计建议
 
 ```sql
