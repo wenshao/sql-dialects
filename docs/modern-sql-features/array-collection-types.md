@@ -1194,6 +1194,51 @@ Dremel 编码 (适合深度嵌套):
 └── 适合: 半结构化数据引擎
 ```
 
+### 7. 数组索引策略：GIN vs Multi-valued Index
+
+```
+PostgreSQL GIN (Generalized Inverted Index):
+├── 为每个数组元素建立倒排列表（element → row list）
+├── 适合 @>（包含）、&&（重叠）等集合运算符
+├── 优势: 查询 "数组包含 X" 非常快，一次 B-tree 查找定位倒排列表
+├── 劣势: 写入放大——每次 INSERT/UPDATE 需要更新所有元素的倒排条目
+├── 延迟更新 (fastupdate): 写入先进 pending list，后台批量合并
+└── 适合读多写少的场景
+
+MySQL 8.0+ Multi-valued Index (基于 InnoDB):
+├── 将 JSON 数组的每个元素展开为独立的索引条目
+├── CREATE INDEX idx ON t ((CAST(data->'$.tags' AS UNSIGNED ARRAY)))
+├── 底层仍是 B-tree，每个元素对应一条 B-tree 记录
+├── 优势: 复用 InnoDB 已有的 B-tree 基础设施，实现成本低
+├── 劣势: 大数组导致索引条目膨胀严重
+└── 仅支持 JSON 数组，不支持原生 ARRAY 类型
+
+索引膨胀警告:
+├── 若数组平均 100 个元素，索引大小 ≈ 行数 × 100
+├── 大集合的 UPDATE 触发大量索引维护操作
+├── 高并发写场景下可能引发 MDL (Metadata Lock) 争用
+├── 建议: 对大数组列（平均 > 50 元素）考虑 JSONB + GIN 而非逐元素索引
+└── 监控指标: 索引大小与表大小的比值，超过 10:1 应预警
+```
+
+### 8. JSONB 作为事实标准的半结构化数组存储
+
+```
+现实情况:
+├── 虽然 SQL 标准定义了 ARRAY 类型，但多数应用使用 JSON 数组存储集合数据
+├── PostgreSQL JSONB、MySQL JSON、Snowflake VARIANT 是实际的跨引擎通用方案
+├── JSONB 的优势: 灵活 schema、自描述、生态成熟（工具链/ORM 支持广泛）
+└── 原生 ARRAY 的优势: 类型安全、存储紧凑、查询优化器可深入优化
+
+引擎开发者的建议:
+├── 优先实现 JSONB/JSON 数组支持——覆盖 80% 的用户场景
+├── 原生 ARRAY 作为高级特性第二优先级实现
+├── 提供 JSONB 数组与原生 ARRAY 之间的互转函数
+├── 对 JSONB 数组支持 GIN 索引加速 containment 查询
+└── 考虑: 列式引擎中 JSONB 数组的 shredding 优化
+    （将常见路径抽取为独立列存储，BigQuery/Snowflake 已采用此策略）
+```
+
 ## 跨引擎移植指南
 
 在不同引擎间移植数组操作时，以下是最常遇到的差异：
