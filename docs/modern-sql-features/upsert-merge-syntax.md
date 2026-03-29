@@ -302,7 +302,7 @@ SELECT LAST_INSERT_ID();   -- 仅 INSERT 时有意义
 | SQLite `ON CONFLICT` | 原子 | **安全** | 库级锁（WAL 模式下写锁） |
 | Oracle `MERGE` | 原子 | **安全** | 行锁 + 快照隔离 |
 | SQL Server `MERGE` | ⚠️ 有并发风险 | 需 HOLDLOCK | 需加 `WITH (HOLDLOCK)` 提示，否则有竞态条件 |
-| PG `MERGE` (15+) | 原子 | **安全** | 快照隔离 + 行锁 |
+| PG `MERGE` (15+) | 原子 | 快照隔离 | 快照隔离 + 行锁（非 ON CONFLICT 级别的并发优化） |
 | Snowflake `MERGE` | 原子 | **表级锁** | 单表写串行化，不存在竞态 |
 | BigQuery `MERGE` | 原子 | **快照** | 快照隔离，冲突时失败重试 |
 | Databricks `MERGE` | 原子 | **乐观锁** | 乐观并发，冲突时失败重试 |
@@ -390,10 +390,10 @@ ON CONFLICT (sensor_id) DO UPDATE SET
 
 -- MySQL: 同等逻辑
 INSERT INTO metrics (sensor_id, max_value, last_seen)
-VALUES (42, 100, NOW())
+VALUES (42, 100, NOW()) AS new_row
 ON DUPLICATE KEY UPDATE
-    max_value = GREATEST(max_value, VALUES(max_value)),
-    last_seen = VALUES(last_seen);
+    max_value = GREATEST(max_value, new_row.max_value),
+    last_seen = new_row.last_seen;  -- 8.0.19+ AS 别名语法
 
 -- MERGE: 同等逻辑
 MERGE INTO metrics t
@@ -449,8 +449,8 @@ WHEN NOT MATCHED THEN INSERT (id, name, email) VALUES (s.id, s.name, s.email);
 
 ### 性能提示
 
-1. **唯一索引是关键**: ON CONFLICT 和 ON DUPLICATE KEY 都依赖唯一索引快速检测冲突。没有索引就是全表扫描。
-2. **MERGE 的 ON 条件要走索引**: 确保 target 表的 JOIN 列上有索引，否则每行都全表扫描。
+1. **唯一索引是关键**: ON CONFLICT 和 ON DUPLICATE KEY 都依赖唯一索引快速检测冲突。缺少合适索引会显著恶化执行计划。
+2. **MERGE 的 ON 条件要走索引**: 确保 target 表的 JOIN 列上有索引，否则性能急剧下降。
 3. **避免宽 MERGE**: 只 SET 需要更新的列，不要 SET 所有列（减少 WAL/redo 日志）。
 4. **PostgreSQL ON CONFLICT 的 HOT 优化**: 如果更新的列上没有索引，PostgreSQL 可以做 Heap-Only Tuple 优化，不更新索引页。
 5. **MySQL ON DUPLICATE KEY 的 deadlock（单行也会！）**: InnoDB 中即使两条相同的单行 `INSERT ... ODKU` 并发执行，也可能死锁——两事务都因唯一键冲突获取共享锁（S Lock），然后都尝试升级为排他锁（X Lock）执行 UPDATE，互相等待导致死锁。这是插入意向锁与间隙锁的结构性冲突，不仅限于批量场景。建议：应用层做好 deadlock 重试逻辑。
@@ -477,7 +477,7 @@ WHEN NOT MATCHED THEN INSERT (id, name, email) VALUES (s.id, s.name, s.email);
 | 能力 | ON CONFLICT (PG) | ON DUPLICATE KEY (MySQL) | MERGE (标准) | REPLACE INTO |
 |------|:-:|:-:|:-:|:-:|
 | 行级原子 UPSERT | 支持 | 支持 | 支持 (SQL Server 需 HOLDLOCK) | DELETE+INSERT |
-| 跳过冲突行 (DO NOTHING) | `DO NOTHING` | `INSERT IGNORE` | 省略 WHEN MATCHED 子句 | 不支持 |
+| 跳过冲突行 (DO NOTHING) | `DO NOTHING` | `INSERT IGNORE`（⚠️ 非严格等价 DO NOTHING，IGNORE 会吞掉所有错误） | 省略 WHEN MATCHED 子句 | 不支持 |
 | 按条件决定是否更新 | WHERE 子句 | 条件表达式 | WHEN MATCHED AND ... | 不支持 |
 | 引用新值 | `EXCLUDED.col` | `VALUES(col)` / 别名 | `s.col` | 不适用 |
 | 引用旧值 | `table.col` | `col` | `t.col` | 不适用 |
