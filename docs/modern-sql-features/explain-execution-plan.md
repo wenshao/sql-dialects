@@ -15,7 +15,7 @@
 | 能力 | MySQL | PostgreSQL | Oracle | SQL Server | SQLite | MariaDB | Db2 |
 |------|-------|-----------|--------|-----------|--------|---------|-----|
 | EXPLAIN | `EXPLAIN SELECT ...` | `EXPLAIN SELECT ...` | `EXPLAIN PLAN FOR SELECT ...` | 不支持 EXPLAIN | `EXPLAIN QUERY PLAN SELECT ...` | `EXPLAIN SELECT ...` | `EXPLAIN SELECT ...` |
-| EXPLAIN ANALYZE | 8.0.18+ | 支持 | 不支持 | 不支持 | 不支持 | 不支持 (用 `ANALYZE`) | 不支持 |
+| 实际执行统计 | `EXPLAIN ANALYZE` (8.0.18+) | `EXPLAIN ANALYZE` | `DBMS_XPLAN.DISPLAY_CURSOR` | `SET STATISTICS TIME/IO ON` | 不支持 | `ANALYZE` 关键字 | `db2exfmt` |
 | FORMAT JSON | 5.6+ | 支持 | 不支持 | 不支持 | 不支持 | 10.1+ | 不支持 |
 | FORMAT TREE | 8.0.16+ | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | FORMAT XML | 不支持 | 支持 | 不支持 | `SET SHOWPLAN_XML ON` | 不支持 | 不支持 | 不支持 |
