@@ -297,8 +297,8 @@ SELECT REGEXP_SUBSTR('2024-01-15', '(\d{4})-(\d{2})-(\d{2})', 1, 1, NULL, 2) FRO
 -- PostgreSQL：regexp_match 返回数组
 SELECT (regexp_match('2024-01-15', '(\d{4})-(\d{2})-(\d{2})'))[2];  -- '01'
 
--- BigQuery
-SELECT REGEXP_EXTRACT('2024-01-15', r'(\d{4})-(\d{2})-(\d{2})', 2);  -- '01'
+-- BigQuery（不支持 group 参数，需调整正则使目标成为唯一捕获组）
+SELECT REGEXP_EXTRACT('2024-01-15', r'\d{4}-(\d{2})-\d{2}');  -- '01'
 
 -- Spark SQL
 SELECT regexp_extract('2024-01-15', '(\\d{4})-(\\d{2})-(\\d{2})', 2);  -- '01'
