@@ -313,7 +313,7 @@ SELECT EXTRACT(YEAR FROM date_col);  -- 也支持 EXTRACT
 
 | 函数 | 语义 | 引擎 |
 |------|------|------|
-| `CURRENT_DATE` | 当前日期（无括号） | PostgreSQL, MySQL, BigQuery, Snowflake, Trino, DuckDB, Hive, Spark, Redshift, StarRocks, Doris, ClickHouse, Oracle(12c+) |
+| `CURRENT_DATE` | 当前日期（无括号） | PostgreSQL, MySQL, BigQuery, Snowflake, Trino, DuckDB, Hive, Spark, Redshift, StarRocks, Doris, ClickHouse, Oracle(9i+) |
 | `CURRENT_DATE()` | 当前日期（有括号） | MySQL(兼容), ClickHouse, DuckDB |
 | `CURRENT_TIMESTAMP` | 当前时间戳（无括号） | SQL 标准，几乎所有引擎 |
 | `NOW()` | 当前时间戳 | MySQL, PostgreSQL, Snowflake, ClickHouse, DuckDB, StarRocks, Doris, Trino |
