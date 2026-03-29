@@ -784,6 +784,97 @@ Materialize/RisingWave 级别的流式 MV 要点：核心算法为 Differential 
 
 关键问题：刷新期间查询应读到旧数据或新数据（不能读中间状态）；有依赖关系的 MV 按拓扑序刷新；基表 DDL 变更需使 MV 失效或自动适配；刷新任务应保证幂等性。
 
+### 10. 增量刷新 vs 全量刷新的适用边界
+
+```
+增量刷新适用:
+├── 基表变更量远小于总数据量 (变更比 < 5%)
+├── MV 查询只涉及可增量维护的聚合 (SUM, COUNT, MIN, MAX)
+├── 基表有可靠的变更捕获机制 (MV Log, WAL 位点, CDC)
+├── MV 不涉及复杂 JOIN 或非确定性函数
+└── 典型场景: 实时仪表盘、汇总报表
+
+全量刷新适用:
+├── 基表变更量大 (批量导入/ETL 后整表替换)
+├── MV 查询涉及不可增量维护的操作:
+│   ├── DISTINCT 聚合 (COUNT(DISTINCT))
+│   ├── 窗口函数 (ROW_NUMBER, RANK)
+│   ├── 多表 JOIN 且 JOIN 关系频繁变化
+│   └── HAVING 子句 (增量维护需额外状态)
+├── 增量维护的辅助数据结构开销 > 全量重算开销
+└── 典型场景: 夜间批处理、数据仓库分层
+
+混合策略 (推荐):
+├── 白天: 增量刷新保持 MV 近实时
+├── 夜间: 全量刷新修正可能的累积误差 (特别是浮点聚合)
+├── StarRocks/Doris: 分区级增量 — 仅重算变更分区, 兼顾精度和效率
+└── 建议: 引擎应提供 REFRESH MATERIALIZED VIEW ... FORCE 强制全量刷新的入口
+```
+
+### 11. 查询改写透明性：跨表自动改写
+
+```
+查询改写的进阶能力:
+  基本改写: 查询与 MV 的定义完全匹配 → 直接替换 (所有引擎的 MV 都支持)
+  高级改写: 查询与 MV 定义不完全匹配, 但 MV 的数据可以推导出查询结果
+
+StarRocks 的自动改写能力:
+├── 单表聚合改写: MV 定义 GROUP BY (a, b), 查询 GROUP BY (a) → 从 MV 再聚合
+├── JOIN 改写: MV 预先 JOIN 了 A⋈B, 查询只查 A 的聚合 → 从 MV 过滤后聚合
+├── 跨 MV 联合改写: 多个 MV 组合回答一个查询 (Union-based rewrite)
+├── 嵌套 MV 改写: MV2 基于 MV1 定义, 查询可透明命中 MV2
+└── 限制: 需要 MV 的列能覆盖查询所需列, GROUP BY 粒度不能比 MV 更细
+
+Doris 的自动改写能力:
+├── 与 StarRocks 能力接近 (同源 Apache Doris)
+├── 支持 SPJG (Select-Project-Join-GroupBy) 查询的自动改写
+├── 分区对齐的 MV 可实现分区级透明替换
+└── 通过 EXPLAIN 可查看是否命中 MV 改写
+
+Oracle QUERY REWRITE:
+├── 最成熟的实现, 支持 PCT (Partition Change Tracking) 局部改写
+├── ENABLE QUERY REWRITE 子句显式启用
+├── DBMS_MVIEW.EXPLAIN_MVIEW 可诊断为什么改写未生效
+└── 支持基于代价的改写决策 (改写后代价更高则不改写)
+
+引擎开发者建议:
+├── 最小可行: 精确匹配改写 (查询 SQL 与 MV 定义完全相同)
+├── 进阶目标: SPJG 子查询包含改写 (参考 Apache Calcite MaterializedViewRule)
+├── 查询改写必须是可观测的: EXPLAIN 输出中标注 "MV rewrite: mv_name"
+├── 提供全局开关和会话级开关: SET enable_mv_rewrite = OFF 用于调试
+└── 改写决策应基于代价: MV 数据过期或改写后代价更高时应回退到基表查询
+```
+
+### 12. 写放大风险：MV 维护对主写入路径的影响
+
+```
+问题描述:
+  每个同步维护的 MV 相当于一个隐式的二级索引。当基表上定义了多个 MV,
+  每次 INSERT/UPDATE/DELETE 都需要同步更新所有受影响的 MV, 产生写放大:
+
+写放大量化:
+├── 1 个基表 + N 个同步 MV → 每次写入的实际 I/O ≈ (1 + N) 倍
+├── 涉及 JOIN 的 MV: 一次基表写入可能需要查询关联表来计算 MV 增量
+├── 聚合 MV: UPDATE 需要先读旧值、计算差值、再写新值 → 读-改-写模式
+└── 极端案例: 10 个 MV × 每个涉及 2 表 JOIN = 单次写入触发 20+ 次 I/O
+
+对主写入路径的阻塞:
+├── 同步 MV: 写入事务必须等待所有 MV 更新完成才能提交
+│   → 写入延迟线性增长, 可能导致事务超时
+├── 锁争用: MV 刷新持有的锁可能与用户 DML 冲突
+│   → SQL Server Indexed View 的 SERIALIZABLE 要求导致高并发写退化
+├── ClickHouse: MV 以 INSERT trigger 形式实现, 大批量插入时 MV 更新可能阻塞后续 INSERT
+└── Oracle: FAST REFRESH ON COMMIT 在高并发 OLTP 中可能成为瓶颈
+
+缓解策略:
+├── 限制同步 MV 数量: 建议每表 ≤ 3 个同步 MV
+├── 复杂 MV 使用异步刷新: JOIN / 窗口函数 MV 不适合同步维护
+├── 分层设计: 基表 → 简单聚合 MV (同步) → 复杂分析 MV (异步)
+├── 写入限流: 当 MV 维护积压超过阈值时, 反压到上游写入
+├── 监控指标: MV 维护延迟、MV 维护占写入事务时间的比例
+└── 建议: 在 CREATE MATERIALIZED VIEW 时估算写放大比, 超过阈值时警告用户
+```
+
 ## 参考资料
 
 - Oracle: [Materialized Views](https://docs.oracle.com/en/database/oracle/oracle-database/19/dwhsg/basic-materialized-views.html)
