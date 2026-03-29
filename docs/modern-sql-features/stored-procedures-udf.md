@@ -15,7 +15,7 @@
 | SQL Server | ✅ | ✅ | ❌ | ❌ | 2000+ |
 | DB2 | ✅ | ✅ | ✅ `BEGIN ATOMIC` | ✅ | 7.0+ |
 | SQLite | ❌ | ❌(宿主语言注册) | ❌ | ❌ | — |
-| Snowflake | ✅ | ✅ | ✅ (Snowpark) | ✅ | GA |
+| Snowflake | ✅ | ✅ | ✅ (Snowflake Scripting) | ✅ | GA |
 | BigQuery | ✅ | ✅ | ✅ `BEGIN/END` | ❌ | GA |
 | Redshift | ✅ | ✅ | ❌ | ✅ | 2019+ |
 | DuckDB | ❌ | ✅ (macro) | ❌ | ❌ | 0.3.0+ |
@@ -332,7 +332,8 @@ BEGIN
         RETURN;
     END IF;
 
-    -- BigQuery 不支持事务内多表更新; 使用 MERGE 或脚本方式
+    -- BigQuery 支持 BEGIN TRANSACTION/COMMIT 多语句事务 (DML)，但有限制:
+    -- 事务只能包含 DML（INSERT/UPDATE/DELETE/MERGE），且受并发和超时限制
     UPDATE myproject.mydataset.accounts
     SET balance = balance - p_amount
     WHERE acct_id = p_from_acct;
