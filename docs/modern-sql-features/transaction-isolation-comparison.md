@@ -359,8 +359,7 @@ SQLite             ✗ 否              ✓ 可回滚       事务 DDL: DDL 在�
 Redshift           ✗ 否              ✓ 可回滚       事务 DDL: 同 PostgreSQL
 DuckDB             ✗ 否              ✓ 可回滚       事务 DDL: DDL 在事务中可以回滚
 
-OceanBase          ✓ (MySQL模式)     取决于模式      MySQL 模式同 MySQL; Oracle 模式同 Oracle
-                   ✓ (Oracle模式)
+OceanBase          ✓ (两种模式)      ✗ 不可回滚     MySQL 模式: 隐式 COMMIT; Oracle 模式: 隐式 COMMIT
 
 Snowflake          ✓ 是              ✗ 不可回滚     DDL 自动提交, 不参与多语句事务
 BigQuery           N/A               N/A             DDL 不参与事务
@@ -417,7 +416,7 @@ SQL Server         ✗(2)         ✗(2)          ✗(2)         ✗(2)         
 MariaDB            ✓            ✓             ✓ (10.3+)    ✓ (10.6+)
 SQLite             ✗            ✗             ✗            ✗              无行级锁
 
-TiDB               ✓            ✓             ✗(4)         ✗              FOR UPDATE 悲观锁
+TiDB               ✓            ✓             ✓            ✓ (6.6+)       FOR UPDATE 悲观锁
 CockroachDB        ✓            ✓             ✓            ✗              FOR UPDATE 获取排他锁
 OceanBase          ✓            ✓             ✓            ✓
 YugabyteDB         ✓            ✓             ✓            ✓
@@ -433,7 +432,7 @@ Hive               ✗            ✗             ✗            ✗            
 (1) MySQL 8.0 前使用 LOCK IN SHARE MODE, 8.0+ 改为 FOR SHARE (兼容旧语法)
 (2) SQL Server 使用表提示 (table hint) 代替 FOR UPDATE 语法
 (3) SQL Server WITH (READPAST) 等价于 SKIP LOCKED
-(4) TiDB 不支持 NOWAIT 语法, 需使用 innodb_lock_wait_timeout=0 近似实现
+(4) TiDB 悲观模式下支持 NOWAIT；SKIP LOCKED 自 v6.6.0 起支持
 ```
 
 ### SQL Server 锁提示对照
