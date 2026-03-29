@@ -231,7 +231,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 | 模式 | 语法 | 引擎 |
 |------|------|------|
 | A: EXTRACT(unit FROM date) | SQL 标准 | PostgreSQL, MySQL 5.5+, BigQuery, Snowflake, Trino, DuckDB, Hive, Spark, StarRocks, Doris, Redshift, ClickHouse |
-| B: YEAR()/MONTH()/DAY() | 专用函数 | MySQL, SQL Server, Oracle, Hive, Spark, BigQuery, Snowflake, StarRocks, Doris, ClickHouse |
+| B: YEAR()/MONTH()/DAY() | 专用函数 | MySQL, SQL Server, Oracle, Hive, Spark, Snowflake, StarRocks, Doris, ClickHouse |
 | C: DATEPART(unit, date) | 微软风格 | SQL Server, Snowflake, Redshift |
 | D: TO_CHAR(date, 'YYYY') | 格式化提取 | Oracle, PostgreSQL |
 | E: strftime('%Y', date) | C 风格 | SQLite |
@@ -245,7 +245,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 | SQL Server | 否 | 是 | 是 | 否 | 否(FORMAT) |
 | Oracle | 是(受限) | 否(注2) | 否 | 否 | 是 |
 | SQLite | 否 | 否 | 否 | 是 | 否 |
-| BigQuery | 是 | 是(部分) | 否 | 否 | 否(FORMAT_DATE) |
+| BigQuery | 是 | 否(用 EXTRACT) | 否 | 否 | 否(FORMAT_DATE) |
 | Snowflake | 是 | 是 | 是 | 否 | 是 |
 | ClickHouse | 是 | 是(toYear等) | 否 | 否 | 否(formatDateTime) |
 | DuckDB | 是 | 是 | 是 | 是 | 否 |
@@ -447,7 +447,7 @@ SELECT CURRENT_TIMESTAMP;     -- 正确（SQL 标准，无括号）
 | DuckDB | 是 `TIMESTAMPTZ` | 存 UTC | 同 PostgreSQL |
 | Trino | 是 `TIMESTAMP WITH TIME ZONE` | 存 UTC + 时区 | - |
 | Redshift | 是 `TIMESTAMPTZ` | 存 UTC | 同 PostgreSQL |
-| MySQL | 否 | 存为 session 时区的值 | `TIMESTAMP` 存 UTC 但显示受 `time_zone` 影响 |
+| MySQL | 否（TIMESTAMP 存 UTC，DATETIME 无时区） | `CONVERT_TZ()` | TIMESTAMP 以 UTC 存储，输入输出按 session time_zone 转换；DATETIME 是纯墙钟值 |
 | Hive/Spark | 否（Spark 3.4+ 有） | - | 通常依赖 session 时区 |
 | StarRocks | 否 | - | `DATETIME` 无时区语义 |
 | Doris | 否 | - | `DATETIME` 无时区语义 |
@@ -565,7 +565,7 @@ SELECT toStartOfMinute(now());
 -- 也支持: SELECT DATE_TRUNC('month', toDate('2024-03-15'));
 
 -- MySQL: 无原生 DATE_TRUNC，需手工拼接
-SELECT DATE_FORMAT('2024-03-15', '%Y-%m-01');          -- 月初
+SELECT DATE_FORMAT('2024-03-15', '%Y-%m-01');  -- 月初（注意：返回 STRING 非 DATE！需 CAST）
 SELECT MAKEDATE(YEAR('2024-03-15'), 1);                -- 年初
 SELECT DATE_SUB('2024-03-15',
        INTERVAL DAYOFMONTH('2024-03-15')-1 DAY);       -- 月初(另一种)
