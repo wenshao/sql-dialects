@@ -9,11 +9,11 @@
 | MySQL | `AUTO_INCREMENT` | 不支持 | 不支持 | 经典自增，单列限制 |
 | PostgreSQL | `SERIAL`(旧) / `IDENTITY`(新) | 支持 | 支持 | 10+ 推荐 IDENTITY |
 | Oracle | 无(旧) / `IDENTITY`(新) | 支持 | 支持 | 12c+ 支持 IDENTITY，之前依赖 SEQUENCE |
-| SQL Server | `IDENTITY(seed, increment)` | 支持(2012+) | 部分 | IDENTITY 是私有语法，非 SQL 标准 IDENTITY |
+| SQL Server | `IDENTITY(seed, increment)` | 支持(2012+) | 不支持 | IDENTITY 是私有语法，非 SQL 标准 IDENTITY |
 | SQLite | `AUTOINCREMENT` / `INTEGER PRIMARY KEY` | 不支持 | 不支持 | `INTEGER PRIMARY KEY` 自动 rowid |
 | MariaDB | `AUTO_INCREMENT` | 支持(10.3+) | 不支持 | 兼容 MySQL + 额外 SEQUENCE 引擎 |
 | BigQuery | 无 | 不支持 | 不支持 | 设计哲学：分布式系统不应依赖全局序列 |
-| Snowflake | `AUTOINCREMENT` / `IDENTITY` | 支持 | 部分 | 不保证连续，保证唯一且递增（但可能有间隙） |
+| Snowflake | `AUTOINCREMENT` / `IDENTITY` | 支持 | 不支持 | 不保证连续，保证唯一且递增（但可能有间隙） |
 | TiDB | `AUTO_INCREMENT` / `AUTO_RANDOM` | 支持(6.4+) | 不支持 | 分布式推荐 AUTO_RANDOM |
 | CockroachDB | `SERIAL` → `unique_rowid()` | 支持 | 支持 | SERIAL 映射为 unique_rowid()，非连续 |
 | Spanner | 无原生自增 | 支持(位反转) | 不支持 | bit-reversed sequence 避免热点 |
@@ -21,7 +21,7 @@
 | Hive | 无 | 不支持 | 不支持 | 批处理引擎 |
 | Spark SQL | 无 | 不支持 | 不支持 | `monotonically_increasing_id()` 非连续 |
 | MaxCompute | 无 | 不支持 | 不支持 | 批处理引擎 |
-| DuckDB | `GENERATED ALWAYS AS IDENTITY` | 支持 | 支持 | 遵循 SQL 标准 |
+| DuckDB | `GENERATED {ALWAYS | BY DEFAULT} AS IDENTITY` | 支持 | 支持 | 遵循 SQL 标准 |
 | OceanBase | `AUTO_INCREMENT` | 支持(4.0+) | 不支持 | MySQL 兼容模式 / Oracle 兼容模式 |
 
 ## 各引擎语法详解
@@ -70,7 +70,7 @@ CREATE TABLE users (
 );
 
 -- IDENTITY 的优势:
--- 1. 不会意外被 DROP（SERIAL 的 SEQUENCE 是独立对象）
+-- 1. sequence 与列生命周期绑定（随表/列自动管理）（SERIAL 的 SEQUENCE 是独立对象）
 -- 2. pg_dump/pg_restore 行为更正确
 -- 3. 符合 SQL:2003 标准
 -- 4. 权限管理更简单（无需额外的 SEQUENCE 权限）
@@ -284,6 +284,9 @@ CREATE TABLE users (
 | SQLite | 不支持 | - | - | - | 无 SEQUENCE |
 | BigQuery | 不支持 | - | - | - | 无 SEQUENCE |
 | ClickHouse | 不支持 | - | - | - | 无 SEQUENCE |
+| Hive | 不支持 | - | - | - | 批处理引擎 |
+| Spark SQL | 不支持 | - | - | - | 批处理引擎 |
+| MaxCompute | 不支持 | - | - | - | 批处理引擎 |
 
 ### SEQUENCE 语法对比
 
@@ -334,7 +337,7 @@ ALTER TABLE orders ADD CONSTRAINT df_id DEFAULT NEXT VALUE FOR order_seq FOR id;
 
 ```
 CACHE（如 CACHE 20）:
-  - 每个会话/节点预取 20 个序列值到内存
+  - 预取 N 个序列值到内存（缓存粒度因引擎而异：PG per-session，Oracle/SQL Server per-instance）
   - 数据库崩溃或正常关闭时，缓存中未使用的值丢失
   - 造成间隙，但性能高（减少磁盘写入）
 
@@ -368,6 +371,8 @@ NOCACHE:
 | 服务器重启 | 5.7:产生 / 8.0:不产生 | 不回退(但 CACHE 值丢失可产生间隙) | CACHE 导致 | CACHE 导致 | 不产生 |
 | DELETE 后 | 不回填 | 不回填 | 不回填 | 不回填 | INTEGER PK 可复用 |
 | 行级冲突 | 产生间隙 | 产生间隙 | 产生间隙 | 产生间隙 | - |
+
+> ⚠️ 本表仅覆盖自增/SEQUENCE 语义最成熟的 5 个引擎。MariaDB 间隙行为同 MySQL；TiDB AUTO_INCREMENT 同 MySQL（AUTO_RANDOM 无间隙概念）；Snowflake/DuckDB 间隙行为同 PostgreSQL SEQUENCE。
 
 ### MySQL 5.7 重启回退 bug
 
