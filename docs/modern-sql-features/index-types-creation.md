@@ -1269,6 +1269,50 @@ YugabyteDB         ✅     ✅     ✅       ✅      ✅      ❌      ❌     
         * 在线 schema change 的核心挑战是多节点协调
         * Google F1 论文的状态机方案 (absent → delete-only → write-only → public)
           被 TiDB 和 CockroachDB 广泛采用
+
+11. Visibility Map 对 Index-Only Scan 的影响
+
+    Index-Only Scan 的前提是能够仅从索引获取所有所需列, 但在 MVCC 引擎中
+    还需要确认行的可见性:
+      - PostgreSQL: 维护 Visibility Map (VM), 标记每个 heap page 是否 all-visible
+        * 如果页已标记 all-visible, 索引扫描可跳过 heap 访问 → 真正的 Index-Only
+        * 如果页未标记 (频繁 UPDATE 后), 仍需回表做 visibility check → 退化为 Index Scan
+        * VACUUM 负责设置 VM 位; 未及时 VACUUM 的表无法享受 Index-Only Scan 优势
+      - InnoDB: 二级索引不存储事务信息, 每次都需要回聚簇索引检查可见性
+        * 覆盖索引 (covering index) 在 InnoDB 中仍可能需要回表 (change buffer 场景)
+      - 建议: 新引擎如果支持 MVCC + Index-Only Scan, 必须设计类似 VM 的机制
+        * 在执行计划的 EXPLAIN 输出中区分 "Index Only Scan" vs "Index Scan"
+        * 暴露 VM 命中率指标, 帮助用户诊断 "为什么 Index-Only Scan 还是很慢"
+
+12. MDL (Metadata Lock) 陷阱与 Online DDL
+
+    CREATE INDEX 即使使用 Online DDL (ALGORITHM=INPLACE), 仍需在开始和结束阶段
+    短暂获取排他 MDL (Metadata Lock):
+      - 开始阶段: 获取 MDL_EXCLUSIVE 以切换表定义 → 立即降级为 MDL_SHARED_UPGRADABLE
+      - 结束阶段: 再次升级为 MDL_EXCLUSIVE 以提交索引变更
+      - 高并发写场景: 如果有长事务持有 MDL_SHARED, 升级被阻塞 → 后续所有 DML 排队等待
+        导致线上服务看起来像 "卡住了"
+      - 诊断: SHOW PROCESSLIST 看 "Waiting for table metadata lock" 状态
+      - 缓解措施:
+        * MySQL 8.0.31+: lock_wait_timeout 限制 MDL 等待时间
+        * pt-online-schema-change / gh-ost: 通过触发器/binlog 避免长时间持有 MDL
+        * PostgreSQL CONCURRENTLY: 使用弱锁 (ShareUpdateExclusiveLock), 不阻塞 DML
+      - 建议: 新引擎的 Online DDL 在文档中明确标注 MDL 获取时机和持续时间
+
+13. 幂等 DDL: IF NOT EXISTS
+
+    MySQL 8.0.30+ 支持 ADD INDEX IF NOT EXISTS, 解决了长期痛点:
+      - 之前版本: CREATE INDEX 重复执行报 "Duplicate key name" 错误
+      - 8.0.30+: ALTER TABLE t ADD INDEX IF NOT EXISTS idx (col) — 已存在时仅警告
+      - 对 CI/CD 和迁移脚本的价值:
+        * 迁移脚本可以安全重放, 不需要额外的 "索引是否存在" 检查
+        * 多环境部署时无需维护状态, 幂等执行即可
+      - 其他引擎的支持情况:
+        * PostgreSQL: CREATE INDEX IF NOT EXISTS (9.5+, 最早支持)
+        * SQLite: CREATE INDEX IF NOT EXISTS
+        * CockroachDB: CREATE INDEX IF NOT EXISTS
+        * Oracle / SQL Server / MariaDB: 不支持, 需手动检查
+      - 建议: 新引擎必须从第一天支持 IF NOT EXISTS / IF EXISTS 语法对
 ```
 
 ## 附录: 快速参考
