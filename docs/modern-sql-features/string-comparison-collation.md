@@ -158,11 +158,11 @@ SELECT * FROM users WHERE name ILIKE '%john%'; -- 不敏感匹配
 | DB2 | **支持** | 不支持 | CONCAT(a,b) | `\|\|`: NULL 传播 | CONCAT 只接受 2 个参数 |
 | Snowflake | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: 跳过 NULL | CONCAT 可变参数 |
 | BigQuery | **支持** | 不支持 | CONCAT() | 均 NULL 传播 | - |
-| ClickHouse | **支持** | 不支持 | concat() | concat: 跳过 NULL | `\|\|` 是 concat 的别名 |
+| ClickHouse | **支持** | 不支持 | concat() | concat: **NULL 传播** | `\|\|` 是 concat 别名；`concatAssumeNotNull()` 跳过 NULL |
 | Trino | **支持** | 不支持 | CONCAT() | 均 NULL 传播 | CONCAT 可变参数 |
-| Spark SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: NULL 传播 | - |
+| Spark SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: **跳过 NULL** | CONCAT 和 `\|\|` NULL 行为不同！ |
 | Hive | **不支持** | 不支持 | CONCAT() | CONCAT: NULL 传播 | - |
-| Flink SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: 跳过 NULL | - |
+| Flink SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: **NULL 传播** | CONCAT_WS 才跳过 NULL |
 | DuckDB | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: 跳过 NULL | 与 PostgreSQL 兼容 |
 | TiDB | 不支持 | 不支持 | **CONCAT()** | CONCAT: NULL 传播 | MySQL 兼容 |
 | StarRocks | **支持** | 不支持 | CONCAT() | CONCAT: NULL 传播 | - |
