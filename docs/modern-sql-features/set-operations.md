@@ -284,7 +284,7 @@ SQL 标准规定 `INTERSECT` 的优先级高于 `UNION` 和 `EXCEPT`，但并非
 | PostgreSQL | 支持 | `(SELECT ...) UNION (SELECT ...)` |
 | MySQL | 支持 | 8.0+ 完整支持括号化 |
 | Oracle | 支持 | `(SELECT ... FROM DUAL) UNION (SELECT ... FROM DUAL)` |
-| SQL Server | 不支持 | 不能在 UNION 的分支外加括号；需用子查询 |
+| SQL Server | ✅ | 支持括号化查询表达式，如 `(SELECT ... UNION ALL SELECT ...) UNION (SELECT ...)`；单分支括号需包含完整子查询 |
 | SQLite | 支持 | |
 | DuckDB | 支持 | |
 | BigQuery | 支持 | |
