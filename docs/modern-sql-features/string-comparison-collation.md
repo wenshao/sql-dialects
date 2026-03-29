@@ -165,13 +165,13 @@ SELECT * FROM users WHERE name ILIKE '%john%'; -- 不敏感匹配
 | Flink SQL | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: **NULL 传播** | CONCAT_WS 才跳过 NULL |
 | DuckDB | **支持** | 不支持 | CONCAT() | `\|\|`: NULL 传播; CONCAT: 跳过 NULL | 与 PostgreSQL 兼容 |
 | TiDB | 不支持 | 不支持 | **CONCAT()** | CONCAT: NULL 传播 | MySQL 兼容 |
-| StarRocks | **支持** | 不支持 | CONCAT() | CONCAT: NULL 传播 | - |
-| Doris | **支持** | 不支持 | CONCAT() | CONCAT: NULL 传播 | - |
+| StarRocks | **不支持** | 不支持 | CONCAT() | CONCAT: NULL 传播 | `\|\|` 是逻辑 OR（MySQL 兼容） |
+| Doris | **不支持** | 不支持 | CONCAT() | CONCAT: NULL 传播 | `\|\|` 是逻辑 OR（MySQL 兼容） |
 
 **关键发现**:
-- MySQL/MariaDB/TiDB 中 `||` 默认是逻辑 OR，**不是**字符串拼接，这是最常见的迁移陷阱
+- MySQL/MariaDB/TiDB/StarRocks/Doris 中 `||` 默认是逻辑 OR，**不是**字符串拼接，这是最常见的迁移陷阱
 - SQL Server 是唯一使用 `+` 做拼接的方言
-- `CONCAT()` 的 NULL 处理分两派：PostgreSQL/SQL Server/Snowflake/DuckDB/Flink 跳过 NULL，其余传播 NULL
+- `CONCAT()` 的 NULL 处理分两派：PostgreSQL/SQL Server/Snowflake/DuckDB/Spark 跳过 NULL；MySQL/MariaDB/Oracle/BigQuery/ClickHouse/Trino/Flink/Hive/TiDB/StarRocks/Doris 传播 NULL
 
 ### NULL 处理对比
 
