@@ -53,7 +53,7 @@ JSON 路径表达式是 SQL 引擎中分裂最严重的语法领域。同一个�
 | Snowflake | `data:user` | `data:user:name::STRING` | `data:scores[0]` |
 | ClickHouse | `JSON_QUERY(data, '$.user')` | `JSON_VALUE(data, '$.user.name')` | `JSON_VALUE(data, '$.scores[0]')` |
 | ClickHouse (传统) | `JSONExtract(data, 'user', 'String')` | `JSONExtractString(data, 'user', 'name')` | `JSONExtractInt(data, 'scores', 1)` |
-| DuckDB | `data->'user'` | `data->>'user'` | `data->'scores'->0` |
+| DuckDB | `data->'user'` | `data->'user'->>'name'` | `data->'scores'->0` |
 | DuckDB (点表示法) | `data.user` | `data.user.name` | `data.scores[0]` |
 | Trino | `json_query(data, 'lax $.user')` | `json_value(data, 'lax $.user.name')` | `json_value(data, 'lax $.scores[0]')` |
 | Spark SQL | — | `get_json_object(data, '$.user.name')` | `get_json_object(data, '$.scores[0]')` |
