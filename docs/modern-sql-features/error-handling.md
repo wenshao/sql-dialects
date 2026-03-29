@@ -18,7 +18,7 @@ SQL Server         ✓          ✗                 ✗                ✗      
 Azure SQL          ✓          ✗                 ✗                ✗         ✓           GA
 PostgreSQL         ✗          ✓                 ✗                ✗         ✓           8.0+
 Oracle PL/SQL      ✗          ✓                 ✗                ✗         ✓           7.0+
-MySQL              ✗          ✗                 ✓                ✗         ✗           5.5+
+MySQL              ✗          ✗                 ✓                ✗         ✗           5.0+ (SIGNAL/RESIGNAL 5.5+)
 MariaDB            ✗          ✗                 ✓                ✗         ✗           5.5+
 Db2 (LUW)         ✗          ✗                 ✓                ✓(嵌入)   ✓           V7+
 Db2 (z/OS)        ✗          ✗                 ✓                ✓(嵌入)   ✓           V7+
@@ -880,7 +880,7 @@ MySQL (InnoDB)     等待图 (wait-for graph)  50 秒           应用层重试;
 MariaDB            等待图                   50 秒           应用层重试; 错误 1213
 PostgreSQL         等待图                   无超时(1)       应用层重试; SQLSTATE 40P01
 Oracle             等待图                   即时检测        应用层重试; ORA-00060
-SQL Server         等待图                   5 秒            应用层重试; 错误 1205
+SQL Server         等待图                   即时检测（lock_timeout 默认无限）  应用层重试; 错误 1205
 Db2                等待图                   可配置          应用层重试; SQLSTATE 40001
 CockroachDB        时间戳排序               自动重试(2)     引擎内自动重试
 TiDB               等待图 (悲观锁)           50 秒           可配置自动重试
@@ -1352,11 +1352,11 @@ END;
 抛出机制              THROW        RAISE       RAISE     SIGNAL    SIGNAL    RAISE      RAISE
 重新抛出              THROW (无参) RAISE (无参) RAISE     RESIGNAL  RESIGNAL  RAISE      RAISE
 按SQLSTATE捕获        ✗            ✓           部分      ✓         ✓         ✗          ✗
-按错误号捕获          ✗(ERROR_NUM) ✗           ✓(PRAGMA) ✓(ERRNO)  ✓         ✗          ✗
+按错误号捕获          ✗(ERROR_NUMBER) ✗        ✓(PRAGMA) ✓(ERRNO)  ✓         ✗          ✗
 预定义异常名          ✗            ✓(40+个)    ✓(20+个)  ✗         ✗         ✓(3个)     ✓(1个)
 用户自定义异常        ✗            ✓(SQLSTATE) ✓(PRAGMA) ✓(COND)   ✓(COND)   ✓(EXCPT)   ✗
-获取错误号            ERROR_NUM()  SQLSTATE    SQLCODE   GET DIAG  GET DIAG  SQLCODE    @@error
-获取错误消息          ERROR_MSG()  SQLERRM     SQLERRM   GET DIAG  GET DIAG  SQLERRM    @@error
+获取错误号            ERROR_NUMBER() SQLSTATE  SQLCODE   GET DIAG  GET DIAG  SQLCODE    @@error
+获取错误消息          ERROR_MESSAGE() SQLERRM  SQLERRM   GET DIAG  GET DIAG  SQLERRM    @@error
 获取调用栈            ERROR_LINE() CONTEXT     BACKTRACE ✗         ✗         ✗          stack_trace
 子事务/Savepoint      手动         隐式创建    ✗         手动      UNDO      ✗          ✗
 嵌套捕获              ✓            ✓           ✓         ✓         ✓         ✓          ✓
