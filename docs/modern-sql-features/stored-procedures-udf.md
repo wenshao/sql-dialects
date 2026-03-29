@@ -18,7 +18,7 @@
 | Snowflake | ✅ | ✅ | ✅ (Snowflake Scripting) | ✅ | GA |
 | BigQuery | ✅ | ✅ | ✅ `BEGIN/END` | ❌ | GA |
 | Redshift | ✅ | ✅ | ❌ | ✅ | 2019+ |
-| DuckDB | ❌ | ✅ (macro) | ❌ | ❌ | 0.3.0+ |
+| DuckDB | ❌ | ✅ MACRO / TABLE MACRO（语法宏，非传统 stored function） | ❌ | ❌ | 0.3.0+ |
 | ClickHouse | ❌ | ✅ (UDF) | ❌ | ❌ | 21.10+ |
 | Trino | ❌ | ✅ (SQL routine 419+) | ❌ | ❌ | 419+ |
 | Spark SQL | ❌ | ✅ (UDF via API) | ❌ | ❌ | 1.0+ |
@@ -61,7 +61,7 @@
 | MySQL | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | MariaDB | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | Oracle | ✅ | ❌ | ✅ | ❌ | ✅ (23ai) | ❌ | ✅ | ❌ | — |
-| SQL Server | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ (2017+) | ❌ | ❌ | R, C# (CLR) |
+| SQL Server | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ (2017+)^† | ❌ | ❌ | R, C# (CLR) |
 | DB2 | ✅ | ❌ | ✅ (兼容) | ❌ | ❌ | ❌ | ✅ | ❌ | C |
 | Snowflake | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | Scala |
 | BigQuery | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | — |
@@ -82,6 +82,8 @@
 | Greenplum | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ (PL/Python) | ✅ (PL/Java) | ❌ | Perl, R |
 | 达梦 (DM) | ✅ | ❌ | ✅ (兼容) | ❌ | ❌ | ❌ | ✅ | ❌ | — |
 | openGauss | ✅ | ✅ | ✅ (兼容) | ❌ | ❌ | ❌ | ✅ | ❌ | — |
+
+> ^† SQL Server Python 支持需要安装 Machine Learning Services (原 R Services) 外部运行时，非内置于 SQL 引擎。Python 代码通过 `sp_execute_external_script` 调用，在独立的外部进程中执行，与原生 T-SQL 的执行方式有本质区别。
 
 ## PROCEDURE 与 FUNCTION 的本质区别
 
