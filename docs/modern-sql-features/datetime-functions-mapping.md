@@ -76,9 +76,9 @@ SELECT DATE '2024-01-01' + INTERVAL '7 days';
 SELECT CURRENT_DATE + 7;  -- 直接加整数（天数）
 SELECT CURRENT_TIMESTAMP + INTERVAL '3 hours';
 
--- DuckDB: 同 PostgreSQL 风格
+-- DuckDB: 同 PostgreSQL 风格（不支持 SQL Server 三参数 DATEADD）
 SELECT DATE '2024-01-01' + INTERVAL 7 DAY;
--- 也支持 DATEADD(unit, delta, date) 兼容语法
+-- 或 DATE_ADD(date, INTERVAL n unit) 两参数形式
 
 -- ClickHouse: INTERVAL 算术或专用函数
 SELECT toDate('2024-01-01') + INTERVAL 7 DAY;
