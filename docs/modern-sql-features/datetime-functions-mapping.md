@@ -175,7 +175,7 @@ SELECT DATE_DIFF('month', DATE '2024-01-01', DATE '2024-04-01');  -- 3
 
 -- Hive / Spark SQL: DATEDIFF(end, start) —— 同 MySQL，仅天数
 SELECT DATEDIFF('2024-01-08', '2024-01-01');  -- 7
--- Spark 3.4+: 按单位计算用 TIMESTAMPDIFF(unit, start, end)
+-- Spark 3.3+: 按单位计算用 TIMESTAMPDIFF(unit, start, end)
 SELECT TIMESTAMPDIFF(MONTH, '2024-01-01', '2024-04-01');  -- 3
 -- 注意: DATEDIFF 本身始终只返回天数，不支持 unit 参数
 
@@ -265,7 +265,7 @@ SELECT CAST(JULIANDAY('2024-01-08') - JULIANDAY('2024-01-01') AS INTEGER);  -- 7
 SELECT EXTRACT(YEAR FROM date_col);
 SELECT EXTRACT(MONTH FROM date_col);
 SELECT EXTRACT(DOW FROM date_col);  -- 星期几（PostgreSQL）
-SELECT EXTRACT(DAYOFWEEK FROM date_col);  -- 星期几（MySQL/BigQuery）
+SELECT EXTRACT(DAYOFWEEK FROM date_col);  -- 星期几（BigQuery; MySQL 用 DAYOFWEEK() 函数）
 
 -- SQL Server: DATEPART 或专用函数
 SELECT DATEPART(YEAR, date_col);
