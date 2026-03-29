@@ -1,5 +1,12 @@
 # JSON 路径与查询语法：各 SQL 方言全对比
 
+> 参考资料:
+> - [MySQL 8.0 - JSON Functions](https://dev.mysql.com/doc/refman/8.0/en/json-functions.html)
+> - [PostgreSQL - JSON Functions](https://www.postgresql.org/docs/current/functions-json.html)
+> - [SQL Server - JSON Data](https://learn.microsoft.com/en-us/sql/relational-databases/json/json-data-sql-server)
+> - [BigQuery - JSON Functions](https://cloud.google.com/bigquery/docs/reference/standard-sql/json_functions)
+> - [Snowflake - Semi-structured Data](https://docs.snowflake.com/en/sql-reference/data-types-semistructured)
+
 JSON 路径表达式是 SQL 引擎中分裂最严重的语法领域。同一个查询——"取出 JSON 对象中 `user.name` 的值"——在 17 种引擎中可能有 10 种完全不同的写法。本文系统梳理各引擎的 JSON 路径语法、提取函数、索引策略、修改操作与聚合能力。
 
 ## JSON 类型支持矩阵
