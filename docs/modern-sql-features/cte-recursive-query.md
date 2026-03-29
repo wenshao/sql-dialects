@@ -50,7 +50,7 @@ JOIN dept_stats d ON e.dept_id = d.dept_id;
 | Trino | ✅ | ✅ | 必须 | 340+ | 有深度限制 |
 | Presto | ✅ | ✅ | 必须 | 0.246+ | - |
 | Databricks | ✅ | ⚠️ | N/A | Runtime 7+ | 无标准递归 CTE；有 CONNECT BY 扩展 |
-| Redshift | ✅ | ❌ | N/A | GA | 不支持递归 |
+| Redshift | ✅ | ✅ | 必须 | GA (2021+) | WITH RECURSIVE 支持 |
 | Teradata | ✅ | ✅ | 必须 | 14.0+ | - |
 | Db2 | ✅ | ✅ | 不需要 | 9.7+ | 隐式递归 |
 | H2 | ✅ | ✅ | 必须 | 1.4+ | - |
@@ -68,7 +68,7 @@ JOIN dept_stats d ON e.dept_id = d.dept_id;
 | Kylin | ✅ | ❌ | N/A | GA | 不支持递归 |
 | AnalyticDB | ✅ | ❌ | N/A | GA | 不支持递归 |
 
-**关键发现**: OLAP / 大数据引擎（Hive、Spark SQL、StarRocks、Doris、MaxCompute、Redshift、Vertica 等）普遍不支持递归 CTE。ClickHouse 从 21.8 起提供实验性递归 CTE 支持。这不是疏忽，而是设计选择——递归查询本质上是迭代计算，与大规模并行处理（MPP）架构的批量扫描模式不兼容。
+**关键发现**: OLAP / 大数据引擎（Hive、Spark SQL、StarRocks、Doris、MaxCompute、Vertica 等）普遍不支持递归 CTE。Redshift 从 2021 年起支持 WITH RECURSIVE，是 MPP 引擎中的例外。ClickHouse 从 21.8 起提供实验性递归 CTE 支持。这不是疏忽，而是设计选择——递归查询本质上是迭代计算，与大规模并行处理（MPP）架构的批量扫描模式不兼容。
 
 ---
 
@@ -577,7 +577,7 @@ SEARCH BREADTH FIRST BY name SET ordercol
 | OceanBase | ✅ | ✅ | 模式相关 | ✅ | ❌ | ❌ | ✅ | 1000 |
 | CockroachDB | ✅ | ✅ | 是 | ✅ | ❌ | ✅ | ✅ | 无限制 |
 | Db2 | ✅ | ✅ | 否 | ✅ | ✅ | ❌ | ✅ | 无限制 |
-| Redshift | ✅ | ❌ | - | - | - | - | ✅ | - |
+| Redshift | ✅ | ✅ | 是 | ✅ | ❌ | ❌ | ✅ | 无限制 |
 | Teradata | ✅ | ✅ | 是 | ✅ | ❌ | ❌ | ✅ | 无限制 |
 | Greenplum | ✅ | ✅ | 是 | ✅ | ❌ | ❌ | ✅ | 无限制 |
 | Vertica | ✅ | ❌ | - | - | - | - | ✅ | - |
