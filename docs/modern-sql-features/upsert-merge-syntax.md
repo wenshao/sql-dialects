@@ -7,7 +7,7 @@
 | 引擎 | ON DUPLICATE KEY UPDATE | ON CONFLICT DO UPDATE/NOTHING | MERGE INTO | REPLACE INTO / INSERT OR REPLACE | INSERT OVERWRITE |
 |------|:-:|:-:|:-:|:-:|:-:|
 | MySQL 4.1+ | **主要方式** | - | - | 支持 | - |
-| MariaDB 10.5+ | **主要方式** | 10.6+ | - | 支持 | - |
+| MariaDB 10.5+ | **主要方式** | - | - | 支持 | - |
 | TiDB | **主要方式** | - | - | 支持 | - |
 | OceanBase (MySQL 模式) | **主要方式** | - | - | 支持 | - |
 | OceanBase (Oracle 模式) | - | - | **主要方式** (MERGE INTO) | - | - |
