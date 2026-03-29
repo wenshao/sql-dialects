@@ -152,7 +152,7 @@ VALUES (1, 'Alice', 'alice@example.com');
 - 自增 ID 会变化（如果不指定 ID）
 - DELETE + INSERT 触发器都会执行
 - 未在 INSERT 中指定的列会被重置为默认值
-- 关联的外键 CASCADE DELETE 会触发
+- **⚠️ 外键级联灾难**: `ON DELETE CASCADE` 会触发——REPLACE 的 DELETE 操作可能级联删除关联表数据，造成"血洗"
 
 #### 5. INSERT OVERWRITE（大数据引擎）
 
