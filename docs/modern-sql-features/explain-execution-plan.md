@@ -1,5 +1,11 @@
 # EXPLAIN 与执行计划：各 SQL 方言全对比
 
+> 参考资料:
+> - [MySQL 8.0 - EXPLAIN](https://dev.mysql.com/doc/refman/8.0/en/explain.html)
+> - [PostgreSQL - EXPLAIN](https://www.postgresql.org/docs/current/sql-explain.html)
+> - [SQL Server - Execution Plans](https://learn.microsoft.com/en-us/sql/relational-databases/performance/execution-plans)
+> - [Oracle - EXPLAIN PLAN](https://docs.oracle.com/en/database/oracle/oracle-database/19/tgsql/generating-and-displaying-execution-plans.html)
+
 执行计划是 SQL 引擎将声明式查询转化为物理操作序列的蓝图。理解不同引擎的 EXPLAIN 语法、输出格式、Cost 模型和 Hint 机制，是引擎开发者和 DBA 的核心技能。本文覆盖 17+ 种 SQL 方言，从传统 RDBMS 到分布式分析引擎逐一对比。
 
 ## EXPLAIN 语法矩阵
