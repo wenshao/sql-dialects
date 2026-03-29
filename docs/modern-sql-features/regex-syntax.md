@@ -472,6 +472,85 @@ REGEXP_COUNT(source, pattern [, position [, flags]])
 
 如果引擎有 collation 系统，正则的大小写行为应默认遵循列的 collation，但允许通过 `'i'`/`'c'` 标志覆盖——这是最不让用户惊讶的设计。
 
+### 8. ReDoS 防御：RE2 优先原则
+
+对于接受用户输入正则的场景（Web 应用搜索框、API 过滤参数、多租户 SaaS），正则引擎的选型直接决定了系统安全性：
+
+```
+PCRE / Java regex / ICU（回溯引擎）:
+├── 支持反向引用、环视等高级特性
+├── 最坏情况: O(2^n) 指数时间复杂度
+├── 攻击模式: (a+)+$ 对输入 "aaaaaaaaaaaaaaaaX" 可触发灾难性回溯
+├── 即使设置 backtrack_limit, 攻击者仍可消耗大量 CPU
+└── 仅适合: 单租户、受信正则来源（DBA 编写的 CHECK 约束等）
+
+RE2 / RE2J / Rust regex（非回溯引擎）:
+├── 基于 NFA/DFA 自动机, 保证 O(mn) 线性时间
+├── 代价: 不支持反向引用 (\1)、不支持环视 (?=...)
+├── 实际影响: 95%+ 的业务正则不需要反向引用
+├── BigQuery / ClickHouse / DuckDB / CockroachDB / TiDB 均选择 RE2
+└── 推荐: 所有面向用户输入的正则场景必须使用 RE2 系列
+
+混合方案:
+├── 用 RE2 处理用户输入的正则（WHERE col REGEXP user_input）
+├── 用 PCRE2 处理系统定义的正则（CHECK 约束、内部校验）
+├── 通过编译期检测正则来源决定使用哪个引擎
+└── Trino 已采用此方案: 默认 Java regex, 可配置切换到 RE2J
+```
+
+### 9. Collation 对正则匹配的隐藏影响
+
+Collation 不仅影响大小写敏感性，还会影响字符类匹配和排序范围：
+
+```
+大小写行为:
+├── MySQL: 正则的大小写敏感性默认跟随列的 collation
+│   col VARCHAR(100) COLLATE utf8mb4_general_ci → REGEXP 不区分大小写
+│   col VARCHAR(100) COLLATE utf8mb4_bin → REGEXP 区分大小写
+├── PostgreSQL: 正则运算符 (~) 始终区分大小写, 无论 collation 设置
+│   需要不区分大小写时必须显式使用 ~* 运算符
+├── Oracle: REGEXP_LIKE 默认区分大小写, 需通过 'i' 标志切换
+└── 陷阱: 同一条 SQL, 在 MySQL 和 PostgreSQL 中因 collation 语义不同结果可能相反
+
+字符类 [a-z] 的范围:
+├── 在二进制 collation 下, [a-z] 严格匹配 ASCII 0x61-0x7A
+├── 在语言感知 collation 下, [a-z] 可能包含重音字符 (如 ä, ö, ü)
+├── 这导致同一正则在不同 collation 下匹配不同的字符集
+└── 建议: 文档中明确标注正则中字符范围与 collation 的交互规则
+
+引擎开发者建议:
+├── 在正则编译阶段将 collation 信息传入正则引擎
+├── 字符类展开应参考当前 collation 的字符映射表
+├── 提供 BINARY 修饰符允许用户绕过 collation 影响 (MySQL: BINARY col REGEXP)
+└── 测试矩阵中必须包含 case-insensitive collation + 正则的组合
+```
+
+### 10. 多字节编码下的正则性能
+
+非 UTF-8 编码（如 GBK、Shift-JIS、EUC-JP）下正则匹配可能产生非线性 CPU 开销：
+
+```
+问题根源:
+├── 变长多字节编码中, 正则引擎需要判断每个字节是字符边界还是后续字节
+├── `.` (匹配任意字符) 在多字节编码下必须解码完整字符, 不能简单匹配单字节
+├── 某些编码的字符边界判断本身就是 O(n) 回溯 (如 Shift-JIS 的歧义字节)
+├── 最坏情况: O(n × m × k), k 为字符边界判断开销
+└── UTF-8 设计精巧: 每个字节的前导位明确标记角色, 字符边界判断 O(1)
+
+实际影响:
+├── GBK 编码下 REGEXP_REPLACE 对 1MB 文本的耗时可能是 UTF-8 的 3-5 倍
+├── Latin1 编码下单字节匹配最快 (无多字节问题)
+├── 某些正则引擎 (如旧版 MySQL Henry Spencer) 对非 ASCII 字节处理不正确
+└── MySQL 5.x: 非 ASCII 字符的正则匹配结果可能不正确 (已在 8.0 ICU 中修复)
+
+引擎开发者建议:
+├── 内部统一使用 UTF-8 处理正则匹配, 在接口层做编码转换
+├── 如果必须支持非 UTF-8, 在正则编译阶段注入编码感知的字符解码器
+├── 对 REGEXP_REPLACE 等可能产生大量中间结果的函数, 设置输出大小上限
+├── 性能测试矩阵: 必须包含 UTF-8、GBK、Latin1 三种编码的基准对比
+└── 文档中警告: 非 UTF-8 编码下正则操作可能显著变慢
+```
+
 ## 附录：快速迁移指南
 
 ### MySQL → PostgreSQL
