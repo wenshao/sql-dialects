@@ -825,6 +825,17 @@ SELECT * FROM orders
 WHERE order_date IN (SELECT dt FROM dim_date WHERE is_holiday = TRUE);
 -- MySQL 8.0 的子查询优化可能帮助裁剪, 但不保证
 
+-- ⚠️ 分区裁剪的隐式类型转换陷阱:
+-- 如果分区键是 DATETIME 但查询用字符串 '2024-01-01'，某些引擎会因
+-- 隐式类型转换导致裁剪失效，变成全分区扫描！
+-- 原则: 分区键查询条件必须严格类型匹配，显式 CAST 而非依赖隐式转换
+
+-- ⚠️ MySQL 分区表的唯一键限制:
+-- MySQL 要求所有唯一索引（含主键）必须包含分区列！
+-- 如果按 create_time 分区，主键必须从 (id) 改为 (id, create_time)
+-- Oracle/SQL Server 通过全局索引（Global Index）规避了此限制
+-- 这是 Oracle → MySQL 分区迁移时最常导致架构推倒重来的约束
+
 -- 验证分区裁剪
 -- MySQL
 EXPLAIN SELECT * FROM orders WHERE order_date = '2025-01-15';
