@@ -43,7 +43,7 @@ SELECT * FROM users WHERE REGEXP_LIKE(name, '^A'); -- Oracle / DB2
 | SQL Server | ✗ | ✗ | ✗ | ✗ | **无原生支持** |
 | SQLite | ✓ (需扩展) | ✗ | ✗ | ✗ | 用户自定义 |
 | DB2 | ✗ | ✓ | ✗ | ✓ (9.7+) | ICU (XQuery) |
-| Snowflake | ✓ | ✗ | ✗ | ✓ | PCRE |
+| Snowflake | ✓ | ✗ | ✗ | ✓ | POSIX ERE (内部 PCRE2 实现) |
 | BigQuery | ✓ | ✗ | ✗ | ✓ | RE2 |
 | DuckDB | ✓ | ✓ | ✓ | ✓ | RE2 |
 | Spark SQL | ✓ | ✗ | ✗ | ✗ | Java regex |
@@ -70,7 +70,7 @@ SELECT * FROM users WHERE REGEXP_LIKE(name, '^A'); -- Oracle / DB2
 | H2 | ✓ | ✗ | ✗ | ✓ | Java regex |
 | HSQLDB | ✗ | ✓ | ✗ | ✗ | Java regex |
 | Derby | ✗ | ✗ | ✗ | ✗ | 无原生支持 |
-| Firebird | ✓ (3.0+) | ✓ | ✗ | ✗ | SQL 标准语义 |
+| Firebird | ✗ | ✓ | ✗ | ✗ | SQL 标准语义 |
 | Exasol | ✓ | ✗ | ✗ | ✓ | PCRE |
 | TimescaleDB | ✗ | ✓ | ✓ | ✗ | POSIX ARE |
 | QuestDB | ✓ | ✗ | ✗ | ✗ | Java regex |
