@@ -84,20 +84,20 @@ SELECT city FROM suppliers;
 | PostgreSQL | 支持 | 支持 | 不支持 | 支持 | 支持 | 8.4+ (ALL) |
 | MySQL | 支持 | 支持 | 不支持 | 支持 | 支持 | **8.0.31+** |
 | MariaDB | 支持 | 支持 | 不支持 | 支持 | 支持 | 10.3+ / 10.5+ (ALL) |
-| Oracle | 支持 | **21c+** | **MINUS** | 支持 | 不支持 | MINUS 全版本; EXCEPT 21c+ |
+| Oracle | 支持 | **21c+** | **MINUS** | 不支持 | 不支持 | MINUS 全版本; EXCEPT 21c+ |
 | SQL Server | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 2005+ |
 | SQLite | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 3.x+ |
 | Db2 | 支持 | 支持 | 不支持 | 支持 | 支持 | 9.x+ |
 | DuckDB | 支持 | 支持 | 不支持 | 支持 | 支持 | 0.3+ |
 | ClickHouse | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 21.x+ |
-| BigQuery | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 全版本 |
-| Snowflake | 支持 | 支持 | **MINUS** | 不支持 | 不支持 | 全版本 |
+| BigQuery | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
+| Snowflake | 支持 | 支持 | **MINUS** | 支持 | 支持 | 全版本 |
 | Trino | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
 | Presto | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
 | Spark SQL | 支持 | 支持 | **MINUS** | 支持 | 支持 | 2.0+ / 3.0+ (ALL) |
 | Hive | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 2.1.0+ |
 | Flink SQL | 支持 | 支持 | 支持(别名) | 支持 | 支持 | 1.12+ |
-| Redshift | 支持 | 支持 | 不支持 | 不支持 | 不支持 | 全版本 |
+| Redshift | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
 | Teradata | 支持 | 支持 | **MINUS** | 支持 | 支持 | 全版本 |
 | Greenplum | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本（同 PostgreSQL） |
 | CockroachDB | 支持 | 支持 | 不支持 | 支持 | 支持 | 全版本 |
