@@ -1529,7 +1529,115 @@ DECLARE HANDLER (MySQL/Db2 风格):
    - 超时应返回 SQLSTATE '57014' (query_canceled)
 ```
 
-### 7. 测试错误处理的验证清单
+### 7. PostgreSQL EXCEPTION 块的性能陷阱
+
+PostgreSQL 的 `BEGIN...EXCEPTION...END` 块在进入时隐式创建 savepoint，这在高频错误场景下会造成严重的性能问题:
+
+```
+-- 性能分析: EXCEPTION 块的隐式 savepoint 开销
+
+无 EXCEPTION 块:
+  BEGIN
+    INSERT INTO t VALUES (...);  -- 直接执行, 无额外开销
+  END;
+
+有 EXCEPTION 块:
+  BEGIN                          -- → 隐式 SAVEPOINT (写入 WAL)
+    INSERT INTO t VALUES (...);  -- 执行
+  EXCEPTION                      -- → 如果异常: ROLLBACK TO SAVEPOINT (写入 WAL)
+    WHEN unique_violation THEN   --   如果无异常: RELEASE SAVEPOINT (写入 WAL)
+      NULL;
+  END;
+
+每个 EXCEPTION 块至少产生 2 次额外 WAL 写入 (创建 + 释放/回滚)
+```
+
+**高频错误场景的灾难性影响**:
+- "INSERT ... 遇到重复则忽略" 模式: 如果 90% 的插入触发 unique_violation，事务日志开销增加 3-5 倍
+- 批量 UPSERT 操作: 每行一个 EXCEPTION 块 = 每行 2 次额外 WAL I/O
+- 检测手段: `pg_stat_bgwriter` 中的 `buffers_checkpoint` 异常增长
+
+**推荐替代方案**:
+```sql
+-- 反模式: 用 EXCEPTION 处理预期的重复
+FOR rec IN SELECT * FROM staging LOOP
+  BEGIN
+    INSERT INTO target VALUES (rec.*);
+  EXCEPTION WHEN unique_violation THEN
+    NULL;  -- 忽略重复
+  END;
+END LOOP;
+
+-- 正确做法: 用 INSERT ON CONFLICT 避免异常
+INSERT INTO target SELECT * FROM staging
+ON CONFLICT (id) DO NOTHING;  -- 零 savepoint 开销
+```
+
+### 8. 热路径中优先使用状态码检查
+
+在高频执行的代码路径 (每秒数千次调用) 中，结构化异常处理的开销可能不可接受。应优先使用状态码检查模式:
+
+```sql
+-- 热路径反模式: 用异常控制流程
+BEGIN
+  SELECT balance INTO v_balance FROM accounts WHERE id = p_id;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    v_balance := 0;  -- 将"未找到"视为正常情况
+END;
+
+-- 热路径正确模式: 状态码检查
+SELECT balance INTO v_balance FROM accounts WHERE id = p_id;
+IF NOT FOUND THEN          -- 检查状态码, 零异常开销
+  v_balance := 0;
+END IF;
+```
+
+**引擎实现建议**:
+- 在过程化语言中提供 `FOUND` / `ROW_COUNT` / `SQLSTATE` 等状态变量，让用户无需 EXCEPTION 块即可检查上一条语句的结果
+- 对于预期会频繁发生的"非异常错误" (如 NOT FOUND、重复键)，提供非抛出的替代语法 (如 `INSERT ... ON CONFLICT`、`MERGE`、`GET DIAGNOSTICS`)
+- 在性能文档中明确标注: EXCEPTION 块适用于真正的异常情况 (磁盘故障、约束违反等)，不应用于控制流
+
+### 9. 深层嵌套异常处理器的 Savepoint 溢出
+
+在递归调用或深层嵌套的过程中，每层 EXCEPTION 块都创建 savepoint，可能导致 savepoint 栈溢出:
+
+```
+-- 嵌套深度示例
+PROCEDURE level_1()
+  BEGIN                    -- savepoint 1
+    CALL level_2();
+  EXCEPTION ...
+  END;
+
+  PROCEDURE level_2()
+    BEGIN                  -- savepoint 2
+      CALL level_3();
+    EXCEPTION ...
+    END;
+
+    PROCEDURE level_3()
+      BEGIN                -- savepoint 3
+        -- ... 以此类推
+      EXCEPTION ...
+      END;
+
+-- 10 层嵌套 = 10 个并发活跃 savepoint
+-- 每个 savepoint 占用: WAL 日志空间 + 内存中的事务快照
+```
+
+**实际风险**:
+- PostgreSQL: 大量活跃 savepoint 增加 `PGPROC` 数组遍历开销，影响 MVCC 快照获取性能
+- SQL Server: 嵌套 TRY/CATCH 本身不创建 savepoint，但手动 savepoint 过多会影响锁管理器
+- 递归调用 + EXCEPTION 块: 递归深度 = savepoint 深度，可能耗尽事务日志空间
+
+**引擎实现建议**:
+- 设置 savepoint 嵌套深度上限 (如 64 层)，超过时报明确错误
+- 优化 savepoint 实现: 对仅包含读操作的 EXCEPTION 块，可跳过 savepoint 创建 (因为读操作无需回滚)
+- 提供 savepoint 使用统计 (如 `pg_stat_activity` 中的活跃 savepoint 计数)，帮助用户诊断性能问题
+- 在递归过程中自动检测 EXCEPTION 块的存在，对超过阈值的嵌套深度发出警告
+
+### 10. 测试错误处理的验证清单
 
 ```
 引擎开发者在实现错误处理时应验证:
