@@ -510,6 +510,105 @@ SQL Server: #table 创建/删除都参与事务
 4. 权限: SQL Server 需 tempdb CREATE TABLE 权限；PostgreSQL 需数据库级 TEMPORARY 权限
 ```
 
+### 8. 系统目录锁争用与高频 CREATE/DROP
+
+```
+问题根源:
+  每次 CREATE TEMPORARY TABLE / DROP TEMPORARY TABLE 都需要修改系统目录元数据,
+  在高并发场景下成为瓶颈:
+
+  SQL Server tempdb:
+  ├── 系统表 (sys.sysallocunits, sys.sysrowsets) 的页级闩锁 (page latch) 争用
+  ├── 高频创建/销毁临时表导致 PFS/GAM/SGAM 页争用
+  ├── 缓解: 2019+ MEMORY_OPTIMIZED TEMPDB_METADATA 将系统表移入内存, 消除闩锁
+  └── 缓解: 预分配多个 tempdb 文件 (一般推荐 = CPU 核数, 上限 8)
+
+  PostgreSQL:
+  ├── CREATE TEMP TABLE 需要在 pg_class, pg_attribute 等系统目录中插入行
+  ├── 每次创建/删除都产生 WAL 和 catalog cache invalidation
+  ├── 高频场景: 函数中每次调用都 CREATE/DROP → catalog 膨胀
+  └── 缓解: 改用 TRUNCATE 重用已有临时表, 或使用 UNLOGGED TABLE 替代
+
+  MySQL:
+  ├── 8.0 前: 每个临时表在磁盘上创建 .frm 文件, 文件系统 I/O 成瓶颈
+  ├── 8.0+: 数据字典统一管理, frm 文件消除, 但仍需更新内存数据字典
+  └── 缓解: 复用连接中的临时表 (TRUNCATE 而非 DROP + CREATE)
+
+建议:
+  - 新引擎的临时表元数据应绕过全局系统目录, 使用会话本地的轻量级注册表
+  - 避免为临时表生成 WAL/redo log (元数据部分)
+  - 提供 "临时表池" 或对象复用机制, 减少高频 DDL 的开销
+```
+
+### 9. 日志开销：Unlogged 临时表在批处理中的优势
+
+```
+核心观察:
+  临时表通常不需要崩溃恢复, 因此可以跳过 redo/undo 日志, 大幅减少 I/O:
+
+  PostgreSQL UNLOGGED:
+  ├── CREATE UNLOGGED TABLE (非临时表也可用, 但临时表天然不写 WAL 到归档)
+  ├── 临时表默认就不会被 WAL 归档和流复制发送
+  ├── 但本地 WAL 仍会写入 (用于崩溃后 startup 清理)
+  └── 性能提升: 批量插入场景可快 2-5 倍
+
+  Oracle:
+  ├── GTT 的 redo 日志量远小于普通表 (仅记录 undo 的 redo)
+  ├── 直接路径插入 (INSERT /*+ APPEND */) + NOLOGGING 可进一步减少日志
+  └── 但事务回滚仍需 undo, 不可完全消除
+
+  Db2 NOT LOGGED:
+  ├── DECLARE GLOBAL TEMPORARY TABLE ... NOT LOGGED
+  ├── 完全不写日志, 最高性能
+  ├── 代价: 事务回滚时直接清空整个临时表 (而非逐行回滚)
+  └── 适合 ETL/批处理中的中间结果暂存
+
+  SQL Server:
+  ├── #table 的日志行为与普通表相同 (完整的 redo/undo)
+  ├── 但 tempdb 的恢复模型固定为 SIMPLE, 日志可快速截断
+  └── 内存优化表变量: 完全不写日志
+
+建议:
+  - 新引擎应提供 LOGGED / NOT LOGGED 选项
+  - 默认 NOT LOGGED (多数临时表场景不需要崩溃恢复)
+  - NOT LOGGED 模式下事务回滚的语义需明确文档化 (清空 vs 回滚)
+  - 批处理场景下, unlogged 临时表 + 批量插入可显著降低 I/O 压力
+```
+
+### 10. 连接池清理策略
+
+```
+连接池场景的核心问题:
+  连接被归还到池后, 下一个使用者可能遇到上一次的残留临时表。
+  这不仅浪费内存, 还可能导致同名创建失败或读到脏数据。
+
+显式 DROP (推荐):
+  ├── 在业务代码的 finally/defer 块中显式 DROP TEMPORARY TABLE IF EXISTS
+  ├── 优点: 语义清晰, 立即释放资源
+  ├── 缺点: 需要在代码中维护临时表名列表, 容易遗漏
+  └── 适合: 知道自己创建了哪些临时表的场景
+
+依赖会话结束自动清理:
+  ├── 连接池归还时不做处理, 依赖连接关闭时引擎自动销毁临时表
+  ├── 问题: 连接池中的连接通常不会真正关闭!
+  ├── MySQL: 连接归还后临时表依然存在, 下次使用者可看到残留数据
+  ├── PostgreSQL: 同上, 临时表在 pg_temp_N schema 中持续存在
+  └── 不推荐: 除非连接池配置了 maxLifetime 且临时表生命周期可接受
+
+连接池重置命令:
+  ├── PostgreSQL: DISCARD TEMP (清除所有临时表) 或 DISCARD ALL (重置整个会话)
+  ├── SQL Server: sp_reset_connection (连接池驱动自动调用, 清理 #table)
+  │   注意: ##table (全局临时表) 不会被 sp_reset_connection 清理!
+  ├── MySQL: 无等价命令, 需手动 DROP 或 RESET CONNECTION (5.7.3+, 但会清除所有状态)
+  └── 建议: 在连接池的 validationQuery / testOnReturn 中执行清理命令
+
+最佳实践总结:
+  1. 优先方案: 业务代码中显式 DROP (try/finally 模式)
+  2. 防御方案: 连接池的归还钩子中执行 DISCARD TEMP / sp_reset_connection
+  3. 兜底方案: 配置连接池 maxLifetime, 定期销毁并重建物理连接
+  4. 命名约定: 临时表名包含会话/请求 ID, 方便排查残留问题
+```
+
 ## 参考资料
 
 - ISO/IEC 9075-2 (SQL Foundation) Section 11.2, 11.32 (Temporary Tables)
