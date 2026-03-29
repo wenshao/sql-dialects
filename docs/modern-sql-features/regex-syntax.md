@@ -43,7 +43,7 @@ SELECT * FROM users WHERE REGEXP_LIKE(name, '^A'); -- Oracle / DB2
 | SQL Server | ✗ | ✗ | ✗ | ✗ | **无原生支持** |
 | SQLite | ✓ (需扩展) | ✗ | ✗ | ✗ | 用户自定义 |
 | DB2 | ✗ | ✓ | ✗ | ✓ (9.7+) | ICU (XQuery) |
-| Snowflake | ✓ | ✗ | ✗ | ✓ | POSIX ERE (Go) |
+| Snowflake | ✓ | ✗ | ✗ | ✓ | PCRE |
 | BigQuery | ✓ | ✗ | ✗ | ✓ | RE2 |
 | DuckDB | ✓ | ✓ | ✓ | ✓ | RE2 |
 | Spark SQL | ✓ | ✗ | ✗ | ✗ | Java regex |
@@ -221,7 +221,7 @@ SELECT replaceRegexpOne('a1b2c3', '\\d', 'X');  -- 'aXb2c3'
 SELECT replaceRegexpAll('a1b2c3', '\\d', 'X');  -- 'aXbXcX'
 ```
 
-> **默认替换行为差异**：PostgreSQL 和 Oracle 默认**只替换第一个**，MySQL / Snowflake / BigQuery / Spark 默认**全部替换**。这是迁移中最常见的 bug 来源。
+> **默认替换行为差异**：PostgreSQL 默认**只替换第一个**，Oracle / MySQL / Snowflake / BigQuery / Spark 默认**全部替换**。这是迁移中最常见的 bug 来源。
 
 ### REGEXP_INSTR / REGEXP_COUNT
 
@@ -238,9 +238,9 @@ SELECT REGEXP_COUNT('aaa bbb aaa', 'aaa') FROM dual;  -- 2 (Oracle / Snowflake /
 
 | 风格 | 回溯 | 时间保证 | 反向引用 | 环视 | Unicode `\p{L}` | 代表引擎 |
 |------|:---:|:---:|:---:|:---:|:---:|------|
-| **PCRE2** | ✓ | ✗ | ✓ | ✓ | ✓ | MariaDB, Exasol, Vertica |
+| **PCRE2** | ✓ | ✗ | ✓ | ✓ | ✓ | MariaDB, Snowflake, Exasol, Vertica |
 | **POSIX ERE/ARE** | ✓ | ✗ | ✗/有限 | ✗ | ✗ | PostgreSQL, Oracle, Redshift |
-| **RE2** | ✗ | **O(mn)** | **✗** | 前瞻✓ 后瞻✗ | ✓ | BigQuery, ClickHouse, DuckDB, CockroachDB |
+| **RE2** | ✗ | **O(mn)** | **✗** | **✗** | ✓ | BigQuery, ClickHouse, DuckDB, CockroachDB |
 | **Java regex** | ✓ | ✗ | ✓ | ✓ (定长后瞻) | ✓ | Spark, Hive, Trino, Flink |
 | **ICU** | ✓ | ✗ | ✓ | ✓ | ✓ | MySQL 8.0+, DB2, Teradata |
 
@@ -323,8 +323,9 @@ SELECT extractGroups('2024-01-15', '(\\d{4})-(\\d{2})-(\\d{2})');  -- ['2024','0
 | BigQuery / ClickHouse / DuckDB (RE2) | ✓ | ✓ | ✓ | |
 | Spark / Trino (Java) | ✓ | ✓ | ✓ | Java 需 `\p{IsHan}` 前缀 |
 | DB2 / Teradata (ICU) | ✓ | ✓ | ✓ | |
+| Snowflake (PCRE) | ✓ | ✓ | ✓ | |
 | PostgreSQL (POSIX ARE) | ✗ | ✗ | ✗ | 有限支持 |
-| Oracle / Snowflake (POSIX ERE) | ✗ | ✗ | ✗ | 需用字符范围变通 |
+| Oracle (POSIX ERE) | ✗ | ✗ | ✗ | 需用字符范围变通 |
 
 ```sql
 SELECT * FROM t WHERE REGEXP_LIKE(col, '\\p{Han}');             -- MySQL 8.0+
