@@ -495,14 +495,18 @@ LIMIT 100 BY region;
 ### 子查询中的采样
 
 ```sql
--- 先过滤再采样（推荐：缩小采样范围）
--- 注意：对子查询结果使用 TABLESAMPLE 的支持因引擎而异
--- PostgreSQL: 仅支持基表，不能对子查询使用 TABLESAMPLE（会报错）
--- Snowflake: 支持对子查询结果采样
--- SQL Server: 仅支持基表和简单视图
+-- 先过滤再采样（缩小采样范围）
+-- 重要：对子查询结果使用 TABLESAMPLE 并非通用能力，各引擎差异很大：
+-- PostgreSQL: 仅支持基表，不能对子查询使用 TABLESAMPLE（会报语法错误）
+-- SQL Server: 仅支持基表和简单视图，对子查询使用会报错
+-- DuckDB: 支持对子查询结果采样
+-- Snowflake: 支持对子查询结果采样（使用 SAMPLE 语法）
+-- Trino/Presto: 仅支持基表
+-- 下面的写法仅在部分引擎中合法，请勿作为通用模式使用：
 SELECT * FROM (
     SELECT * FROM orders WHERE status = 'completed'
 ) completed_orders TABLESAMPLE BERNOULLI(10);
+-- 如果目标引擎不支持子查询采样，推荐方案：先将子查询结果写入临时表，再对临时表采样
 
 -- 先采样再过滤（标准语义：TABLESAMPLE 在 FROM 中，所有引擎通用）
 SELECT * FROM orders TABLESAMPLE BERNOULLI(10)
