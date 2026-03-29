@@ -99,9 +99,9 @@ ROLLBACK;
 CREATE TABLE dataset.t1 (id INT64);
 -- 无法回滚
 
--- ClickHouse: 无事务支持
--- DDL 和 DML 都没有事务语义 (无 BEGIN/COMMIT/ROLLBACK)
--- 每条语句独立执行
+-- ClickHouse: DDL 不参与事务
+-- 单条 INSERT 具备 ACID；多语句事务为实验性功能 (23.x+, allow_experimental_transactions)
+-- DDL 始终独立执行，无法回滚
 ALTER TABLE t1 ADD COLUMN name String;
 -- 立即生效, 无回滚机制
 
@@ -144,7 +144,7 @@ CREATE TABLE t1 (id BIGINT);
 | **OceanBase** | NO | YES | 语句级 | MySQL/Oracle 模式分别继承对应行为 |
 | **Snowflake** | NO | YES | 语句级 | DDL 自动提交 |
 | **BigQuery** | NO | N/A | 语句级 | 多语句事务明确排除 DDL |
-| **ClickHouse** | NO | N/A | 语句级 | 无事务机制 |
+| **ClickHouse** | NO | N/A | 语句级 | 单 INSERT ACID；多语句事务实验性 (23.x+) |
 | **Hive** | NO | N/A | 语句级 | DDL 独立于 ACID 事务 |
 | **Spark SQL** | NO | N/A | 语句级 | Delta Lake DML 事务不含 DDL |
 | **StarRocks** | NO | N/A | 语句级 | DDL 独立执行 |
@@ -268,7 +268,7 @@ TiDB 6.5+: Fast DDL 加速索引回填 (分布式框架)
 #### CockroachDB
 
 ```
-同样基于 F1 Online Schema Change 协议:
+受 Google F1 论文启发，采用类似的在线 schema 变更策略（但实现细节与 TiDB 不同）:
 
 ADD COLUMN:    非阻塞
 DROP COLUMN:   非阻塞, GC job 清理
@@ -482,7 +482,7 @@ MaxCompute 是全托管批处理平台:
 | **Spark SQL** | 元数据 | Delta Lake 支持 | Delta (类型扩宽) | N/A |
 | **StarRocks** | Fast Schema Evo (3.0+) | Fast Schema Evo (3.0+) | SchemaChange job | 后台构建 |
 | **Doris** | Light Schema Change (2.0+) | Light Schema Change (2.0+) | SchemaChange job | 后台构建 |
-| **MaxCompute** | 元数据 | 不支持 | 不支持 | N/A |
+| **MaxCompute** | 元数据 | 元数据 | 不支持 | N/A |
 
 ## Atomic DDL
 
