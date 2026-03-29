@@ -10,6 +10,7 @@
 | MariaDB 10.5+ | **主要方式** | - | - | 支持 | - |
 | TiDB | **主要方式** | - | - | 支持 | - |
 | OceanBase (MySQL 模式) | **主要方式** | - | - | 支持 | - |
+| OceanBase (Oracle 模式) | - | - | **主要方式** (MERGE INTO) | - | - |
 | PostgreSQL 9.5+ | - | **主要方式** | 15+ | - | - |
 | CockroachDB | - | **主要方式** | - | - | - |
 | YugabyteDB | - | **主要方式** | - | - | - |
@@ -23,13 +24,13 @@
 | Spark SQL | - | - | **主要方式** (Delta Lake) | - | 支持 |
 | Hive 2.2+ | - | - | ACID 事务表 | - | **主要方式** |
 | Trino | - | - | 部分 connector | - | 支持 |
-| StarRocks 3.0+ | - | - | 支持 | - | 支持 |
-| Doris | - | - | 支持 | - | 支持 |
+| StarRocks 3.0+ | - | - | 支持 (仅 PK 表) | - | 支持 |
+| Doris 2.1+ | - | - | 支持 (Unique Key 表) | - | 支持 |
 | Flink SQL | - | - | - | - | **主要方式** |
 | MaxCompute | - | - | - | - | **主要方式** |
 | ClickHouse | - | - | - | - | - |
 
-ClickHouse 没有传统的 UPSERT 语义。它使用 ReplacingMergeTree 引擎在后台 merge 时做去重，属于"最终一致性去重"而非即时 UPSERT。
+ClickHouse 没有传统的 UPSERT 语义。它使用 ReplacingMergeTree 引擎在后台 merge 时做去重（查询时需加 FINAL 关键字才能看到去重结果），属于"最终一致性去重"而非即时 UPSERT。此外 ClickHouse 支持 ALTER TABLE UPDATE/DELETE（异步 mutation），但性能远低于传统 DML。StarRocks/Doris 的 Primary Key/Unique Key 模型也是类似的 LSM-Tree 异步去重机制。
 
 ## 五种 UPSERT 机制详解
 
