@@ -1590,3 +1590,89 @@ PostgreSQL 的类型优先级链定义在 `pg_type.typpreferred` 中，可参考
 | ACL | 执行权限列表 |
 
 PostgreSQL 的 `pg_proc` 系统表是一个成熟的参考实现。
+
+### 10. Package/模块化组织与代码复用
+
+大型项目中存储过程和函数数量可达数百甚至数千，缺乏模块化组织会导致命名冲突和维护灾难:
+
+**Oracle Package 模式 (最成熟)**:
+```sql
+-- Package 提供命名空间 + 公私分离 + 状态封装
+CREATE PACKAGE order_mgmt AS
+    PROCEDURE create_order(p_customer_id INT, p_items ITEM_LIST);
+    FUNCTION get_total(p_order_id INT) RETURN DECIMAL;
+    -- 私有辅助函数在 Package Body 中定义，外部不可见
+END;
+
+-- 好处: Package 级别的初始化 (首次调用时执行)
+-- 好处: Package 变量在会话内持久 (可做缓存)
+-- 好处: 编译时依赖检查 (Package 状态: VALID / INVALID)
+```
+
+**PostgreSQL schema + search_path 模式**:
+```sql
+-- 使用 schema 作为命名空间
+CREATE SCHEMA order_mgmt;
+CREATE FUNCTION order_mgmt.create_order(...) ...;
+CREATE FUNCTION order_mgmt.get_total(...) ...;
+
+-- 通过 search_path 控制可见性
+SET search_path TO order_mgmt, public;
+```
+
+**引擎实现建议**:
+- 如果不实现完整的 Package 语义，至少提供 schema 级别的命名空间隔离
+- 考虑提供 Package 级别的编译依赖追踪: 当 Package 内函数修改时，自动标记依赖此 Package 的其他对象为 INVALID
+- Package 变量 (会话级状态) 的实现需要在会话上下文中分配额外存储，注意内存泄漏风险
+
+### 11. MySQL 依赖追踪缺失问题
+
+MySQL 的存储过程和函数不跟踪对底层表结构的依赖关系。这是一个严重的架构缺陷:
+
+```sql
+-- 创建依赖 orders 表的存储过程
+CREATE PROCEDURE get_order_summary()
+BEGIN
+    SELECT order_id, customer_name, total FROM orders;  -- 引用了 customer_name 列
+END;
+
+-- 之后修改表结构
+ALTER TABLE orders RENAME COLUMN customer_name TO cust_name;
+
+-- 存储过程不会报错，直到被调用时才发现失败
+CALL get_order_summary();  -- 运行时错误: Unknown column 'customer_name'
+```
+
+**与 Oracle 的对比**:
+- Oracle 在 `ALTER TABLE` 时会自动将依赖的 Package/Procedure 标记为 `INVALID`
+- Oracle 的 `DBA_DEPENDENCIES` 视图可查询完整的依赖图
+- MySQL 无等价机制: `INFORMATION_SCHEMA.ROUTINES` 仅存储过程体文本，不解析依赖
+
+**引擎实现建议**:
+- 在 `CREATE PROCEDURE/FUNCTION` 时解析函数体中引用的表和列，存储到依赖关系表中
+- 在 DDL 操作 (ALTER/DROP TABLE) 时检查依赖关系，至少发出警告
+- 提供 `SHOW DEPENDENCIES FOR PROCEDURE proc_name` 语法供用户主动查询
+- 可选实现自动重编译: DDL 后标记依赖对象为 INVALID，下次调用时尝试重新编译
+
+### 12. 高并发 UDF 调用的上下文切换开销
+
+当 UDF 使用外部运行时 (Python, JavaScript, Java) 时，每次调用涉及 SQL 引擎与外部运行时之间的上下文切换:
+
+```
+SQL 执行器 → 序列化参数 → 切换到外部运行时 → 反序列化参数
+           → 执行 UDF 逻辑
+           → 序列化返回值 → 切换回 SQL 执行器 → 反序列化返回值
+
+每次切换开销: ~10-100μs (进程内) 或 ~1-10ms (进程间/容器)
+```
+
+**高并发场景的性能问题**:
+- 标量 UDF 在 `SELECT f(col) FROM big_table` 中被逐行调用，百万行 = 百万次上下文切换
+- 外部运行时的 GIL (Python) 或 GC 暂停 (Java/JavaScript) 在高频调用下被放大
+- 线程池耗尽: 每个并发 UDF 调用可能占用一个外部运行时线程
+
+**引擎实现建议**:
+- **向量化/批量调用接口**: 不逐行调用 UDF，而是传递整个列向量 (如 Arrow RecordBatch)，外部运行时一次处理多行。Snowflake 的 Vectorized Python UDF 和 DuckDB 的 Arrow UDF 都采用此策略
+- **连接池化**: 为外部运行时维护预热的连接/进程池，避免每次调用都初始化运行时
+- **SQL UDF 内联优化**: 对简单的 SQL UDF (单表达式)，在优化器阶段直接内联到调用查询中，完全消除调用开销 (PostgreSQL 已实现此优化)
+- **调用开销监控**: 在 EXPLAIN ANALYZE 输出中展示 UDF 调用次数和累计上下文切换时间，帮助用户识别瓶颈
