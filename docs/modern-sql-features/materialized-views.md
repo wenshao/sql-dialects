@@ -60,7 +60,6 @@
 | GaussDB | `MATERIALIZED VIEW` | COMPLETE / FAST | 自动 | 支持 |
 | SingleStore (MemSQL) | `MATERIALIZED VIEW` | 自动维护 | 不支持 | 7.0+ |
 | Vitess | 不支持 | - | - | - |
-| TiDB | 不支持 | - | - | - |
 
 ### 流处理 / 实时引擎
 
@@ -185,7 +184,7 @@ AS SELECT ...;
 CREATE MATERIALIZED VIEW mv_name
 AS SELECT col1, SUM(col2) FROM t GROUP BY col1;
 
--- 异步物化视图 (3.0+)
+-- 异步物化视图 (2.4+)
 CREATE MATERIALIZED VIEW mv_name
 REFRESH { ASYNC | MANUAL }
 [ PARTITION BY col ]
@@ -194,7 +193,7 @@ REFRESH { ASYNC | MANUAL }
 AS SELECT ...;
 ```
 
-StarRocks 区分同步和异步两种物化视图。同步 MV 类似 Rollup 索引，写入时自动维护；异步 MV 功能更强大，支持多表 JOIN、定时刷新、查询改写。
+StarRocks 区分同步和异步两种物化视图。同步 MV 类似 Rollup 索引，写入时自动维护；异步 MV 自 2.4 版本引入，功能更强大，支持多表 JOIN、定时刷新、查询改写。
 
 ### Doris
 
@@ -522,7 +521,7 @@ StarRocks 和 Doris 是同时提供两种模式的典型代表。
 
 ### StarRocks 同步/异步对比
 
-| 维度 | 同步 MV | 异步 MV (3.0+) |
+| 维度 | 同步 MV | 异步 MV (2.4+) |
 |------|---------|---------------|
 | 创建语法 | `CREATE MATERIALIZED VIEW` (无 REFRESH) | `CREATE MATERIALIZED VIEW ... REFRESH ASYNC` |
 | 数据模型 | Rollup（列子集+预聚合） | 独立表 |
@@ -596,7 +595,7 @@ GROUP BY dt, user_id;
 |------|----------|---------|------|
 | Oracle | 支持 | 按依赖顺序自动刷新 | `DBMS_MVIEW.REFRESH` 处理依赖 |
 | ClickHouse | 支持 | INSERT 自动级联触发 | 常见模式 |
-| StarRocks | 支持 (异步 MV) | 自动追踪依赖 | 3.1+ |
+| StarRocks | 支持 (异步 MV) | 自动追踪依赖 | 2.5+ |
 | Doris | 支持 (异步 MV) | 自动追踪依赖 | 2.1+ |
 | Materialize | 支持 | 自动级联（流式） | 核心能力 |
 | RisingWave | 支持 | 自动级联（流式） | 核心能力 |
