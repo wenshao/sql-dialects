@@ -22,7 +22,7 @@
 | ClickHouse | ❌ | ✅ (UDF) | ❌ | ❌ | 21.10+ |
 | Trino | ❌ | ✅ (SQL routine 419+) | ❌ | ❌ | 419+ |
 | Spark SQL | ❌ | ✅ (UDF via API) | ❌ | ❌ | 1.0+ |
-| Databricks | ❌ | ✅ (SQL UDF + Python UDF) | ❌ | ❌ | DBR 9.1+ |
+| Databricks | ✅ (DBR 14.0+) | ✅ (SQL UDF + Python UDF) | ❌ | ❌ | DBR 9.1+ |
 | Hive | ❌ | ✅ (UDF via Java) | ❌ | ❌ | 0.5+ |
 | Flink SQL | ❌ | ✅ (UDF via Java/Scala) | ❌ | ❌ | 1.0+ |
 | CockroachDB | ✅ (22.2+) | ✅ | ❌ | ✅ | 20.1+ |
@@ -60,8 +60,8 @@
 | PostgreSQL | ✅ | ✅ | ❌ | ❌ | ✅ (V8) | ✅ (PL/Python) | ✅ (PL/Java) | ✅ (PL/Lua) | Perl, Tcl, R |
 | MySQL | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | MariaDB | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
-| Oracle | ✅ | ❌ | ✅ | ❌ | ✅ (21c+) | ❌ | ✅ | ❌ | — |
-| SQL Server | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ (2017+) | ✅ (CLR) | ❌ | R, C# |
+| Oracle | ✅ | ❌ | ✅ | ❌ | ✅ (23ai) | ❌ | ✅ | ❌ | — |
+| SQL Server | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ (2017+) | ❌ | ❌ | R, C# (CLR) |
 | DB2 | ✅ | ❌ | ✅ (兼容) | ❌ | ❌ | ❌ | ✅ | ❌ | C |
 | Snowflake | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | Scala |
 | BigQuery | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | — |
@@ -70,10 +70,10 @@
 | Trino | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | Spark SQL | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | Scala, R |
 | Databricks | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | Scala |
-| Hive | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | — |
+| Hive | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | — |
 | Flink SQL | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | Scala |
 | SAP HANA | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | SQLScript, R |
-| Firebird | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ (3.0+) | ❌ | PSQL |
+| Firebird | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | PSQL, C/C++ (UDR 3.0+) |
 | CockroachDB | ✅ | ✅ (兼容) | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 | Vertica | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | C++, R |
 | Teradata | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | C |
@@ -726,7 +726,7 @@ END;
 ### Oracle
 
 ```sql
-CREATE PROCEDURE safe_divide(a NUMBER, b NUMBER, OUT result NUMBER) AS
+CREATE PROCEDURE safe_divide(a NUMBER, b NUMBER, result OUT NUMBER) AS
 BEGIN
     result := a / b;
 EXCEPTION
