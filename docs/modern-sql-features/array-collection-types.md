@@ -14,7 +14,7 @@ ARRAY、MAP、STRUCT 及集合类型——从关系模型的"第一范式"到嵌
 | SQLite | ❌ | ❌ | ❌ | 动态类型 | ❌ | — |
 | BigQuery | ✅ ARRAY | ❌ | ✅ STRUCT | ❌ | ✅ | GA |
 | Snowflake | ✅ ARRAY | ✅ OBJECT | ✅ OBJECT | ✅ VARIANT | ✅ | GA |
-| Redshift | ✅ SUPER | ✅ SUPER | ✅ SUPER | ✅ SUPER | ✅ | 2021+ |
+| Redshift | ✅ SUPER¹ | ✅ SUPER¹ | ✅ SUPER¹ | ✅ SUPER | ✅ | 2021+ |
 | DuckDB | ✅ LIST | ✅ MAP | ✅ STRUCT | ✅ UNION | ✅ | GA |
 | ClickHouse | ✅ Array | ✅ Map | ✅ Tuple / Nested | ❌ | ✅ | GA |
 | Trino | ✅ ARRAY | ✅ MAP | ✅ ROW | ❌ | ✅ | GA |
@@ -52,6 +52,8 @@ ARRAY、MAP、STRUCT 及集合类型——从关系模型的"第一范式"到嵌
 | Firebolt | ✅ ARRAY | ❌ | ❌ | ❌ | ❌ | GA |
 | Materialize | ✅ LIST | ✅ MAP | ✅ ROW / record | ❌ | ✅ | GA |
 | RisingWave | ✅ ARRAY | ❌ | ✅ STRUCT | ❌ | ✅ | GA |
+
+¹ Redshift 没有独立的 ARRAY、MAP、STRUCT 类型。所有复合/嵌套数据统一使用 SUPER 类型表示，通过 ARRAY()、OBJECT() 等函数构造，底层均为 SUPER 容器。
 
 ## 设计动机与历史演进
 
@@ -178,9 +180,9 @@ SELECT ARRAY<INT64>[1, 2, 3];
 INSERT INTO t (id, tags) VALUES (1, ['a', 'b', 'c']);
 INSERT INTO t (id, labels) VALUES (1, {'a', 'b', 'c'});
 
--- Redshift: ARRAY() 函数或 JSON 解析
-SELECT ARRAY(1, 2, 3);
-SELECT JSON_PARSE('[1,2,3]');
+-- Redshift: ARRAY() 函数或 JSON 解析（均返回 SUPER 类型，非独立 ARRAY 类型）
+SELECT ARRAY(1, 2, 3);          -- 返回 SUPER
+SELECT JSON_PARSE('[1,2,3]');   -- 返回 SUPER
 
 -- Vertica: ARRAY 关键字 + 方括号
 SELECT ARRAY[1, 2, 3];
