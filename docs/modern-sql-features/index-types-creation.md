@@ -31,7 +31,7 @@ Trino/Presto       ❌     ❌     ❌    ❌    ❌     ❌     ❌    ❌    �
 DuckDB             ✅(17) ❌     ❌    ❌    ❌     ❌     ❌    ✅(18)❌     ❌
 TiDB               ✅     ❌     ❌    ❌    ❌     ❌     ❌    ✅(19)❌     ❌
 OceanBase          ✅     ✅     ❌    ❌    ❌     ❌     ✅    ✅    ✅     ❌
-CockroachDB        ✅     ✅     ✅    ✅    ❌     ❌     ✅    ✅    ✅     ❌
+CockroachDB        ✅     ✅     ✅(23)✅(24)❌     ❌     ✅    ✅    ✅     ❌
 StarRocks          ❌(20) ❌     ❌    ❌    ❌     ✅     ❌    ❌    ❌     ❌
 Doris              ❌(20) ❌     ❌    ❌    ❌     ✅     ✅    ❌    ❌     ❌
 MaxCompute         ❌     ❌     ❌    ❌    ❌     ❌     ❌    ❌    ❌     ❌
@@ -86,6 +86,8 @@ Derby              ✅     ❌     ❌    ❌    ❌     ❌     ❌    ❌    �
 (20) StarRocks/Doris: 基于排序键的稀疏索引, 非传统 B-tree
 (21) Redshift: 无用户索引, 依赖 Sort Key + Zone Maps
 (22) Teradata/Vertica: 使用 Primary Index (PI) 或投影 (Projection) 机制
+(23) CockroachDB: 倒排索引 (Inverted Index)，语法兼容 PG GIN 但非等价实现
+(24) CockroachDB: 空间索引能力，语法近似 PG GiST 但内部为自有实现
 ```
 
 ## 索引类型详解
@@ -164,9 +166,9 @@ CREATE INDEX idx_meta ON products USING gin (metadata jsonb_path_ops);
 CREATE INDEX idx_fts ON documents USING gin (to_tsvector('english', content));
 -- 查询: SELECT * FROM documents WHERE to_tsvector('english', content) @@ to_tsquery('database & index');
 
--- CockroachDB: 兼容 PostgreSQL GIN 语法
+-- CockroachDB: 倒排索引 (Inverted Index)，语法近似 PG GIN 但非等价实现
 CREATE INVERTED INDEX idx_tags ON articles (tags);
--- 或
+-- 或 (兼容语法，内部实现为 CockroachDB 自有的倒排索引)
 CREATE INDEX idx_tags ON articles USING gin (tags);
 
 -- Greenplum: 继承 PostgreSQL GIN
@@ -190,7 +192,7 @@ CREATE INDEX idx_period ON reservations USING gist (period);
 ALTER TABLE reservations ADD CONSTRAINT no_overlap
     EXCLUDE USING gist (room_id WITH =, period WITH &&);
 
--- CockroachDB: 空间索引使用 GiST
+-- CockroachDB: 空间索引 (语法近似 PG GiST，但内部为自有空间索引实现)
 CREATE INDEX idx_geo ON locations USING gist (geom);
 ```
 
