@@ -13,7 +13,7 @@
 | SQLite | `AUTOINCREMENT` / `INTEGER PRIMARY KEY` | 不支持 | 不支持 | `INTEGER PRIMARY KEY` 自动 rowid |
 | MariaDB | `AUTO_INCREMENT` | 支持(10.3+) | 不支持 | 兼容 MySQL + 额外 SEQUENCE 引擎 |
 | BigQuery | 无 | 不支持 | 不支持 | 设计哲学：分布式系统不应依赖全局序列 |
-| Snowflake | `AUTOINCREMENT` / `IDENTITY` | 支持 | 部分 | 不保证连续，仅保证唯一 |
+| Snowflake | `AUTOINCREMENT` / `IDENTITY` | 支持 | 部分 | 不保证连续，保证唯一且递增（但可能有间隙） |
 | TiDB | `AUTO_INCREMENT` / `AUTO_RANDOM` | 支持(6.4+) | 不支持 | 分布式推荐 AUTO_RANDOM |
 | CockroachDB | `SERIAL` → `unique_rowid()` | 支持 | 支持 | SERIAL 映射为 unique_rowid()，非连续 |
 | Spanner | 无原生自增 | 支持(位反转) | 不支持 | bit-reversed sequence 避免热点 |
@@ -263,7 +263,7 @@ CREATE TABLE users (
     id INT AUTOINCREMENT START 1 INCREMENT 1 ORDER,
     name VARCHAR(100)
 );
--- NOORDER（默认）: 仅保证唯一
+-- NOORDER（默认）: 保证唯一且递增，但不保证连续（可能有间隙）
 ```
 
 ## SEQUENCE 支持矩阵
