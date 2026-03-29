@@ -25,7 +25,7 @@ ClickHouse      ✓(*)   ✗     ✗    ✗     ✗         任意表达式分�
 Hive            ✓(*)   ✗     ✗    ✗     ✓         动态分区, 基于目录结构
 Spark SQL       ✓(*)   ✗     ✗    ✗     ✓         继承 Hive 分区 + bucketing
 Trino/Presto    取决于 connector (Hive/Iceberg/Delta)
-MaxCompute      ✓      ✗     ✓    ✗     ✓         多级分区, LIFECYCLE
+MaxCompute      ✓      ✗     ✗(*)  ✗     ✓         多级分区, LIFECYCLE; (*) CLUSTERED BY 是 bucketing 非原生 HASH 分区
 StarRocks       ✓      ✓(*)  ✓    ✗     ✓(必选)   RANGE+HASH 必选, 自动分区
 Doris           ✓      ✓(*)  ✓    ✗     ✓(必选)   RANGE+HASH 必选, 自动分区
 TiDB            ✓      ✓     ✓    ✓     ✗         MySQL 兼容
@@ -530,7 +530,7 @@ SELECT id, amount FROM raw_data WHERE dt = '2025-01-15';
 INSERT INTO orders PARTITION (dt, region)
 SELECT id, amount, dt, region FROM raw_data;
 
--- HASH 分区 (MaxCompute 2.0+)
+-- Bucketing/Clustering (MaxCompute 2.0+, 非原生 HASH 分区)
 CREATE TABLE user_actions (
     user_id  BIGINT,
     action   STRING,
@@ -965,11 +965,11 @@ INTERVAL (NUMTODSINTERVAL(1, 'DAY')) (
 引擎            ADD     DROP    TRUNCATE  EXCHANGE  SPLIT   MERGE   RENAME
 ─────────────  ─────   ─────   ────────  ────────  ─────   ─────   ──────
 MySQL           ✓       ✓       ✓         ✓(5.7+)   ✓(5.1+) ✓(5.1+) ✗
-PostgreSQL      ✓       ✓(*)    ✓         ✓(ATTACH) ✗       ✗       ✗
+PostgreSQL      ✓       ✓(*)    ✓         ⚠️ ATTACH(非 EXCHANGE) ✗       ✗       ✗
 Oracle          ✓       ✓       ✓         ✓         ✓       ✓       ✓
 SQL Server      ✓(**)   ✓(**)   ✓         ✓(***)    ✓(**)   ✓(**)   ✗
 BigQuery        ✗(自动)  ✓       ✗         ✗         ✗       ✗       ✗
-ClickHouse      ✗(自动)  ✓       ✗         ✓(ATTACH) ✗       ✗       ✗
+ClickHouse      ✗(自动)  ✓       ✗         ⚠️ ATTACH(非 EXCHANGE) ✗       ✗       ✗
 Hive            ✓       ✓       ✗         ✗         ✗       ✗       ✓
 StarRocks       ✓       ✓       ✓         ✗         ✗       ✗       ✗
 Doris           ✓       ✓       ✓         ✗         ✗       ✗       ✗
