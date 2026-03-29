@@ -781,6 +781,91 @@ def set_operation_equals(row1, row2):
 - **INTERSECT / EXCEPT**: 需要维护两侧的状态，在流语义下复杂度高
 - 建议：流模式下优先使用 UNION ALL，避免有状态的集合操作
 
+### 8. 内存管理与 work_mem 配置
+
+集合操作中的去重（UNION、INTERSECT、EXCEPT）依赖 Hash Table 或 Sort，其内存消耗直接影响性能和稳定性：
+
+```
+去重的内存消耗模型:
+  Hash 去重: 内存 = 行数 × (行大小 + hash 桶开销)
+  Sort 去重: 内存 = 数据量 (排序缓冲区)
+
+PostgreSQL 参考:
+  - work_mem 参数控制每个排序/哈希操作的可用内存
+  - 默认 4MB，复杂集合操作可能需要调高
+  - 超过 work_mem 后自动切换到磁盘临时文件 (外部排序/Hash)
+
+引擎实现建议:
+  1. 为 SetOperation 节点分配独立的内存配额
+  2. 配额可参考 PostgreSQL 的 work_mem 模型: 每个算子独立计量
+  3. 内存超限时的行为:
+     - 优先: 溢出到磁盘 (external sort / partitioned hash)
+     - 次选: 报错并提示用户增大内存配额
+     - 禁止: 静默 OOM 或无限制占用内存
+  4. 监控: 暴露每个 SetOperation 节点的内存使用量和溢出次数
+```
+
+### 9. Hash 去重的碰撞风险与磁盘溢出
+
+Hash 去重在高并发、大数据量场景下需要关注碰撞率和溢出机制：
+
+```
+Hash 碰撞风险:
+  - 当 hash 桶数不足或 hash 函数质量差时，大量行映射到同一桶
+  - 同桶内退化为线性比较，极端情况下 O(N²)
+  - 高并发写入 hash 表时，锁竞争加剧碰撞链的遍历延迟
+
+碰撞缓解策略:
+  1. 使用高质量 hash 函数 (如 xxHash, MurmurHash3)
+  2. 动态扩容: 负载因子超过阈值 (如 0.75) 时 rehash
+  3. 两级 hash: 先用粗粒度 hash 分区，再在分区内精确去重
+
+磁盘溢出 (Disk Spill) 机制:
+  当内存中的 hash 表超过配额时，必须有可靠的溢出路径:
+  1. Grace Hash 分区: 按 hash 值将数据分为 P 个分区，
+     每次只加载一个分区到内存中去重
+  2. Hybrid Hash: 尽量将第一个分区保留在内存中处理，
+     其余分区写入磁盘后逐个加载
+  3. 递归分区: 如果单个分区仍超过内存，对该分区使用
+     不同 hash 函数再次分区
+
+  注意: 溢出路径必须在并发场景下线程安全，
+        临时文件需要在查询结束后清理
+```
+
+### 10. MULTISET 类型与标准集合操作的区分
+
+SQL 标准（SQL:2003+）定义了 MULTISET 类型，它是一种保留重复元素的集合类型，与常规集合操作（UNION/INTERSECT/EXCEPT）语义不同但容易混淆：
+
+```
+标准集合操作 vs MULTISET 操作:
+
+  UNION vs MULTISET UNION:
+    {1,1,2} UNION {1,3}       = {1,2,3}       -- 去重
+    {1,1,2} MULTISET UNION {1,3} = {1,1,2,1,3}  -- 保留所有
+
+  INTERSECT vs MULTISET INTERSECT:
+    {1,1,2} INTERSECT {1,1,3}       = {1}         -- 去重
+    {1,1,2} MULTISET INTERSECT {1,1,3} = {1,1}     -- 取最小出现次数
+
+  EXCEPT vs MULTISET EXCEPT:
+    {1,1,2} EXCEPT {1}       = {2}           -- 去重后差集
+    {1,1,2} MULTISET EXCEPT {1} = {1,2}       -- 减去一个实例
+
+SQL 标准中的 MULTISET 支持:
+  - SQL:2003 引入 MULTISET 类型和 MULTISET UNION/INTERSECT/EXCEPT
+  - Oracle 从 10g 开始支持 MULTISET 操作（基于嵌套表类型）
+  - 大多数引擎未实现 MULTISET 类型
+
+引擎实现注意:
+  - UNION ALL / INTERSECT ALL / EXCEPT ALL 在语义上等价于
+    MULTISET UNION / INTERSECT / EXCEPT，但操作对象是查询结果而非集合类型
+  - 如果引擎计划支持 MULTISET 类型，需要在类型系统中区分
+    集合类型 (SET) 和多重集合类型 (MULTISET)
+  - 解析器需区分 SELECT ... UNION ALL ... (集合操作)
+    和 col MULTISET UNION col2 (MULTISET 表达式)
+```
+
 ## 参考资料
 
 - SQL:1992 标准: ISO/IEC 9075:1992 Section 7.10 `<query expression>`
