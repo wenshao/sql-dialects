@@ -1,5 +1,11 @@
 # 窗口函数高级语法：各 SQL 方言全对比
 
+> 参考资料:
+> - [SQL:2003 Window Functions](https://modern-sql.com/feature/over)
+> - [PostgreSQL - Window Functions](https://www.postgresql.org/docs/current/functions-window.html)
+> - [MySQL 8.0 - Window Functions](https://dev.mysql.com/doc/refman/8.0/en/window-functions.html)
+> - [BigQuery - QUALIFY](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#qualify_clause)
+
 窗口函数是 SQL 中最强大也最复杂的特性之一。SQL:2003 引入基本窗口函数，SQL:2011 增加了 GROUPS 帧模式、FILTER 子句和 EXCLUDE 选项。但各引擎的实现进度差异巨大——有的引擎已经支持 QUALIFY 等非标准扩展，有的连 GROUPS 都尚未实现。本文对 40+ 引擎的窗口函数高级语法做全面横向对比。
 
 ---
