@@ -79,7 +79,7 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 
 | 方言 | `NULL \|\| 'text'` 结果 | 备注 |
 |------|---|---|
-| **MySQL** | `0`（或 `NULL` 若 `PIPES_AS_CONCAT`） | `\|\|` 默认是逻辑 OR，不是拼接！ |
+| **MySQL** | `NULL`（`\|\|` 是逻辑 OR：`NULL OR 0 = NULL`） | `\|\|` 默认是逻辑 OR，不是拼接！ |
 | **MariaDB** | `NULL` | 10.2+ 默认启用 `PIPES_AS_CONCAT`（`\|\|` 是拼接）；10.2 前同 MySQL 为逻辑 OR |
 | **PostgreSQL** | `NULL` | NULL 传播 |
 | **Oracle** | `'text'` | **特殊**: Oracle 把 NULL 当空字符串处理 |
@@ -118,7 +118,7 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 | **Snowflake** | `'text'` | NULL 跳过 |
 | **ClickHouse** | `'text'` | NULL 跳过 |
 | **Hive** | `NULL` | NULL 传播 |
-| **Spark SQL** | `'text'` | NULL 跳过 |
+| **Spark SQL** | `NULL` | NULL 传播（`concat_ws()` 才跳过 NULL） |
 | **Trino** | `NULL` | NULL 传播 |
 | **DuckDB** | `'text'` | NULL 跳过 |
 | **Flink SQL** | `NULL` | NULL 传播 |
@@ -131,8 +131,8 @@ SELECT x IS NOT NULL;  -- TRUE 或 FALSE
 
 | 行为 | 方言 |
 |------|------|
-| **NULL 传播**（返回 NULL） | MySQL, MariaDB, SQLite, BigQuery, Trino, Hive, Flink, Redshift, MaxCompute, StarRocks, Doris |
-| **NULL 跳过**（忽略 NULL） | PostgreSQL, Oracle, SQL Server, Snowflake, Spark, ClickHouse, DuckDB |
+| **NULL 传播**（返回 NULL） | MySQL, MariaDB, Spark, SQLite, BigQuery, Trino, Hive, ClickHouse, Flink, Redshift, MaxCompute, StarRocks, Doris |
+| **NULL 跳过**（忽略 NULL） | PostgreSQL, Oracle, SQL Server, Snowflake, DuckDB |
 
 **引擎开发者要点**：跨引擎迁移时，`CONCAT()` 的 NULL 行为差异是最常见的静默 bug 来源之一。如果你的引擎是 NULL 传播型，应提供 `CONCAT_WS` 或类似函数让用户选择跳过 NULL。
 
