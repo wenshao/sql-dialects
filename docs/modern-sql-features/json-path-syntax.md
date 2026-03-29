@@ -42,7 +42,7 @@ JSON 路径表达式是 SQL 引擎中分裂最严重的语法领域。同一个�
 | PostgreSQL | `data->'user'` | `data->'user'->>'name'` | `data->'scores'->0` |
 | PostgreSQL (路径) | `data#>'{user}'` | `data#>>'{user,name}'` | `data#>'{scores,0}'` |
 | MySQL | `data->'$.user'` | `data->>'$.user.name'` | `data->'$.scores[0]'` |
-| MariaDB | `data->'$.user'` | `JSON_UNQUOTE(data->'$.user')` | `data->'$.scores[0]'` |
+| MariaDB | `data->'$.user'` | `JSON_UNQUOTE(data->'$.user.name')` | `data->'$.scores[0]'` |
 | Oracle (点表示法) | `t.data.user` | `t.data.user.string()` | `t.data.scores[0]` |
 | Oracle (函数) | `JSON_QUERY(data, '$.user')` | `JSON_VALUE(data, '$.user.name')` | `JSON_VALUE(data, '$.scores[0]')` |
 | SQL Server | `JSON_QUERY(data, '$.user')` | `JSON_VALUE(data, '$.user.name')` | `JSON_VALUE(data, '$.scores[0]')` |
