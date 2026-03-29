@@ -39,7 +39,7 @@ WHERE rn = 1;
 | Snowflake | ✅ | GA | 完整支持 |
 | BigQuery | ✅ | GA | 完整支持 |
 | DuckDB | ✅ | 0.3.0+ | 完整支持 |
-| Databricks | ✅ | Runtime 11.0+ | Spark SQL 原生不支持，Databricks 扩展 |
+| Databricks | ✅ | Runtime 11.0+ | Databricks 扩展（早于 Spark 3.4 原生支持） |
 | StarRocks | ✅ | 2.5+ | 完整支持 |
 | ClickHouse | ✅ | 22.7+ | 完整支持 |
 | H2 | ✅ | 2.0+ | 完整支持 |
