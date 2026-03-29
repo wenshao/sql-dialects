@@ -49,7 +49,7 @@ JSON 路径表达式是 SQL 引擎中分裂最严重的语法领域。同一个�
 | SQLite (3.38+) | `data->'$.user'` | `data->>'$.user.name'` | `data->>'$.scores[0]'` |
 | SQLite (函数) | `json_extract(data, '$.user')` | `json_extract(data, '$.user.name')` | `json_extract(data, '$.scores[0]')` |
 | BigQuery | `JSON_QUERY(data, '$.user')` | `JSON_VALUE(data, '$.user.name')` | `JSON_VALUE(data, '$.scores[0]')` |
-| BigQuery (下标) | `data.user` | `STRING(data.user.name)` | `data.scores[0]` |
+| BigQuery (下标, *仅 STRUCT 类型*) | `data.user` | `data.user.name` | `data.scores[0]` |
 | Snowflake | `data:user` | `data:user:name::STRING` | `data:scores[0]` |
 | ClickHouse | `JSON_QUERY(data, '$.user')` | `JSON_VALUE(data, '$.user.name')` | `JSON_VALUE(data, '$.scores[0]')` |
 | ClickHouse (传统) | `JSONExtract(data, 'user', 'String')` | `JSONExtractString(data, 'user', 'name')` | `JSONExtractInt(data, 'scores', 1)` |
