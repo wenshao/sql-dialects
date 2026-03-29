@@ -763,17 +763,22 @@ SUBPARTITION BY HASH (user_id) SUBPARTITIONS 8 (
 ### CockroachDB
 
 ```sql
--- CockroachDB: 基于 PARTITION BY 但语义是数据放置
+-- CockroachDB: 分区在索引上定义，不是 CREATE TABLE 语法
+-- ⚠️ CockroachDB 不支持 CREATE TABLE ... PARTITION BY（会报错）
 CREATE TABLE orders (
     id         INT8 DEFAULT unique_rowid(),
     order_date DATE NOT NULL,
     region     STRING NOT NULL,
-    amount     DECIMAL(10,2)
-)
-PARTITION BY LIST (region) (
+    amount     DECIMAL(10,2),
+    PRIMARY KEY (region, id)  -- 分区列必须在主键中
+);
+-- 在主键索引上分区
+ALTER INDEX orders@primary PARTITION BY LIST (region) (
     PARTITION us VALUES IN ('us-east', 'us-west'),
     PARTITION eu VALUES IN ('eu-west', 'eu-central')
 );
+-- CockroachDB 22.1+ 推荐: Regional Tables（替代手动分区）
+-- ALTER TABLE orders SET LOCALITY REGIONAL BY ROW;
 
 -- 分区的主要用途: 地理分区 (Geo-Partitioning)
 ALTER PARTITION us OF TABLE orders
@@ -968,7 +973,7 @@ MySQL           ✓       ✓       ✓         ✓(5.7+)   ✓(5.1+) ✓(5.1+) 
 PostgreSQL      ✓       ✓(*)    ✓         ⚠️ ATTACH(非 EXCHANGE) ✗       ✗       ✗
 Oracle          ✓       ✓       ✓         ✓         ✓       ✓       ✓
 SQL Server      ✓(**)   ✓(**)   ✓         ✓(***)    ✓(**)   ✓(**)   ✗
-BigQuery        ✗(自动)  ✓       ✗         ✗         ✗       ✗       ✗
+BigQuery        ✗(自动)  ✗(CLI/过期)  ✗      ✗         ✗       ✗       ✗
 ClickHouse      ✗(自动)  ✓       ✗         ⚠️ ATTACH(非 EXCHANGE) ✗       ✗       ✗
 Hive            ✓       ✓       ✗         ✗         ✗       ✗       ✓
 StarRocks       ✓       ✓       ✓         ✗         ✗       ✗       ✗
