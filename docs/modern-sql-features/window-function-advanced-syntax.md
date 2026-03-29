@@ -50,7 +50,7 @@ WHERE rn = 1;
 | SQL Server | ❌ | - | 需子查询改写 |
 | SQLite | ❌ | - | 需子查询改写 |
 | MariaDB | ❌ | - | 需子查询改写 |
-| Trino | ❌ | - | 有社区 PR 但未合入 |
+| Trino | ✅ (411+) |
 | Db2 | ❌ | - | 需子查询改写 |
 | Redshift | ❌ | - | 需子查询改写 |
 | SAP HANA | ❌ | - | 需子查询改写 |
@@ -379,7 +379,7 @@ FROM scores;
 | BigQuery | ❌ | ❌ | ❌ | - |
 | Snowflake | ❌ | ❌ | ❌ | - |
 | ClickHouse | ❌ | ❌ | ❌ | - |
-| Trino | ❌ | ❌ | ❌ | - |
+| Trino | ✅ (411+) | ❌ | ❌ | - |
 | Spark SQL | ❌ | ❌ | ❌ | - |
 | Databricks | ❌ | ❌ | ❌ | - |
 | Hive | ❌ | ❌ | ❌ | - |
