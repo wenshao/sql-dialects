@@ -299,7 +299,7 @@ CREATE SEQUENCE order_seq
     NO CYCLE;                  -- 到达 MAXVALUE 时报错
 
 SELECT nextval('order_seq');
-SELECT currval('order_seq');   -- 当前会话最后获取的值
+SELECT currval('order_seq');   -- 当前会话最后获取的值（⚠️ 必须先调用 nextval，否则报错）
 SELECT setval('order_seq', 1000);  -- 重置序列值
 
 -- Oracle
@@ -478,7 +478,7 @@ SERIAL vs IDENTITY 的并发差异:
 - 序列号: 12 bits（每毫秒每节点 4096 个 ID）
 
 优点: 时间有序、全局唯一、无需协调
-缺点: 依赖时钟同步、需要应用层实现
+缺点: 依赖时钟同步（⚠️ 时钟回拨会导致 ID 重复！NTP 校时/闰秒是主要风险源）、需要应用层实现
 
 Twitter 原版使用自定义纪元 (2010-11-04)
 百度 UidGenerator / 美团 Leaf 是变种实现
