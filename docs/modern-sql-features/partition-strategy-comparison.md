@@ -833,7 +833,10 @@ WHERE order_date IN (SELECT dt FROM dim_date WHERE is_holiday = TRUE);
 -- ⚠️ MySQL 分区表的唯一键限制:
 -- MySQL 要求所有唯一索引（含主键）必须包含分区列！
 -- 如果按 create_time 分区，主键必须从 (id) 改为 (id, create_time)
--- Oracle/SQL Server 通过全局索引（Global Index）规避了此限制
+-- Oracle/SQL Server/TiDB/OceanBase 通过全局索引（Global Index）规避了此限制
+-- ⚠️ 但全局索引有写入放大代价：更新会触发跨分区分布式事务
+-- 金律：全局索引是查询的利器，但是写入吞吐的杀手
+-- 大规模写入场景应优先通过业务逻辑重构，让查询对齐本地分区索引
 -- 这是 Oracle → MySQL 分区迁移时最常导致架构推倒重来的约束
 
 -- 验证分区裁剪
