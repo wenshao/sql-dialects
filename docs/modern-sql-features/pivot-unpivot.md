@@ -80,7 +80,7 @@
 | BigQuery | 支持 | 不支持 | **支持** | GA |
 | DuckDB | 支持 | **支持（自动检测）** | **支持** | 0.8.0+ |
 | Databricks | 支持 | 部分支持 | 不支持 | Runtime 11.0+ |
-| Spark SQL | 支持 | 不支持 | 不支持 | 1.6+ |
+| Spark SQL | 支持 | 不支持 | 不支持 | 2.4+ |
 | PostgreSQL | 不支持 | - | - | 用 crosstab / FILTER |
 | MySQL | 不支持 | - | - | 用 CASE WHEN |
 | MariaDB | 不支持 | - | - | 用 CASE WHEN |
@@ -126,10 +126,10 @@
 | SQL Server | 支持 (2005+) | 不支持 | 不支持 | CROSS APPLY + VALUES |
 | Oracle | 支持 (11g+) | **支持** | **支持** | - |
 | Snowflake | 支持 | 不支持 | 不支持 | LATERAL FLATTEN |
-| BigQuery | 支持 | 不支持 | **支持** | CROSS JOIN + UNNEST |
-| DuckDB | 支持 (0.8+) | 不支持 | 支持 | COLUMNS(*) 语法 |
-| Databricks | 支持 (11.0+) | 不支持 | 支持 | LATERAL VIEW + STACK |
-| Spark SQL | 支持 (3.4+) | 不支持 | 支持 | STACK() |
+| BigQuery | 支持 | **支持** | **支持** | CROSS JOIN + UNNEST |
+| DuckDB | 支持 (0.8+) | **支持** | 支持 | COLUMNS(*) 语法 |
+| Databricks | 支持 (11.0+) | **支持** | 支持 | LATERAL VIEW + STACK |
+| Spark SQL | 支持 (3.4+) | **支持** | 支持 | STACK() |
 | PostgreSQL | 不支持 | - | - | LATERAL + VALUES |
 | MySQL | 不支持 | - | - | UNION ALL |
 | Trino | 不支持 | - | - | CROSS JOIN + UNNEST |
