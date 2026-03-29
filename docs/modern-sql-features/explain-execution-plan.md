@@ -52,7 +52,7 @@
 
 | 能力 | BigQuery | Snowflake | Redshift | Synapse | Databricks | Vertica | Teradata |
 |------|---------|-----------|----------|---------|-----------|---------|---------|
-| EXPLAIN | UI/API | `EXPLAIN USING TEXT` | 支持 | 支持 | 支持 | 支持 | `EXPLAIN SELECT ...` |
+| EXPLAIN | SQL 不支持（Dry Run 估算字节 + 控制台 Query Plan 可视化） | `EXPLAIN USING TEXT` | 支持 | 支持 | 支持 | 支持 | `EXPLAIN SELECT ...` |
 | EXPLAIN ANALYZE | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | EXPLAIN VERBOSE | 不支持 | 不支持 | 支持 | 不支持 | 支持 | 支持 | 不支持 |
 | Dry Run / 预估 | 支持 (`--dry_run`) | 不支持 | 不支持 | 支持 (估算) | 不支持 | 不支持 | 不支持 |
