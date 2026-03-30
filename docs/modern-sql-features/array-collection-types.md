@@ -680,10 +680,12 @@ SELECT * FROM t WHERE arr && ARRAY[1, 2];     -- arr 与 {1,2} 有交集
 | Snowflake | ❌ | ❌ | ✅ | ✅ |
 | DuckDB | ✅ | ✅ | ✅ | ✅ |
 | ClickHouse | ❌ (用 has) | ❌ (用 arrayAll) | ✅ | ✅ |
-| Trino | ✅ | ✅ | ✅ | ✅ |
+| Trino | ⚠️ 子查询语义 | ⚠️ 子查询语义 | ✅ | ✅ |
 | Spark SQL | ❌ | ❌ | ✅ | ✅ |
 | MySQL | ❌ (无数组) | ❌ | ✅ | ✅ |
 | SQL Server | ❌ (无数组) | ❌ | ✅ | ✅ |
+
+> **注意**: Trino 的 `ANY`/`ALL` 是子查询量词（subquery quantifier），不是 PostgreSQL 风格的数组量词。`val = ANY(arr)` 语法在 Trino 中不可用，需改用 `CONTAINS(arr, val)`。
 
 ## 嵌套类型: ARRAY<STRUCT<...>>
 
