@@ -126,7 +126,7 @@
 | SQL Server | 支持 (2005+) | 不支持 | 不支持 | CROSS APPLY + VALUES |
 | Oracle | 支持 (11g+) | **支持** | **支持** | - |
 | Snowflake | 支持 | **支持** | 不支持 | LATERAL FLATTEN |
-| BigQuery | 支持 | 不支持 | **支持** | CROSS JOIN + UNNEST |
+| BigQuery | 支持 | **支持** | **支持** | CROSS JOIN + UNNEST |
 | DuckDB | 支持 (0.8+) | 不支持 | 支持 | COLUMNS(*) 语法 |
 | Databricks | 支持 (11.0+) | 不支持 | 支持 | LATERAL VIEW + STACK |
 | Spark SQL | 支持 (3.4+) | 不支持 | 支持 | STACK() |
@@ -737,7 +737,7 @@ SQL 是强类型语言，查询的输出 schema（列数和类型）必须在编
 | 引擎 | 多聚合 | 列名格式 |
 |------|--------|---------|
 | Oracle | 支持 | `<value>_<agg_alias>` |
-| BigQuery | 支持 | `<value>_<agg_alias>` |
+| BigQuery | 支持 | `<agg_alias>_<value>` |
 | DuckDB | 支持 | `<value>_<agg_alias>` |
 | SQL Server | **不支持** | - |
 | Snowflake | **不支持** | - |
