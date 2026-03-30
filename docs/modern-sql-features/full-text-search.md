@@ -65,7 +65,6 @@
 │ TimescaleDB         │ ✓        │ GIN                │ tsvector @@  │ 扩展     │
 │ QuestDB             │ ✗        │ --                 │ --           │ --       │
 │ InfluxDB (SQL)      │ ✗        │ --                 │ --           │ --       │
-│ MongoDB (SQL 接口)  │ ✓        │ text index         │ $text/$search│ ✓        │
 │ Cassandra (CQL)     │ 有限     │ SASI/SAI           │ LIKE (前缀)  │ 有限     │
 │ ScyllaDB            │ 有限     │ secondary index    │ LIKE (前缀)  │ 有限     │
 │ CrateDB             │ ✓        │ Lucene 倒排索引    │ MATCH        │ ✓ 插件   │
@@ -84,6 +83,8 @@
 │ Aurora (PG)         │ ✓        │ GIN                │ tsvector @@  │ 扩展     │
 └─────────────────────┴──────────┴────────────────────┴──────────────┴──────────┘
 ```
+
+> **非 SQL 参考：** MongoDB (SQL 接口) 通过 text index 与 $text/$search 语法提供全文检索能力，支持 CJK；Atlas Search 基于 Lucene 提供更丰富的全文检索功能。因其并非 SQL 引擎，未纳入上方矩阵。
 
 ## MySQL / MariaDB: FULLTEXT INDEX + MATCH AGAINST
 
