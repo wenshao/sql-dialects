@@ -780,28 +780,31 @@ BERNOULLI(1) 对 1 亿行表的执行过程:
 
 ### 7. 谓词下推与采样的交互悖论
 
-采样与 WHERE 过滤的执行顺序会显著影响结果的统计分布:
+采样与 WHERE 过滤的执行顺序对 SYSTEM（块级）采样会显著影响结果，但对 BERNOULLI（行级）采样语义等价:
 
 ```
-方案 A: 先采样后过滤 (大多数引擎的默认行为)
-  SELECT * FROM orders TABLESAMPLE BERNOULLI(10)
-  WHERE status = 'completed';
-  -- 先从全表随机选 10% 行，再过滤 status
-  -- 结果: 全表的均匀随机子集中状态为 completed 的行
-  -- 如果 completed 占 50%，预期输出 = N * 10% * 50% = 5% of N
+BERNOULLI (行独立采样): 与 WHERE 可交换
+  -- 以下两种写法语义等价（每行独立以 10% 概率选中，与过滤顺序无关）:
+  SELECT * FROM orders TABLESAMPLE BERNOULLI(10) WHERE status = 'completed';
+  SELECT * FROM (SELECT * FROM orders WHERE status = 'completed') TABLESAMPLE BERNOULLI(10);
 
-方案 B: 先过滤后采样 (需要子查询实现)
-  SELECT * FROM (SELECT * FROM orders WHERE status = 'completed')
-  TABLESAMPLE BERNOULLI(10);
-  -- 先过滤 completed 行，再从中随机选 10%
-  -- 结果: completed 行的均匀随机 10% 子集
-  -- 预期输出 = N * 50% * 10% = 5% of N (数量相同但分布不同!)
+SYSTEM (块级采样): 与 WHERE 不可交换
+  方案 A: 先采样后过滤
+    SELECT * FROM orders TABLESAMPLE SYSTEM(10) WHERE status = 'completed';
+    -- 先选 10% 的数据块，再从中过滤 status
+    -- 如果 completed 行在块间分布不均匀，结果有偏
+
+  方案 B: 先过滤后采样
+    SELECT * FROM (SELECT * FROM orders WHERE status = 'completed')
+    TABLESAMPLE SYSTEM(10);
+    -- 先过滤 completed 行，再从结果的块中选 10%
+    -- 块的组成不同，采样结果不同
 ```
 
 **关键区别**:
-- 方案 A 中 completed 行的选中概率 = 10% (与 pending 行相同)
-- 方案 B 中 completed 行的选中概率 = 10%，但仅从 completed 中选，保证了分层均匀性
-- 当 WHERE 过滤条件与分析目标相关时，两种方案的统计推断结论可能不同
+- BERNOULLI: 逐行独立概率，WHERE 前后交换不影响结果分布（语义等价）
+- SYSTEM: 块级选择，WHERE 过滤改变了块的组成，两种顺序结果不同
+- 当使用 SYSTEM 采样且 WHERE 过滤条件与分析目标相关时，两种方案的统计推断结论可能不同
 
 **引擎实现建议**:
 - SQL 标准规定 TABLESAMPLE 在 FROM 子句中，语义上在 WHERE 之前执行
