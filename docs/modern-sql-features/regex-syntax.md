@@ -270,7 +270,7 @@ SELECT REGEXP_REPLACE('John Smith', '(\\w+) (\\w+)', '$2, $1'); -- Spark/Trino
 | Snowflake | **敏感** | flags 参数 `'i'` 或 `(?i)` |
 | BigQuery | **敏感** | `(?i)` 嵌入 |
 | Spark SQL | **敏感** | `(?i)` 嵌入 |
-| ClickHouse | **敏感** | `(?i)` 嵌入 或 `matchi()`（`(?i)` 更具可移植性） |
+| ClickHouse | **敏感** | `match(col, '(?i)pattern')`（部分版本亦有 `matchi()`） |
 | Trino | **敏感** | `(?i)` 嵌入 |
 | DuckDB | **敏感** | `(?i)` 嵌入 |
 
