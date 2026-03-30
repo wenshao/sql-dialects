@@ -176,7 +176,7 @@ $$;
 CALL transfer_funds(1001, 1002, 500.00);
 ```
 
-关键差异：PostgreSQL 的过程没有 OUT 参数语义，用 `INOUT` 代替。
+关键差异：PostgreSQL 11+ 的 PROCEDURE 同时支持 OUT 和 INOUT（也可用 INOUT 模拟 OUT）。
 
 ### SQL Server T-SQL
 
