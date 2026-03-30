@@ -12,7 +12,7 @@
 | Oracle | `CREATE PRIVATE TEMPORARY TABLE` (18c+) | `CREATE GLOBAL TEMPORARY TABLE`（DDL 持久） | PL/SQL 集合 | DELETE/PRESERVE ROWS | 不支持 |
 | MariaDB | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | MEMORY 引擎 |
 | Db2 | `DECLARE GLOBAL TEMPORARY TABLE` | `CREATE GLOBAL TEMPORARY TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
-| SQLite | `CREATE TEMP TABLE` | 不支持 | 不支持 | 不支持 | 内存模式 |
+| SQLite | `CREATE TEMP TABLE`³ | 不支持 | 不支持 | 不支持 | 内存模式 |
 | Teradata | `CREATE VOLATILE TABLE` | `CREATE GLOBAL TEMPORARY TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | Snowflake | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | 自动 |
 | BigQuery | 脚本内临时表 | 不支持 | 不支持 | 不支持 | 自动 |
@@ -25,7 +25,7 @@
 | OceanBase | `CREATE TEMPORARY TABLE` | `CREATE GLOBAL TEMPORARY TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | Hive | `CREATE TEMPORARY TABLE` | 不支持 | 不支持 | 不支持 | 不支持 |
 | Spark SQL | `CREATE TEMPORARY VIEW`² | `CREATE GLOBAL TEMP VIEW`² | 不支持 | 不支持 | 自动 |
-| Presto/Trino | memory connector | 不支持 | 不支持 | 不支持 | 内存连接器 |
+| Presto/Trino | memory connector³ | 不支持 | 不支持 | 不支持 | 内存连接器 |
 | Vertica | `CREATE LOCAL TEMP TABLE` | `CREATE GLOBAL TEMP TABLE` | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | Greenplum | `CREATE TEMP TABLE` | 不支持 | 不支持 | DELETE/PRESERVE ROWS | 不支持 |
 | SAP HANA | `CREATE LOCAL TEMPORARY TABLE` | `CREATE GLOBAL TEMPORARY TABLE` | 不支持 | DELETE/PRESERVE（仅全局） | 列/行存储 |
@@ -51,6 +51,8 @@
 | Umbra | `CREATE TEMP TABLE` | 不支持 | 不支持 | 不支持 | 自动 |
 
 ² Spark SQL 和 Databricks 的临时视图 (TEMPORARY VIEW) 不是临时表。临时视图只是命名的查询别名，不物化数据、不支持索引、不支持 DML 操作（INSERT/UPDATE/DELETE）。它们在此矩阵中列出是因为功能上用于替代临时表存放中间结果，但本质上是不同的机制。
+
+³ SQLite 的 TEMP TABLE 存储在独立的临时文件中，Presto/Trino 的 memory connector 是替代机制而非 SQL 标准意义上的临时表。
 
 ## 核心概念
 
@@ -403,7 +405,7 @@ DISCARD TEMP;   -- 清除所有临时表
 DISCARD ALL;    -- 重置整个会话状态（连 search_path 都重置）
 
 -- SQL Server: sp_reset_connection（连接池自动调用）清理 #table
--- 但 ##table 不会被自动清理！
+-- 但 ##table 在创建会话结束且无其他会话引用时自动清理，但连接池复用场景下可能残留
 
 -- 通用最佳实践:
 -- 1. 优先使用 ON COMMIT DELETE ROWS（事务级自动清空）
@@ -599,7 +601,7 @@ SQL Server: #table 创建/删除都参与事务
 连接池重置命令:
   ├── PostgreSQL: DISCARD TEMP (清除所有临时表) 或 DISCARD ALL (重置整个会话)
   ├── SQL Server: sp_reset_connection (连接池驱动自动调用, 清理 #table)
-  │   注意: ##table (全局临时表) 不会被 sp_reset_connection 清理!
+  │   注意: ##table (全局临时表) 在创建会话结束且无其他会话引用时自动清理，但连接池复用场景下可能残留
   ├── MySQL: 无等价命令, 需手动 DROP 或 RESET CONNECTION (5.7.3+, 但会清除所有状态)
   └── 建议: 在连接池的 validationQuery / testOnReturn 中执行清理命令
 
