@@ -21,12 +21,12 @@
 | Hive | 支持 | 支持 | 支持 | 0.10+ | 部分使用 WITH CUBE/ROLLUP |
 | ClickHouse | 支持 | 支持 | 支持 | 19.13+ | 同时支持 WITH ROLLUP/CUBE |
 | MySQL | 支持 (8.0.31+) | 支持 (8.0.1+) | 支持 | 8.0.1+ | 8.0.1 起支持 CUBE/ROLLUP 标准语法；8.0.31 起支持 GROUPING SETS |
-| MariaDB | 不支持 | 不支持 | 仅 ROLLUP | 10.0+ | 仅 WITH ROLLUP 语法 |
+| MariaDB | 不支持 | 不支持 | 仅 ROLLUP | 5.1+ | 仅 WITH ROLLUP 语法（继承自 MySQL） |
 | SQLite | 不支持 | 不支持 | 不支持 | - | 需 UNION ALL 模拟 |
 | Redshift | 支持 | 支持 | 支持 | GA | 标准语法 |
 | Teradata | 支持 | 支持 | 支持 | 14+ | 标准语法 |
 | Vertica | 支持 | 支持 | 支持 | 7.0+ | 标准语法 |
-| Greenplum | 支持 | 支持 | 支持 | 5.0+ | 继承 PostgreSQL |
+| Greenplum | 支持 | 支持 | 支持 | 5.0+ | 自有实现（早于 PostgreSQL 9.5） |
 | CockroachDB | 不支持 | 不支持 | 不支持 | - | 计划中 |
 | Impala | 不支持 | 不支持 | 不支持 | - | 需 UNION ALL 模拟 |
 | Doris | 支持 | 支持 | 支持 | 1.1+ | 标准语法 |
