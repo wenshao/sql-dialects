@@ -236,7 +236,7 @@ SELECT d.* FROM dept d ANTI JOIN emp e ON e.dept_id = d.dept_id;
 | **Oracle** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **最成熟的子查询优化器** |
 | **SQL Server** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 优化器非常成熟 |
 | **SQLite** | ❌ | ✅ (3.35+) | ✅ (3.35+) | ✅ | ❌ | ❌ | 优化能力有限 |
-| **BigQuery** | ✅ | ✅ | ✅ | ⚠️ (仅 UNNEST 展开，非通用 LATERAL) | ✅ | ✅ | 自动去关联化大多数关联子查询 |
+| **BigQuery** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 自动去关联化大多数关联子查询 |
 | **Snowflake** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 同上 |
 | **ClickHouse** | ⚠️ | ✅ | ✅ | ✅ | ✅ | ❌ | 关联子查询整体支持较弱 |
 | **Hive** | ❌ | ✅ | ⚠️ | ✅ | ⚠️ | ❌ | 无专用 Anti-Join 算子，依赖 MapReduce 模型 |
