@@ -1154,6 +1154,8 @@ GROUP BY <implicit_group_cols>
 
 列名生成规则: `<pivot_value>_<agg_alias>`，需要处理特殊字符和命名冲突。
 
+> **注意**: BigQuery 的多聚合列名格式为 `<agg_alias>_<value>`，与上述通用规则相反，详见"多聚合 PIVOT"章节的支持矩阵。
+
 ### 3. UNPIVOT 语义转换
 
 UNPIVOT 可转换为 CROSS JOIN LATERAL + VALUES + 可选 WHERE:
