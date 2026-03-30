@@ -31,7 +31,7 @@ SELECT city FROM suppliers;
 
 ## UNION / UNION ALL 支持矩阵
 
-所有主流引擎均支持 UNION 和 UNION ALL，这是 SQL 最古老的集合操作。
+主流引擎通常支持某种形式的 UNION/UNION ALL，但默认语义与是否要求显式 ALL/DISTINCT 因方言而异。这是 SQL 最古老的集合操作。
 
 | 引擎 | UNION | UNION ALL | 默认行为 | 版本 |
 |------|-------|-----------|---------|------|
