@@ -1407,7 +1407,7 @@ ParadeDB:
 │ 引擎             │ 评分算法                                  │
 ├──────────────────┼───────────────────────────────────────────┤
 │ MySQL 8.0        │ 专有评分公式（基于 TF-IDF 思想，可类比 BM25 但非标准实现）│
-│ MySQL 5.7        │ TF-IDF 变体                               │
+│ MySQL 5.7        │ 专有相关性公式（可类比 TF-IDF 家族）       │
 │ PostgreSQL       │ ts_rank: 自定义权重模型 (非 BM25)         │
 │                  │ ts_rank_cd: Cover Density 算法            │
 │ SQL Server       │ 专有 IDF 变体 (CONTAINSTABLE RANK)        │
@@ -1624,7 +1624,7 @@ FROM articles WHERE CONTAINS(body, 'database & optimization') > 0;
 │                  │ (vs 原文)    │              │              │
 ├──────────────────┼──────────────┼──────────────┼──────────────┤
 │ MySQL InnoDB     │ 100-200%     │ 慢           │ 近实时       │
-│ PostgreSQL GIN   │ 50-100%      │ 中等         │ 实时         │
+│ PostgreSQL GIN   │ 50-100%      │ 中等         │ 同步(fastupdate=off) / 异步(fastupdate=on, 默认) │
 │ SQL Server FT    │ 30-80%       │ 快           │ 可配置       │
 │ Oracle Text      │ 50-150%      │ 中等         │ 可配置       │
 │ SQLite FTS5      │ 30-50%       │ 快           │ 实时         │
