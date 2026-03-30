@@ -563,7 +563,7 @@ SEARCH BREADTH FIRST BY name SET ordercol
 | SQL Server | ✅ | ✅ | 否 | ✅ | ❌ | ❌ | ✅ | 100 |
 | SQLite | ✅ | ✅ | 是 | ✅ | ❌ | ✅ (3.35+) | ✅ | 1000 |
 | BigQuery | ✅ | ✅ | 是 | ✅ | ❌ | ❌ | ✅ | 500 |
-| Snowflake | ✅ | ✅ | 可选 | ✅ | ❌ | ❌ | ✅ | 无限制 |
+| Snowflake | ✅ | ✅ | 可选 | ❌ | ❌ | ❌ | ✅ | 无限制 |
 | ClickHouse | ✅ | ⚠️ (实验) | 是 | - | - | - | ❌ | - |
 | DuckDB | ✅ | ✅ | 是 | ✅ | ✅ | ✅ | ✅ | 无限制 |
 | Trino | ✅ | ✅ | 是 | ✅ | ❌ | ❌ | ✅ | 10 |
