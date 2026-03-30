@@ -520,9 +520,11 @@ WHERE status = 'completed';
 ### 视图与 JOIN 中的采样
 
 ```sql
--- 视图采样（大多数引擎支持，SQL Server 对复杂视图可能报错）
+-- 视图采样（仅部分引擎支持）
 CREATE VIEW active_users AS SELECT * FROM users WHERE last_login > CURRENT_DATE - 30;
 SELECT * FROM active_users TABLESAMPLE BERNOULLI(5);
+-- 注意：PostgreSQL/Oracle/Db2 支持视图采样；SQL Server 对复杂视图可能报错；
+-- MySQL/MariaDB/SQLite/ClickHouse 不支持 TABLESAMPLE，更无视图采样。
 
 -- JOIN 中对单表采样
 SELECT o.*, c.name
