@@ -55,7 +55,7 @@ ALTER TABLE table_name
 | Teradata | 是 | 是 | 是 | 不支持 | 不支持 | 13.0+ |
 | Greenplum | 是 | 是 | 是 (多条 ADD) | 是 | 不支持 | 5.0+ |
 | CockroachDB | 是 | 是 | 是 (多条 ADD) | 是 | 不支持 | 1.0+ |
-| TiDB | 是 | 是 | 是 (多条 ADD) | 不支持 | **FIRST / AFTER** | 2.0+ |
+| TiDB | 是 | 是 | 是 (多条 ADD) | 是 (5.0+) | **FIRST / AFTER** | 2.0+ |
 | OceanBase | 是 | 是 | 是 | 部分 | **FIRST / AFTER** (MySQL 模式) | 3.x+ |
 | YugabyteDB | 是 | 是 | 是 (多条 ADD) | 是 | 不支持 | 2.0+ |
 | SingleStore | 是 | 是 | 是 (多条 ADD) | 不支持 | **AFTER** | 6.0+ |
