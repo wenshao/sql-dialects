@@ -362,7 +362,7 @@ SELECT CONCAT('Hello', NULL);            -- NULL
 | BigQuery | 是 | 是 | 是 | 是 | -- | GA |
 | Redshift | 是 | 是 | 是 | 是 | 是 | GA |
 | DuckDB | 是 | 是 | 是 | 是 | -- | 0.3+ |
-| ClickHouse | 是 | -- | -- | -- | -- | 18.1+ |
+| ClickHouse | 是 | 是(21.8+) | 是(trimLeft) | 是(trimRight) | -- | 18.1+ |
 | Trino | 是 | 是 | 是 | 是 | -- | 早期 |
 | Presto | 是 | 是 | 是 | 是 | -- | 0.57+ |
 | Spark SQL | 是 | 是 | 是 | 是 | -- | 1.0+ |
@@ -777,7 +777,7 @@ SELECT SUBSTRING_INDEX(SUBSTRING_INDEX('a,b,c', ',', 2), ',', -1);  -- 'b'
 | Presto | -- | -- | 不支持（需模拟） |
 | Spark SQL | 是 | -- | 1.5+ |
 | Hive | 是 | -- | 1.2+ |
-| Flink SQL | -- | -- | 不支持 |
+| Flink SQL | 是 | -- | 1.12+ |
 | Databricks | 是 | -- | GA |
 | Teradata | -- | -- | 不支持（需模拟） |
 | Greenplum | 是 | -- | 继承 PG |
