@@ -133,11 +133,11 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | MySQL | 支持 | 支持 | 支持 | 支持 | =POP | =POP | 5.0+ |
 | MariaDB | 支持 | 支持 | 支持 | 支持 | =POP | =POP | 5.0+ |
 | SQLite | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 需扩展 |
-| Oracle | 支持 | 支持 | 支持 | 支持 | =POP | =POP | 8i+ |
-| SQL Server | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | 2005+ |
+| Oracle | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | 8i+ |
+| SQL Server | 不支持(用STDEVP) | 不支持(用STDEV) | 不支持(用VARP) | 不支持(用VAR) | =SAMP | =SAMP | 2005+(非标准名: STDEV/STDEVP/VAR/VARP) |
 | DB2 | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | 9.0+ |
-| Snowflake | 支持 | 支持 | 支持 | 支持 | =POP | =POP | GA |
-| BigQuery | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | GA |
+| Snowflake | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | GA |
+| BigQuery | 支持 | 支持 | 支持 | 支持 | =POP | =POP | GA |
 | Redshift | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | GA |
 | DuckDB | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | 0.3+ |
 | ClickHouse | 支持 | 支持 | 支持 | 支持 | =POP | =POP | 早期 |
@@ -179,7 +179,7 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | Yellowbrick | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | GA |
 | Firebolt | 支持 | 支持 | 支持 | 支持 | =SAMP | =SAMP | GA |
 
-> **关键陷阱：STDDEV / VARIANCE 的默认行为不一致**。`STDDEV` 和 `VARIANCE` 这两个简写名在不同引擎中指向的是**总体**（POP）还是**样本**（SAMP）版本完全不同。MySQL/Oracle/ClickHouse/Hive/Teradata 等指向总体版本（除以 N），而 PostgreSQL/SQL Server/BigQuery/DB2/Trino 等指向样本版本（除以 N-1）。**在跨引擎迁移时，务必使用完整名称 `STDDEV_POP`/`STDDEV_SAMP`。**
+> **关键陷阱：STDDEV / VARIANCE 的默认行为不一致**。`STDDEV` 和 `VARIANCE` 这两个简写名在不同引擎中指向的是**总体**（POP）还是**样本**（SAMP）版本完全不同。MySQL/ClickHouse/Hive/Teradata 等指向总体版本（除以 N），而 Oracle/PostgreSQL/SQL Server/Snowflake/DB2/Trino 等指向样本版本（除以 N-1）。**在跨引擎迁移时，务必使用完整名称 `STDDEV_POP`/`STDDEV_SAMP`。**
 
 ### 布尔聚合：BOOL_AND / BOOL_OR / EVERY / SOME / ANY
 
@@ -192,12 +192,12 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | Oracle | 不支持 | 不支持 | 不支持 | 不支持 | 无布尔类型 |
 | SQL Server | 不支持 | 不支持 | 不支持 | 不支持 | 无布尔类型 |
 | DB2 | 不支持 | 不支持 | 不支持 | 不支持 | 需 `MIN`/`MAX` 模拟 |
-| Snowflake | 支持 | 支持 | 不支持 | 不支持 | GA |
+| Snowflake | 不支持(用BOOLAND_AGG) | 不支持(用BOOLOR_AGG) | 不支持 | 不支持 | 用 BOOLAND_AGG/BOOLOR_AGG |
 | BigQuery | 支持 | 支持 | 不支持 | 不支持 | `LOGICAL_AND`/`LOGICAL_OR` |
 | Redshift | 支持 | 支持 | 支持 | 支持 | GA |
 | DuckDB | 支持 | 支持 | 支持 | 不支持 | 0.3+ |
 | ClickHouse | 不支持 | 不支持 | 不支持 | 不支持 | 需 `min`/`max` 或 `groupBitAnd` |
-| Trino | 支持 | 不支持 | 支持 | 不支持 | `BOOL_AND`/`EVERY` |
+| Trino | 支持 | 支持 | 支持 | 不支持 | `BOOL_AND`/`BOOL_OR`/`EVERY` |
 | Presto | 不支持 | 不支持 | 支持 | 不支持 | 仅 `EVERY` |
 | Spark SQL | 支持 | 支持 | 支持 | 支持 | 3.0+；`BOOL_AND` = `EVERY`，`BOOL_OR` = `SOME` |
 | Hive | 不支持 | 不支持 | 不支持 | 不支持 | 需 UDF |
@@ -310,7 +310,7 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | BigQuery | 支持 | 不支持 | 不支持 | 支持 | - |
 | Redshift | 支持 | 不支持 | 支持 | 不支持 | - |
 | DuckDB | 支持 | 支持 | 支持 | 支持 | 多别名全部支持 |
-| ClickHouse | 不支持 | 不支持 | 不支持 | 支持 | 需 `groupArray` + `arrayStringConcat` |
+| ClickHouse | 不支持 | 不支持 | 不支持 | 不支持 | 无 ARRAY_AGG，用 `groupArray` + `arrayStringConcat` 替代 |
 | Trino | 不支持 | 不支持 | 支持 | 支持 | `LISTAGG`: 357+, `ARRAY_AGG`: 早期 |
 | Presto | 不支持 | 不支持 | 不支持 | 支持 | 需 `ARRAY_JOIN(ARRAY_AGG(...))` |
 | Spark SQL | 不支持 | 不支持 | 不支持 | 支持 | 需 `CONCAT_WS` + `COLLECT_LIST` |
@@ -1232,7 +1232,7 @@ SELECT STDDEV_POP(salary) FROM (VALUES (100)) t(salary);
 
 1. **基础聚合是唯一的共同点**：`COUNT`/`SUM`/`AVG`/`MIN`/`MAX` 是所有 49 个引擎都支持的唯一一组函数，但即便如此，`AVG` 的返回类型和 `SUM` 的溢出行为仍有显著差异。
 
-2. **STDDEV/VARIANCE 的命名陷阱是最危险的跨引擎问题**：`STDDEV()` 在 MySQL/Oracle/ClickHouse 中等于 `STDDEV_POP`（总体），在 PostgreSQL/SQL Server/BigQuery 中等于 `STDDEV_SAMP`（样本）。这种差异可能导致统计结果的系统性偏差。**迁移时务必使用带后缀的完整名称。**
+2. **STDDEV/VARIANCE 的命名陷阱是最危险的跨引擎问题**：`STDDEV()` 在 MySQL/ClickHouse 中等于 `STDDEV_POP`（总体），在 Oracle/PostgreSQL/SQL Server/Snowflake/BigQuery 中等于 `STDDEV_SAMP`（样本）。这种差异可能导致统计结果的系统性偏差。**迁移时务必使用带后缀的完整名称。**
 
 3. **SQL Server 的命名完全独立**：SQL Server 是唯一不遵循标准命名的主流引擎——`STDEV`/`STDEVP`/`VAR`/`VARP` 而非 `STDDEV_SAMP`/`STDDEV_POP`/`VAR_SAMP`/`VAR_POP`。
 
