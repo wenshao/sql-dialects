@@ -1232,7 +1232,7 @@ SELECT STDDEV_POP(salary) FROM (VALUES (100)) t(salary);
 
 1. **基础聚合是唯一的共同点**：`COUNT`/`SUM`/`AVG`/`MIN`/`MAX` 是所有 49 个引擎都支持的唯一一组函数，但即便如此，`AVG` 的返回类型和 `SUM` 的溢出行为仍有显著差异。
 
-2. **STDDEV/VARIANCE 的命名陷阱是最危险的跨引擎问题**：`STDDEV()` 在 MySQL/ClickHouse 中等于 `STDDEV_POP`（总体），在 Oracle/PostgreSQL/SQL Server/Snowflake/BigQuery 中等于 `STDDEV_SAMP`（样本）。这种差异可能导致统计结果的系统性偏差。**迁移时务必使用带后缀的完整名称。**
+2. **STDDEV/VARIANCE 的命名陷阱是最危险的跨引擎问题**：`STDDEV()` 在 MySQL/ClickHouse/BigQuery 中等于 `STDDEV_POP`（总体），在 Oracle/PostgreSQL/SQL Server/Snowflake 中等于 `STDDEV_SAMP`（样本）。这种差异可能导致统计结果的系统性偏差。**迁移时务必使用带后缀的完整名称。**
 
 3. **SQL Server 的命名完全独立**：SQL Server 是唯一不遵循标准命名的主流引擎——`STDEV`/`STDEVP`/`VAR`/`VARP` 而非 `STDDEV_SAMP`/`STDDEV_POP`/`VAR_SAMP`/`VAR_POP`。
 
