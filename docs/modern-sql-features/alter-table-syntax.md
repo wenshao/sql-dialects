@@ -38,7 +38,7 @@ ALTER TABLE table_name
 | MySQL | 是 | 是 | 是 (多条 ADD) | 不支持 | **FIRST / AFTER** | 3.22+ |
 | MariaDB | 是 | 是 | 是 (多条 ADD) | 10.0+ | **FIRST / AFTER** | 5.1+ |
 | SQLite | 是 | 是 | 不支持 | 不支持 | 不支持 | 3.2.0+ |
-| Oracle | 是 (12c+) | 是 | **ADD (col1, col2)** | 不支持 | 不支持 | 8i+ |
+| Oracle | 不支持 (仅 ADD) | 是 | **ADD (col1, col2)** | 不支持 | 不支持 | 8i+ |
 | SQL Server | 是 | 是 | 是 (多列) | 不支持 | 不支持 | 6.0+ |
 | DB2 | 是 | 是 | 是 | 不支持 | 不支持 | 9.7+ |
 | Snowflake | 是 | 是 | 是 (多条 ADD) | 是 | 不支持 | GA |
@@ -155,7 +155,7 @@ ALTER TABLE table_name
 | DB2 | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TABLE old TO new` | 9.7+ |
 | Snowflake | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TO new_name` | GA |
 | BigQuery | 是 | 不支持 | `RENAME COLUMN old TO new` | GA |
-| Redshift | 是 | 不支持 | `RENAME COLUMN old TO new` / 需 `ALTER TABLE RENAME TO` | GA |
+| Redshift | 是 | 是 | `RENAME COLUMN old TO new` / `ALTER TABLE ... RENAME TO` | GA |
 | DuckDB | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TO new_name` | 0.3.0+ |
 | ClickHouse | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TABLE old TO new` | 20.4+ |
 | Trino | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TO new_name` | 351+ |
@@ -551,7 +551,7 @@ ALTER TABLE table_name
 | Teradata | 不支持 | 不支持 | 不支持 | -- |
 | Greenplum | 9.6+ | 是 | 是 | 6.0+ |
 | CockroachDB | 是 | 是 | 是 | 1.0+ |
-| TiDB | 不支持 | 不支持 | 不支持 | -- |
+| TiDB | 不支持 | 是 | 不支持 | 5.0+ |
 | OceanBase | 不支持 | 不支持 | 不支持 | -- |
 | YugabyteDB | 是 | 是 | 是 | 2.0+ |
 | SingleStore | 不支持 | 不支持 | 不支持 | -- |
