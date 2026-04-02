@@ -207,10 +207,10 @@ SELECT RIGHT('Hello World', 5);                  -- 'World'
 | 引擎 | `\|\|` 运算符 | CONCAT(a,b,...) | `+` 运算符 | CONCAT_WS | 版本 |
 |------|-------------|----------------|-----------|-----------|------|
 | PostgreSQL | 是 | 是 | -- | 是 | 7.1+ |
-| MySQL | 可选(PIPES_AS_CONCAT) | 是(忽略NULL) | -- | 是 | 4.0+ |
-| MariaDB | 可选(PIPES_AS_CONCAT) | 是(忽略NULL) | -- | 是 | 5.1+ |
-| SQLite | 是 | -- | -- | -- | 3.0+ |
-| Oracle | 是 | 是(仅2参) | -- | -- | 7+ |
+| MySQL | 可选(PIPES_AS_CONCAT) | 是(NULL传播) | -- | 是 | 4.0+ |
+| MariaDB | 可选(PIPES_AS_CONCAT) | 是(NULL传播) | -- | 是 | 5.1+ |
+| SQLite | 是 | 是 | -- | -- | 3.44.0+(CONCAT) |
+| Oracle | 是 | 是(仅2参, 21c+ 多参) | -- | -- | 7+ |
 | SQL Server | -- | 是 | 是 | 是 | 2012+(CONCAT) |
 | DB2 | 是 | 是 | -- | -- | 9.1+ |
 | Snowflake | 是 | 是 | -- | 是 | GA |
@@ -227,10 +227,10 @@ SELECT RIGHT('Hello World', 5);                  -- 'World'
 | Teradata | 是 | -- | -- | -- | V2R5+ |
 | Greenplum | 是 | 是 | -- | 是 | 继承 PG |
 | CockroachDB | 是 | 是 | -- | 是 | 1.0+ |
-| TiDB | 可选 | 是(忽略NULL) | -- | 是 | 2.0+ |
+| TiDB | 可选 | 是(NULL传播) | -- | 是 | 2.0+ |
 | OceanBase | 是 | 是 | -- | 是 | 1.0+ |
 | YugabyteDB | 是 | 是 | -- | 是 | 2.0+ |
-| SingleStore | 可选 | 是(忽略NULL) | -- | 是 | 7.0+ |
+| SingleStore | 可选 | 是(NULL传播) | -- | 是 | 7.0+ |
 | Vertica | 是 | 是 | -- | -- | 9.0+ |
 | Impala | 是 | 是 | -- | 是 | 2.0+ |
 | StarRocks | 是 | 是 | -- | 是 | 1.0+ |
@@ -355,7 +355,7 @@ SELECT CONCAT('Hello', NULL);            -- NULL
 | MySQL | 是 | 是 | 是 | 是 | -- | 3.23+ |
 | MariaDB | 是 | 是 | 是 | 是 | -- | 5.1+ |
 | SQLite | 是 | -- | 是 | 是 | -- | 3.0+ |
-| Oracle | 是 | 是 | 是 | 是 | -- | 9i+ |
+| Oracle | 是 | 是 | 是 | 是 | -- | 8i+ |
 | SQL Server | 是(2017+) | -- | 是 | 是 | -- | 2000+ |
 | DB2 | 是 | 是 | 是 | 是 | -- | 9.1+ |
 | Snowflake | 是 | 是 | 是 | 是 | -- | GA |
