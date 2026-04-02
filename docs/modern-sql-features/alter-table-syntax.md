@@ -1086,7 +1086,8 @@ ALTER TABLE orders DROP PRIMARY KEY;
 IF EXISTS / IF NOT EXISTS 对部署脚本的幂等性至关重要，但令人意外的是，许多主流引擎至今不支持：
 
 - **支持**: PostgreSQL (9.6+), MariaDB (10.0+), Snowflake, BigQuery, DuckDB, ClickHouse, Trino, CockroachDB, YugabyteDB, H2, Google Spanner
-- **不支持**: MySQL, SQLite, Oracle, SQL Server, DB2, Redshift, Spark SQL, Hive, TiDB, OceanBase, Teradata
+- **部分支持**: TiDB (5.0+ 仅 ADD COLUMN IF NOT EXISTS)
+- **不支持**: MySQL, SQLite, Oracle, SQL Server, DB2, Redshift, Spark SQL, Hive, OceanBase, Teradata
 
 MySQL 不支持 `ADD COLUMN IF NOT EXISTS` 是一个常见的兼容性痛点，MariaDB 在 10.0 就添加了这一能力。
 
