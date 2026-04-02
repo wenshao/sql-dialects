@@ -26,7 +26,7 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 
 | 引擎 | STORED | VIRTUAL | 版本 | 语法关键字 |
 |------|--------|---------|------|-----------|
-| PostgreSQL | 支持 | 不支持 | 12+ | `GENERATED ALWAYS AS (...) STORED` |
+| PostgreSQL | 支持 | 是 (17+) | 12+ | `GENERATED ALWAYS AS (...) {VIRTUAL\|STORED}` |
 | MySQL | 支持 | 支持 (默认) | 5.7.6+ | `[GENERATED ALWAYS] AS (...) {VIRTUAL\|STORED}` |
 | MariaDB | 支持 | 支持 (默认) | 5.2+ / 10.2+ | `{GENERATED ALWAYS\|} AS (...) {VIRTUAL\|STORED\|PERSISTENT}` |
 | SQLite | 支持 | 支持 (默认) | 3.31.0+ | `[GENERATED ALWAYS] AS (...) {VIRTUAL\|STORED}` |
@@ -160,7 +160,7 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 
 ### PostgreSQL 12+
 
-PostgreSQL 仅支持 STORED 生成列。表达式中的函数必须标记为 `IMMUTABLE`。
+PostgreSQL 12+ 支持 STORED 生成列，17+ 新增 VIRTUAL 支持。表达式中的函数必须标记为 `IMMUTABLE`。
 
 ```sql
 CREATE TABLE users (
@@ -186,13 +186,7 @@ CREATE INDEX idx_lower_email ON users (lower(email));
 ALTER TABLE users ADD COLUMN name_length INT GENERATED ALWAYS AS (length(first_name) + length(last_name)) STORED;
 ```
 
-PostgreSQL 不支持 VIRTUAL 列的原因：
-1. 元组格式假设每列都有物理存储
-2. 表达式索引 (`CREATE INDEX ON t ((a + b))`) 已覆盖主要场景
-3. VIEW 可作为替代方案
-4. 需修改存储层、执行器、pg_dump、逻辑复制等多个组件
-
-PostgreSQL 17（2024 年 9 月发布）已支持 VIRTUAL 生成列。
+PostgreSQL 17（2024 年 9 月发布）新增了 VIRTUAL 生成列支持。在此之前，表达式索引 (`CREATE INDEX ON t ((a + b))`) 和 VIEW 可作为 VIRTUAL 列的替代方案。
 
 ### MySQL 5.7.6+
 
@@ -884,7 +878,7 @@ CREATE INDEX idx ON t ((a + b));  -- PostgreSQL 表达式索引
 |------|---------|------|
 | 读多写少，表达式复杂 | STORED | 避免重复计算，读性能最优 |
 | 写多读少 | VIRTUAL | 不影响写入吞吐 |
-| 需要索引且引擎只支持 STORED | STORED | PostgreSQL、DB2 等只支持 STORED |
+| 需要索引且引擎只支持 STORED | STORED | DB2、SAP HANA 等只支持 STORED |
 | 简单拼接（如全名） | VIRTUAL | 计算代价极低 |
 | JSON 字段提取并索引 | VIRTUAL + INDEX | MySQL/Oracle 中效果最佳 |
 | 磁盘空间敏感 | VIRTUAL | 零额外存储 |
@@ -922,7 +916,7 @@ UPDATE users SET first_name = '李' WHERE id = 1;
 
 1. **语法分裂严重**: 同一概念至少有 6 种关键字变体 (STORED / PERSISTED / MATERIALIZED / PERSISTENT / VIRTUAL / ALIAS / COMPUTED BY)，移植 DDL 时需逐一转换。
 
-2. **STORED vs VIRTUAL 能力不对称**: PostgreSQL/DB2/SAP HANA 只支持 STORED；Oracle 只支持 VIRTUAL；MySQL/MariaDB/SQL Server/CockroachDB 两者都支持。没有任何引擎完全对称地实现了这两种模式的所有功能。
+2. **STORED vs VIRTUAL 能力不对称**: DB2/SAP HANA 只支持 STORED；Oracle 只支持 VIRTUAL；PostgreSQL (17+)/MySQL/MariaDB/SQL Server/CockroachDB 两者都支持。没有任何引擎完全对称地实现了这两种模式的所有功能。
 
 3. **云原生数据仓库普遍不支持**: Snowflake、BigQuery、Redshift、Azure Synapse、Firebolt、Yellowbrick 等分析型引擎均不提供生成列，因为列式存储引擎更倾向于通过物化视图或 VIEW 来实现类似功能。
 
