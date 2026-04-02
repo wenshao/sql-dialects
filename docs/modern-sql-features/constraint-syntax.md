@@ -27,9 +27,9 @@ ON UPDATE { CASCADE | SET NULL | SET DEFAULT | RESTRICT | NO ACTION }
 - `SET NULL`：将外键列设为 NULL
 - `SET DEFAULT`：将外键列设为默认值
 
-### SQL:2003 扩展
+### SQL:1992 扩展
 
-SQL:2003 增加了约束的可延迟特性：
+SQL:1992 增加了约束的可延迟特性：
 
 ```sql
 CONSTRAINT fk_order_customer
@@ -103,7 +103,7 @@ CONSTRAINT fk_order_customer
 | MySQL (InnoDB) | 支持 | 支持 | 支持 | 不支持 | 支持 | 支持 | 强制 |
 | MariaDB (InnoDB) | 支持 | 支持 | 支持 | 不支持 | 支持 | 支持 | 强制 |
 | SQLite | 支持 | 支持 | 支持 | 支持 | 支持 | 支持 | 需 `PRAGMA foreign_keys=ON` |
-| Oracle | 支持 | 支持 | 支持 | 不支持 | 不支持(用 NO ACTION) | 支持 | 强制 |
+| Oracle | 支持 | 仅 ON DELETE CASCADE（不支持 ON UPDATE CASCADE） | 支持 | 不支持 | 不支持(用 NO ACTION) | 支持 | 强制 |
 | SQL Server | 支持 | 支持 | 支持 | 支持 | 不支持(用 NO ACTION) | 支持 | 强制 |
 | DB2 | 支持 | 支持 | 支持 | 不支持 | 支持 | 支持 | 强制 |
 | Snowflake | 支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不强制 |
@@ -120,7 +120,7 @@ CONSTRAINT fk_order_customer
 | Teradata | 支持 | 支持 | 支持 | 不支持 | 支持 | 支持 | 强制 |
 | Greenplum | 支持 | 支持 | 支持 | 支持 | 支持 | 支持 | 强制(7.0+) |
 | CockroachDB | 支持 | 支持 | 支持 | 支持 | 支持 | 支持 | 强制 |
-| TiDB | 支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不强制(解析但不执行) |
+| TiDB | 支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | v6.6+ 可强制(`tidb_enable_foreign_key=ON`，默认不强制) |
 | OceanBase | 支持 | 支持 | 支持 | 不支持 | 支持 | 支持 | 强制(MySQL 模式) |
 | YugabyteDB | 支持 | 支持 | 支持 | 支持 | 支持 | 支持 | 强制 |
 | SingleStore | 支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 | 不强制(解析但不执行) |
@@ -241,6 +241,8 @@ CONSTRAINT fk_order_customer
 | Yellowbrick | 不支持 | - | - | - | - |
 | Firebolt | 不支持 | - | - | - | - |
 
+> 注意：PostgreSQL 的 CHECK 约束不支持 DEFERRABLE，始终为 IMMEDIATE 检查。只有 UNIQUE、PRIMARY KEY、EXCLUDE 和 FOREIGN KEY 约束支持延迟。
+
 ## NOT NULL 与 DEFAULT 支持矩阵
 
 | 引擎 | NOT NULL | DEFAULT 常量 | DEFAULT 表达式 | DEFAULT 序列/函数 |
@@ -306,7 +308,7 @@ CONSTRAINT fk_order_customer
 | ClickHouse | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | Teradata | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | Greenplum | 支持(继承 PG) | 支持 | 不支持 | 支持(NOT VALID) | 不支持 |
-| CockroachDB | 不支持 | 不支持 | 不支持 | 支持(NOT VALID) | 不支持 |
+| CockroachDB | 不支持 | 支持(FK, v22.1+) | 不支持 | 支持(NOT VALID) | 不支持 |
 | TiDB | 不支持 | 不支持 | 不支持 | 不支持 | 支持(FK 不强制) |
 | OceanBase | 不支持 | 支持(Oracle 模式) | 支持(Oracle 模式) | 支持(Oracle 模式) | 不支持 |
 | YugabyteDB | 不支持 | 支持 | 不支持 | 不支持 | 不支持 |
@@ -757,7 +759,7 @@ ALTER TABLE orders ADD CONSTRAINT fk_orders_product
     FOREIGN KEY (product_id) REFERENCES products(id) NOT VALID;
 ALTER TABLE orders VALIDATE CONSTRAINT fk_orders_product;
 
--- 注意：CockroachDB 不支持 DEFERRABLE 约束
+-- 注意：CockroachDB v22.1+ 支持 DEFERRABLE 外键约束
 -- 也不支持 EXCLUDE 约束
 ```
 
@@ -1175,7 +1177,8 @@ CREATE TABLE orders (
 |------|------|------|
 | **完全强制** | PostgreSQL, Oracle, SQL Server, DB2, MySQL(InnoDB), MariaDB, CockroachDB, YugabyteDB, DuckDB, Firebird, H2, HSQLDB, Derby, SAP HANA, Teradata, Greenplum, OceanBase, MonetDB, TimescaleDB, Informix, Google Spanner | 约束在 DML 时实时检查并拒绝违规数据 |
 | **信息性约束** | Snowflake, BigQuery, Redshift, Azure Synapse, Vertica, Exasol, Hive, Databricks, Impala, Firebolt, Yellowbrick, Flink SQL | 接受约束语法但不执行，仅供优化器使用 |
-| **无约束支持** | ClickHouse(仅CHECK), Trino, Presto, Amazon Athena, QuestDB, InfluxDB, DatabendDB, CrateDB(仅PK) | 不支持或仅支持极少约束类型 |
+| **最小约束支持** | ClickHouse(CHECK, 22.6+), CrateDB(仅PK) | 仅支持极少约束类型 |
+| **无约束支持** | Trino, Presto, Amazon Athena, QuestDB, InfluxDB, DatabendDB | 不支持约束 |
 
 ### 2. 外键是分布式数据库的分水岭
 
@@ -1202,7 +1205,7 @@ EXCLUDE 约束用 GiST 索引实现范围/几何不重叠检查，目前只有 P
 
 ### 6. 可延迟约束的采用率较低
 
-尽管 SQL:2003 标准定义了 DEFERRABLE 约束，但实际支持的引擎有限：PostgreSQL、Oracle、SQLite（有限）、YugabyteDB、OceanBase（Oracle 模式）、Firebird、HSQLDB、Greenplum。MySQL、SQL Server、DB2（LUW）、CockroachDB 等主流引擎均不支持。可延迟约束最常见的使用场景是循环引用和批量数据加载。
+尽管 SQL:1992 标准就已定义了 DEFERRABLE 约束，但实际支持的引擎有限：PostgreSQL、Oracle、SQLite（有限）、YugabyteDB、OceanBase（Oracle 模式）、Firebird、HSQLDB、Greenplum、CockroachDB（v22.1+ FK）。MySQL、SQL Server、DB2（LUW）等主流引擎均不支持。可延迟约束最常见的使用场景是循环引用和批量数据加载。
 
 ### 7. 流处理引擎中 PRIMARY KEY 的语义变化
 
