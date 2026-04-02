@@ -76,7 +76,7 @@ ISO/IEC 9075 SQL 标准（包括 SQL:2023）中没有定义任何批量导入导
 
 | 引擎 | 外部表语法 | 可写外部表 | 典型数据源 | 版本 |
 |------|------|:---:|------|------|
-| Oracle | `CREATE TABLE ... ORGANIZATION EXTERNAL` | ❌ (Oracle 12c+ 可写) | 本地文件 | 9iR2+ |
+| Oracle | `CREATE TABLE ... ORGANIZATION EXTERNAL` | ❌ (Oracle 10gR2+ 可写，ORACLE_DATAPUMP 驱动) | 本地文件 | 9iR2+ |
 | Hive | `CREATE EXTERNAL TABLE` | ✅ | HDFS, S3 | 0.5+ |
 | Spark SQL | `CREATE TABLE ... USING` | ✅ | 文件, JDBC, 任意 | 2.0+ |
 | Trino | Connector 架构 | 部分 | 任意 | 早期 |
@@ -203,7 +203,7 @@ ISO/IEC 9075 SQL 标准（包括 SQL:2023）中没有定义任何批量导入导
 
 | 引擎 | 导出语法 | 输出格式 | 支持压缩 | 可导出查询结果 |
 |------|------|------|:---:|:---:|
-| PostgreSQL | `COPY ... TO` / `\copy ... TO` | CSV, text, binary | ❌ | ✅ |
+| PostgreSQL | `COPY ... TO` / `\copy ... TO` | CSV, text, binary | 是 (16+, gzip) | ✅ |
 | MySQL | `SELECT ... INTO OUTFILE` | CSV, TSV | ❌ | ✅ |
 | MariaDB | `SELECT ... INTO OUTFILE` | CSV, TSV | ❌ | ✅ |
 | SQL Server | `bcp ... out` / `OPENROWSET` | CSV, native | ❌ | ✅ |
@@ -308,7 +308,7 @@ ISO/IEC 9075 SQL 标准（包括 SQL:2023）中没有定义任何批量导入导
 
 | 引擎 | gzip | zstd | snappy | lz4 | bzip2 | 自动检测 |
 |------|:---:|:---:|:---:|:---:|:---:|:---:|
-| PostgreSQL | ❌ (需外部管道) | ❌ | ❌ | ❌ | ❌ | ❌ |
+| PostgreSQL | 是 (16+) | ❌ | ❌ | ❌ | ❌ | ❌ |
 | MySQL | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | SQL Server | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Oracle | ❌ (Data Pump 支持) | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -1380,7 +1380,7 @@ Derby: SYSCS_UTIL.SYSCS_IMPORT_TABLE 系统过程
 
 8. **MySQL 生态兼容性最广**。TiDB、OceanBase、SingleStore、StarRocks（有限）都兼容 `LOAD DATA INFILE` 语法。PostgreSQL 生态的 COPY 兼容性也很好——Greenplum、YugabyteDB、TimescaleDB、CockroachDB、Materialize 都支持。选择加载语法时，生态兼容性是重要考量。
 
-9. **压缩支持两极化**。传统数据库（PostgreSQL、MySQL、SQL Server）不原生支持压缩文件加载（需外部管道 `gunzip < file.csv.gz | psql -c "COPY ..."`）。云和大数据引擎普遍支持 gzip/zstd/snappy 等多种压缩格式并可自动检测。这一差异在 TB 级数据迁移中尤为关键。
+9. **压缩支持两极化**。传统数据库（MySQL、SQL Server）不原生支持压缩文件加载（需外部管道）。PostgreSQL 16+ 新增了原生 gzip 压缩支持。云和大数据引擎普遍支持 gzip/zstd/snappy 等多种压缩格式并可自动检测。这一差异在 TB 级数据迁移中尤为关键。
 
 10. **导出能力普遍弱于导入**。多数引擎在导入方面投入了大量优化，但导出命令往往功能有限。Redshift 的 `UNLOAD`、BigQuery 的 `EXPORT DATA`、Snowflake 的 `COPY INTO @stage` 是设计较完善的导出方案。CockroachDB 的 `EXPORT INTO` 支持直接导出 Parquet 到云存储，代表了现代设计趋势。
 
