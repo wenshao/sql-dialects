@@ -38,7 +38,7 @@ CREATE TRIGGER <trigger_name>
 
 | 引擎 | BEFORE | AFTER | INSTEAD OF | 版本 |
 |------|:---:|:---:|:---:|------|
-| PostgreSQL | ✅ | ✅ | ✅ (视图) | 7.0+ |
+| PostgreSQL | ✅ | ✅ | ✅ (视图, 9.1+) | 7.0+ |
 | MySQL | ✅ | ✅ | ❌ | 5.0.2+ |
 | MariaDB | ✅ | ✅ | ❌ | 5.0+ |
 | SQLite | ✅ | ✅ | ✅ (视图) | 3.0+ |
@@ -88,7 +88,7 @@ CREATE TRIGGER <trigger_name>
 | Yellowbrick | ❌ | ❌ | ❌ | -- |
 | Firebolt | ❌ | ❌ | ❌ | -- |
 
-> 统计：约 18 个引擎支持某种形式的触发器，约 31 个引擎完全不支持。SQL Server 是唯一不支持 BEFORE 触发器的主流 OLTP 数据库，但通过 INSTEAD OF 触发器可实现类似效果。
+> 统计：约 19 个引擎支持某种形式的触发器，约 30 个引擎完全不支持。SQL Server 是唯一不支持 BEFORE 触发器的主流 OLTP 数据库，但通过 INSTEAD OF 触发器可实现类似效果。
 
 ### 触发事件（Event）
 
@@ -534,7 +534,7 @@ END;
 -- 语句级触发器
 CREATE OR REPLACE TRIGGER trg_orders_stmt
 BEFORE INSERT ON orders
-FOR EACH STATEMENT
+-- Oracle 语句级：省略 FOR EACH ROW 即为语句级（不使用 FOR EACH STATEMENT 关键字）
 BEGIN
     -- 语句级逻辑：例如检查时间窗口
     IF TO_CHAR(SYSDATE, 'HH24') NOT BETWEEN '08' AND '18' THEN
