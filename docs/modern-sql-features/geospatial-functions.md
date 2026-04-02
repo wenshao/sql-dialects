@@ -130,7 +130,7 @@ GEOMETRY vs GEOGRAPHY:
 | 函数 | PostGIS | MySQL 8.0 | SQL Server | Oracle | BigQuery | Snowflake | DuckDB | ClickHouse | Trino |
 |------|---------|-----------|------------|--------|----------|-----------|--------|------------|-------|
 | ST_Point(x,y) | 是 | 是 (8.0.12+) | 方法 | 否 | ST_GEOGPOINT | 是 | 是 | 否 | 否 |
-| ST_MakePoint(x,y) | 是 | 否 | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
+| ST_MakePoint(x,y) | 是 | 否 | 否 | 否 | 否 | 是 | 否 | 否 | 否 |
 | ST_GeomFromText(WKT) | 是 | 是 | 静态方法 | SDO_GEOMETRY | ST_GEOGFROMTEXT | 是 | 是 | 否 | ST_GeometryFromText |
 | ST_GeomFromWKB(WKB) | 是 | 是 | 静态方法 | 否 | ST_GEOGFROMWKB | 是 | 是 | 否 | 否 |
 | ST_GeomFromGeoJSON | 是 | 是 (8.0+) | 否 | 否 | ST_GEOGFROMGEOJSON | 是 | 是 | 否 | 否 |
