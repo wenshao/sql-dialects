@@ -201,7 +201,7 @@ SQL 标准（SQL:1999 ISO/IEC 9075、SQL:2003、SQL:2016）定义了以下类型
 | H2 | ✅ `REAL` 4B | ✅ = `double` | ✅ `DOUBLE PRECISION` 8B | 同 SQL 标准 | -- |
 | HSQLDB | ✅ `REAL` 4B | ✅ = `double` | ✅ `DOUBLE` 8B | 同 SQL 标准 | -- |
 | Derby | ✅ `REAL` 4B | ✅ 8B | ✅ `DOUBLE` 8B | FLOAT = DOUBLE | -- |
-| Amazon Athena | ✅ `REAL` 4B | ❌ | ✅ `DOUBLE` 8B | 同 Trino | -- |
+| Amazon Athena | ✅ `REAL` 4B | ✅ (REAL 别名) | ✅ `DOUBLE` 8B | 同 Trino | FLOAT 是 REAL 的别名 |
 | Azure Synapse | ✅ `REAL` 4B | ✅ = `float(53)` | ✅ `float(53)` 8B | 同 SQL Server | -- |
 | Google Spanner | ❌ | ❌ | ✅ `FLOAT64` 8B | 仅 FLOAT64; FLOAT32 预览中 | -- |
 | Materialize | ✅ `real` 4B | ✅ = `float8` | ✅ `double precision` 8B | 同 PG | -- |
