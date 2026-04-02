@@ -225,7 +225,7 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | H2 | 支持 | 支持 | 支持 | 支持 | 2.0+ |
 | HSQLDB | 支持 | 不支持 | 支持 | 不支持 | 2.5+ |
 | Derby | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
-| Amazon Athena | 支持 | 不支持 | 支持 | 不支持 | 继承 Trino |
+| Amazon Athena | 支持 | 支持 | 支持 | 不支持 | 继承 Trino |
 | Azure Synapse | 不支持 | 不支持 | 不支持 | 不支持 | 需 CASE WHEN 模拟 |
 | Google Spanner | 支持 | 支持 | 不支持 | 不支持 | `LOGICAL_AND`/`LOGICAL_OR` |
 | Materialize | 支持 | 支持 | 不支持 | 不支持 | 继承 PG |
