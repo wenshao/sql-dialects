@@ -110,7 +110,7 @@ ISO/IEC 9075 SQL 标准（包括 SQL:2023）中没有定义任何批量导入导
 | Snowflake | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | XML |
 | BigQuery | ✅ | ❌ | ✅ (NDJSON) | ✅ | ✅ | ✅ | Datastore Backup |
 | Redshift | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Shapefile |
-| DuckDB | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | Excel, SQLite |
+| DuckDB | ✅ | ✅ | ✅ | ✅ | ✅ (扩展, 0.10+) | ❌ | Excel, SQLite |
 | ClickHouse | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 70+ 格式 (Arrow, MsgPack, Protobuf 等) |
 | Trino | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | RCFile |
 | Presto | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | RCFile |
