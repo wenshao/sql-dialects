@@ -40,7 +40,7 @@ SQL 标准（SQL:1999 ISO/IEC 9075、SQL:2003、SQL:2016）定义了以下类型
 | DB2 | ❌ | ✅ 2B | ✅ 4B | ✅ 8B | ❌ | ❌ | ❌ | -- |
 | Snowflake | ✅ 别名 | ✅ 别名 | ✅ 别名 | ✅ 别名 | ❌ | ❌ | ❌ | 全部映射到 NUMBER(38,0) |
 | BigQuery | ❌ | ❌ | ✅ `INT64` | ✅ `INT64` | ❌ | ❌ | ❌ | INT 是 INT64 别名 |
-| Redshift | ✅ 别名 | ✅ 2B | ✅ 4B | ✅ 8B | ❌ | ❌ | ❌ | -- |
+| Redshift | ❌ | ✅ 2B | ✅ 4B | ✅ 8B | ❌ | ❌ | ❌ | 最小整数类型为 SMALLINT |
 | DuckDB | ✅ 1B | ✅ 2B | ✅ 4B | ✅ 8B | ✅ 16B | ❌ | ✅ `UTINYINT` 等 | 0.3+ |
 | ClickHouse | ✅ `Int8` | ✅ `Int16` | ✅ `Int32` | ✅ `Int64` | ❌ | ✅ `Int128`/`Int256` | ✅ `UInt8` 等 | 全版本 |
 | Trino | ✅ 1B | ✅ 2B | ✅ 4B | ✅ 8B | ❌ | ❌ | ❌ | -- |
@@ -173,8 +173,8 @@ SQL 标准（SQL:1999 ISO/IEC 9075、SQL:2003、SQL:2016）定义了以下类型
 | Redshift | ✅ `REAL` 4B | ✅ = `float8` | ✅ `DOUBLE PRECISION` 8B | 同 PG | -- |
 | DuckDB | ✅ `REAL` 4B | ✅ = `float` | ✅ `DOUBLE` 8B | -- | -- |
 | ClickHouse | ✅ `Float32` | ✅ = `Float64` | ✅ `Float64` | -- | -- |
-| Trino | ✅ `REAL` 4B | ❌ (不接受 FLOAT) | ✅ `DOUBLE` 8B | -- | 必须使用 REAL / DOUBLE |
-| Presto | ✅ `REAL` 4B | ❌ | ✅ `DOUBLE` 8B | -- | 同 Trino |
+| Trino | ✅ `REAL` 4B | ✅ (REAL 别名) | ✅ `DOUBLE` 8B | -- | FLOAT 是 REAL 的别名 |
+| Presto | ✅ `REAL` 4B | ✅ (REAL 别名) | ✅ `DOUBLE` 8B | -- | FLOAT 是 REAL 的别名 |
 | Spark SQL | ✅ `FLOAT` 4B | ✅ 4B | ✅ `DOUBLE` 8B | -- | -- |
 | Hive | ✅ `FLOAT` 4B | ✅ 4B | ✅ `DOUBLE` 8B | -- | -- |
 | Flink SQL | ✅ `FLOAT` 4B | ✅ 4B | ✅ `DOUBLE` 8B | -- | -- |
@@ -356,7 +356,7 @@ SQL 标准（SQL:1999 ISO/IEC 9075、SQL:2003、SQL:2016）定义了以下类型
 | SQLite | ❌ | INTEGER (0/1) | `TRUE`=1, `FALSE`=0 | 整数 0/1 | 3.23.0+ 识别 TRUE/FALSE |
 | Oracle | ❌ | -- | ❌ | `NUMBER(1)` / `CHAR(1)` | PL/SQL 有 BOOLEAN，SQL 不支持 (23c 引入) |
 | SQL Server | ✅ `BIT` | 1 位 | `1`/`0` | `BIT` | BIT 可存 0、1、NULL |
-| DB2 | ✅ | 1 字节 | `TRUE`/`FALSE` | -- | 9.7+ |
+| DB2 | ✅ | 1 字节 | `TRUE`/`FALSE` | -- | 11.1+ |
 | Snowflake | ✅ | 1 字节 | `TRUE`/`FALSE` | -- | -- |
 | BigQuery | ✅ `BOOL` | -- | `TRUE`/`FALSE` | -- | -- |
 | Redshift | ✅ | 1 字节 | `TRUE`/`FALSE`, `'t'`/`'f'` | -- | -- |
