@@ -273,7 +273,7 @@ DECODE 是 Oracle 在 SQL 标准 CASE 出现之前的条件表达式。其语义
 | Exasol | 是 | 是 | Oracle 兼容 | 6.0+ |
 | SAP HANA | 是 | 是 | Oracle 兼容 | 1.0+ |
 | Informix | 是 | 否 | 有限支持 | 12.10+ |
-| Firebird | 是 | 否 | 仅 PSQL 内部函数 | 2.1+ |
+| Firebird | -- | -- | 不支持 (DECODE 仅为 PSQL 过程语言内部函数，非 SQL 表达式) | -- |
 | H2 | 是 | 否 | Oracle 兼容模式 | 1.0+ |
 | HSQLDB | 是 | 否 | Oracle 兼容模式 | 2.3+ |
 | Derby | -- | -- | 不支持 | -- |
