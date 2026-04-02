@@ -296,7 +296,6 @@ CLOSE <cursor_name>;
 | HSQLDB | ✅ | 无限制 | 2.0+ |
 | SingleStore | ✅ | 无限制 | 6.0+ |
 | TiDB | ✅ | 无限制 | 2.1+ |
-| MariaDB | ✅ | 无限制 | 5.0+ |
 
 > 关键差异：Oracle 和 OceanBase（Oracle 模式）在 PL/SQL 块中不允许直接写静态 DDL（如 `CREATE TABLE`），必须通过 `EXECUTE IMMEDIATE` 执行。这是 PL/SQL 的设计约束——编译器无法在编译期验证 DDL 语句的语义。
 
@@ -420,7 +419,7 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 ```
 
-> 注意：MySQL 的 `PREPARE` 只能使用用户变量（`@var`），不能使用局部变量。参数标记只有 `?`（位置参数），不支持命名参数。每个 `PREPARE` 只能包含一条 SQL 语句。
+> 注意：MySQL 的 `PREPARE` 在 8.0.22 前仅支持用户变量（`@var`），8.0.22+ 支持局部变量。参数标记只有 `?`（位置参数），不支持命名参数。每个 `PREPARE` 只能包含一条 SQL 语句。
 
 ### MariaDB — EXECUTE IMMEDIATE (10.2.3+)
 
