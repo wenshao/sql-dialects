@@ -41,7 +41,7 @@ END
 | MySQL | `@var` | `SET @var = val` / `SELECT @var := val` | 会话 | 动态类型 | 3.23+ |
 | MariaDB | `@var` | `SET @var = val` / `SELECT @var := val` | 会话 | 动态类型 | 5.1+ |
 | SQLite | 无 | 无 | — | — | — |
-| Oracle | 无 SQL 级用户变量 | PL/SQL `VARIABLE` / `DEFINE`（SQL*Plus） | 会话（SQL*Plus） | 按声明 | — |
+| Oracle | 无 SQL 级用户变量 | SQL*Plus `VARIABLE` / `DEFINE`; PL/SQL `DECLARE` | 会话（SQL*Plus） | 按声明 | — |
 | SQL Server | `@var`（局部变量） | `DECLARE @var TYPE; SET @var = val` | 批处理 | 静态类型 | 2000+ |
 | DB2 | 无 SQL 级用户变量 | `CREATE VARIABLE`（模块变量，9.7+） | 会话 | 静态类型 | 9.7+ |
 | Snowflake | `$var`（会话变量） | `SET var = val` | 会话 | 动态类型 | GA |
@@ -944,7 +944,7 @@ END;
 -- 脚本结束后，threshold 和 filtered 均不可用
 ```
 
-- **会话模式**（2022 GA）: BigQuery 引入了实验性会话支持。通过 `bq query --create_session` 创建会话，后续查询可引用会话内的临时表和变量
+- **会话模式**（2022 GA）: BigQuery 引入了会话支持。通过 `bq query --create_session` 创建会话，后续查询可引用会话内的临时表和变量
 - **系统变量**: `@@time_zone`、`@@dataset_id` 等仅在脚本内通过 SET 设置
 - **核心限制**: 无 `SET SESSION`、无 `SHOW VARIABLES`、无 `ALTER SESSION`
 
