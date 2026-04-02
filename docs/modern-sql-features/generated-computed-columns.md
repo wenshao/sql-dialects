@@ -8,10 +8,11 @@ SQL:2003 (ISO/IEC 9075-2:2003) Section 11.4 定义了 **generation clause**:
 
 ```sql
 -- SQL:2003 标准语法
-column_name data_type GENERATED ALWAYS AS (expression) [STORED | VIRTUAL]
+column_name data_type GENERATED ALWAYS AS (expression)
 ```
 
 标准要求：
+- `STORED` / `VIRTUAL` 关键字不是 SQL:2003 标准的一部分，而是各引擎的供应商扩展
 - 表达式必须是确定性的 (deterministic)
 - 不能包含子查询、聚合函数或窗口函数
 - 不能引用其他生成列（标准未明确，各引擎实现不同）
@@ -30,13 +31,13 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 | MariaDB | 支持 | 支持 (默认) | 5.2+ / 10.2+ | `{GENERATED ALWAYS\|} AS (...) {VIRTUAL\|STORED\|PERSISTENT}` |
 | SQLite | 支持 | 支持 (默认) | 3.31.0+ | `[GENERATED ALWAYS] AS (...) {VIRTUAL\|STORED}` |
 | Oracle | 不支持 | 支持 (仅) | 11g R1+ | `[column_name] [type] AS (expr) [VIRTUAL]` |
-| SQL Server | 支持 (PERSISTED) | 支持 (默认) | 2005+ | `AS (expr) [PERSISTED]` |
+| SQL Server | 支持 (PERSISTED) | 支持 (默认) | 2000+ (PERSISTED: 2005+) | `AS (expr) [PERSISTED]` |
 | DB2 (LUW) | 支持 | 不支持 | 9.5+ | `GENERATED ALWAYS AS (expr)` |
 | Snowflake | 不支持 | 不支持 | - | 无原生支持（用 VIEW / SECURE VIEW 替代） |
 | BigQuery | 不支持 | 不支持 | - | 无原生支持（用 VIEW 替代） |
 | Redshift | 不支持 | 不支持 | - | 无原生支持 |
 | DuckDB | 支持 | 支持 | 0.8.0+ | `[GENERATED ALWAYS] AS (expr) [VIRTUAL\|STORED]` |
-| ClickHouse | 支持 (MATERIALIZED) | 支持 (ALIAS) | 20.1+ | `MATERIALIZED expr` / `ALIAS expr` |
+| ClickHouse | 支持 (MATERIALIZED) | 支持 (ALIAS) | 早期版本 | `MATERIALIZED expr` / `ALIAS expr` |
 | Trino | 不支持 | 不支持 | - | 无原生支持 |
 | Presto | 不支持 | 不支持 | - | 无原生支持 |
 | Spark SQL | 支持 | 不支持 | 3.3+ (Delta Lake) | `GENERATED ALWAYS AS (expr)` |
@@ -58,7 +59,7 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 | CrateDB | 支持 | 不支持 | 4.0+ | `GENERATED ALWAYS AS (expr)` |
 | TimescaleDB | 支持 | 不支持 | (PG12+ base) | `GENERATED ALWAYS AS (...) STORED` (继承 PostgreSQL) |
 | QuestDB | 不支持 | 不支持 | - | 无原生支持 |
-| Exasol | 支持 | 支持 | 7.0+ | `[type] DEFAULT expr` (virtual) / 物化需通过 VIEW |
+| Exasol | 不支持 | 支持 | 7.0+ | `[type] DEFAULT expr` (virtual) |
 | SAP HANA | 支持 | 不支持 | 2.0 SPS 03+ | `GENERATED ALWAYS AS (expr)` |
 | Informix | 不支持 | 不支持 | - | 无原生支持（用 VIEW 替代） |
 | Firebird | 支持 | 支持 | 3.0+ | `GENERATED ALWAYS AS (expr)` / `COMPUTED [BY] (expr)` |
@@ -132,7 +133,7 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 | SingleStore | 支持 (PERSISTED) | 支持 (PERSISTED) | 支持 (PERSISTED) | 支持 |
 | StarRocks | 支持 | 不支持 | 不适用 | 支持 |
 | H2 | 支持 | 不支持 | 不支持 | 支持 |
-| Firebird | 支持 (STORED 3.0+) | 不支持 | 不支持 | 支持 |
+| Firebird | 支持 (VIRTUAL 3.0+) | 不支持 | 不支持 | 支持 |
 | SAP HANA | 支持 | 不支持 | 不支持 | 支持 |
 | CrateDB | 支持 | 不支持 | 不适用 (无外键) | 支持 |
 
@@ -191,7 +192,7 @@ PostgreSQL 不支持 VIRTUAL 列的原因：
 3. VIEW 可作为替代方案
 4. 需修改存储层、执行器、pg_dump、逻辑复制等多个组件
 
-PostgreSQL 17 仍未支持 VIRTUAL 列，社区有活跃的补丁在开发中。
+PostgreSQL 17（2024 年 9 月发布）已支持 VIRTUAL 生成列。
 
 ### MySQL 5.7.6+
 
@@ -327,7 +328,7 @@ BEGIN RETURN amount * 0.08; END;
 ALTER TABLE orders ADD tax_amount NUMBER AS (tax_rate(total_amount));
 ```
 
-### SQL Server 2005+ (计算列)
+### SQL Server 2000+ (计算列)
 
 SQL Server 使用 "Computed Column" 术语。默认为非 PERSISTED（类似 VIRTUAL），添加 `PERSISTED` 关键字后持久化。
 
@@ -390,7 +391,7 @@ REORG TABLE users;
 CREATE INDEX idx_full_name ON users(full_name);
 ```
 
-### ClickHouse 20.1+
+### ClickHouse
 
 ClickHouse 使用 `MATERIALIZED`（写入时计算，物理存储）和 `ALIAS`（查询时计算，虚拟）。
 
