@@ -169,7 +169,7 @@ SQL/PGQ:
 | OceanBase | ✅ | ❌ | ❌ | 手动 | 1000 | 良好 |
 | YugabyteDB | ✅ | ❌ | ❌ | 手动 | 无限制 | 良好 |
 | SingleStore | ❌ | -- | -- | -- | -- | 不可行 |
-| Vertica | ❌ | -- | -- | -- | -- | 不可行 |
+| Vertica | ✅ | ❌ | ❌ | 手动 | 无限制 | 良好 |
 | Impala | ❌ | -- | -- | -- | -- | 不可行 |
 | StarRocks | ❌ | -- | -- | -- | -- | 不可行 |
 | Doris | ❌ | -- | -- | -- | -- | 不可行 |
@@ -204,7 +204,7 @@ Oracle CONNECT BY 是最早的 SQL 层级/图遍历方案（1979 年），后被
 |------|-----------|------------|-----------|---------------------|----------------|-------------------|-------|---------|------|
 | Oracle | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 2+ (1979) |
 | DB2 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | 9.7+ |
-| Databricks | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | Runtime 7+ |
+| Databricks | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | Runtime 11.2+ |
 | Snowflake | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | GA |
 | OceanBase | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | Oracle 模式 |
 | SAP HANA | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | 1.0+ |
@@ -602,7 +602,8 @@ SELECT * FROM reachable;
 
 ```sql
 -- 使用递归 CTE 模拟 BFS 最短路径
--- 关键: UNION (非 UNION ALL) 自动去重已访问节点
+-- 注意: 大多数引擎要求递归 CTE 使用 UNION ALL（不支持 UNION），
+-- 因此需要通过路径检查手动去重已访问节点，并在外层用 MIN(distance) 取最短距离
 WITH RECURSIVE bfs AS (
     SELECT
         vertex_id,
@@ -611,7 +612,7 @@ WITH RECURSIVE bfs AS (
     FROM vertices
     WHERE vertex_id = 1  -- 起点
 
-    UNION
+    UNION ALL
 
     SELECT
         v.vertex_id,
@@ -621,12 +622,13 @@ WITH RECURSIVE bfs AS (
     JOIN edges e ON b.vertex_id = e.source_id
     JOIN vertices v ON e.target_id = v.vertex_id
     WHERE b.distance < 10
+      AND b.path NOT LIKE '%' || CAST(v.vertex_id AS VARCHAR(10)) || '%'  -- 手动去重
 )
 SELECT vertex_id, MIN(distance) AS shortest_distance
 FROM bfs
 GROUP BY vertex_id;
 -- 注意: 严格来说这不是真正的 BFS，因为 CTE 的迭代顺序不保证广度优先
--- 但 UNION 去重 + MIN(distance) 可以得到正确的最短距离
+-- 但路径去重 + MIN(distance) 可以得到正确的最短距离
 ```
 
 #### PostgreSQL 14+ 循环检测语法
@@ -842,10 +844,10 @@ SELECT * FROM traverse;
 
 -- MySQL 8.0+: 字符串拼接路径
 WITH RECURSIVE traverse AS (
-    SELECT vertex_id, CAST(vertex_id AS CHAR(1000)) AS path
+    SELECT vertex_id, CAST(vertex_id AS CHAR(1000)) AS path, 0 AS depth
     FROM vertices WHERE vertex_id = 1
     UNION ALL
-    SELECT e.target_id, CONCAT(t.path, ',', e.target_id)
+    SELECT e.target_id, CONCAT(t.path, ',', e.target_id), t.depth + 1
     FROM traverse t
     JOIN edges e ON t.vertex_id = e.source_id
     WHERE FIND_IN_SET(e.target_id, t.path) = 0  -- CSV 风格循环检测
@@ -1117,13 +1119,14 @@ Tier 3 — 递归 CTE 图遍历 (完整支持):
   MySQL, MariaDB, SQLite, Snowflake, BigQuery, Redshift,
   TiDB, OceanBase, CockroachDB, YugabyteDB, Teradata,
   Greenplum, Exasol, SAP HANA, Informix, Firebird,
-  H2, HSQLDB, Derby, MonetDB, Yellowbrick, Materialize
+  H2, HSQLDB, Derby, MonetDB, Yellowbrick, Materialize,
+  Vertica
 
 Tier 4 — 仅 CONNECT BY (无递归 CTE):
   (无: 所有支持 CONNECT BY 的引擎都同时支持递归 CTE)
 
 Tier 5 — 无图遍历能力:
-  Hive, Spark SQL, Flink SQL, StarRocks, Doris, Vertica,
+  Hive, Spark SQL, Flink SQL, StarRocks, Doris,
   SingleStore, Impala, CrateDB, QuestDB, InfluxDB,
   Google Spanner, RisingWave, DatabendDB, Firebolt
   → 这些引擎需要在应用层处理图遍历，或将图结构预扁平化
