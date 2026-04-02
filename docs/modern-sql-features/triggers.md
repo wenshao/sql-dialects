@@ -1285,7 +1285,7 @@ Informix 的触发器语法较为独特：使用括号而非 BEGIN...END，BEFOR
 
 ## 关键发现
 
-1. **OLTP vs OLAP 的根本分界线**：触发器支持是 OLTP 和 OLAP 引擎之间最鲜明的分界线之一。所有传统 OLTP 数据库（PostgreSQL、MySQL、Oracle、SQL Server、DB2）都支持触发器，而几乎所有 OLAP/分析引擎都不支持。在 49 个被调查的引擎中，仅约 18 个支持触发器。
+1. **OLTP vs OLAP 的根本分界线**：触发器支持是 OLTP 和 OLAP 引擎之间最鲜明的分界线之一。所有传统 OLTP 数据库（PostgreSQL、MySQL、Oracle、SQL Server、DB2）都支持触发器，而几乎所有 OLAP/分析引擎都不支持。在 49 个被调查的引擎中，仅约 19 个支持触发器。
 
 2. **PostgreSQL 家族的一致性**：PostgreSQL 及其衍生引擎（Greenplum、TimescaleDB、YugabyteDB、CockroachDB）形成了触发器支持最统一的生态系统。所有这些引擎都使用触发器函数 + CREATE TRIGGER 的两步模型，语法高度兼容。
 
