@@ -38,7 +38,7 @@ SQL/MM Part 3 (Spatial):
 GEOMETRY vs GEOGRAPHY:
   GEOMETRY  -- 平面坐标系 (笛卡尔)，单位为坐标单位，计算快
   GEOGRAPHY -- 大地坐标系 (球面/椭球面)，单位为米/度，结果精确
-  大多数引擎仅支持 GEOMETRY；PostGIS、SQL Server、BigQuery 同时支持两者
+  大多数引擎仅支持 GEOMETRY；PostGIS、SQL Server 同时支持两者；BigQuery 仅支持 GEOGRAPHY
 ```
 
 ## 空间能力总览
@@ -49,7 +49,7 @@ GEOMETRY vs GEOGRAPHY:
 | MySQL | 中等 | 原生 (8.0+) | ~60 | 否 | R-Tree (InnoDB) |
 | MariaDB | 中等 | 原生 | ~60 | 否 | R-Tree |
 | SQLite + SpatiaLite | 强 | 扩展 (SpatiaLite) | 200+ | 否 | R-Tree |
-| Oracle Spatial | 极强 | 原生/选件 | 200+ | 是 (SDO_GEOMETRY) | R-Tree, Quadtree |
+| Oracle Spatial | 极强 | 原生/选件 | 200+ | 通过 SRID 区分 | R-Tree, Quadtree |
 | SQL Server | 强 | 原生 | ~80 | 是 | 空间网格索引 |
 | DB2 | 强 | Spatial Extender | ~70 | 是 | 网格索引 |
 | Snowflake | 中等 | 原生 | ~50 | 是 | 无显式索引 |
@@ -129,7 +129,7 @@ GEOMETRY vs GEOGRAPHY:
 
 | 函数 | PostGIS | MySQL 8.0 | SQL Server | Oracle | BigQuery | Snowflake | DuckDB | ClickHouse | Trino |
 |------|---------|-----------|------------|--------|----------|-----------|--------|------------|-------|
-| ST_Point(x,y) | 是 | 否 | 方法 | 否 | ST_GEOGPOINT | 是 | 是 | 否 | 否 |
+| ST_Point(x,y) | 是 | 是 (8.0.12+) | 方法 | 否 | ST_GEOGPOINT | 是 | 是 | 否 | 否 |
 | ST_MakePoint(x,y) | 是 | 否 | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
 | ST_GeomFromText(WKT) | 是 | 是 | 静态方法 | SDO_GEOMETRY | ST_GEOGFROMTEXT | 是 | 是 | 否 | ST_GeometryFromText |
 | ST_GeomFromWKB(WKB) | 是 | 是 | 静态方法 | 否 | ST_GEOGFROMWKB | 是 | 是 | 否 | 否 |
@@ -251,11 +251,11 @@ ClickHouse 特殊语法:
 
 | 函数 | PostGIS | MySQL 8.0 | SQL Server | Oracle | BigQuery | Snowflake | DuckDB | Trino |
 |------|---------|-----------|------------|--------|----------|-----------|--------|-------|
-| ST_Union | 是 | 是 | STUnion | SDO_GEOM.SDO_UNION | ST_UNION | 否 | 是 | 否 |
-| ST_Intersection | 是 | 是 | STIntersection | SDO_GEOM.SDO_INTERSECTION | ST_INTERSECTION | 否 | 是 | ST_Intersection |
-| ST_Difference | 是 | 是 | STDifference | SDO_GEOM.SDO_DIFFERENCE | ST_DIFFERENCE | 否 | 是 | ST_Difference |
+| ST_Union | 是 | 是 | STUnion | SDO_GEOM.SDO_UNION | ST_UNION | 是 (GEOGRAPHY) | 是 | 否 |
+| ST_Intersection | 是 | 是 | STIntersection | SDO_GEOM.SDO_INTERSECTION | ST_INTERSECTION | 是 (GEOGRAPHY) | 是 | ST_Intersection |
+| ST_Difference | 是 | 是 | STDifference | SDO_GEOM.SDO_DIFFERENCE | ST_DIFFERENCE | 是 (GEOGRAPHY) | 是 | ST_Difference |
 | ST_SymDifference | 是 | 是 | STSymDifference | SDO_GEOM.SDO_XOR | ST_SYMDIFFERENCE(间接) | 否 | 是 | ST_SymDifference |
-| ST_Buffer | 是 | 是 | STBuffer | SDO_GEOM.SDO_BUFFER | ST_BUFFER | 否 | 是 | ST_Buffer |
+| ST_Buffer | 是 | 是 | STBuffer | SDO_GEOM.SDO_BUFFER | ST_BUFFER | 是 (GEOGRAPHY) | 是 | ST_Buffer |
 | ST_Centroid | 是 | 是 | STCentroid | SDO_GEOM.SDO_CENTROID | ST_CENTROID | 是 | 是 | ST_Centroid |
 | ST_Envelope | 是 | 是 | STEnvelope | SDO_GEOM.SDO_MBR | ST_BOUNDINGBOX | 是 | 是 | ST_Envelope |
 | ST_ConvexHull | 是 | 是 | STConvexHull | SDO_GEOM.SDO_CONVEXHULL | ST_CONVEXHULL | 否 | 是 | ST_ConvexHull |
@@ -284,7 +284,7 @@ ClickHouse 特殊语法:
 | ST_SetSRID | 是 | ST_SRID(g,srid) | 否 | 否 | 不适用 | 是 | 是 | 否 | 否 |
 | ST_AsText (WKT) | 是 | 是 | STAsText | SDO_UTIL.TO_WKTGEOMETRY | ST_ASTEXT | 是 | 是 | 否 | ST_AsText |
 | ST_AsBinary (WKB) | 是 | 是 | STAsBinary | SDO_UTIL.TO_WKBGEOMETRY | ST_ASBINARY | 是 | 是 | 否 | 否 |
-| ST_AsGeoJSON | 是 | 是 (8.0+) | 否 | SDO_UTIL.TO_GEOJSON | ST_ASGEOJSON | 是 | 是 | 否 | ST_AsText (无) |
+| ST_AsGeoJSON | 是 | 是 (8.0+) | 是 (2016+) | SDO_UTIL.TO_GEOJSON | ST_ASGEOJSON | 是 | 是 | 否 | ST_AsText (无) |
 | ST_AsKML | 是 | 否 | AsGml(类似) | SDO_UTIL.TO_KMLGEOMETRY | 否 | 否 | 否 | 否 | 否 |
 | ST_GeometryType | 是 | 是 | STGeometryType | 方法 | ST_GEOMETRYTYPE | 是 | 是 | 否 | ST_GeometryType |
 | ST_NumPoints | 是 | 是 | STNumPoints | SDO_UTIL.GETNUMVERTICES | ST_NUMPOINTS | 否 | 否 | 否 | 否 |
@@ -361,12 +361,12 @@ H3 (Uber) 和 S2 (Google) 是现代空间索引系统，将地球表面离散化
 
 | 函数类别 | BigQuery | ClickHouse | DuckDB | Snowflake | Databricks | Trino | Athena | Presto |
 |---------|----------|------------|--------|-----------|------------|-------|--------|--------|
-| H3 索引 | 否 | 是 (原生) | 扩展 (h3) | 是 (H3 UDF) | 是 (H3) | 否 | 否 | 否 |
+| H3 索引 | 是 | 是 (原生) | 扩展 (h3) | 是 (H3 UDF) | 是 (H3) | 否 | 否 | 否 |
 | S2 单元格 | 是 (S2_) | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
-| H3 点→索引 | 否 | h3ToGeo | h3_latlng_to_cell | H3_LATLNG_TO_CELL | h3_latlng_to_cell | 否 | 否 | 否 |
-| H3 索引→多边形 | 否 | h3ToGeoBoundary | h3_cell_to_boundary | H3_CELL_TO_BOUNDARY | h3_cell_to_boundary | 否 | 否 | 否 |
-| H3 分辨率 | 否 | h3GetResolution | h3_get_resolution | H3_GET_RESOLUTION | h3_get_resolution | 否 | 否 | 否 |
-| H3 邻居 | 否 | h3kRing | h3_grid_disk | H3_GRID_DISK | h3_grid_disk | 否 | 否 | 否 |
+| H3 点→索引 | H3_LATLNG_TO_CELL | h3ToGeo | h3_latlng_to_cell | H3_LATLNG_TO_CELL | h3_latlng_to_cell | 否 | 否 | 否 |
+| H3 索引→多边形 | H3_CELL_TO_BOUNDARY | h3ToGeoBoundary | h3_cell_to_boundary | H3_CELL_TO_BOUNDARY | h3_cell_to_boundary | 否 | 否 | 否 |
+| H3 分辨率 | H3_GET_RESOLUTION | h3GetResolution | h3_get_resolution | H3_GET_RESOLUTION | h3_get_resolution | 否 | 否 | 否 |
+| H3 邻居 | H3_GRID_DISK | h3kRing | h3_grid_disk | H3_GRID_DISK | h3_grid_disk | 否 | 否 | 否 |
 | S2 点→ID | S2_CELLIDFROMPOINT | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
 | S2 ID→令牌 | S2_CELLID_TO_TOKEN(间接) | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
 
@@ -779,7 +779,7 @@ SELECT name,
        H3_LATLNG_TO_CELL(ST_Y(geog), ST_X(geog), 7) AS h3_index
 FROM cities;
 
--- 注意: Snowflake 不支持 ST_Union, ST_Buffer 等几何运算函数
+-- Snowflake 支持 ST_Intersection, ST_Union, ST_Buffer, ST_Difference 等 GEOGRAPHY 几何运算函数
 -- 空间查询自动利用微分区剪裁，无需创建空间索引
 ```
 
@@ -1097,7 +1097,7 @@ Oracle Spatial 独有:
 4. 现代空间索引 (H3/S2) 成为新趋势:
    ClickHouse: H3 原生支持最成熟
    BigQuery: S2 原生集成
-   Snowflake, Databricks, DuckDB: H3 支持
+   BigQuery, Snowflake, Databricks, DuckDB: H3 支持
    传统 R-Tree/GiST 仍是 OLTP 场景的主流选择
 
 5. 命名规范差异显著:
