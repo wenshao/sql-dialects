@@ -142,7 +142,7 @@ DECLARE cursor_name
 | PostgreSQL | ❌ | ✅ (隐含) | ❌ | INSENSITIVE | 游标使用 MVCC 快照，不可见后续修改 |
 | MySQL | ❌ | ❌ | ✅ (隐含) | ASENSITIVE | 实现依赖，部分修改可见 |
 | MariaDB | ❌ | ❌ | ✅ (隐含) | ASENSITIVE | 同 MySQL |
-| Oracle | ✅ (隐含) | ❌ | ❌ | SENSITIVE | 读一致性模型，自身 DML 可见 |
+| Oracle | ❌ | ❌ | ❌ | 读一致性 (非标准 SENSITIVE) | Oracle 使用 MVCC 读一致性快照，外部修改不可见，自身 DML 可见 |
 | SQL Server | ✅ (KEYSET/DYNAMIC) | ✅ (STATIC) | ❌ | 取决于游标类型 | 四种游标类型对应不同灵敏度 |
 | DB2 | ✅ | ✅ | ✅ | ASENSITIVE | 完全实现 SQL 标准三种模式 |
 | Teradata | ❌ | ❌ | ✅ (隐含) | ASENSITIVE | — |
@@ -638,7 +638,7 @@ SQL Server 四种游标类型对比：
 STATIC        INSENSITIVE  物化到 tempdb    中等(大集合)   报表/只读
 KEYSET        半敏感        键值集物化       中等          需检测删除/修改
 DYNAMIC       SENSITIVE    无物化，实时读取  较慢          需看到所有变化
-FAST_FORWARD  同 STATIC    前向只读优化      最快          简单遍历(推荐)
+FAST_FORWARD  优化器选择    前向只读优化      最快          简单遍历(推荐)
 ```
 
 ```sql
