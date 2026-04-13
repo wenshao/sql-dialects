@@ -838,12 +838,12 @@ RESTORE DATABASE sales FROM LATEST IN 's3://mybucket/backups/sales'
   AS OF SYSTEM TIME '2026-04-13 11:45:00';
 ```
 
-## TiDB：BR 工具与 SQL 语句双轨
+## TiDB：BR 命令行工具是唯一推荐方式
 
-TiDB 早期完全依赖 BR（Backup & Restore）命令行工具。从 6.5+ 开始，部分集群也支持 SQL 语句形式：
+TiDB 的 SQL 形式 `BACKUP` / `RESTORE` 语句最早在 4.0 作为**实验性**特性引入，在 5.4 已被**标记为废弃 (deprecated)**，6.x 起官方文档不再推荐使用。从 6.x 开始，**BR (Backup & Restore) 命令行工具**是 TiDB 备份恢复的唯一规范方法，PITR（基于日志备份的时间点恢复）也通过 `br log` 子命令完成。生产环境不应再使用 SQL 形式的 `BACKUP DATABASE` / `RESTORE DATABASE`。
 
 ```bash
-# BR 工具方式
+# 全量备份（推荐）
 br backup full \
    --pd "10.0.0.1:2379" \
    --storage "s3://mybucket/backup-2026-04-13?access-key=...&secret-access-key=..." \
@@ -852,22 +852,27 @@ br backup full \
    --crypter.method aes256-ctr \
    --crypter.key-file /etc/br/key
 
-# 增量备份
+# 库/表级备份
+br backup db --db sales --pd "10.0.0.1:2379" --storage "s3://mybucket/sales"
+br backup table --db sales --table orders --pd "10.0.0.1:2379" --storage "s3://..."
+
+# 增量备份（指定上次备份的 TSO）
 br backup full --lastbackupts 437502653940662272 ...
 
 # 恢复
 br restore full --pd "10.0.0.1:2379" --storage "s3://mybucket/backup-2026-04-13?..."
+
+# PITR：启动持续日志备份任务
+br log start --task-name=cluster_log --pd "10.0.0.1:2379" --storage='s3://mybucket/log/'
+
+# PITR：恢复到指定时间点（先 restore full，再 restore point）
+br restore point --pd "10.0.0.1:2379" \
+   --full-backup-storage='s3://mybucket/backup-2026-04-13' \
+   --storage='s3://mybucket/log/' \
+   --restored-ts='2026-04-13 11:45:00 +08:00'
 ```
 
-```sql
--- TiDB 6.2+ 支持的 SQL 形式
-BACKUP DATABASE sales TO 's3://mybucket/backup-sales';
-RESTORE DATABASE sales FROM 's3://mybucket/backup-sales';
-
--- 持续日志备份（PITR）配合 BR
--- br log start --task-name=cluster_log --storage='s3://...'
--- br restore point --restored-ts='2026-04-13 11:45:00' --storage='s3://...'
-```
+> 历史背景：TiDB 4.0 引入实验性 `BACKUP DATABASE` / `RESTORE DATABASE` SQL 语句，本质是在 SQL 层调用同样的 BR 逻辑；但因为缺少诸多 BR 工具的高级选项（限速、加密、PITR 衔接、并行调度等），从 5.4 起被标记为 deprecated，6.x 后 BR CLI 成为唯一规范路径。
 
 ## SAP HANA：事务一致的 BACKUP DATA
 
