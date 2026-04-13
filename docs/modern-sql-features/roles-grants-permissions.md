@@ -45,9 +45,9 @@ GRANT SELECT ( first_name, last_name ),
 
 同时 SQL:2003 引入了 `INSTEAD OF` 触发器——使可更新视图成为绕过基表权限的安全模式：用户只对视图持有 `INSERT/UPDATE/DELETE`，触发器以视图所有者身份重写到底层表。这是行级安全（SQL:2016 的 `ROW-LEVEL` policies 之前）的"穷人版"实现。
 
-### SQL:2008 — TRUNCATE 权限独立化
+### SQL:2008 — TRUNCATE TABLE 语句标准化
 
-SQL:2008 把 `TRUNCATE` 从 `DELETE` 中拆出来作为独立的对象权限。这一点 PostgreSQL 紧跟标准（`GRANT TRUNCATE ON …`），Oracle 则始终把 TRUNCATE 视为 DDL（需要 `DROP ANY TABLE` 系统权限），MySQL 把它隐式归入 `DROP` 权限。
+SQL:2008 把 `TRUNCATE TABLE` 作为**语句**正式纳入标准（在此之前它是各家厂商的扩展），但**并未**在标准中定义独立的 `TRUNCATE` 对象权限——标准并不要求 GRANT 体系包含 `TRUNCATE`。把 `TRUNCATE` 当作独立对象权限（`GRANT TRUNCATE ON …`）的做法是 **PostgreSQL 自 8.4 起的扩展**，并非 SQL:2008 的硬性要求。其他厂商各行其道：Oracle 把 TRUNCATE 视为 DDL（需要 `DROP ANY TABLE` 系统权限），MySQL 把它隐式归入 `DROP` 权限。
 
 ### SQL:2011 — 安全标签 (Security Labels) 与 SQL/MED 中的远程权限
 
