@@ -15,10 +15,10 @@
 | 引擎 | 行级压缩 | 页/块级压缩 | 表级 DDL | 默认算法 | 备注 |
 |------|---------|------------|---------|---------|------|
 | PostgreSQL | TOAST | -- | `STORAGE` 子句 | PGLZ / LZ4 (14+) | TOAST 仅压缩超出阈值的行外字段 |
-| MySQL | InnoDB Compressed | InnoDB Page Compression | `ROW_FORMAT=COMPRESSED` | zlib / LZ4 / ZSTD (8.0.16+) | 5.7+ 页压缩需稀疏文件支持 |
+| MySQL | InnoDB Compressed | InnoDB Page Compression | `ROW_FORMAT=COMPRESSED` | zlib / LZ4 | 5.7+ 透明页压缩 (`COMPRESSION='zlib\|lz4\|none'`) 需稀疏文件支持 |
 | MariaDB | 是 | InnoDB / MyRocks | `PAGE_COMPRESSED=1` | zlib / LZ4 / LZMA / Snappy / Bzip2 / LZO | 10.1+ 透明页压缩 |
 | SQLite | -- | -- | -- | 无 | 需 ZIPVFS 商业扩展 |
-| Oracle | OLTP / Basic | OLTP 行级 | `COMPRESS [FOR ...]` | LZO 类 | Advanced Compression 选件 |
+| Oracle | OLTP / Basic | OLTP 行级 | `COMPRESS [FOR ...]` | 符号表/页字典压缩 (非 LZO) | Advanced Compression 选件 |
 | SQL Server | `DATA_COMPRESSION=ROW` | `DATA_COMPRESSION=PAGE` | `WITH (DATA_COMPRESSION=...)` | 字典+前缀+RLE | 2008+ |
 | DB2 | Classic Row Compression | Adaptive Compression | `COMPRESS YES` | 字典 + 页字典 | 9.7+ Adaptive |
 | Snowflake | -- | 自动 | -- | 自动多 codec | micropartition 透明压缩 |
@@ -255,7 +255,7 @@ ALTER TABLE logs COMPRESSION='lz4';
 
 依赖文件系统的 **稀疏文件 + hole punching** 特性。InnoDB 写入时压缩 16KB 页，然后用 `fallocate(PUNCH_HOLE)` 释放尾部空闲扇区。优点：不改变 buffer pool 行为；缺点：需要 XFS/ext4 + 4KB 物理扇区，备份工具需理解稀疏文件，碎片化严重时性能崩溃。Percona 的工程实践经验表明，这一模式在云块存储（EBS、GP3）上往往得不偿失。
 
-8.0.16+ 增加 LZ4 与 ZSTD codec。MariaDB 在此基础上继续扩展支持 LZMA、bzip2、Snappy、LZO，并把页压缩做得更稳定。MariaDB MyRocks 引擎则直接继承 RocksDB 的 LZ4/ZSTD 双层压缩模型。
+MySQL InnoDB 透明页压缩自 5.7 引入起即支持 zlib 和 LZ4 两种 codec（`COMPRESSION` 属性，无 ZSTD）。MariaDB 在此基础上继续扩展支持 LZMA、bzip2、Snappy、LZO，并把页压缩做得更稳定。MariaDB MyRocks 引擎则直接继承 RocksDB 的 LZ4/ZSTD 双层压缩模型。
 
 ## Oracle：分级压缩与 HCC
 
