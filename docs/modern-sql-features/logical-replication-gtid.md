@@ -25,8 +25,8 @@
 | 引擎 | 物理复制 | 逻辑复制 | 内置 Pub/Sub DDL | 首次提供逻辑复制 |
 |------|---------|---------|-----------------|----------------|
 | PostgreSQL | 流复制 (9.0+) | 是 (10+) | `CREATE PUBLICATION` / `SUBSCRIPTION` | 2017 |
-| MySQL | -- | binlog 复制 | `CHANGE REPLICATION SOURCE TO` | 2002 (3.23) |
-| MariaDB | -- | binlog 复制 | `CHANGE MASTER TO` | 2002 (继承) |
+| MySQL | -- | binlog 复制 | `CHANGE REPLICATION SOURCE TO` | 3.23 (2000-2001) |
+| MariaDB | -- | binlog 复制 | `CHANGE MASTER TO` | 继承自 MySQL 3.23 |
 | SQLite | -- | -- | -- | 不支持 |
 | Oracle | Data Guard (Physical) | GoldenGate / Streams (停用) | 是 (GoldenGate) | 1999 (Streams) |
 | SQL Server | AlwaysOn AG / Log Shipping | Transactional / Merge Replication | `sp_addpublication` | 1998 (7.0) |
@@ -215,7 +215,7 @@ LSN 是 PG 复制的核心标识：`SELECT pg_current_wal_lsn();` 返回形如 `
 
 MySQL 的复制根植于 binlog——主库的所有写操作以事件序列写入 binary log，副本通过 IO 线程拉取，再由 SQL 线程回放：
 
-- **3.23 (2002)**：基于 binlog 的异步复制，Statement-Based。
+- **3.23 (2000-2001)**：基于 binlog 的异步复制，Statement-Based（复制功能在 3.23.15 即 2000 年 5 月引入，3.23 GA 为 2001 年 1 月）。
 - **5.1 (2008)**：引入 Row-Based Replication 和 Mixed 模式，解决 SBR 非确定性问题。
 - **5.5 (2010)**：半同步复制 (Semi-sync)。
 - **5.6 (2013)**：**GTID 引入**。在此之前，副本必须用 (`binlog file`, `position`) 来定位回放位置，故障切换极易出错；GTID 让每条事务获得全局唯一 ID，自动续点。
