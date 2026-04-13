@@ -93,7 +93,7 @@ Oracle 23ai 的 `DBMS_JSON_SCHEMA` 实现的是 Draft 2020-12 子集，PostgreSQ
 | Oracle | 是 | 是 | 12.1.0.2+ | SQL:2016 之前已实现 |
 | SQL Server | 否 (`ISJSON()`) | 否 | 2016+ | 函数返回 0/1 |
 | DB2 | 是 | 是 | 11.5+ | LUW 与 z/OS |
-| Snowflake | 否 (`IS_VALID_JSON`) | 否 | GA | 仅函数 |
+| Snowflake | 否 (`IS_VALID_JSON_TEXT` / `CHECK_JSON`) | 否 | GA | 仅函数 |
 | BigQuery | 否 (`SAFE.PARSE_JSON`) | 否 | GA | 通过解析失败判定 |
 | Redshift | 否 (`IS_VALID_JSON`) | 否 | GA | SUPER 类型 |
 | DuckDB | 否 (`json_valid()`) | 否 | 0.7+ | JSON 扩展 |
@@ -104,7 +104,7 @@ Oracle 23ai 的 `DBMS_JSON_SCHEMA` 实现的是 Draft 2020-12 子集，PostgreSQ
 | Hive | 否 | 否 | -- | 无 |
 | Flink SQL | 是 | 是 | 1.15+ | SQL:2016 兼容 |
 | Databricks | 否 | 否 | -- | 走 SQL Spark |
-| Teradata | 否 (`JSON_CHECK`) | 否 | 16+ | 函数式 |
+| Teradata | 否（JSON 类型方法） | 否 | 16.20+ | 通过 JSON 类型方法判定，无独立谓词 |
 | Greenplum | 是 | 是 | 7.0+ | 继承 PG 16 |
 | CockroachDB | 否 | 否 | -- | JSONB 隐含校验 |
 | TiDB | 否 (`JSON_VALID`) | 否 | 5.7 兼容 | 函数 |
@@ -306,7 +306,7 @@ Oracle 21c 起 JSON 列默认存储为 OSON 二进制格式（Optimized Schema-l
 | Oracle 21c+ | OSON | 是 | 是 |
 | PostgreSQL | JSONB | 是 | 否（按二叉堆排序） |
 | MySQL 5.7+ | 二进制 JSON | 是 | 否（按键名排序） |
-| MariaDB 10.6+ | LONGTEXT (10.5 之前) / JSON binary (10.6 起 mysql 兼容模式) | 是 | 否 |
+| MariaDB 10.2+ | LONGTEXT + `CHECK(JSON_VALID(...))`（始终为文本，与 MySQL 二进制 JSON 故意分歧） | 是（CHECK 约束） | 是（文本保留） |
 | SQL Server | NVARCHAR | 是（写入函数判定） | 是（文本保留） |
 | DB2 | BSON | 是 | 否 |
 | Snowflake | VARIANT | 是 | 否 |
