@@ -143,7 +143,7 @@
 | PostgreSQL (pgvector) | 0.5+ (2023-08) | 0.4+ | -- | -- | -- | 顺序扫描 | -- |
 | TimescaleDB (pgvectorscale) | -- | -- | -- | -- | StreamingDiskANN | -- | 0.2+ |
 | MySQL 9.0 | -- (HeatWave 内部) | -- | -- | -- | -- | 是 | -- |
-| MariaDB 11.7 | 是 (mhnsw) | -- | -- | -- | -- | 是 | 11.7 |
+| MariaDB 11.6 | 是 (mhnsw) | -- | -- | -- | -- | 是 | 11.6 GA |
 | SQLite (sqlite-vec) | -- | -- | -- | -- | -- | 是 (暴力) | 早期 |
 | Oracle 23ai | HNSW (内存) | IVF (混合内存/磁盘) | -- | -- | -- | -- | 23ai |
 | SQL Server 2025 | DiskANN 路线 | -- | -- | -- | DiskANN | -- | 2025 |
@@ -155,7 +155,7 @@
 | ClickHouse | 实验性 (annoy / usearch) | -- | -- | -- | -- | 暴力 | 23.1+ 实验 |
 | Databricks | HNSW (Vector Search 服务) | -- | -- | -- | -- | -- | GA 2024 |
 | Greenplum | 继承 pgvector | 继承 pgvector | -- | -- | -- | -- | -- |
-| CockroachDB | -- (内置 C-SPANN) | -- | -- | -- | -- | -- | 24.2+ |
+| CockroachDB | C-SPANN (24.3 / 25.1) | -- | -- | -- | -- | -- | VECTOR 类型 24.2 / 索引后续版本 |
 | TiDB | HNSW | -- | -- | -- | -- | -- | 8.4+ |
 | OceanBase | HNSW | IVFFlat / IVFPQ / IVFSQ8 | 是 | -- | -- | 是 | 4.3.3+ |
 | YugabyteDB | 继承 pgvector | 继承 pgvector | -- | -- | -- | -- | -- |
@@ -409,7 +409,7 @@ LIMIT 10;
 
 ### MariaDB 11.6 / 11.7
 
-MariaDB 11.6 (2024 年 11 月预览,2025 年 GA) 引入 `VECTOR` 类型,11.7 加入 **mhnsw** 向量索引,完全开源、社区版可用,这一点与 MySQL 9.0 形成对比。
+MariaDB 11.6 (2024 年 11 月 GA) 同时引入 `VECTOR` 类型与 **mhnsw** HNSW 向量索引,11.7 (2025 年 2 月 GA) 进一步打磨。完全开源、社区版可用,这一点与 MySQL 9.0 形成对比。
 
 ```sql
 CREATE TABLE docs (
@@ -643,7 +643,7 @@ LIMIT 10;
 
 ### CockroachDB
 
-CockroachDB 24.2 (2024) 引入 `VECTOR(N)` 类型,继承 pgvector 操作符,并自研了名为 **C-SPANN** 的分布式向量索引。
+CockroachDB 24.2 (2024 年 8 月) 引入 `VECTOR(N)` 类型,继承 pgvector 操作符;自研的 **C-SPANN** 分布式向量索引在更晚的版本 (24.3 / 25.1) 才陆续落地,而非与 VECTOR 类型同时发布。
 
 ```sql
 CREATE TABLE docs (
