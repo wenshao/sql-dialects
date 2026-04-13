@@ -206,7 +206,7 @@ DDL 与 DML 的核心冲突可以归结为：DML 持读锁，DDL 持写锁，二
 | PostgreSQL | `statement_timeout` | 0 | 毫秒 | 会话级 |
 | MySQL | `lock_wait_timeout` | 31536000 (1 年) | 秒 | 会话级 |
 | MySQL | `innodb_lock_wait_timeout` | 50 | 秒 | 仅行锁 |
-| MariaDB | `lock_wait_timeout` | 86400 | 秒 | 会话级 |
+| MariaDB | `lock_wait_timeout` | 31536000 (1 年，继承自 MySQL) | 秒 | 会话级 |
 | Oracle | `DDL_LOCK_TIMEOUT` | 0 (NOWAIT) | 秒 | 会话级 |
 | SQL Server | `LOCK_TIMEOUT` | -1 (无限) | 毫秒 | SET LOCK_TIMEOUT |
 | DB2 | `LOCKTIMEOUT` | -1 | 秒 | DB cfg |
