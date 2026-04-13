@@ -142,14 +142,14 @@ SQL/PGQ:
 
 递归 CTE 是大多数 SQL 引擎中进行图遍历的唯一标准手段。详细的递归 CTE 支持情况参见 [cte-recursive-query.md](cte-recursive-query.md)，此处仅列出与图遍历直接相关的能力。
 
-| 引擎 | 递归 CTE | CYCLE 检测 | SEARCH 排序 | 路径追踪 | 最大深度 | 图遍历可行性 |
+| 引擎 | 递归 CTE | CYCLE 检测 | SEARCH 排序 | 路径追踪 | 默认限制 | 图遍历可行性 |
 |------|---------|-----------|------------|---------|---------|------------|
 | PostgreSQL | ✅ | ✅ (14+) | ✅ (14+) | 手动 | 无限制 | 优秀 |
-| MySQL | ✅ | ❌ | ❌ | 手动 | 1000 | 良好 |
-| MariaDB | ✅ | ❌ | ❌ | 手动 | 无限制 | 良好 |
+| MySQL | ✅ | ❌ | ❌ | 手动 | 1000（`cte_max_recursion_depth`） | 良好 |
+| MariaDB | ✅ | ❌ | ❌ | 手动 | 1000（`max_recursive_iterations`） | 良好 |
 | SQLite | ✅ | ❌ | ❌ | 手动 | 1000 | 良好 |
 | Oracle | ✅ | ✅ | ✅ | 内置 | 无限制 | 优秀（也有 CONNECT BY） |
-| SQL Server | ✅ | ❌ | ❌ | 手动 | 100 | 有限（深度限制） |
+| SQL Server | ✅ | ❌ | ❌ | 手动 | 100（`OPTION (MAXRECURSION N)`，0 表示无限制） | 有限（深度限制） |
 | DB2 | ✅ | ✅ | ✅ | 手动 | 无限制 | 优秀 |
 | Snowflake | ✅ | ❌ | ❌ | 手动 | 无限制 | 良好 |
 | BigQuery | ✅ | ❌ | ❌ | 手动 | 500 | 良好 |
@@ -569,14 +569,16 @@ CREATE TABLE edges (
 #### 可达性查询（DFS/BFS）
 
 ```sql
--- PostgreSQL / MySQL 8.0+ / DuckDB / 等支持递归 CTE 的引擎
+-- PostgreSQL / Oracle / SQL Server / DB2 / DuckDB 等支持 `||` 字符串拼接的引擎
 -- 从节点 1 出发可达的所有节点（带路径追踪和循环检测）
+-- 注：MySQL 8.0+ 默认 sql_mode 下 `||` 表示逻辑 OR，需使用 `CONCAT(...)` 与 `CAST(... AS CHAR(N))`，
+--     或先 `SET sql_mode='PIPES_AS_CONCAT'`
 WITH RECURSIVE reachable AS (
-    -- 锚成员: 起始节点
+    -- 锚成员: 起始节点（路径两端补上 `->` 分隔符，便于边界匹配）
     SELECT
         v.vertex_id,
         v.label,
-        CAST(v.vertex_id AS VARCHAR(1000)) AS path,
+        '->' || CAST(v.vertex_id AS VARCHAR(1000)) || '->' AS path,
         0 AS depth
     FROM vertices v
     WHERE v.vertex_id = 1
@@ -587,12 +589,13 @@ WITH RECURSIVE reachable AS (
     SELECT
         v.vertex_id,
         v.label,
-        r.path || '->' || CAST(v.vertex_id AS VARCHAR(1000)),
+        r.path || CAST(v.vertex_id AS VARCHAR(1000)) || '->',
         r.depth + 1
     FROM reachable r
     JOIN edges e ON r.vertex_id = e.source_id
     JOIN vertices v ON e.target_id = v.vertex_id
-    WHERE r.path NOT LIKE '%' || CAST(v.vertex_id AS VARCHAR(10)) || '%'  -- 循环检测
+    -- 使用 `->id->` 作为边界匹配，避免节点 1 误匹配路径中的 11、21 等
+    WHERE r.path NOT LIKE '%->' || CAST(v.vertex_id AS VARCHAR(10)) || '->%'
       AND r.depth < 10  -- 深度限制（安全阀）
 )
 SELECT * FROM reachable;
@@ -602,8 +605,10 @@ SELECT * FROM reachable;
 
 ```sql
 -- 使用递归 CTE 模拟 BFS 最短路径
--- 注意: 大多数引擎要求递归 CTE 使用 UNION ALL（不支持 UNION），
--- 因此需要通过路径检查手动去重已访问节点，并在外层用 MIN(distance) 取最短距离
+-- 注意: 部分引擎的递归 CTE 仅支持 UNION ALL（如 Snowflake、TiDB；MySQL 8.0.19 之前亦是如此），
+-- PostgreSQL / Oracle / SQL Server / DB2 / MySQL 8.0.19+ 等支持 UNION 去重。
+-- 为兼容不同引擎，本示例统一采用 UNION ALL，并通过路径检查手动去重已访问节点，
+-- 再在外层用 MIN(distance) 取最短距离
 WITH RECURSIVE bfs AS (
     SELECT
         vertex_id,
