@@ -269,7 +269,7 @@ ISO/IEC 9075 SQL 标准（包括 SQL:2023）中没有定义任何批量导入导
 | DuckDB | ignore_errors | ❌ | ✅ (reject table) | 错误终止 |
 | Spark SQL | mode (PERMISSIVE/DROPMALFORMED/FAILFAST) | ❌ | ✅ (badRecordsPath) | PERMISSIVE |
 | Hive | -- | ❌ | ❌ | 文件移动，不验证 |
-| Databricks | _rescued_data 列 | ❌ | ✅ (rescue 列) | PERMISSIVE |
+| Databricks | `_rescued_data` 列 | ❌ | ✅ (rescue 列) | PERMISSIVE |
 | CockroachDB | -- | ❌ | ❌ | 错误终止 |
 | Vertica | REJECTED DATA / EXCEPTIONS | ✅ | ✅ (rejected 文件) | 终止 |
 | StarRocks | max_filter_ratio | ✅ | ✅ (BE 日志) | 0 (严格模式) |
@@ -356,10 +356,10 @@ TO '/data/high_value_orders.csv' WITH (FORMAT csv, HEADER true);
 -- WITH 参数:
 -- FORMAT: csv | text (默认) | binary
 -- HEADER: true | false
--- DELIMITER: 分隔符 (默认 tab)
--- NULL: NULL 值的字符串表示 (默认 \N)
--- QUOTE: 引用字符 (默认 ")
--- ESCAPE: 转义字符 (默认 ")
+-- DELIMITER: 分隔符（默认值取决于 FORMAT：text 为 tab，csv 为 ,）
+-- NULL: NULL 值的字符串表示（默认值取决于 FORMAT：text 为 \N，csv 为空字符串）
+-- QUOTE: 引用字符（仅 csv 模式使用，默认 "）
+-- ESCAPE: 转义字符（默认值取决于 FORMAT；csv 默认与 QUOTE 相同）
 -- ENCODING: 字符编码
 -- FORCE_NULL: 指定列的空字符串视为 NULL
 -- FREEZE: 加载后立即冻结行 (避免 vacuum)
@@ -558,10 +558,10 @@ FROM (
 );
 
 -- 导出到 Stage
+-- 注：HEADER 仅适用于文本格式（CSV/TSV），对 PARQUET 无效
 COPY INTO @my_s3_stage/export/orders_
 FROM (SELECT * FROM orders WHERE order_date >= '2024-01-01')
 FILE_FORMAT = (TYPE = PARQUET)
-HEADER = TRUE
 MAX_FILE_SIZE = 268435456;  -- 256MB per file
 
 -- 查看加载历史
