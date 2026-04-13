@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 94 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 109 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -30,6 +30,9 @@
 - [PIVOT / UNPIVOT 原生语法对比](pivot-unpivot-native.md)
 - [UNNEST / EXPLODE / 数组展开](unnest-explode.md)
 - [LIMIT BY / LATERAL BY 按分组取行](limit-by.md)
+
+### 伪列与元数据
+- [伪列 (ROWID / ROWNUM / LEVEL)](pseudo-columns.md)
 
 ### 采样
 - [TABLESAMPLE 采样语法](sampling-query.md)
@@ -77,6 +80,7 @@
 - [生成列与计算列](generated-computed-columns.md) · [旧版](generated-columns.md)
 - [AUTO_INCREMENT / SEQUENCE / IDENTITY](auto-increment-sequence-identity.md)
 - [外部表](external-tables.md)
+- [可更新视图规则](updatable-views.md)
 
 ### 索引
 - [索引类型与创建语法](index-types-creation.md)
@@ -97,9 +101,11 @@
 - [数据类型映射](data-type-mapping.md)
 - [类型系统设计](type-system-design.md)
 - [数组 / 集合类型 (ARRAY/MAP/STRUCT)](array-collection-types.md)
+- [行类型与复合类型 (ROW / STRUCT)](row-composite-types.md)
 - [JSON 在 SQL 中的演进](json-in-sql-evolution.md)
 - [JSON Path 语法](json-path-syntax.md)
 - [JSON_TABLE](json-table.md)
+- [JSON 模式验证 (IS JSON / JSON Schema)](json-schema-validation.md)
 - [半结构化数据支持](semi-structured-data.md)
 
 ### 类型转换与 NULL
@@ -135,6 +141,7 @@
 ### 高级函数
 - [正则表达式语法](regex-syntax.md)
 - [Lambda 表达式](lambda-expressions.md)
+- [函数与操作符重载](function-operator-overloading.md)
 
 ---
 
@@ -142,6 +149,7 @@
 
 - [全文检索](full-text-search.md)
 - [地理空间函数](geospatial-functions.md)
+- [向量类型与相似性搜索](vector-similarity-search.md)
 
 ---
 
@@ -163,12 +171,15 @@
 
 - [EXPLAIN 执行计划](explain-execution-plan.md)
 - [优化器演进](optimizer-evolution.md)
+- [预编译语句与计划缓存](prepared-statement-cache.md)
+- [资源管理与工作负载管理 (WLM)](resource-management-wlm.md)
 
 ---
 
 ## 存储过程与编程
 
 - [存储过程与 UDF](stored-procedures-udf.md)
+- [外部 UDF 与原生扩展 (C/Java/Python/JS/Rust/WASM)](udf-external-functions.md)
 - [触发器](triggers.md)
 - [游标](cursors.md)
 - [动态 SQL](dynamic-sql.md)
@@ -182,13 +193,24 @@
 
 - [批量导入导出](bulk-import-export.md) · [旧版](copy-bulk-load.md)
 - [CDC / Changefeed 变更捕获](cdc-changefeed.md)
+- [外部数据源与数据库链接 (FDW / dblink)](foreign-data-wrappers.md)
+- [备份与恢复语法](backup-restore-syntax.md)
+- [数据库事件通知 (LISTEN/NOTIFY / Service Broker)](database-events-notify.md)
 
 ---
 
 ## 安全
 
 - [权限与安全模型](permission-security-model.md) · [权限模型设计](permission-model-design.md)
+- [角色与授权粒度 (CREATE ROLE / GRANT)](roles-grants-permissions.md)
 - [行级安全 (RLS)](row-level-security.md)
+- [审计日志](audit-logging.md)
+
+---
+
+## 元数据与系统目录
+
+- [系统目录与信息模式 (INFORMATION_SCHEMA / pg_catalog / sys.*)](information-schema-catalogs.md)
 
 ---
 
