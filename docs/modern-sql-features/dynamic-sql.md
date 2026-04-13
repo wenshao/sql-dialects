@@ -6,9 +6,9 @@
 
 ## SQL 标准
 
-### SQL:1999 动态 SQL (ISO/IEC 9075-5)
+### SQL-92 动态 SQL (Clause 17)
 
-SQL:1999 标准在 Part 5 (CLI) 和 Part 4 (PSM) 中正式定义了动态 SQL 的核心语法：
+SQL-92 标准在 Clause 17 (Dynamic SQL) 中正式定义了动态 SQL 的核心语法；后续 SQL:1999 在 Part 4 (PSM) 与 Part 5 (CLI) 中扩展了过程化语言内的使用：
 
 ```sql
 -- EXECUTE IMMEDIATE: 构建并立即执行 SQL 字符串
@@ -63,7 +63,7 @@ CLOSE <cursor_name>;
 | Databricks | ✅ | `EXECUTE IMMEDIATE <string>` | SQL 脚本 | Runtime 14.1+ |
 | Teradata | ❌ | — | 使用 CALL DBC.SysExecSQL | — |
 | Greenplum | ✅ | `EXECUTE <string>` | PL/pgSQL | 4.0+ |
-| CockroachDB | ✅ | `EXECUTE <string>` | PL/pgSQL (23.1+) | 23.1+ |
+| CockroachDB | ✅ | `EXECUTE <string>` | PL/pgSQL (23.2+) | 23.2+ |
 | TiDB | ❌ | — | 使用 PREPARE/EXECUTE | — |
 | OceanBase | ✅ | `EXECUTE IMMEDIATE <string>` | Oracle 模式 PL | 3.0+ |
 | YugabyteDB | ✅ | `EXECUTE <string>` | PL/pgSQL | 2.0+ |
@@ -79,7 +79,7 @@ CLOSE <cursor_name>;
 | Exasol | ✅ | `EXECUTE IMMEDIATE <string>` | Exasol 脚本 | 6.0+ |
 | SAP HANA | ✅ | `EXECUTE IMMEDIATE <string>` / `EXEC <string>` | SQLScript | 1.0+ |
 | Informix | ✅ | `EXECUTE IMMEDIATE <string>` | SPL | 7.20+ |
-| Firebird | ✅ | `EXECUTE STATEMENT <string>` | PSQL | 2.0+ |
+| Firebird | ✅ | `EXECUTE STATEMENT <string>` | PSQL | 1.5+ (参数化: 2.5+) |
 | H2 | ❌ | — | 无 EXECUTE IMMEDIATE | — |
 | HSQLDB | ✅ | `EXECUTE IMMEDIATE <string>` | SQL/PSM | 2.0+ |
 | Derby | ✅ | `EXECUTE IMMEDIATE <string>` | SQL/PSM (有限) | 10.0+ |
@@ -97,12 +97,12 @@ CLOSE <cursor_name>;
 
 | 引擎 | 客户端 PREPARE | 过程内 PREPARE | DEALLOCATE | 参数标记风格 | 版本 |
 |------|:---:|:---:|:---:|------|------|
-| PostgreSQL | ✅ | ✅ | ✅ | `$1, $2` | 7.0+ |
+| PostgreSQL | ✅ | ✅ (EXECUTE USING, 非 PREPARE) | ✅ | `$1, $2` | 7.0+ |
 | MySQL | ✅ | ✅ | ✅ | `?` | 4.1+ |
 | MariaDB | ✅ | ✅ | ✅ | `?` | 5.0+ |
 | SQLite | ✅ (API) | — | ✅ (API) | `?`, `?NNN`, `:name`, `@name`, `$name` | 3.0+ |
 | Oracle | ✅ (API) | ✅ (`DBMS_SQL`) | ✅ | `:name` | 7.0+ |
-| SQL Server | ✅ (API) | ✅ (`sp_executesql`) | ✅ | `@name` | 6.0+ |
+| SQL Server | ✅ (API) | ✅ (`sp_executesql`) | ✅ | `@name` | 7.0+ |
 | DB2 | ✅ | ✅ | ✅ | `?` | 7.0+ |
 | Snowflake | ✅ (API) | ✅ | — | `?`, `:name` | GA |
 | BigQuery | ✅ (API) | ✅ | — | `@name` | GA |
@@ -191,7 +191,7 @@ CLOSE <cursor_name>;
 | BigQuery | ❌ | ❌ | ❌ | — |
 | Redshift | ✅ `OPEN cur FOR EXECUTE <string>` | ✅ `REFCURSOR` | ❌ | GA |
 | Greenplum | ✅ `OPEN cur FOR EXECUTE <string>` | ✅ `REFCURSOR` | ❌ | 4.0+ |
-| CockroachDB | ✅ (23.2+) | ❌ | ❌ | 23.2+ |
+| CockroachDB | ✅ | ❌ | ❌ | 23.2+ |
 | YugabyteDB | ✅ `OPEN cur FOR EXECUTE <string>` | ✅ `REFCURSOR` | ❌ | 2.0+ |
 | OceanBase | ✅ (Oracle 模式) | ✅ (Oracle 模式) | ✅ (Oracle 模式) | 3.0+ |
 | Vertica | ✅ `FOR row IN EXECUTE <string>` | ❌ | ❌ | 9.0+ |
@@ -219,7 +219,7 @@ CLOSE <cursor_name>;
 | BigQuery | ✅ | ❌ | `EXECUTE IMMEDIATE <string> INTO <var>` | 2020+ |
 | Redshift | ✅ | ✅ | `EXECUTE <string> INTO <var>` | GA |
 | Greenplum | ✅ | ✅ | `EXECUTE <string> INTO <var>` | 4.0+ |
-| CockroachDB | ✅ | ❌ | `EXECUTE <string> INTO <var>` | 23.1+ |
+| CockroachDB | ✅ | ❌ | `EXECUTE <string> INTO <var>` | 23.2+ |
 | YugabyteDB | ✅ | ✅ | `EXECUTE <string> INTO <var>` | 2.0+ |
 | OceanBase | ✅ | ✅ | `EXECUTE IMMEDIATE <string> INTO <var>` | 3.0+ |
 | Vertica | ✅ | ❌ | `EXECUTE <string> INTO <var>` | 9.0+ |
@@ -248,7 +248,7 @@ CLOSE <cursor_name>;
 | BigQuery | ✅ | ✅ | `EXECUTE IMMEDIATE <string> USING <val> AS name` | 2020+ |
 | Redshift | ✅ | ❌ | `EXECUTE <string> USING <val>` | GA |
 | Greenplum | ✅ | ❌ | `EXECUTE <string> USING <val>` | 5.0+ |
-| CockroachDB | ✅ | ❌ | `EXECUTE <string> USING <val>` | 23.1+ |
+| CockroachDB | ✅ | ❌ | `EXECUTE <string> USING <val>` | 23.2+ |
 | YugabyteDB | ✅ | ❌ | `EXECUTE <string> USING <val>` | 2.0+ |
 | OceanBase | ✅ | ❌ | `EXECUTE IMMEDIATE <string> USING <val>` | 3.0+ |
 | Vertica | ✅ | ❌ | `EXECUTE <string> USING <val>` | 9.0+ |
@@ -280,7 +280,7 @@ CLOSE <cursor_name>;
 | BigQuery | ✅ | 无限制 | 2020+ |
 | Redshift | ✅ | 无限制 | GA |
 | Greenplum | ✅ | 无限制 | 4.0+ |
-| CockroachDB | ✅ | 无限制 | 23.1+ |
+| CockroachDB | ✅ | 无限制 | 23.2+ |
 | YugabyteDB | ✅ | 无限制 | 2.0+ |
 | OceanBase | ✅ | Oracle 模式 PL 中 DDL 必须通过 EXECUTE IMMEDIATE | 3.0+ |
 | Vertica | ✅ | 无限制 | 9.0+ |
@@ -313,7 +313,7 @@ CLOSE <cursor_name>;
 | BigQuery | ✅ `USING @name` | ❌ | ❌ | ❌ | 2020+ |
 | Redshift | ✅ `USING $1` | ❌ | ❌ | ✅ `quote_ident()`, `quote_literal()` | GA |
 | Greenplum | ✅ `USING $1` | ❌ | ❌ | ✅ `quote_ident()`, `quote_literal()` | 4.0+ |
-| CockroachDB | ✅ `USING $1` | ❌ | ❌ | ✅ `quote_ident()` | 23.1+ |
+| CockroachDB | ✅ `USING $1` | ❌ | ❌ | ✅ `quote_ident()` | 23.2+ |
 | YugabyteDB | ✅ `USING $1` | ❌ | ❌ | ✅ `quote_ident()`, `quote_literal()` | 2.0+ |
 | OceanBase | ✅ `USING` | ✅ (Oracle 模式) | ✅ (Oracle 模式) | ❌ | 3.0+ |
 | SAP HANA | ✅ `USING ?` | ❌ | ❌ | ✅ `ESCAPE_SINGLE_QUOTES()` | 1.0+ |
@@ -429,9 +429,11 @@ MariaDB 在 MySQL 兼容的基础上新增了 `EXECUTE IMMEDIATE`，简化了动
 -- EXECUTE IMMEDIATE: 一步完成 (10.2.3+)
 EXECUTE IMMEDIATE 'SELECT * FROM users WHERE id = ?' USING 42;
 
--- 带 INTO 的 EXECUTE IMMEDIATE
-DECLARE v_name VARCHAR(100);
-EXECUTE IMMEDIATE 'SELECT name FROM users WHERE id = ?' INTO v_name USING 42;
+-- 带 INTO 的 EXECUTE IMMEDIATE (需放在 BEGIN ... END 块内)
+BEGIN NOT ATOMIC
+    DECLARE v_name VARCHAR(100);
+    EXECUTE IMMEDIATE 'SELECT name FROM users WHERE id = ?' INTO v_name USING 42;
+END;
 
 -- 也兼容 MySQL 的三步方式
 PREPARE stmt FROM 'SELECT * FROM users WHERE age > ?';
@@ -742,7 +744,7 @@ CREATE PROCEDURE dynamic_query(IN p_table NVARCHAR(128), OUT p_count INTEGER)
 LANGUAGE SQLSCRIPT
 AS
 BEGIN
-    EXECUTE IMMEDIATE 'SELECT COUNT(*) INTO p_count FROM ' || :p_table;
+    EXECUTE IMMEDIATE 'SELECT COUNT(*) FROM ' || :p_table INTO p_count;
 END;
 
 -- EXEC 简写
@@ -1073,7 +1075,7 @@ AS ...
 
 ## 关键发现
 
-1. **标准遵循度低**：SQL:1999 定义了 `EXECUTE IMMEDIATE` 和 `PREPARE/EXECUTE`，但各引擎实现差异巨大。MySQL 完全不支持 `EXECUTE IMMEDIATE`，SQL Server 使用独有的 `EXEC()` / `sp_executesql`，PostgreSQL 简化为 `EXECUTE`（省略 IMMEDIATE）。
+1. **标准遵循度低**：SQL-92 (Clause 17) 定义了 `EXECUTE IMMEDIATE` 和 `PREPARE/EXECUTE`，但各引擎实现差异巨大。MySQL 完全不支持 `EXECUTE IMMEDIATE`，SQL Server 使用独有的 `EXEC()` / `sp_executesql`，PostgreSQL 简化为 `EXECUTE`（省略 IMMEDIATE）。
 
 2. **三大阵营**：
    - **EXECUTE IMMEDIATE 阵营**：Oracle、DB2、MariaDB、Snowflake、BigQuery、SAP HANA、Exasol、HSQLDB、Informix、OceanBase、MonetDB、Databricks——较接近 SQL 标准
