@@ -262,7 +262,7 @@ CLOSE <cursor_name>;
 | TimescaleDB | ✅ | ❌ | 继承 PG | 继承 PG |
 | Yellowbrick | ✅ | ❌ | `EXECUTE <string> USING <val>` | GA |
 | MonetDB | ✅ | ❌ | `EXECUTE <stmt> USING <val>` | 11.19+ |
-| SQL Server | ❌ | ✅ | `sp_executesql N'...', N'@p1 int', @p1 = <val>` | 6.5+ |
+| SQL Server | ❌ | ✅ | `sp_executesql N'...', N'@p1 int', @p1 = <val>` | 7.0+ |
 | SingleStore | ✅ | ❌ | `EXECUTE <stmt> USING @var1, @var2` | 6.0+ |
 | TiDB | ✅ | ❌ | `EXECUTE <stmt> USING @var1, @var2` | 2.1+ |
 
@@ -307,7 +307,7 @@ CLOSE <cursor_name>;
 | MySQL | ✅ `USING ?` | ❌ | ❌ | ❌ | 4.1+ |
 | MariaDB | ✅ `USING ?` | ❌ | ❌ | ❌ | 5.0+ |
 | Oracle | ✅ `USING :name` | ✅ `DBMS_ASSERT` | ✅ | ❌ | 10gR2+ |
-| SQL Server | ✅ `sp_executesql @name` | ✅ `QUOTENAME()` | ❌ | ❌ | 6.5+ |
+| SQL Server | ✅ `sp_executesql @name` | ✅ `QUOTENAME()` | ❌ | ❌ | 7.0+ |
 | DB2 | ✅ `USING ?` | ❌ | ❌ | ❌ | 7.0+ |
 | Snowflake | ✅ `USING ?/:name` | ❌ | ❌ | ❌ | GA |
 | BigQuery | ✅ `USING @name` | ❌ | ❌ | ❌ | 2020+ |
