@@ -278,7 +278,7 @@ PostgreSQL postgres_fdw 的下推能力清单：
 - **JOIN 下推**（9.6+）：同一远端服务器上的两表 JOIN 整体下推。
 - **聚合下推**（10+）：GROUP BY、COUNT、SUM、AVG、MIN、MAX。
 - **ORDER BY / LIMIT 下推**。
-- **UPDATE/DELETE 直接下推**（9.5+ 直接修改远端而不先 SELECT 回本地）。
+- **UPDATE/DELETE 直接下推**（9.6+ 直接修改远端而不先 SELECT 回本地）。
 - **分区表与外部表混合**（partition-wise join，11+）。
 - **异步执行**（14+ 异步 append）。
 
