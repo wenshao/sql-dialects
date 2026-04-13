@@ -332,7 +332,7 @@ LAG / LEAD 和滑动窗口帧（ROWS/RANGE BETWEEN）是时序分析的核心工
 | BigQuery | 是 | 是 | 是 | GA |
 | Redshift | 是 | 是 | 是 | GA |
 | DuckDB | 是 | 是 | 是 | 0.3+ |
-| ClickHouse | 是 | -- | -- | 21.1+ |
+| ClickHouse | 是(21.11+，早期用 lagInFrame/leadInFrame) | -- | -- | 21.11+ |
 | Trino | 是 | 是 | 是 | GA |
 | Presto | 是 | 是 | 是 | GA |
 | Spark SQL | 是 | 是 | 是 | 1.4+ |
@@ -420,7 +420,7 @@ FROM groups;
 | SQL Server | 是 | 是 | -- | -- | 2012+，RANGE 受限 |
 | DB2 | 是 | 是 | -- | 是 | RANGE + INTERVAL |
 | Snowflake | 是 | 是 | -- | -- | RANGE 仅限数值 |
-| BigQuery | 是 | 是 | -- | -- | RANGE 仅限数值 |
+| BigQuery | 是 | 是 | -- | -- | RANGE + INTERVAL (日期/时间) |
 | Redshift | 是 | 是 | -- | -- | RANGE 受限 |
 | DuckDB | 是 | 是 | 是 | 是 | RANGE + INTERVAL |
 | ClickHouse | 是 | 是 | -- | -- | 22.1+ 增强 |
