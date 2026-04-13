@@ -259,8 +259,11 @@ SELECT RIGHT('Hello World', 5);                  -- 'World'
 ### NULL 处理差异（关键！）
 
 ```sql
--- PostgreSQL / Oracle / DB2 / SQLite: || 遇 NULL 结果为 NULL
+-- PostgreSQL / DB2 / SQLite: || 遇 NULL 结果为 NULL
 SELECT 'Hello' || NULL || 'World';      -- NULL
+
+-- Oracle: || 将 NULL 视为空字符串（与大多数方言不同）
+SELECT 'Hello' || NULL || 'World' FROM DUAL;  -- 'HelloWorld'
 
 -- MySQL / MariaDB / TiDB: CONCAT 遇 NULL 结果为 NULL
 SELECT CONCAT('Hello', NULL, 'World');   -- NULL
@@ -730,10 +733,13 @@ SELECT OREPLACE('Hello World', 'World', 'SQL');  -- 'Hello SQL'
 -- PostgreSQL / Redshift / DuckDB / CockroachDB / Greenplum
 SELECT SPLIT_PART('a,b,c', ',', 2);              -- 'b'
 
--- SQL Server 2016+ / Azure Synapse
-SELECT value FROM STRING_SPLIT('a,b,c', ',')
-    ORDER BY (SELECT NULL) OFFSET 1 ROW FETCH NEXT 1 ROW ONLY;
--- SQL Server 2022+ 支持 ordinal:
+-- SQL Server 2016-2019 / Azure Synapse
+-- 注意: STRING_SPLIT 返回行顺序不保证 (官方文档明确说明)，
+-- 不能通过 ORDER BY (SELECT NULL) / OFFSET 稳定获取第 N 个元素。
+-- 需要保序时可改用 JSON + OPENJSON ([key] 为 0-based):
+SELECT value FROM OPENJSON('["a","b","c"]') WHERE [key] = 1;  -- 'b'
+
+-- SQL Server 2022+ 新增 enable_ordinal 参数，可稳定获取第 N 个元素:
 SELECT value FROM STRING_SPLIT('a,b,c', ',', 1) WHERE ordinal = 2;
 
 -- Snowflake
@@ -820,8 +826,10 @@ SELECT RPAD('ab', LENGTH('ab') * 3, 'ab') FROM DUAL;  -- 'ababab'
 -- SQL Server: REPLICATE 是原生函数
 SELECT REPLICATE('ab', 3);                              -- 'ababab'
 
--- Trino / Presto / Amazon Athena: 用 ARRAY 模拟
-SELECT ARRAY_JOIN(REPEAT('ab', 3), '');                 -- 'ababab'
+-- Trino / Presto / Amazon Athena: 无字符串 REPEAT，
+-- 用 SEQUENCE + TRANSFORM + ARRAY_JOIN 组合模拟
+-- (Trino 的 repeat(element, count) 返回数组而非字符串)
+SELECT ARRAY_JOIN(TRANSFORM(SEQUENCE(1, 3), x -> 'ab'), '');  -- 'ababab'
 
 -- SQLite: 用 REPLACE + ZEROBLOB 模拟
 SELECT REPLACE(HEX(ZEROBLOB(3)), '00', 'ab');           -- 'ababab'
@@ -1162,13 +1170,13 @@ FROM (SELECT CAST('Hello World' AS VARBINARY(MAX)) AS bin) t;
 
 | 操作 | NULL 传播（标准行为） | NULL 忽略 |
 |------|-------------------|----------|
-| `\|\|`（连接） | PostgreSQL, Oracle, SQLite, DB2 | -- |
-| `CONCAT()` | Oracle(2参数版) | SQL Server 2012+, PostgreSQL, MySQL* |
+| `\|\|`（连接） | PostgreSQL, SQLite, DB2 | Oracle（将 NULL 视为空字符串） |
+| `CONCAT()` | Oracle(2参数版), MySQL* | SQL Server 2012+, PostgreSQL |
 | `CONCAT_WS()` | -- | 几乎所有支持引擎 |
 | `LENGTH(NULL)` | 所有引擎 | -- |
 | `REPLACE(NULL,...)` | 所有引擎 | -- |
 
-> *MySQL 的 `CONCAT()` 任一参数为 NULL 则返回 NULL；但 `CONCAT_WS()` 会跳过 NULL 参数。
+> *MySQL 的 `CONCAT()` 任一参数为 NULL 时返回 NULL（NULL 传播）；`CONCAT_WS()` 则会跳过 NULL 参数。
 
 ### 4. 迁移优先级建议
 
