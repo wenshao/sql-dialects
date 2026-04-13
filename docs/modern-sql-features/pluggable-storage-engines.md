@@ -414,7 +414,7 @@ PostgreSQL 12 的 TAM API 只是"半成品"：
 
 ### Oracle：单引擎 + 多格式
 
-Oracle 没有可插拔存储引擎概念，但在 Oracle 12c（2013）引入了 **Database In-Memory** 选项，让同一张表同时存在两种格式：
+Oracle 没有可插拔存储引擎概念，但在 Oracle 12.1.0.2（2014）引入了 **Database In-Memory** 选项，让同一张表同时存在两种格式：
 
 ```sql
 ALTER TABLE sales INMEMORY PRIORITY HIGH;
