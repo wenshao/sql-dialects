@@ -50,7 +50,7 @@
 | SingleStore | `SHARD KEY (col)` / `REFERENCE` | 是 | -- | -- | REFERENCE | 是 | 是 | 默认 | 早期 |
 | Vertica | `SEGMENTED BY HASH(col) ALL NODES` / `UNSEGMENTED ALL NODES` | 是 | -- | -- | UNSEGMENTED | 是 | 是 | 可选 | 早期 |
 | Impala | (依赖 Kudu/HDFS) | Kudu HASH | Kudu RANGE | -- | -- | 是 | 是 | 是 | 2.6+ |
-| StarRocks | `DISTRIBUTED BY HASH/RANDOM` | 是 | 是 (3.0+) | -- | -- | Colocate Group | 是 | 可选 | GA |
+| StarRocks | `DISTRIBUTED BY HASH/RANDOM` | 是 | 否 | -- | -- | Colocate Group | 是 | 可选 | GA |
 | Doris | `DISTRIBUTED BY HASH/RANDOM` | 是 | -- | -- | -- | Colocate Group | 是 | 可选 | GA |
 | MonetDB | -- | -- | -- | -- | -- | -- | -- | -- | 单机为主 |
 | CrateDB | `CLUSTERED BY (col) INTO N SHARDS` | 是 | -- | -- | -- | -- | 单列 | 默认 | 早期 |
@@ -153,9 +153,14 @@ CREATE TABLE events (
     PRIMARY KEY (ts ASC, id ASC)
 );
 
--- StarRocks 3.0+
+-- 注意：StarRocks 仅支持 DISTRIBUTED BY HASH/RANDOM，
+-- 范围只能在 PARTITION BY RANGE 上表达（与分布键正交）：
 CREATE TABLE orders (id BIGINT, dt DATE, amount DECIMAL)
-DISTRIBUTED BY RANGE(dt) BUCKETS 16;
+PARTITION BY RANGE(dt) (
+    PARTITION p202401 VALUES LESS THAN ('2024-02-01'),
+    PARTITION p202402 VALUES LESS THAN ('2024-03-01')
+)
+DISTRIBUTED BY HASH(id) BUCKETS 16;
 ```
 
 特点：范围查询高效（只扫部分节点），但**容易产生写入热点**（递增时间戳全打到最后一个节点）。CockroachDB 用 hash-sharded index 缓解：`PRIMARY KEY (ts, id) USING HASH WITH BUCKET_COUNT = 16`。
@@ -169,9 +174,9 @@ DISTRIBUTED BY RANGE(dt) BUCKETS 16;
 CREATE SHARDED TABLE customers (
     id NUMBER, region VARCHAR2(20), name VARCHAR2(100)
 ) PARTITION BY LIST (region) (
-    PARTITION p_us VALUES ('US') TABLESPACE ts_us,
-    PARTITION p_eu VALUES ('EU') TABLESPACE ts_eu,
-    PARTITION p_ap VALUES ('AP') TABLESPACE ts_ap
+    PARTITION p_us VALUES ('US') TABLESPACE SET tsset_us,
+    PARTITION p_eu VALUES ('EU') TABLESPACE SET tsset_eu,
+    PARTITION p_ap VALUES ('AP') TABLESPACE SET tsset_ap
 );
 
 -- OceanBase
