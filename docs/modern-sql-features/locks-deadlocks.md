@@ -174,7 +174,7 @@ SELECT ... FROM ...
 | 引擎 | API | 键类型 | 作用域 |
 |------|-----|--------|--------|
 | PostgreSQL | `pg_advisory_lock(key)`, `pg_try_advisory_lock`, `pg_advisory_unlock` | bigint 或两个 int | 会话级 / 事务级 |
-| MySQL | `GET_LOCK(name, timeout)`, `RELEASE_LOCK`, `IS_FREE_LOCK` | 字符串 | 会话级 (8.0+ 实例级) |
+| MySQL | `GET_LOCK(name, timeout)`, `RELEASE_LOCK`, `IS_FREE_LOCK` | 字符串 | 会话级 (5.7.5+ 实例级) |
 | MariaDB | `GET_LOCK`, `RELEASE_LOCK` | 字符串 | 会话级 |
 | Oracle | `DBMS_LOCK.REQUEST` (需 EXECUTE 权限) | 用户分配 ID | 会话/事务 |
 | SQL Server | `sp_getapplock`, `sp_releaseapplock` | 字符串 | 会话/事务 |
