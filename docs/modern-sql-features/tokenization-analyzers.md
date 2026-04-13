@@ -529,7 +529,7 @@ SELECT splitByNonAlpha('foo-bar.baz');
 SELECT ngrams('北京欢迎你', 2);
 -- ['北京', '京欢', '欢迎', '迎你']
 
--- tokenbf_v1 跳数索引 (21.x+)
+-- tokenbf_v1 跳数索引 (v19.6+，2019)
 CREATE TABLE logs (
   ts DateTime,
   message String,
