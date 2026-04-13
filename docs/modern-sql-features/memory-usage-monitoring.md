@@ -324,7 +324,7 @@ GROUP BY a.x, b.y, c.z;         -- HashAggregate: work_mem
 
 如果 `work_mem = 64MB` 且 100 个并发连接，理论上限为 `100 * 64MB * 4 算子 = 25.6GB`——远超人们对"每会话 64MB"的直觉。生产环境大量 OOM 事件源自此。
 
-PostgreSQL 13 引入 `hash_mem_multiplier`（默认 1.0，13.x 后默认 2.0）解决哈希算子相对内存敏感的问题：
+PostgreSQL 13 引入 `hash_mem_multiplier`（默认 1.0；PG 15+ 改为默认 2.0）解决哈希算子相对内存敏感的问题：
 
 ```sql
 SET hash_mem_multiplier = 4.0;  -- Hash 算子可用 work_mem * 4
@@ -425,7 +425,7 @@ FROM sys.dm_exec_query_memory_grants;
 
 `requested` > `granted` 时查询在 `RESOURCE_SEMAPHORE` 上等待。如果等待超过 `query_wait` 配置，查询失败。
 
-**MEMORYGRANT 提示**（2012+）：
+**MEMORYGRANT 提示**（2012 SP3 / 2014 SP2 / 2016+）：
 
 ```sql
 SELECT * FROM Orders o JOIN Customers c ON o.cid = c.id
