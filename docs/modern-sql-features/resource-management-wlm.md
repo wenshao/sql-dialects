@@ -26,7 +26,7 @@ ISO SQL 标准从未定义资源管理语法。这是数据库管理领域中最
 
 1. **资源是物理概念**：标准只关心逻辑数据模型，不涉及 CPU 调度算法
 2. **架构差异巨大**：单机 vs MPP vs 云原生（计算存储分离）的资源单位完全不同
-3. **历史包袱**：Oracle Resource Manager (1998) 早于任何标准化尝试
+3. **历史包袱**：Oracle Resource Manager (1999) 早于任何标准化尝试
 
 因此本文不存在"标准语法"一节——所有内容都是厂商特定的。
 
@@ -76,7 +76,7 @@ ISO SQL 标准从未定义资源管理语法。这是数据库管理领域中最
 | H2 | -- | -- | -- | -- |
 | HSQLDB | -- | -- | -- | -- |
 | Derby | -- | -- | -- | -- |
-| Amazon Athena | 是 | Workgroup | `CREATE WORKGROUP` (API) | GA |
+| Amazon Athena | 是 | Workgroup | API/Console only (no SQL DDL) | GA |
 | Azure Synapse | 是 | Workload Group / Resource Class | `CREATE WORKLOAD GROUP` | GA |
 | Google Spanner | -- | (内部自动管理) | -- | -- |
 | Materialize | 是 | Cluster | `CREATE CLUSTER` | GA |
@@ -354,7 +354,7 @@ OS 层：cgroups v2 限制 PostgreSQL 后端进程的 CPU、内存、I/O；syste
 
 ### Oracle Database Resource Manager —— 资源管理的鼻祖
 
-Oracle 在 8i (1998) 引入 Database Resource Manager (DBRM)，是关系数据库领域最早的全功能 WLM。
+Oracle 在 8i (1999) 引入 Database Resource Manager (DBRM)，是关系数据库领域最早的全功能 WLM。
 
 ```sql
 -- 1. 创建 pending area
@@ -563,35 +563,57 @@ BigQuery 的资源单位是 **slot**（虚拟 CPU 单位）。两种计费模式
 1. **On-demand**：按扫描字节计费，slot 由 Google 共享池动态分配
 2. **Capacity (Reservations)**：购买固定 slot 容量，可分配到不同 reservation
 
+> **重要**：BigQuery Reservations **没有 SQL DDL**——`CREATE CAPACITY` / `CREATE RESERVATION` / `CREATE ASSIGNMENT` 等语句并不存在。容量提交、预留与分配只能通过 `bq` CLI、`gcloud`、REST API (`bigqueryreservation.googleapis.com`) 或 Terraform (`google_bigquery_reservation` 等资源) 管理。
+
+```bash
+# 1) 创建 capacity commitment（一次性购买）
+bq mk --project_id=admin --location=US \
+  --capacity_commitment --plan=ANNUAL --slots=500
+
+# 2) 创建预留
+bq mk --project_id=admin --location=US \
+  --reservation --slots=300 --ignore_idle_slots=false \
+  analytics_reservation
+
+# 3) 分配项目到预留
+bq mk --project_id=admin --location=US \
+  --reservation_assignment \
+  --reservation_id=admin:US.analytics_reservation \
+  --assignee_type=PROJECT --assignee_id=my-project \
+  --job_type=QUERY
+```
+
+```hcl
+# Terraform 等价写法
+resource "google_bigquery_capacity_commitment" "commit" {
+  capacity_commitment_id = "my-commit"
+  location               = "US"
+  slot_count             = 500
+  plan                   = "ANNUAL"
+}
+
+resource "google_bigquery_reservation" "analytics" {
+  name              = "analytics-reservation"
+  location          = "US"
+  slot_capacity     = 300
+  ignore_idle_slots = false
+}
+
+resource "google_bigquery_reservation_assignment" "analytics" {
+  reservation = google_bigquery_reservation.analytics.id
+  assignee    = "projects/my-project"
+  job_type    = "QUERY"
+}
+```
+
+真正可用的 SQL 部分仅限于 **查询级控制**：
+
 ```sql
--- 创建 capacity commitment（一次性购买）
-CREATE CAPACITY my_commit
-  AS JSON """{
-    "slot_count": 500,
-    "plan": "ANNUAL"
-  }""";
-
--- 创建预留
-CREATE RESERVATION analytics_reservation
-  AS JSON """{
-    "slot_capacity": 300,
-    "ignore_idle_slots": false,
-    "concurrency": 100
-  }""";
-
--- 分配项目到预留
-CREATE ASSIGNMENT analytics_assignment
-  AS JSON """{
-    "assignee": "projects/my-project",
-    "job_type": "QUERY",
-    "reservation": "projects/admin/locations/US/reservations/analytics_reservation"
-  }""";
-
--- 查询级成本上限
+-- 查询级成本上限（合法 SQL）
 SELECT * FROM big_table
 OPTIONS (maximum_bytes_billed = 10000000000);  -- 10 GB
 
--- 标签 → workload 路由
+-- 通过 SET 设置 query label，用于成本归因/路由
 SET @@dataset_project_id = 'my-project';
 SET @@query_label = 'team:analytics,priority:high';
 ```
