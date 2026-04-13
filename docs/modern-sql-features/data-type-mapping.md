@@ -401,7 +401,7 @@ SQL 标准（SQL:1999 ISO/IEC 9075、SQL:2003、SQL:2016）定义了以下类型
 | Firebolt | ✅ | 1 字节 | `TRUE`/`FALSE` | -- | -- |
 
 > **关键差异**：
-> - **MySQL 系**（MySQL、MariaDB、TiDB、SingleStore）中 `BOOLEAN` 是 `TINYINT(1)` 的语法糖，因此 `SELECT col = 2` 在 BOOLEAN 列上不会报错（列可以存储 0-255 的任何整数）。
+> - **MySQL 系**（MySQL、MariaDB、TiDB、SingleStore）中 `BOOLEAN` 是 `TINYINT(1)` 的语法糖，因此 `SELECT col = 2` 在 BOOLEAN 列上不会报错（列可存储 `TINYINT` 范围内的整数，默认有符号为 `-128..127`；若显式声明 `UNSIGNED` 则为 `0..255`）。
 > - **Oracle** 直到 23c 才在 SQL 层面引入 `BOOLEAN`，之前只有 PL/SQL 支持。
 > - **SQL Server / Azure Synapse** 使用 `BIT` 而非 `BOOLEAN`，只能存储 0、1、NULL。
 > - **Teradata** 没有布尔类型，通常用 `BYTEINT` 列存储 0/1。
@@ -683,7 +683,7 @@ SQL 标准（SQL:1999 ISO/IEC 9075、SQL:2003、SQL:2016）定义了以下类型
 | `CAST(expr AS type)` | `CAST('123' AS INT)` | 所有引擎（SQL 标准） |
 | `::` 操作符 | `'123'::INT` | PostgreSQL, Redshift, DuckDB, CockroachDB, YugabyteDB, Greenplum, TimescaleDB, Materialize, RisingWave, Databricks (3.4+) |
 | `CONVERT(type, expr)` | `CONVERT(INT, '123')` | SQL Server, Azure Synapse |
-| `CONVERT(expr, type)` | `CONVERT('123', INT)` | MySQL, MariaDB, TiDB, SingleStore |
+| `CONVERT(expr, type)` | `CONVERT('123', SIGNED INTEGER)` | MySQL, MariaDB, TiDB, SingleStore |
 | `TRY_CAST(expr AS type)` | `TRY_CAST('abc' AS INT)` → NULL | SQL Server, Trino, Databricks, DuckDB, Snowflake, Azure Synapse |
 | `SAFE_CAST(expr AS type)` | `SAFE_CAST('abc' AS INT64)` → NULL | BigQuery |
 | `TRY_CONVERT(type, expr)` | `TRY_CONVERT(INT, 'abc')` → NULL | SQL Server, Azure Synapse |
@@ -745,7 +745,7 @@ DuckDB   CockroachDB   Snowflake   DB2       Spark SQL     MariaDB
 
 2. **SQLite 动态类型**：声明类型仅影响"亲和性"（affinity），不强制执行。`CREATE TABLE t(x INT)` 后执行 `INSERT INTO t VALUES('hello')` 完全合法。
 
-3. **MySQL BOOLEAN 陷阱**：`BOOLEAN` 是 `TINYINT(1)` 的别名，因此布尔列可以存储 0-255 的任何整数。`WHERE bool_col = TRUE` 只匹配 `1`，不匹配 `2`、`3` 等非零值。正确写法是 `WHERE bool_col != 0` 或 `WHERE bool_col IS TRUE`（MySQL 8.0.16+）。
+3. **MySQL BOOLEAN 陷阱**：`BOOLEAN` 是 `TINYINT(1)` 的别名，因此布尔列可存储 `TINYINT` 范围内的整数（默认有符号 `-128..127`，声明 `UNSIGNED` 时为 `0..255`）。`WHERE bool_col = TRUE` 只匹配 `1`，不匹配 `2`、`3` 等非零值。正确写法是 `WHERE bool_col != 0` 或 `WHERE bool_col IS TRUE`（MySQL 8.0.16+）。
 
 4. **FLOAT 含义歧义**：`FLOAT` 在 PostgreSQL / Redshift 中是 8 字节（=DOUBLE），在 MySQL / Spark SQL 中是 4 字节。跨库迁移时务必显式指定 `REAL`（4B）或 `DOUBLE PRECISION`（8B）。
 
