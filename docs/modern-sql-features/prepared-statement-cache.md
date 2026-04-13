@@ -134,7 +134,7 @@ DEALLOCATE PREPARE <statement_name>;
 | SQL Server | 是 (Plan Cache) | 全局 | 是 | `max server memory` |
 | DB2 | 是 (Package Cache) | 全局 | 是 | `PCKCACHESZ` |
 | PostgreSQL | 部分 | 会话级 | 是 | `plan_cache_mode` |
-| MySQL | -- | -- | -- | -- (8.0 移除 Query Cache) |
+| MySQL | -- | -- | -- | -- (8.0.3 移除 Query Cache) |
 | MariaDB | 部分 (Query Cache) | 全局 | 否 | `query_cache_type` |
 | SQLite | 是 (语句缓存) | 连接级 | 是 | `sqlite3_prepare_v2` |
 | Snowflake | 内部 (不暴露) | 全局 | 是 | -- |
@@ -586,7 +586,7 @@ MySQL 的预编译机制经历了一段曲折的历史。
 MySQL 5.0-5.7 提供 Query Cache：缓存完整的查询结果（不是计划），通过 SQL 文本完全匹配查找。当任何被引用的表发生写入时，相关的所有缓存条目都被失效。
 
 ```sql
--- 5.7 时代的配置（8.0 已废除）
+-- 5.7 时代的配置（8.0.3 已废除）
 SET GLOBAL query_cache_type = ON;
 SET GLOBAL query_cache_size = 256 * 1024 * 1024;
 SHOW STATUS LIKE 'Qcache%';
@@ -598,7 +598,7 @@ Query Cache 的致命问题：
 3. **正确性陷阱**：与某些 SQL 函数（NOW(), RAND()）交互复杂
 4. **命中率低**：实际生产环境命中率常低于 10%
 
-MySQL 8.0 直接移除 Query Cache 整个特性。这是数据库领域罕见的"否定之否定"：曾经被认为是优化银弹的功能，在十几年后被证明是负资产。
+MySQL 8.0.3 直接移除 Query Cache 整个特性。这是数据库领域罕见的"否定之否定"：曾经被认为是优化银弹的功能，在十几年后被证明是负资产。
 
 #### Prepared Statements
 
@@ -760,7 +760,7 @@ SET GLOBAL tidb_instance_plan_cache_max_size = '512MiB';
 CREATE GLOBAL BINDING FOR
     SELECT * FROM users WHERE id = ?
 USING
-    SELECT * /*+ USE_INDEX(users, idx_id) */ * FROM users WHERE id = ?;
+    SELECT /*+ USE_INDEX(users, idx_id) */ * FROM users WHERE id = ?;
 ```
 
 TiDB 计划缓存的演进路线：
