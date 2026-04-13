@@ -148,8 +148,8 @@ INSERT INTO v3 VALUES (-1, 1);   -- 失败（要求 a>0 AND b>0）
 | PostgreSQL | 是 (9.4+) | 是 (9.4+) | CASCADED |
 | MySQL | 是 | 是 | CASCADED |
 | MariaDB | 是 | 是 | CASCADED |
-| Oracle | 否 (只支持单一 CHECK OPTION) | 是 | CASCADED |
-| SQL Server | 否 | 是 | CASCADED |
+| Oracle | 仅 `WITH CHECK OPTION`（无 LOCAL/CASCADED 关键字，行为接近 LOCAL） | -- | LOCAL（默认且唯一） |
+| SQL Server | 仅 `WITH CHECK OPTION`（无 LOCAL/CASCADED 关键字，行为接近 LOCAL） | -- | LOCAL（默认且唯一） |
 | DB2 LUW | 是 | 是 | CASCADED |
 | HSQLDB | 是 | 是 | CASCADED |
 | Greenplum/YugabyteDB/TimescaleDB | 是 | 是 | CASCADED（继承 PG） |
