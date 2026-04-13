@@ -308,7 +308,7 @@ CONSTRAINT fk_order_customer
 | ClickHouse | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | Teradata | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | Greenplum | 支持(继承 PG) | 支持 | 不支持 | 支持(NOT VALID) | 不支持 |
-| CockroachDB | 不支持 | 支持(FK, v22.1+) | 不支持 | 支持(NOT VALID) | 不支持 |
+| CockroachDB | 不支持 | 支持(FK, v22.2+) | 不支持 | 支持(NOT VALID) | 不支持 |
 | TiDB | 不支持 | 不支持 | 不支持 | 不支持 | 支持(FK 不强制) |
 | OceanBase | 不支持 | 支持(Oracle 模式) | 支持(Oracle 模式) | 支持(Oracle 模式) | 不支持 |
 | YugabyteDB | 不支持 | 支持 | 不支持 | 不支持 | 不支持 |
@@ -759,7 +759,7 @@ ALTER TABLE orders ADD CONSTRAINT fk_orders_product
     FOREIGN KEY (product_id) REFERENCES products(id) NOT VALID;
 ALTER TABLE orders VALIDATE CONSTRAINT fk_orders_product;
 
--- 注意：CockroachDB v22.1+ 支持 DEFERRABLE 外键约束
+-- 注意：CockroachDB v22.2+ 支持 DEFERRABLE 外键约束
 -- 也不支持 EXCLUDE 约束
 ```
 
@@ -1175,9 +1175,9 @@ CREATE TABLE orders (
 
 | 分类 | 引擎 | 特征 |
 |------|------|------|
-| **完全强制** | PostgreSQL, Oracle, SQL Server, DB2, MySQL(InnoDB), MariaDB, CockroachDB, YugabyteDB, DuckDB, Firebird, H2, HSQLDB, Derby, SAP HANA, Teradata, Greenplum, OceanBase, MonetDB, TimescaleDB, Informix, Google Spanner | 约束在 DML 时实时检查并拒绝违规数据 |
+| **完全强制** | PostgreSQL, Oracle, SQL Server, DB2, MySQL(InnoDB), MariaDB, SQLite (FK 需 PRAGMA foreign_keys=ON), CockroachDB, YugabyteDB, DuckDB, Firebird, H2, HSQLDB, Derby, SAP HANA, Teradata, Greenplum, OceanBase, MonetDB, TimescaleDB, Informix, Google Spanner | 约束在 DML 时实时检查并拒绝违规数据 |
 | **信息性约束** | Snowflake, BigQuery, Redshift, Azure Synapse, Vertica, Exasol, Hive, Databricks, Impala, Firebolt, Yellowbrick, Flink SQL | 接受约束语法但不执行，仅供优化器使用 |
-| **最小约束支持** | ClickHouse(CHECK, 22.6+), CrateDB(仅PK) | 仅支持极少约束类型 |
+| **最小约束支持** | ClickHouse(CHECK, 22.6+), CrateDB (PK + CHECK + NOT NULL) | 仅支持极少约束类型 |
 | **无约束支持** | Trino, Presto, Amazon Athena, QuestDB, InfluxDB, DatabendDB | 不支持约束 |
 
 ### 2. 外键是分布式数据库的分水岭
@@ -1190,7 +1190,7 @@ CREATE TABLE orders (
 
 ### 3. CHECK 约束是 MySQL 生态的历史痛点
 
-MySQL 直到 8.0.16（2019 年）才真正强制执行 CHECK 约束。在此之前长达二十年的时间里，CHECK 子句被解析但完全忽略。MariaDB 在 10.2.1（2017 年）率先修复了这一问题。TiDB 在 8.0 版本才支持 CHECK 强制执行。
+MySQL 直到 8.0.16（2019 年）才真正强制执行 CHECK 约束。在此之前长达二十年的时间里，CHECK 子句被解析但完全忽略。MariaDB 在 10.2.1（2017 年）率先修复了这一问题。TiDB 在 7.2 引入实验性 CHECK 支持，并在 7.5 版本稳定。
 
 ### 4. OLAP 引擎中 NOT NULL 的特殊地位
 
@@ -1205,7 +1205,7 @@ EXCLUDE 约束用 GiST 索引实现范围/几何不重叠检查，目前只有 P
 
 ### 6. 可延迟约束的采用率较低
 
-尽管 SQL:1992 标准就已定义了 DEFERRABLE 约束，但实际支持的引擎有限：PostgreSQL、Oracle、SQLite（有限）、YugabyteDB、OceanBase（Oracle 模式）、Firebird、HSQLDB、Greenplum、CockroachDB（v22.1+ FK）。MySQL、SQL Server、DB2（LUW）等主流引擎均不支持。可延迟约束最常见的使用场景是循环引用和批量数据加载。
+尽管 SQL:1992 标准就已定义了 DEFERRABLE 约束，但实际支持的引擎有限：PostgreSQL、Oracle、SQLite（有限）、YugabyteDB、OceanBase（Oracle 模式）、Firebird、HSQLDB、Greenplum、CockroachDB（v22.2+ FK）。MySQL、SQL Server、DB2（LUW）等主流引擎均不支持。可延迟约束最常见的使用场景是循环引用和批量数据加载。
 
 ### 7. 流处理引擎中 PRIMARY KEY 的语义变化
 
