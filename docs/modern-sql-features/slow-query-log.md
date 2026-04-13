@@ -12,7 +12,7 @@ OLTP 系统的性能问题几乎都遵循 80/20 分布：少数 SQL 模板贡献
 4. **容量规划**：CPU/IO 排名前 N 的 SQL 模板决定了下一次硬件采购的方向。
 5. **审计取证**：和审计日志互补，慢查询日志保留了"实际执行了什么"以及"为什么慢"。
 
-正因如此，几乎所有 OLTP 数据库都在很早期就引入了某种形式的慢查询日志：MySQL 在 4.0（2003）就有 `slow_query_log`，PostgreSQL 在 7.x 就有 `log_min_duration_statement`，Oracle 的 AWR/ASH 在 10g（2003）一并发布，SQL Server 早期靠 SQL Trace 和 Profiler，2016 年后被 Query Store 取代。
+正因如此，几乎所有 OLTP 数据库都在很早期就引入了某种形式的慢查询日志：MySQL 在 3.23（2001）就有 `slow_query_log`，PostgreSQL 在 7.x 就有 `log_min_duration_statement`，Oracle 的 AWR/ASH 在 10g（2003）一并发布，SQL Server 早期靠 SQL Trace 和 Profiler，2016 年后被 Query Store 取代。
 
 > 注意：本主题完全是厂商扩展，**SQL 标准没有任何关于性能监控/慢查询日志的规定**。所有语法、视图、配置项都是各厂商独立设计的，互不兼容。本文的对比因此完全围绕"能力维度"而非"标准符合度"。
 
@@ -25,7 +25,7 @@ OLTP 系统的性能问题几乎都遵循 80/20 分布：少数 SQL 模板贡献
 | 引擎 | 文件日志 | 系统视图/表 | 默认开启 | 历史 |
 |------|---------|-------------|---------|------|
 | PostgreSQL | `log_min_duration_statement` → server log | `pg_stat_statements` 扩展 | 否 | 7.x / 8.4 |
-| MySQL | `slow_query_log` (file) / `slow_log` (table) | `performance_schema.events_statements_*` | 否 / 是(PS) | 4.0 / 5.5 |
+| MySQL | `slow_query_log` (file) / `slow_log` (table) | `performance_schema.events_statements_*` | 否 / 是(PS) | 3.23 (2001) / 5.5 |
 | MariaDB | `slow_query_log` | `performance_schema` + `slow_log` 表 | 否 | 继承 MySQL |
 | SQLite | -- | -- | -- | 不支持 |
 | Oracle | -- | AWR + ASH + `V$SQL` / `DBA_HIST_*` | 是(AWR) | 10g+ |
@@ -211,7 +211,7 @@ OLTP 系统的性能问题几乎都遵循 80/20 分布：少数 SQL 模板贡献
 ### 8. 关键厂商锚点能力
 
 - **PostgreSQL `log_min_duration_statement`**：8.x 起的 GUC，单位毫秒，-1 关闭，0 全开。配合 `log_min_duration_sample` (13+) 和 `log_statement_sample_rate` (15+)。
-- **MySQL `long_query_time`**：4.0 引入的 `slow_query_log`，5.1 引入 `log_queries_not_using_indexes`，5.5 引入 Performance Schema。`long_query_time` 支持 **微秒粒度浮点**。
+- **MySQL `long_query_time`**：3.23 (2001) 引入的 `slow_query_log`，5.1 引入 `log_queries_not_using_indexes`，5.5 引入 Performance Schema。`long_query_time` 支持 **微秒粒度浮点**。
 - **`performance_schema.events_statements_summary_by_digest`**：MySQL 5.6 起按 digest 聚合，含 `COUNT_STAR`、`SUM_TIMER_WAIT`、`SUM_ROWS_EXAMINED` 等。
 - **SQL Server Query Store**：2016 起内置；2017 引入 wait stats；2022 引入 Query Store hints。捕获模式 `AUTO/ALL/CUSTOM/NONE`。
 - **Oracle AWR**：10g 起，默认每小时快照；保留 8 天。`DBA_HIST_SQLSTAT` 是慢 SQL 的核心历史视图。
@@ -644,7 +644,7 @@ for row in curr:
 
 ### 2. "文件 vs 表"的分裂逐渐倾向"表"
 
-老一代引擎（MySQL 4.0、PostgreSQL 8.x、Oracle 9i）默认提供文件日志；新一代云数据仓库（Snowflake、BigQuery、Redshift、Databricks）**完全不提供文件日志**——只通过系统视图暴露。原因：
+老一代引擎（MySQL 3.23、PostgreSQL 8.x、Oracle 9i）默认提供文件日志；新一代云数据仓库（Snowflake、BigQuery、Redshift、Databricks）**完全不提供文件日志**——只通过系统视图暴露。原因：
 
 - 云原生没有"shell 登录主机"的概念
 - 对象存储日志成本高且查询慢
