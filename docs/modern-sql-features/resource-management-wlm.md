@@ -44,7 +44,7 @@ ISO SQL 标准从未定义资源管理语法。这是数据库管理领域中最
 | SQL Server | 是 | Workload Group | `CREATE WORKLOAD GROUP` | 2008 Ent+ |
 | DB2 | 是 | Workload / Service Class | `CREATE WORKLOAD` | 9.5+ |
 | Snowflake | 是 | Warehouse + Resource Monitor | `CREATE WAREHOUSE` | GA |
-| BigQuery | 是 | Reservation / Assignment | `CREATE RESERVATION` | GA |
+| BigQuery | 是 | Reservation / Assignment | 无 SQL DDL (bq CLI / API / Terraform) | GA |
 | Redshift | 是 | WLM Queue / Auto WLM | 参数组 / `wlm_json_configuration` | GA |
 | DuckDB | -- | (单进程内嵌) | -- | -- |
 | ClickHouse | 是 | Profile / Quota / Workload | `CREATE WORKLOAD` | 24.x+ |
