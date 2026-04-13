@@ -364,7 +364,7 @@ Checkpoint 是把脏页刷盘从而**截断 WAL** 的过程。触发条件通常
 | 引擎 | 段大小 (segment) | 块大小 (block) |
 |------|----------------|---------------|
 | PostgreSQL | 默认 16 MB（编译期 `--with-wal-segsize`，11+ initdb 可调） | 8 KB |
-| MySQL InnoDB | 8.0.30+ 可在线调整，redo log 文件 4MB-512MB | 512 B (log block) |
+| MySQL InnoDB | 8.0.30+ 可在线调整 `innodb_redo_log_capacity` (8MB-128GB)；旧 `innodb_log_file_size` 范围 4MB-512MB | 512 B (log block) |
 | MariaDB | 同上 | 512 B |
 | Oracle | redo log file 可定义（典型 50-200 MB） | OS block size |
 | SQL Server | VLF 大小由 log 文件大小决定 | 512 B / 4 KB |
