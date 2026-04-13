@@ -7,7 +7,7 @@
 | 引擎 | STORED | VIRTUAL | 版本 | 语法关键字 |
 |------|--------|---------|------|-----------|
 | MySQL | 支持 | 支持 | 5.7+ | `GENERATED ALWAYS AS (...) STORED/VIRTUAL` |
-| PostgreSQL | 支持 | 是 (17+) | 12+ | `GENERATED ALWAYS AS (...) STORED` / `VIRTUAL` (17+) |
+| PostgreSQL | 支持 | 是 (18+) | 12+ | `GENERATED ALWAYS AS (...) STORED` / `VIRTUAL` (18+) |
 | SQLite | 支持 | 支持 | 3.31+ | `GENERATED ALWAYS AS (...) STORED/VIRTUAL` |
 | Oracle | 不支持 | 支持 | 11g+ | `AS (expr)` —— 虚拟列 |
 | SQL Server | 支持 | 支持 | 2005+ | `AS (expr) [PERSISTED]` —— 计算列 |
@@ -89,7 +89,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    -- PostgreSQL 12-16 只支持 STORED，PG 17+ 也支持 VIRTUAL
+    -- PostgreSQL 12-17 只支持 STORED，PG 18+ 也支持 VIRTUAL
     full_name VARCHAR(101) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
     email VARCHAR(200),
     email_domain VARCHAR(100) GENERATED ALWAYS AS (split_part(email, '@', 2)) STORED,
@@ -98,7 +98,7 @@ CREATE TABLE users (
     city TEXT GENERATED ALWAYS AS ((profile ->> 'city')) STORED
 );
 
--- PostgreSQL 17+ 支持 VIRTUAL 列，早期版本可以用表达式索引替代部分场景
+-- PostgreSQL 18+ 支持 VIRTUAL 列，早期版本可以用表达式索引替代部分场景
 CREATE INDEX idx_lower_email ON users (lower(email));
 -- 表达式索引是 PostgreSQL 的强项，某种程度上弥补了无 VIRTUAL 列的不足
 ```
@@ -308,14 +308,14 @@ ALTER TABLE t DROP COLUMN c;
 
 6. PostgreSQL VIRTUAL 列的演进
 
-PostgreSQL 社区长期讨论 VIRTUAL 列支持，早期版本（12-16）仅支持 STORED，核心顾虑包括：
+PostgreSQL 社区长期讨论 VIRTUAL 列支持，早期版本（12-17）仅支持 STORED，核心顾虑包括：
 
 1. **元数据存储**: VIRTUAL 列的定义需要存储在系统表中，但 PostgreSQL 的元组格式假设每列都有物理存储
 2. **表达式索引已覆盖**: `CREATE INDEX ON t ((a + b))` 提供了类似功能
 3. **VIEW 可替代**: `CREATE VIEW v AS SELECT *, a + b AS c FROM t` 也能实现
 4. **实现复杂度**: 需要修改存储层、执行器、pg_dump、逻辑复制等多个组件
 
-PostgreSQL 17 正式引入了 VIRTUAL 生成列支持，结束了长期仅支持 STORED 的局面。
+PostgreSQL 18 正式引入了 VIRTUAL 生成列支持，结束了长期仅支持 STORED 的局面，并且 VIRTUAL 成为了默认选项。
 
 ## 限制与陷阱
 
@@ -334,7 +334,7 @@ PostgreSQL 17 正式引入了 VIRTUAL 生成列支持，结束了长期仅支持
 -- BEFORE INSERT 触发器看不到 VIRTUAL 列的值
 
 -- PostgreSQL 额外限制:
--- PG 17 之前不支持 VIRTUAL 列（17+ 已支持）
+-- PG 18 之前不支持 VIRTUAL 列（18+ 已支持，且 VIRTUAL 为默认）
 -- 计算列不能引用其他计算列
 -- 不能直接用 COPY 导入计算列
 ```
@@ -360,9 +360,9 @@ UPDATE users SET first_name = '李' WHERE id = 1;
 
 | 特性 | MySQL | PG | Oracle | SQL Server |
 |------|-------|-----|--------|------------|
-| VIRTUAL 列 | 支持 | 支持 (17+) | 支持 | 支持（非 PERSISTED） |
+| VIRTUAL 列 | 支持 | 支持 (18+) | 支持 | 支持（非 PERSISTED） |
 | STORED 列 | 支持 | 支持 | 不支持 | 支持（PERSISTED） |
-| 虚拟列索引 | 支持 | 支持 (17+) | 支持 | 支持 |
+| 虚拟列索引 | 支持 | 支持 (18+) | 支持 | 支持 |
 | 虚拟列做分区键 | 不支持 | 不支持 | 支持 | 不支持 |
 | 引用其他计算列 | 不支持 | 不支持 | 支持 | 支持 |
 | 非确定性表达式 | VIRTUAL 允许 | 不支持 | 不支持 | 不支持 |

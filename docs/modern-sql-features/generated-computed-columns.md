@@ -26,7 +26,7 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 
 | 引擎 | STORED | VIRTUAL | 版本 | 语法关键字 |
 |------|--------|---------|------|-----------|
-| PostgreSQL | 支持 | 是 (17+) | 12+ | `GENERATED ALWAYS AS (...) {VIRTUAL\|STORED}` |
+| PostgreSQL | 支持 | 是 (18+) | 12+ | `GENERATED ALWAYS AS (...) {VIRTUAL\|STORED}` |
 | MySQL | 支持 | 支持 (默认) | 5.7.6+ | `[GENERATED ALWAYS] AS (...) {VIRTUAL\|STORED}` |
 | MariaDB | 支持 | 支持 (默认) | 5.2+ / 10.2+ | `{GENERATED ALWAYS\|} AS (...) {VIRTUAL\|STORED\|PERSISTENT}` |
 | SQLite | 支持 | 支持 (默认) | 3.31.0+ | `[GENERATED ALWAYS] AS (...) {VIRTUAL\|STORED}` |
@@ -160,7 +160,7 @@ SQL:2003 同时引入了 **identity column** 语法 `GENERATED { ALWAYS | BY DEF
 
 ### PostgreSQL 12+
 
-PostgreSQL 12+ 支持 STORED 生成列，17+ 新增 VIRTUAL 支持。表达式中的函数必须标记为 `IMMUTABLE`。
+PostgreSQL 12+ 支持 STORED 生成列，18+ 新增 VIRTUAL 支持。表达式中的函数必须标记为 `IMMUTABLE`。
 
 ```sql
 CREATE TABLE users (
@@ -179,14 +179,14 @@ CREATE TABLE users (
 -- 支持在 STORED 生成列上创建索引
 CREATE INDEX idx_full_name ON users (full_name);
 
--- 不支持 VIRTUAL，但可用表达式索引替代
+-- PG 12-17 不支持 VIRTUAL；PG 18+ 支持。早期版本可用表达式索引替代
 CREATE INDEX idx_lower_email ON users (lower(email));
 
 -- ALTER TABLE 添加生成列（需回填所有现有行）
 ALTER TABLE users ADD COLUMN name_length INT GENERATED ALWAYS AS (length(first_name) + length(last_name)) STORED;
 ```
 
-PostgreSQL 17（2024 年 9 月发布）新增了 VIRTUAL 生成列支持。在此之前，表达式索引 (`CREATE INDEX ON t ((a + b))`) 和 VIEW 可作为 VIRTUAL 列的替代方案。
+PostgreSQL 18（2025 年 9 月发布）新增了 VIRTUAL 生成列支持，并使 VIRTUAL 成为默认选项；17 及以下版本仅支持 STORED。在此之前，表达式索引 (`CREATE INDEX ON t ((a + b))`) 和 VIEW 可作为 VIRTUAL 列的替代方案。
 
 ### MySQL 5.7.6+
 
@@ -916,7 +916,7 @@ UPDATE users SET first_name = '李' WHERE id = 1;
 
 1. **语法分裂严重**: 同一概念至少有 6 种关键字变体 (STORED / PERSISTED / MATERIALIZED / PERSISTENT / VIRTUAL / ALIAS / COMPUTED BY)，移植 DDL 时需逐一转换。
 
-2. **STORED vs VIRTUAL 能力不对称**: DB2/SAP HANA 只支持 STORED；Oracle 只支持 VIRTUAL；PostgreSQL (17+)/MySQL/MariaDB/SQL Server/CockroachDB 两者都支持。没有任何引擎完全对称地实现了这两种模式的所有功能。
+2. **STORED vs VIRTUAL 能力不对称**: PostgreSQL 17 及以下、DB2、SAP HANA 只支持 STORED；Oracle 只支持 VIRTUAL；PostgreSQL 18+、MySQL、MariaDB、SQL Server、CockroachDB、DuckDB、TiDB、OceanBase 两者都支持。没有任何引擎完全对称地实现了这两种模式的所有功能。
 
 3. **云原生数据仓库普遍不支持**: Snowflake、BigQuery、Redshift、Azure Synapse、Firebolt、Yellowbrick 等分析型引擎均不提供生成列，因为列式存储引擎更倾向于通过物化视图或 VIEW 来实现类似功能。
 
