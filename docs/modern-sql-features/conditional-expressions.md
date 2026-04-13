@@ -1039,7 +1039,7 @@ FROM annual_sales;
 
 ### 短路求值 (Short-Circuit Evaluation)
 
-所有主流 SQL 引擎都在 CASE 表达式中实现了短路求值：当某个 WHEN 条件匹配后，后续的 WHEN 分支不再求值。
+多数主流 SQL 引擎在大多数场景下都表现为对 CASE 表达式进行短路求值：当某个 WHEN 条件匹配后，后续的 WHEN 分支通常不再求值。但需要注意，这通常属于具体引擎实现和优化策略层面的行为，并非 SQL 标准层面的强保证；某些引擎或执行场景（例如 SQL Server 中可能出现的优化器重排）下，严格的短路语义未必成立。
 
 ```sql
 -- 短路求值示例：除零不会发生
@@ -1134,7 +1134,7 @@ COALESCE(a, b)
 
 ### SQL Server 的优化器重排问题
 
-SQL Server 优化器可能在特定条件下重排 CASE 表达式中的求值顺序。这在官方文档中有说明，可能导致看似安全的短路求值实际失败：
+SQL Server 优化器可能在特定条件下重排 CASE 表达式中的求值顺序。Microsoft 官方文档对此有明确说明，可参考 [`CASE (Transact-SQL)`](https://learn.microsoft.com/sql/t-sql/language-elements/case-transact-sql)（关于某些表达式可能在 `CASE` 接收结果前就被计算）以及 [`IIF (Transact-SQL)`](https://learn.microsoft.com/sql/t-sql/functions/logical-functions-iif-transact-sql)（说明 `IIF` 会被转换为 `CASE`）。这可能导致看似安全的短路求值实际失败：
 
 ```sql
 -- 可能出现问题的写法
@@ -1152,7 +1152,7 @@ FROM mixed_data;
 
 ## NULL 处理函数对比总览
 
-以下矩阵汇总了各引擎的 NULL 处理函数支持情况：
+以下矩阵摘录了主要引擎的 NULL 处理函数支持情况（完整 49 引擎清单请参见下方的综合对比矩阵）：
 
 | 引擎 | COALESCE | NVL | IFNULL | ISNULL(替换) | NVL2 |
 |------|----------|-----|--------|-------------|------|
@@ -1227,12 +1227,12 @@ FROM mixed_data;
 | H2 | 是 | -- | -- | 是 | 是 | 是 | 是 | 是 | 是 |
 | HSQLDB | 是 | -- | -- | 是 | 是 | 是 | 是 | 是 | 是 |
 | Derby | 是 | -- | -- | -- | 是 | 是 | -- | -- | -- |
-| Athena | 是 | 是 | -- | -- | 是 | 是 | -- | -- | 是 |
+| Amazon Athena | 是 | 是 | -- | -- | 是 | 是 | -- | -- | 是 |
 | Azure Synapse | 是 | -- | 是 | -- | 是 | 是 | -- | -- | 是 |
-| Spanner | 是 | 是 | -- | -- | 是 | 是 | -- | 是 | 是 |
+| Google Spanner | 是 | 是 | -- | -- | 是 | 是 | -- | 是 | 是 |
 | Materialize | 是 | -- | -- | -- | 是 | 是 | -- | -- | 是 |
 | RisingWave | 是 | -- | -- | -- | 是 | 是 | -- | -- | 是 |
-| InfluxDB | 是 | -- | -- | -- | 是 | 是 | -- | -- | -- |
+| InfluxDB (SQL) | 是 | -- | -- | -- | 是 | 是 | -- | -- | -- |
 | DatabendDB | 是 | 是 | -- | -- | 是 | 是 | -- | 是 | 是 |
 | Yellowbrick | 是 | -- | -- | -- | 是 | 是 | -- | -- | 是 |
 | Firebolt | 是 | 是 | -- | -- | 是 | 是 | -- | 是 | 是 |
