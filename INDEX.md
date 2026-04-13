@@ -199,6 +199,7 @@
 ## 相关文档
 
 - [README.md](README.md) — 项目介绍与目录结构
+- [docs/modern-sql-features/](docs/modern-sql-features/) — 现代 SQL 特性对比（94 篇深度文章，按 15 大类分组）
 - [dialects/](dialects/) — 按方言浏览（45 个方言索引页）
 - [REFERENCES.md](REFERENCES.md) — 全方言官方文档链接索引
 - [CONTRIBUTING.md](CONTRIBUTING.md) — 贡献指南
