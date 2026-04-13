@@ -114,7 +114,7 @@ CREATE TABLE t (id INT) WITH (appendonly=true, orientation=column);
 | MariaDB | InnoDB / Aria | ColumnStore | -- | MyRocks | MEMORY |
 | PostgreSQL | heap | (zedstore 实验) | -- | OrioleDB（实验） | -- |
 | SQLite | B-tree | -- | -- | -- | `:memory:` |
-| Oracle | row heap | In-Memory Column Store (12c+) | 是（双格式） | -- | In-Memory Column Store |
+| Oracle | row heap | In-Memory Column Store (12.1.0.2+, 2014) | 是（双格式） | -- | In-Memory Column Store |
 | SQL Server | heap / clustered | columnstore (2012+) | 是 | -- | In-Memory OLTP (Hekaton, 2014+) |
 | DB2 | row | BLU columnar (10.5+) | 是 | -- | Timestack (时序) |
 | Snowflake | -- | micro-partition | -- | -- | -- |
