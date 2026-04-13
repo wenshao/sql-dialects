@@ -109,12 +109,12 @@ GEOMETRY vs GEOGRAPHY:
 | SQL Server | geometry | geography | 子类型 | 子类型 | 子类型 | 是 | CLR |
 | DB2 | ST_Geometry | ST_Geometry | 是 | 是 | 是 | 是 | WKB 内部 |
 | Snowflake | GEOMETRY | GEOGRAPHY | 子类型 | 子类型 | 子类型 | 是 | GeoJSON 内部 |
-| BigQuery | GEOGRAPHY | 是 (默认) | 子类型 | 子类型 | 子类型 | 是 | S2 内部 |
+| BigQuery | 否 (仅 GEOGRAPHY) | 是 (默认) | 子类型 | 子类型 | 子类型 | 是 | S2 内部 |
 | Redshift | GEOMETRY | 否 | 子类型 | 子类型 | 子类型 | 是 | WKB 内部 |
 | DuckDB | GEOMETRY | 否 | 独立类型 | 独立类型 | 独立类型 | 是 | 内部 |
 | ClickHouse | 无统一类型 | 否 | Point | LineString | Polygon | Multi* | Tuple/Array |
-| Trino | 无统一类型 | 否 | 无 | 无 | 无 | 无 | varbinary(WKB) |
-| Presto | 无统一类型 | 否 | 无 | 无 | 无 | 无 | varbinary(WKB) |
+| Trino | 无独立类型 (varbinary WKB) | 否 | 通过 ST_* | 通过 ST_* | 通过 ST_* | 通过 ST_* | varbinary(WKB) |
+| Presto | 无独立类型 (varbinary WKB) | 否 | 通过 ST_* | 通过 ST_* | 通过 ST_* | 通过 ST_* | varbinary(WKB) |
 | Spark SQL | 无原生 | 否 | 无 | 无 | 无 | 无 | 字符串/UDF |
 | Hive | 无原生 | 否 | 无 | 无 | 无 | 无 | 字符串/UDF |
 | Databricks | 无原生 | 否 | 无 | 无 | 无 | 无 | 字符串/内建函数 |
@@ -129,14 +129,14 @@ GEOMETRY vs GEOGRAPHY:
 
 | 函数 | PostGIS | MySQL 8.0 | SQL Server | Oracle | BigQuery | Snowflake | DuckDB | ClickHouse | Trino |
 |------|---------|-----------|------------|--------|----------|-----------|--------|------------|-------|
-| ST_Point(x,y) | 是 | 是 (8.0.12+) | 方法 | 否 | ST_GEOGPOINT | 是 | 是 | 否 | 否 |
+| ST_Point(x,y) | 是 | 是 (8.0.12+) | 方法 | 否 | ST_GEOGPOINT | 是 | 是 | 否 | 是 |
 | ST_MakePoint(x,y) | 是 | 否 | 否 | 否 | 否 | 是 | 否 | 否 | 否 |
 | ST_GeomFromText(WKT) | 是 | 是 | 静态方法 | SDO_GEOMETRY | ST_GEOGFROMTEXT | 是 | 是 | 否 | ST_GeometryFromText |
 | ST_GeomFromWKB(WKB) | 是 | 是 | 静态方法 | 否 | ST_GEOGFROMWKB | 是 | 是 | 否 | 否 |
 | ST_GeomFromGeoJSON | 是 | 是 (8.0+) | 否 | 否 | ST_GEOGFROMGEOJSON | 是 | 是 | 否 | 否 |
 | ST_MakeLine | 是 | 否 | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
 | ST_MakePolygon | 是 | 否 | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
-| ST_MakeEnvelope | 是 | 是 (Envelope) | 否 | 否 | ST_MAKELINE 等 | 否 | 否 | 否 | 否 |
+| ST_MakeEnvelope | 是 | 是 (Envelope) | 否 | 否 | 无直接等价（用 ST_GEOGFROMTEXT 构造闭合 POLYGON） | 否 | 否 | 否 | 否 |
 
 补充说明：
 
@@ -153,7 +153,7 @@ ClickHouse: 无 ST_ 构造函数，使用 Tuple 和 Array 表示:
             Polygon = [[(x1,y1), (x2,y2), ...]]  -- Array(Array(Tuple))
 
 Trino:      ST_GeometryFromText('POINT (0 0)')
-            ST_Point(x, y) 在较新版本中可用
+            ST_Point(x, y) 同样可用（Trino 标准 ST_ 函数集）
 
 BigQuery:   所有空间函数使用 GEOGRAPHY 类型，ST_GEOGPOINT(lng, lat)
 
@@ -164,7 +164,7 @@ Databricks: ST_Point(x, y), ST_GeomFromWKT('...') (3.4+, 内建函数)
 
 | 函数 | 功能 | PostGIS | MySQL 8.0 | SQL Server | Oracle | BigQuery | Snowflake | DuckDB | ClickHouse | Trino |
 |------|------|---------|-----------|------------|--------|----------|-----------|--------|------------|-------|
-| ST_Distance | 两几何距离 | 是 | 是 | STDistance | SDO_GEOM.SDO_DISTANCE | ST_DISTANCE | 是 | 是 | 是 | ST_Distance |
+| ST_Distance | 两几何距离 | 是 | 是 | STDistance | SDO_GEOM.SDO_DISTANCE | ST_DISTANCE | 是 | 是 | geoDistance/greatCircleDistance | ST_Distance |
 | ST_Area | 面积 | 是 | 是 | STArea | SDO_GEOM.SDO_AREA | ST_AREA | 是 | 是 | 否 | ST_Area |
 | ST_Length | 线长度 | 是 | 是 | STLength | SDO_GEOM.SDO_LENGTH | ST_LENGTH | 是 | 是 | 否 | ST_Length |
 | ST_Perimeter | 周长 | 是 | 否 | 否 | SDO_GEOM.SDO_LENGTH | ST_PERIMETER | 是 | 是 | 否 | 否 |
@@ -284,7 +284,7 @@ ClickHouse 特殊语法:
 | ST_SetSRID | 是 | ST_SRID(g,srid) | 否 | 否 | 不适用 | 是 | 是 | 否 | 否 |
 | ST_AsText (WKT) | 是 | 是 | STAsText | SDO_UTIL.TO_WKTGEOMETRY | ST_ASTEXT | 是 | 是 | 否 | ST_AsText |
 | ST_AsBinary (WKB) | 是 | 是 | STAsBinary | SDO_UTIL.TO_WKBGEOMETRY | ST_ASBINARY | 是 | 是 | 否 | 否 |
-| ST_AsGeoJSON | 是 | 是 (8.0+) | 是 (2016+) | SDO_UTIL.TO_GEOJSON | ST_ASGEOJSON | 是 | 是 | 否 | ST_AsText (无) |
+| ST_AsGeoJSON | 是 | 是 (8.0+) | 是 (2016+) | SDO_UTIL.TO_GEOJSON | ST_ASGEOJSON | 是 | 是 | 否 | 否 (仅支持 WKT/WKB) |
 | ST_AsKML | 是 | 否 | AsGml(类似) | SDO_UTIL.TO_KMLGEOMETRY | 否 | 否 | 否 | 否 | 否 |
 | ST_GeometryType | 是 | 是 | STGeometryType | 方法 | ST_GEOMETRYTYPE | 是 | 是 | 否 | ST_GeometryType |
 | ST_NumPoints | 是 | 是 | STNumPoints | SDO_UTIL.GETNUMVERTICES | ST_NUMPOINTS | 否 | 否 | 否 | 否 |
@@ -363,7 +363,7 @@ H3 (Uber) 和 S2 (Google) 是现代空间索引系统，将地球表面离散化
 |---------|----------|------------|--------|-----------|------------|-------|--------|--------|
 | H3 索引 | 是 | 是 (原生) | 扩展 (h3) | 是 (H3 UDF) | 是 (H3) | 否 | 否 | 否 |
 | S2 单元格 | 是 (S2_) | 否 | 否 | 否 | 否 | 否 | 否 | 否 |
-| H3 点→索引 | H3_LATLNG_TO_CELL | h3ToGeo | h3_latlng_to_cell | H3_LATLNG_TO_CELL | h3_latlng_to_cell | 否 | 否 | 否 |
+| H3 点→索引 | H3_LATLNG_TO_CELL | geoToH3 | h3_latlng_to_cell | H3_LATLNG_TO_CELL | h3_latlng_to_cell | 否 | 否 | 否 |
 | H3 索引→多边形 | H3_CELL_TO_BOUNDARY | h3ToGeoBoundary | h3_cell_to_boundary | H3_CELL_TO_BOUNDARY | h3_cell_to_boundary | 否 | 否 | 否 |
 | H3 分辨率 | H3_GET_RESOLUTION | h3GetResolution | h3_get_resolution | H3_GET_RESOLUTION | h3_get_resolution | 否 | 否 | 否 |
 | H3 邻居 | H3_GRID_DISK | h3kRing | h3_grid_disk | H3_GRID_DISK | h3_grid_disk | 否 | 否 | 否 |
@@ -464,6 +464,7 @@ CREATE TABLE cities (
 CREATE TABLE districts (
     id    SERIAL PRIMARY KEY,
     name  TEXT NOT NULL,
+    city  TEXT NOT NULL,
     geom  GEOMETRY(Polygon, 4326)
 );
 
