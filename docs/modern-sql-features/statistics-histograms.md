@@ -440,9 +440,9 @@ MySQL 直方图的特点：
 - **手动维护**：MySQL 直方图不会随 `ANALYZE TABLE` 自动重建，需要显式 `UPDATE HISTOGRAM`
 - **innodb_stats_persistent_sample_pages**：控制 InnoDB 持久化统计的采样页数（默认 20）
 
-### MariaDB：等宽直方图（10.0+，早于 MySQL）
+### MariaDB：等高(height-balanced)直方图 (10.0+，早于 MySQL)
 
-MariaDB 早在 10.0 就引入了直方图，但实现完全不同于 MySQL：
+MariaDB 早在 10.0 就引入了直方图（`DOUBLE_PREC_HB` 为等高/height-balanced 实现），但实现完全不同于 MySQL：
 
 ```sql
 -- 收集持久化统计（包括直方图）
