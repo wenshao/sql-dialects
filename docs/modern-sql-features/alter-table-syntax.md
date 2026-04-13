@@ -151,7 +151,7 @@ ALTER TABLE table_name
 | MariaDB | **10.5.2+** | 是 | `RENAME COLUMN old TO new` / `RENAME TO new_name` | 10.5.2+ / 5.1+ |
 | SQLite | **3.25.0+** | 是 | `RENAME COLUMN old TO new` / `RENAME TO new_name` | 3.25.0+ / 2.0+ |
 | Oracle | 是 | **RENAME old TO new** | `RENAME COLUMN old TO new` / `RENAME old_table TO new_table` | 9iR2+ |
-| SQL Server | **sp_rename** | **sp_rename** | `EXEC sp_rename 'table.old', 'new', 'COLUMN'` | 6.0+ |
+| SQL Server | 是 (sp_rename) | 是 (sp_rename) | `EXEC sp_rename 'table.old', 'new', 'COLUMN'` / `EXEC sp_rename 'old_table', 'new_table'` | 6.0+ |
 | DB2 | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TABLE old TO new` | 9.7+ |
 | Snowflake | 是 | 是 | `RENAME COLUMN old TO new` / `RENAME TO new_name` | GA |
 | BigQuery | 是 | 不支持 | `RENAME COLUMN old TO new` | GA |
@@ -218,7 +218,7 @@ ALTER TABLE table_name
 | Presto | 不支持 | -- | 无 ALTER COLUMN TYPE | -- |
 | Spark SQL | `ALTER COLUMN col TYPE` | `ALTER COLUMN age TYPE BIGINT` | Delta Lake 3.0+; 仅安全扩宽 | 3.0+ |
 | Hive | `CHANGE COLUMN` | `CHANGE COLUMN age age BIGINT` | 需重复列名; 仅 ORC/Parquet | 0.14+ |
-| Flink SQL | `MODIFY` | `MODIFY col BIGINT` | 取决于 connector | 1.14+ |
+| Flink SQL | `MODIFY` | `MODIFY (col BIGINT)` | 取决于 connector | 1.14+ |
 | Databricks | `ALTER COLUMN col TYPE` | `ALTER COLUMN age TYPE BIGINT` | 仅安全扩宽 | Runtime 10.4+ |
 | Teradata | 不支持 | -- | 需 DROP + ADD 变通 | -- |
 | Greenplum | `ALTER COLUMN col TYPE` | `ALTER COLUMN age TYPE BIGINT` | 继承 PostgreSQL | 5.0+ |
@@ -552,7 +552,7 @@ ALTER TABLE table_name
 | Greenplum | 9.6+ | 是 | 是 | 6.0+ |
 | CockroachDB | 是 | 是 | 是 | 1.0+ |
 | TiDB | 不支持 | 是 | 不支持 | 5.0+ |
-| OceanBase | 不支持 | 不支持 | 不支持 | -- |
+| OceanBase | 不支持 | 是 (MySQL 模式) | 不支持 | 仅 `ADD COLUMN IF NOT EXISTS` |
 | YugabyteDB | 是 | 是 | 是 | 2.0+ |
 | SingleStore | 不支持 | 不支持 | 不支持 | -- |
 | Vertica | 不支持 | 不支持 | 不支持 | -- |
@@ -1050,9 +1050,9 @@ ALTER TABLE orders DROP PRIMARY KEY;
 
 ## 关键发现
 
-### 1. 语法关键字的三大阵营
+### 1. 语法关键字的四大阵营
 
-各引擎修改列类型的关键字形成了三大阵营：
+各引擎修改列类型的关键字形成了四大阵营：
 
 | 阵营 | 关键字 | 代表引擎 |
 |------|--------|---------|
@@ -1086,10 +1086,10 @@ ALTER TABLE orders DROP PRIMARY KEY;
 IF EXISTS / IF NOT EXISTS 对部署脚本的幂等性至关重要，但令人意外的是，许多主流引擎至今不支持：
 
 - **支持**: PostgreSQL (9.6+), MariaDB (10.0+), Snowflake, BigQuery, DuckDB, ClickHouse, Trino, CockroachDB, YugabyteDB, H2, Google Spanner
-- **部分支持**: TiDB (5.0+ 仅 ADD COLUMN IF NOT EXISTS)
-- **不支持**: MySQL, SQLite, Oracle, SQL Server, DB2, Redshift, Spark SQL, Hive, OceanBase, Teradata
+- **部分支持**: TiDB (5.0+ 仅 `ADD COLUMN IF NOT EXISTS`), OceanBase MySQL 模式 (仅 `ADD COLUMN IF NOT EXISTS`)
+- **不支持**: MySQL, SQLite, Oracle, SQL Server, DB2, Redshift, Spark SQL, Hive, Teradata
 
-MySQL 不支持 `ADD COLUMN IF NOT EXISTS` 是一个常见的兼容性痛点，MariaDB 在 10.0 就添加了这一能力。
+这类语法在不少引擎中属于"子句级支持"而非完整支持：例如 TiDB 和 OceanBase MySQL 模式支持 `ADD COLUMN IF NOT EXISTS`，但不支持 `ALTER TABLE IF EXISTS` / `DROP COLUMN IF EXISTS`。相比之下，MySQL 连 `ADD COLUMN IF NOT EXISTS` 也不支持，这是一个常见的兼容性痛点；MariaDB 则在 10.0 就添加了这一能力。
 
 ### 6. 约束管理的 OLTP / OLAP 鸿沟
 
