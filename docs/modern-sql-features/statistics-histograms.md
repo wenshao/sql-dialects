@@ -101,7 +101,7 @@
 |------|------|------|------|------|-----|---------|
 | PostgreSQL | 是 | -- | -- | -- | 是 | 等深 + MCV |
 | MySQL | 是 | 是 | -- | -- | -- | SINGLETON 或 EQUI-HEIGHT |
-| MariaDB | -- | 是 | -- | -- | -- | 等宽（DOUBLE_PREC_HB） |
+| MariaDB | 是 | -- | -- | -- | -- | 等高（DOUBLE_PREC_HB） |
 | SQLite | -- | -- | -- | -- | -- | 仅 sqlite_stat1 行数 |
 | Oracle | 是 (height-balanced) | -- | 是 | 是 (12c+) | top-frequency | 自动选择 |
 | SQL Server | 是 | -- | -- | -- | -- | 等深（最多 200 step） |
@@ -461,7 +461,7 @@ SELECT * FROM mysql.column_stats WHERE table_name = 'orders';
 
 MariaDB 直方图的关键特点：
 
-- **类型**：默认 `DOUBLE_PREC_HB`（双精度等宽 height-balanced）或 `SINGLE_PREC_HB`
+- **类型**：默认 `DOUBLE_PREC_HB`（双精度等高 (height-balanced/equi-depth)）或 `SINGLE_PREC_HB`
 - **存储**：`mysql.column_stats` 系统表
 - **histogram_size**：1 ~ 255 桶
 - 与 MySQL 相比，MariaDB 直方图更早出现但接受度较低，许多查询模式下精度不如 MySQL 8.0 的等深方案
