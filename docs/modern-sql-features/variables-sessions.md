@@ -154,7 +154,7 @@ END
 | MariaDB | `DECLARE v TYPE [DEFAULT expr]` | `SET v = expr` / `SELECT expr INTO v` | ✅ | 支持 | 5.0+ |
 | SQLite | 无过程化 SQL | — | — | — | — |
 | Oracle | `v TYPE [:= expr]`（DECLARE 块） | `v := expr` / `SELECT expr INTO v` | ✅ | 支持 | 7.0+ |
-| SQL Server | `DECLARE @v TYPE [= expr]` | `SET @v = expr` / `SELECT @v = expr` | 批处理级 | 2008+ | 2000+ |
+| SQL Server | `DECLARE @v TYPE [= expr]`（`= expr` 需 2008+） | `SET @v = expr` / `SELECT @v = expr` | 批处理级 | 支持 | 2000+ |
 | DB2 | `DECLARE v TYPE [DEFAULT expr]` | `SET v = expr` / `SELECT expr INTO v` | ✅ | 支持 | 7.0+ |
 | Snowflake | `LET v TYPE := expr` / `DECLARE v TYPE` | `v := expr` | ✅ | 支持 | GA |
 | BigQuery | `DECLARE v TYPE [DEFAULT expr]` | `SET v = expr` | ✅ | 支持 | GA |
@@ -266,7 +266,7 @@ END
 | MariaDB | `SET var = val` | `SET a=1, b=2` | `=` / `:=` | 按类型 | `SET STATEMENT var=val FOR stmt` |
 | SQLite | `PRAGMA name = val` | 每条一个 | `=` | 无需引号 | `PRAGMA name(val)` |
 | Oracle | `ALTER SESSION SET param = val` | 每条一个 | `=` | 按类型 | 无 SET 关键字 |
-| SQL Server | `SET @var = expr` / `SET option ON\|OFF` | 每条一个 | `=` | 按类型 | `SET NOCOUNT ON` / `SET XACT_ABORT ON` |
+| SQL Server | `SET @var = expr` / `SET option ON/OFF` | 每条一个 | `=` | 按类型 | `SET NOCOUNT ON` / `SET XACT_ABORT ON` |
 | DB2 | `SET var = val` | `SET (a, b) = (1, 2)` | `=` | 按类型 | `SET CURRENT SCHEMA = 'name'` |
 | Snowflake | `SET var = expr` | 每条一个 | `=` | 按类型 | `UNSET var` |
 | BigQuery | `SET var = expr` | 每条一个 | `=` | 按类型 | `SET @@param = val` |
@@ -275,7 +275,7 @@ END
 | ClickHouse | `SET param = val` | `SET a=1, b=2` | `=` | 按类型 | `SETTINGS` 子句（查询级） |
 | Trino | `SET SESSION prop = val` | 每条一个 | `=` | 按类型 | `RESET SESSION prop` |
 | CockroachDB | `SET param = val` / `SET param TO val` | 每条一个 | `=` / `TO` | 按类型 | `RESET param` |
-| TiDB | `SET [SESSION\|GLOBAL] var = val` | `SET a=1, b=2` | `=` | 按类型 | `SET @@var = val` |
+| TiDB | `SET [SESSION/GLOBAL] var = val` | `SET a=1, b=2` | `=` | 按类型 | `SET @@var = val` |
 | Hive | `SET param = val` | 每条一个 | `=` | 字符串 | `RESET` 全部重置 |
 | SAP HANA | `SET 'key' = 'val'` | 每条一个 | `=` | 字符串 | `UNSET 'key'` |
 | Firebird | `SET TERM ^;`（isql 工具）| — | — | — | 多为工具级命令 |
