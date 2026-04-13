@@ -488,12 +488,16 @@ BEGIN
 END;
 
 -- MySQL 5.7.2+ / MariaDB 10.2.3+: 同一事件多个触发器
-CREATE TRIGGER trg_second_before_insert
-BEFORE INSERT ON orders
+-- 注：BEFORE INSERT 阶段自增列 NEW.id 尚未分配（通常为 0/NULL），
+-- 若需要基于自增主键生成 order_number，应使用 AFTER INSERT + UPDATE
+CREATE TRIGGER trg_second_after_insert
+AFTER INSERT ON orders
 FOR EACH ROW
 FOLLOWS trg_before_insert_orders  -- 在 trg_before_insert_orders 之后执行
 BEGIN
-    SET NEW.order_number = CONCAT('ORD-', LPAD(NEW.id, 8, '0'));
+    UPDATE orders
+    SET order_number = CONCAT('ORD-', LPAD(NEW.id, 8, '0'))
+    WHERE id = NEW.id;
 END;
 
 -- MariaDB: CREATE OR REPLACE (10.1.4+)
@@ -567,27 +571,29 @@ END;
 CREATE OR REPLACE TRIGGER trg_compound_orders
 FOR INSERT OR UPDATE ON orders
 COMPOUND TRIGGER
-    TYPE t_order_ids IS TABLE OF orders.id%TYPE;
-    v_order_ids t_order_ids := t_order_ids();
+    TYPE t_customer_ids IS TABLE OF orders.customer_id%TYPE;
+    v_customer_ids t_customer_ids := t_customer_ids();
 
     BEFORE STATEMENT IS
     BEGIN
-        v_order_ids.DELETE;
+        v_customer_ids.DELETE;
     END BEFORE STATEMENT;
 
     AFTER EACH ROW IS
     BEGIN
-        v_order_ids.EXTEND;
-        v_order_ids(v_order_ids.COUNT) := :NEW.id;
+        v_customer_ids.EXTEND;
+        v_customer_ids(v_customer_ids.COUNT) := :NEW.customer_id;
     END AFTER EACH ROW;
 
     AFTER STATEMENT IS
     BEGIN
-        FOR i IN 1..v_order_ids.COUNT LOOP
-            -- 在语句级安全地查询触发表
-            UPDATE order_summary SET total = (
-                SELECT SUM(amount) FROM orders WHERE customer_id = v_order_ids(i)
-            );
+        FOR i IN 1..v_customer_ids.COUNT LOOP
+            -- 在语句级安全地查询触发表，并只更新对应客户的汇总行
+            UPDATE order_summary
+            SET total = (
+                SELECT SUM(amount) FROM orders WHERE customer_id = v_customer_ids(i)
+            )
+            WHERE customer_id = v_customer_ids(i);
         END LOOP;
     END AFTER STATEMENT;
 END trg_compound_orders;
@@ -991,6 +997,8 @@ AS
 BEGIN
     IF (NEW.id IS NULL) THEN
         NEW.id = GEN_ID(gen_orders_id, 1);
+
+    -- 下面这行在 IF 之外，始终无条件执行
     NEW.created_at = CURRENT_TIMESTAMP;
 END;
 
