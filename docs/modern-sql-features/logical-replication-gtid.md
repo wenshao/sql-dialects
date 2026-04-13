@@ -493,7 +493,7 @@ SELECT pg_create_logical_replication_slot('s1', 'pgoutput', false, false, true);
 
 1. **逻辑复制没有 SQL 标准**。从 1980 年代到现在，逻辑复制始终是厂商各自为政的领域，没有任何 ISO SQL 条款定义 `CREATE PUBLICATION` 或 GTID。所有语法、所有事务标识格式都是私有的，互不兼容。
 
-2. **PostgreSQL 是最晚但最完整的"标准式"逻辑复制**。直到 PG 10 (2017) 才有内置的 `CREATE PUBLICATION/SUBSCRIPTION`，而 MySQL 早在 2002 年就有了 binlog 复制、Oracle Streams 在 2002 年也有了。但 PG 用 7 年时间（10 → 17）补齐了流式、过滤、故障切换槽等关键特性，今天的 PG 逻辑复制是设计最干净的厂商方案。
+2. **PostgreSQL 是最晚但最完整的"标准式"逻辑复制**。直到 PG 10 (2017) 才有内置的 `CREATE PUBLICATION/SUBSCRIPTION`，而 MySQL 3.23 (2000-2001) 就有了 binlog 复制、Oracle Streams 在 2002 年也有了。但 PG 用 7 年时间（10 → 17）补齐了流式、过滤、故障切换槽等关键特性，今天的 PG 逻辑复制是设计最干净的厂商方案。
 
 3. **MySQL GTID 与 MariaDB GTID 是不可调和的两套体系**。两者都叫 GTID，但格式、语义、续点机制完全不同，互相无法直接复制——这是开源数据库分叉后最显著的不兼容点之一。
 
