@@ -684,7 +684,7 @@ AS WASM FROM 'power_mod.wasm' WITH (HANDLER = 'power_mod');
 
 ### 4. Wasm 是新建系统的主流方向
 
-新一代 OLAP（SingleStore Wasm、DatabendDB Wasm、ClickHouse 24.4 Wasm、ScyllaDB Wasm）几乎都把 Wasm 当成 UDF 的"第一路径"，因为它一次性解决了沙箱、跨平台、多语言三个传统痛点。预计未来 5 年 Wasm UDF 将成为云原生数据库的标配。
+新一代 OLAP（SingleStore Wasm、DatabendDB Wasm、ScyllaDB Wasm）几乎都把 Wasm 当成 UDF 的"第一路径"，因为它一次性解决了沙箱、跨平台、多语言三个传统痛点。预计未来 5 年 Wasm UDF 将成为云原生数据库的标配。
 
 ### 5. SQL-only UDF 才是优化器的最爱
 
@@ -726,7 +726,7 @@ Snowflake External Function、BigQuery Remote Function、Redshift/Athena Lambda 
 | Python UDF | 是 (PL/Py) | -- | ML Services | -- | 是 (Snowpark) | -- | 是 | 进程外 | 是 (Pandas) | 是 |
 | JavaScript UDF | PL/V8 | MLE | -- | -- | 是 (V8) | 是 (V8) | -- | -- | -- | -- |
 | Rust UDF | pgrx | -- | -- | -- | -- | -- | 实验 | 实验 | -- | -- |
-| WASM UDF | 实验 | -- | -- | -- | -- | -- | 实验 | 24.4+ | -- | -- |
+| WASM UDF | 实验 | -- | -- | -- | -- | -- | 实验 | 不支持 | -- | -- |
 | 远程函数 | 自建 | -- | -- | -- | 是 | 是 | -- | executable | -- | -- |
 | FENCED 模式 | 通过进程 | extproc | -- | 是 | 是 | 是 | -- | 是 | -- | 是 |
 | GPU UDF | -- | -- | -- | -- | 间接 | ML 函数 | -- | -- | RAPIDS | -- |
