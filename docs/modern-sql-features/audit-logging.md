@@ -129,7 +129,7 @@ ISO/IEC 9075 系列标准 (SQL:1992 至 SQL:2023) 从未定义任何审计相关
 | 引擎 | 条件审计 (FGA) | 查询文本捕获 | 绑定参数捕获 | 敏感数据掩码 | 不可篡改 (Tamper-proof) |
 |------|---------------|-------------|-------------|-------------|----------------------|
 | Oracle | DBMS_FGA + Unified Policy `WHEN` | 是 | 是 | DDM / Vault | Audit Vault |
-| SQL Server | `WHERE` 谓词 (2017+) | 是 | 部分 | DDM | 是 (CC 认证) |
+| SQL Server | `WHERE` 谓词 (2012+) | 是 | 部分 | DDM | 是 (CC 认证) |
 | PostgreSQL pgaudit | -- | 是 | 是 (`pgaudit.log_parameter`) | 无原生 | 依赖 OS |
 | MySQL Enterprise | 过滤规则 | 是 | 是 | -- | -- |
 | MariaDB | 规则 (loggable) | 是 | 是 | -- | -- |
@@ -247,7 +247,7 @@ ADD (SELECT, UPDATE, DELETE ON dbo.Salaries BY public),
 ADD (EXECUTE ON SCHEMA::dbo BY [Auditor])
 WITH (STATE = ON);
 
--- 4) 带谓词的过滤 (2017+)
+-- 4) 带谓词的过滤 (2012+)
 CREATE SERVER AUDIT FilteredAudit
 TO FILE (FILEPATH = 'D:\AuditLogs\')
 WHERE database_name = N'Finance' AND server_principal_name <> N'sa';
@@ -258,7 +258,7 @@ SELECT event_time, action_id, succeeded, server_principal_name,
   FROM sys.fn_get_audit_file('D:\AuditLogs\*.sqlaudit', DEFAULT, DEFAULT);
 ```
 
-SQL Server 2017 起 `WHERE` 谓词使审计可以根据条件过滤，避免记录无关事件。Azure SQL Database 把审计输出到 Azure Storage / Log Analytics / Event Hubs。
+SQL Server 2012 起 Server Audit 的 `WHERE` 谓词使审计可以根据条件过滤，避免记录无关事件。Azure SQL Database 把审计输出到 Azure Storage / Log Analytics / Event Hubs。
 
 ### PostgreSQL：pgaudit 扩展
 
