@@ -48,7 +48,7 @@
 | MySQL | 是 | 是 | 是 | 是 | Linux 不区分 | 增加大量私有列 |
 | MariaDB | 是 | 是 | 是 | 是 | Linux 不区分 | 兼容 MySQL |
 | SQLite | -- | -- | -- | -- | -- | 仅 sqlite_schema |
-| Oracle | -- | -- | -- | -- | -- | 仅 USER_/ALL_/DBA_ |
+| Oracle | 23ai+ | 23ai+ | 23ai+ | -- | 大写 | 23ai (2024 May) 引入基本 INFORMATION_SCHEMA 视图 (TABLES/COLUMNS/VIEWS)；历史上以 USER_/ALL_/DBA_ 为主 |
 | SQL Server | 是 | 是 | 是 | 是 (SCHEMATA) | 大小写敏感取决于排序规则 | 与 sys.* 共存，部分列缺失 |
 | DB2 (LUW) | 是 | 是 | 是 | 是 | 大写 | SYSCAT 是主目录 |
 | Snowflake | 是 | 是 | 是 | 是 | 大写 | 每库独立 |
