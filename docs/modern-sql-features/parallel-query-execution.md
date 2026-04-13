@@ -85,7 +85,7 @@ Aggregate.next_batch() → Join.next_batch() → Scan.next_batch() → 一个 Co
 | MySQL (InnoDB) | 主键扫描 | -- | -- | 8.0.14 |
 | MariaDB | -- | -- | -- | 不支持 |
 | SQLite | -- | -- | -- | 不支持 |
-| Oracle | 是 | 是 | 是 | 7.x (并行 Query Option) |
+| Oracle | 是 | 是 | 是 | 7.1 (1994, 并行 Query Option) |
 | SQL Server | 是 | 是 | -- | 2000+ |
 | DB2 | 是 | 是 | 是 | DB2 EEE 早期 |
 | Snowflake | 是 (自动) | 不适用 | -- | GA |
@@ -276,7 +276,7 @@ GROUP BY customer_id;
 
 ### Oracle：最早的商业并行实现
 
-Oracle 在 7.x (1992) 就引入了 Parallel Query Option，是商业数据库中最早系统化支持 intra-query 并行的产品。其模型对后来所有 MPP 数据库都有深远影响。
+Oracle 在 7.1 (1994) 就引入了 Parallel Query Option，是商业数据库中最早系统化支持 intra-query 并行的产品。其模型对后来所有 MPP 数据库都有深远影响。
 
 **核心概念**：
 
@@ -636,7 +636,7 @@ Spark AQE 的 `skewJoin.enabled` 自动做后两者。Snowflake 内部有自动 
 
 2. **PostgreSQL 的并行查询用了 7 年才"成熟"**。9.6 (2016) 起步到 16 (2023) 才补齐 Parallel Full Outer Hash Join。但仍然不支持并行 DML，且基于多进程模型导致短查询启动开销高。社区在讨论将来引入线程模型 ("threaded postgres") 来根本性改善这一点。
 
-3. **Oracle 的 Parallel Query 是工程范本**。1992 年的 7.x 起就有完整的 PX 框架、PQ_DISTRIBUTE hint、parallel DML、自动 DOP，至今几乎所有 MPP 数据库 (Greenplum、OceanBase、SingleStore) 的并行架构都是这个模型的变体。
+3. **Oracle 的 Parallel Query 是工程范本**。1994 年的 7.1 起就有完整的 PX 框架、PQ_DISTRIBUTE hint、parallel DML、自动 DOP，至今几乎所有 MPP 数据库 (Greenplum、OceanBase、SingleStore) 的并行架构都是这个模型的变体。
 
 4. **Morsel-Driven 是新引擎的事实标准**。DuckDB、HyPer、Umbra、CedarDB 都基于 morsel 模型，因为它能在单机多核场景下榨干硬件、自然解决 straggler、NUMA 感知。但代价是必须 from scratch 重写执行器——这是 PostgreSQL/Oracle 无法采用的根本原因。
 
