@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 109 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 124 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -81,6 +81,11 @@
 - [AUTO_INCREMENT / SEQUENCE / IDENTITY](auto-increment-sequence-identity.md)
 - [外部表](external-tables.md)
 - [可更新视图规则](updatable-views.md)
+
+### 存储架构
+- [可插拔存储引擎](pluggable-storage-engines.md)
+- [表空间与文件布局](tablespace-file-layout.md)
+- [表与列压缩](table-column-compression.md)
 
 ### 索引
 - [索引类型与创建语法](index-types-creation.md)
@@ -164,6 +169,8 @@
 
 - [MVCC 实现机制](mvcc-implementation.md)
 - [事务隔离级别对比](transaction-isolation-comparison.md)
+- [锁机制与死锁检测](locks-deadlocks.md)
+- [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
 
 ---
 
@@ -173,6 +180,12 @@
 - [优化器演进](optimizer-evolution.md)
 - [预编译语句与计划缓存](prepared-statement-cache.md)
 - [资源管理与工作负载管理 (WLM)](resource-management-wlm.md)
+- [并行查询执行](parallel-query-execution.md)
+- [查询提示 (Query Hints)](query-hints.md)
+- [查询重写规则](query-rewrite-rules.md)
+- [查询取消与超时控制](query-cancellation-timeouts.md)
+- [统计信息与直方图](statistics-histograms.md)
+- [慢查询日志与性能监控](slow-query-log.md)
 
 ---
 
@@ -186,6 +199,7 @@
 - [错误处理](error-handling.md)
 - [安全错误处理](error-handling-safe.md)
 - [变量与会话管理](variables-sessions.md)
+- [连接池与会话管理](connection-pooling.md)
 
 ---
 
@@ -193,6 +207,8 @@
 
 - [批量导入导出](bulk-import-export.md) · [旧版](copy-bulk-load.md)
 - [CDC / Changefeed 变更捕获](cdc-changefeed.md)
+- [逻辑复制与 GTID](logical-replication-gtid.md)
+- [跨区域地理复制](geo-replication.md)
 - [外部数据源与数据库链接 (FDW / dblink)](foreign-data-wrappers.md)
 - [备份与恢复语法](backup-restore-syntax.md)
 - [数据库事件通知 (LISTEN/NOTIFY / Service Broker)](database-events-notify.md)
@@ -205,6 +221,7 @@
 - [角色与授权粒度 (CREATE ROLE / GRANT)](roles-grants-permissions.md)
 - [行级安全 (RLS)](row-level-security.md)
 - [审计日志](audit-logging.md)
+- [数据血缘与查询溯源](data-lineage.md)
 
 ---
 
