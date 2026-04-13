@@ -631,7 +631,7 @@ ORDER BY CreatedAt;
 
 10. **Snowflake、BigQuery、ClickHouse 等代表"无锁哲学"**。它们用不可变存储 + MVCC + 乐观重试替代了所有传统锁机制。在 OLAP 场景下这是合理的——读多写少、批量更新、追加为主。但代价是无法支持点更新热点（同一行高频并发写入），这也是为什么这些引擎都不适合 OLTP。
 
-11. **PostgreSQL 咨询锁是被低估的应用层工具**。bigint 键空间允许任意 hash 字符串成键，`pg_try_advisory_lock` 是非阻塞的，事务级版本自动释放——是分布式定时任务、单实例 leader 选举、限流器的优雅实现。MySQL 的 `GET_LOCK` 自 8.0 起也升级为实例级（之前是会话级），但仍只支持字符串键。
+11. **PostgreSQL 咨询锁是被低估的应用层工具**。bigint 键空间允许任意 hash 字符串成键，`pg_try_advisory_lock` 是非阻塞的，事务级版本自动释放——是分布式定时任务、单实例 leader 选举、限流器的优雅实现。MySQL 的 `GET_LOCK` 自 5.7.5 起升级为实例级（之前是会话级），但仍只支持字符串键。
 
 12. **`lock_timeout` 与 `deadlock_timeout` 是不同的事**。前者限制单次锁等待的最大时长（防止业务 hang 死），后者控制何时触发死锁检测（性能调优旋钮）。生产环境通常都会把 `lock_timeout` 设为几秒到几十秒——0（无限等待）虽是默认，但在线上几乎总会引发问题。
 
