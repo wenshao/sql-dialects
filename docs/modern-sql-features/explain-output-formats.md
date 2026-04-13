@@ -973,7 +973,7 @@ MariaDB 的 JSON 字段以 `r_` 前缀表示运行时实际值（r_rows、r_filt
 
 3. **JSON 已成事实标准**。约 15 个引擎原生支持 JSON 输出，是除 TEXT 之外覆盖最广的格式。Dalibo PEV、explain.depesz.com、PEV2、VividCortex、Datadog 都以 JSON 为输入。
 
-4. **XML 退守 SQL Server**。XML 在 SQL Server 中是一等公民（SSMS 图形化计划、Query Store 都基于 XML），但在其他引擎中正在被 JSON 取代。MySQL 5.5 引入 XML 后，5.6 引入 JSON，到 8.0 几乎不再有人用 XML。
+4. **XML 退守 SQL Server**。XML 在 SQL Server 中是一等公民（SSMS 图形化计划、Query Store 都基于 XML），但在其他引擎中正在被 JSON 取代。MySQL 5.6 (2013) 首次引入结构化 EXPLAIN (XML 和 JSON)，5.7.6 (2015) 又加入 EXPLAIN FOR CONNECTION，到 8.0 几乎不再有人用 XML。
 
 5. **YAML 是 PostgreSQL 系独有的奢侈品**。仅 PG 及其直系继承支持。优势是无需大量引号即可人读，但下游工具支持差，使用率远低于 JSON。
 
