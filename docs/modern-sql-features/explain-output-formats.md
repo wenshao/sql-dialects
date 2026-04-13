@@ -144,7 +144,7 @@ ISO/IEC 9075 系列标准（SQL:1992 至 SQL:2023）从未定义 `EXPLAIN`、`EX
 | 引擎 | 语法 | 首个版本 | 备注 |
 |------|------|---------|------|
 | PostgreSQL | `EXPLAIN (FORMAT XML)` | 9.0 (2010) | -- |
-| MySQL | `EXPLAIN FORMAT=XML` | 5.5 (2010) | 5.7 起淡出，被 JSON 取代 |
+| MySQL | `EXPLAIN FORMAT=XML` | 5.6 (2013) | 5.7 起淡出，被 JSON 取代 |
 | MariaDB | -- | -- | 不支持 XML |
 | SQL Server | `SET SHOWPLAN_XML ON` / `STATISTICS XML` | 2005+ | XML 是 SSMS 图形化的源 |
 | Oracle | `DBMS_XPLAN.DISPLAY(format=>'XML')` | 10g+ | 配合 SQL Monitor |
