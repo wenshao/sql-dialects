@@ -112,9 +112,9 @@
 | 引擎 | LZ4 | ZSTD | Snappy | GZIP / zlib | LZO | Brotli |
 |------|-----|------|--------|-------------|-----|--------|
 | PostgreSQL | 14+ (TOAST) | -- | -- | -- | -- | -- |
-| MySQL InnoDB | 8.0.16+ | 8.0.16+ | -- | 是 (默认) | -- | -- |
+| MySQL InnoDB | 是 (5.7+ 透明页压缩) | -- | -- | 是 (默认) | -- | -- |
 | MariaDB | 是 | 是 | 是 | 是 | 是 | -- |
-| Oracle | -- | 23ai | -- | 是 (HCC ZLIB) | LZO 类 (BASIC) | -- |
+| Oracle | -- | 23ai | -- | 是 (HCC ZLIB) | 符号表/页字典 (非 LZO) | -- |
 | SQL Server | -- | 2022+ (Backup) | -- | 是 (Backup) | -- | -- |
 | DB2 | -- | -- | -- | 是 | -- | -- |
 | Snowflake | 是 | 是 | 是 | 是 | -- | 是 |
