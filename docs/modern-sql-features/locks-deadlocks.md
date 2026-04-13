@@ -380,7 +380,7 @@ UNLOCK TABLES;
 SET innodb_lock_wait_timeout = 30;
 SET GLOBAL innodb_deadlock_detect = ON;   -- 5.7+ 默认 ON
 
--- 应用锁（实例级 8.0+，之前会话级）
+-- 应用锁（5.7.5+ 实例级，之前会话级）
 SELECT GET_LOCK('mylock', 5);
 SELECT IS_USED_LOCK('mylock');
 SELECT RELEASE_LOCK('mylock');
