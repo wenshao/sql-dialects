@@ -136,7 +136,7 @@ ANSI SQL:2003 引入了 `GENERATED ... AS IDENTITY` 和 `CREATE SEQUENCE` 的语
 |------|-----------|----------------|---------|
 | PostgreSQL | `CACHE n` | 1 | per session/backend |
 | Oracle | `CACHE n` | 20 | per instance |
-| SQL Server | `CACHE n` | 50 (varies) | instance |
+| SQL Server | `CACHE n` | 未记录，由实现决定（非用户可查） | instance |
 | DB2 | `CACHE n` | 20 | instance |
 | MariaDB SEQUENCE | `CACHE n` | 1000 | session |
 | Snowflake | -- | 不暴露 | warehouse |
@@ -527,7 +527,7 @@ CREATE SEQUENCE s
     AS BIGINT
     START WITH 1
     INCREMENT BY 1
-    CACHE 100;        -- 显式指定，默认 50
+    CACHE 100;        -- 显式指定；默认值未记录，由实现决定（非用户可查）
 
 SELECT NEXT VALUE FOR s;
 ```
@@ -578,13 +578,11 @@ CREATE TABLE t (
 );
 ```
 
-`unique_rowid()` 的内部结构（80 bit）：
+`unique_rowid()` 返回 INT8（64 位），布局为：48 位时间戳（从 2015-01-01 起的 10 微秒刻度）+ 15 位 node ID（+ 1 位保留）。
 
 ```text
-| 64-bit timestamp (微秒) | 16-bit node-id |
+| 48-bit timestamp (10µs ticks since 2015-01-01) | 15-bit node-id | 1-bit reserved |
 ```
-
-但实际上低 14 bit 用作"同一微秒内的随机后缀"，避免同节点同微秒的多次调用冲突。
 
 设计目标：
 - **完全无锁**：不需要任何全局协调
