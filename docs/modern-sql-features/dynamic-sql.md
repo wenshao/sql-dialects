@@ -1058,12 +1058,15 @@ EXECUTE IMMEDIATE 'SELECT * FROM ' || DBMS_ASSERT.ENQUOTE_NAME(table_name);
 CREATE FUNCTION safe_count(p_table TEXT) RETURNS BIGINT
 SECURITY DEFINER SET search_path = public
 LANGUAGE plpgsql AS $$
+DECLARE
+    v_count BIGINT;
 BEGIN
     -- 白名单验证
     IF p_table NOT IN ('users', 'orders', 'products') THEN
         RAISE EXCEPTION 'Table not allowed: %', p_table;
     END IF;
-    RETURN (EXECUTE format('SELECT count(*) FROM %I', p_table));
+    EXECUTE format('SELECT count(*) FROM %I', p_table) INTO v_count;
+    RETURN v_count;
 END;
 $$;
 

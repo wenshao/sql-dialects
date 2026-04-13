@@ -420,7 +420,7 @@ FROM groups;
 | SQL Server | 是 | 是 | -- | -- | 2012+，RANGE 受限 |
 | DB2 | 是 | 是 | -- | 是 | RANGE + INTERVAL |
 | Snowflake | 是 | 是 | -- | -- | RANGE 仅限数值 |
-| BigQuery | 是 | 是 | -- | -- | RANGE + INTERVAL (日期/时间) |
+| BigQuery | 是 | 是 | -- | -- | RANGE 仅限数值 |
 | Redshift | 是 | 是 | -- | -- | RANGE 受限 |
 | DuckDB | 是 | 是 | 是 | 是 | RANGE + INTERVAL |
 | ClickHouse | 是 | 是 | -- | -- | 22.1+ 增强 |
