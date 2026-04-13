@@ -215,7 +215,7 @@ CONSTRAINT fk_order_customer
 | Teradata | 支持 | 完整表达式 | 支持 | 强制 | 全版本 |
 | Greenplum | 支持 | 完整表达式 | 支持 | 强制 | 全版本 |
 | CockroachDB | 支持 | 完整表达式 | 支持 | 强制 | 全版本 |
-| TiDB | 支持 | 完整表达式 | 支持 | 强制 | 8.0+ |
+| TiDB | 支持 | 完整表达式 | 支持 | 强制 | 7.5+(7.2 实验性) |
 | OceanBase | 支持 | 完整表达式 | 支持 | 强制 | 全版本 |
 | YugabyteDB | 支持 | 完整表达式 | 支持 | 强制 | 全版本 |
 | SingleStore | 不支持 | - | - | - | - |
@@ -259,7 +259,7 @@ CONSTRAINT fk_order_customer
 | Redshift | 支持 | 支持 | 支持(有限) | 不支持(用 IDENTITY) |
 | DuckDB | 支持 | 支持 | 支持 | 支持 `nextval()` |
 | ClickHouse | 支持(Nullable 类型体系) | 支持 | 支持 | 不支持 |
-| Trino | 不支持 | 不支持 | 不支持 | 不支持 |
+| Trino | 部分支持(取决于连接器) | 部分支持 | 部分支持 | 不支持 |
 | Hive | 支持(3.0+) | 支持 | 不支持 | 不支持 |
 | Spark SQL | 支持 | 支持 | 不支持 | 不支持 |
 | Flink SQL | 支持 | 支持 | 支持(含函数) | 不支持 |
@@ -782,7 +782,7 @@ CREATE TABLE orders (
     CONSTRAINT fk_orders_customer 
         FOREIGN KEY (customer_id) REFERENCES customers(id),
     
-    -- CHECK 约束 (TiDB 8.0+)
+    -- CHECK 约束 (TiDB 7.5+, 7.2 实验性)
     CONSTRAINT chk_quantity CHECK (quantity > 0)
 );
 
@@ -1185,7 +1185,7 @@ CREATE TABLE orders (
 分布式 NewSQL 数据库对外键的态度截然不同：
 
 - **完全支持**：CockroachDB、YugabyteDB、OceanBase（MySQL 模式）、Google Spanner
-- **语法兼容但不强制**：TiDB（v6.6 前）、SingleStore
+- **语法兼容但不强制**：TiDB（默认不强制，v6.6+ 可启用 `tidb_enable_foreign_key`）、SingleStore
 - **不支持**：StarRocks、Doris、CrateDB
 
 ### 3. CHECK 约束是 MySQL 生态的历史痛点
