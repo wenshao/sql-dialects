@@ -193,7 +193,7 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | SQL Server | 不支持 | 不支持 | 不支持 | 不支持 | 无布尔类型 |
 | DB2 | 不支持 | 不支持 | 不支持 | 不支持 | 需 `MIN`/`MAX` 模拟 |
 | Snowflake | 不支持(用BOOLAND_AGG) | 不支持(用BOOLOR_AGG) | 不支持 | 不支持 | 用 BOOLAND_AGG/BOOLOR_AGG |
-| BigQuery | 支持 | 支持 | 不支持 | 不支持 | `LOGICAL_AND`/`LOGICAL_OR` |
+| BigQuery | 不支持 | 不支持 | 不支持 | 不支持 | 用 `LOGICAL_AND`/`LOGICAL_OR` |
 | Redshift | 支持 | 支持 | 支持 | 支持 | GA |
 | DuckDB | 支持 | 支持 | 支持 | 不支持 | 0.3+ |
 | ClickHouse | 不支持 | 不支持 | 不支持 | 不支持 | 需 `min`/`max` 或 `groupBitAnd` |
@@ -299,7 +299,7 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 
 | 引擎 | STRING_AGG | GROUP_CONCAT | LISTAGG | ARRAY_AGG | 版本/备注 |
 |------|:---:|:---:|:---:|:---:|------|
-| PostgreSQL | 支持 | 不支持 | 支持 (16+) | 支持 | STRING_AGG: 9.0+, ARRAY_AGG: 8.4+ |
+| PostgreSQL | 支持 | 不支持 | 不支持 | 支持 | STRING_AGG: 9.0+, ARRAY_AGG: 8.4+ |
 | MySQL | 不支持 | 支持 | 不支持 | 不支持 | 默认 1024 字节截断 |
 | MariaDB | 不支持 | 支持 | 不支持 | 不支持 | 同 MySQL |
 | SQLite | 不支持 | 支持 | 不支持 | 不支持 | `GROUP_CONCAT` 行为与 MySQL 不同 |
@@ -330,7 +330,7 @@ SQL:2016 标准化了 `LISTAGG` 字符串聚合函数，并定义了溢出处理
 | Doris | 支持 | 支持 | 不支持 | 支持 | `GROUP_CONCAT` + `STRING_AGG` |
 | MonetDB | 不支持 | 支持 | 不支持 | 不支持 | `GROUP_CONCAT` |
 | CrateDB | 支持 | 不支持 | 不支持 | 支持 | - |
-| TimescaleDB | 支持 | 不支持 | 支持 (16+) | 支持 | 继承 PG |
+| TimescaleDB | 支持 | 不支持 | 不支持 | 支持 | 继承 PG（无内置 LISTAGG） |
 | QuestDB | 不支持 | 不支持 | 不支持 | 不支持 | 不支持 |
 | Exasol | 不支持 | 支持 | 支持 | 不支持 | - |
 | SAP HANA | 支持 | 不支持 | 不支持 | 支持 | - |
@@ -830,7 +830,7 @@ SELECT DISTINCT department,
 FROM employees;
 
 -- 统计函数
--- STDDEV() = STDDEV_SAMP()（与 MySQL 相反！）
+-- SQL Server 无 STDDEV()：STDEV() = sample (≈STDDEV_SAMP)，STDEVP() = population (≈STDDEV_POP)
 SELECT department,
        STDEV(salary) AS stddev_samp,         -- SQL Server 用 STDEV 而非 STDDEV
        STDEVP(salary) AS stddev_pop,         -- SQL Server 用 STDEVP
@@ -1108,7 +1108,7 @@ aggregate_function(...) FILTER (WHERE search_condition)
 
 ### 支持引擎的详细行为
 
-**完整支持 FILTER 的引擎**（约 16 个）：PostgreSQL (9.4+)、SQLite (3.30+)、DuckDB (0.3+)、Trino、Presto (0.142+)、Spark SQL (3.0+)、Databricks、CockroachDB (20.1+)、Greenplum、YugabyteDB、TimescaleDB、H2 (2.0+)、HSQLDB (2.5+)、Amazon Athena、Materialize、RisingWave、Yellowbrick。
+**完整支持 FILTER 的引擎**（17 个）：PostgreSQL (9.4+)、SQLite (3.30+)、DuckDB (0.3+)、Trino、Presto (0.142+)、Spark SQL (3.0+)、Databricks、CockroachDB (20.1+)、Greenplum、YugabyteDB、TimescaleDB、H2 (2.0+)、HSQLDB (2.5+)、Amazon Athena、Materialize、RisingWave、Yellowbrick。
 
 ### 不支持引擎的替代写法
 
@@ -1232,13 +1232,13 @@ SELECT STDDEV_POP(salary) FROM (VALUES (100)) t(salary);
 
 1. **基础聚合是唯一的共同点**：`COUNT`/`SUM`/`AVG`/`MIN`/`MAX` 是所有 49 个引擎都支持的唯一一组函数，但即便如此，`AVG` 的返回类型和 `SUM` 的溢出行为仍有显著差异。
 
-2. **STDDEV/VARIANCE 的命名陷阱是最危险的跨引擎问题**：`STDDEV()` 在 MySQL/ClickHouse/BigQuery 中等于 `STDDEV_POP`（总体），在 Oracle/PostgreSQL/SQL Server/Snowflake 中等于 `STDDEV_SAMP`（样本）。这种差异可能导致统计结果的系统性偏差。**迁移时务必使用带后缀的完整名称。**
+2. **STDDEV/VARIANCE 的命名陷阱是最危险的跨引擎问题**：`STDDEV()` 在 MySQL/ClickHouse/BigQuery 中等于 `STDDEV_POP`（总体），在 Oracle/PostgreSQL/Snowflake 中等于 `STDDEV_SAMP`（样本）；SQL Server 不提供 `STDDEV()`，其 `STDEV`≈`STDDEV_SAMP`、`STDEVP`≈`STDDEV_POP`。这种差异可能导致统计结果的系统性偏差。**迁移时务必使用带后缀的完整名称，或在 SQL Server 中使用对应的 `STDEV`/`STDEVP`。**
 
 3. **SQL Server 的命名完全独立**：SQL Server 是唯一不遵循标准命名的主流引擎——`STDEV`/`STDEVP`/`VAR`/`VARP` 而非 `STDDEV_SAMP`/`STDDEV_POP`/`VAR_SAMP`/`VAR_POP`。
 
 4. **字符串聚合碎片化最严重**：四种主流函数名（`STRING_AGG`、`GROUP_CONCAT`、`LISTAGG`、`ARRAY_AGG`+拼接）在不同引擎中各自为政。DuckDB 通过支持所有别名成为兼容性最好的选择。
 
-5. **FILTER 子句的采纳率仍然很低**：仅约 16/49 个引擎支持标准的 `FILTER (WHERE ...)` 语法。ClickHouse 的 `-If` 后缀和 BigQuery 的 `COUNTIF` 是两种有趣的替代设计。
+5. **FILTER 子句的采纳率仍然很低**：仅 17/49 个引擎支持标准的 `FILTER (WHERE ...)` 语法。ClickHouse 的 `-If` 后缀和 BigQuery 的 `COUNTIF` 是两种有趣的替代设计。
 
 6. **回归/相关性函数的分水岭**：OLAP 引擎（PostgreSQL、Oracle、Snowflake、Trino、Vertica 等）普遍支持完整的 `REGR_*` 函数族，而 OLTP 引擎（MySQL、SQL Server、TiDB）和流式引擎（Flink、RisingWave）普遍不支持。
 
