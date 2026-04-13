@@ -24,7 +24,7 @@ ISO/IEC 9075 SQL 标准对"事件通知"几乎没有规范——LISTEN/NOTIFY、
 | MySQL | -- | -- | -- | -- | -- | 不支持 |
 | MariaDB | -- | -- | -- | -- | -- | 不支持 |
 | SQLite | -- | -- | -- | -- | -- | 不支持 |
-| Oracle | DBMS_ALERT.REGISTER | DBMS_ALERT.SIGNAL | REMOVE | VARCHAR2(30) | 1800 字节 | 8i+ |
+| Oracle | DBMS_ALERT.REGISTER | DBMS_ALERT.SIGNAL | REMOVE | VARCHAR2(30) | 1800 字节 | DBMS_ALERT 自 Oracle 7+ |
 | SQL Server | -- (用 Service Broker) | -- | -- | -- | -- | 不直接支持 |
 | DB2 | -- | -- | -- | -- | -- | 不支持 |
 | Snowflake | -- | -- | -- | -- | -- | 不支持 |
@@ -890,7 +890,7 @@ EXEC DBMS_AQADM.START_QUEUE('orders_kafka_q');
 
 ## 关键发现
 
-1. **没有标准**：SQL 标准从未定义事件通知。LISTEN/NOTIFY 是 PostgreSQL 1998 年的扩展，DBMS_ALERT 是 Oracle 8i 的扩展，Service Broker 是 SQL Server 2005 的扩展——三者完全不兼容。
+1. **没有标准**：SQL 标准从未定义事件通知。LISTEN/NOTIFY 是 PostgreSQL 1998 年的扩展，DBMS_ALERT 自 Oracle 7（1990 年代初）即存在、DBMS_AQ 自 Oracle 8i（1999）加入，Service Broker 是 SQL Server 2005 的扩展——三者完全不兼容。
 2. **PostgreSQL 是开源生态事实标准**：PG 系（PG / Greenplum / TimescaleDB / 部分 YugabyteDB）是仅有的原生支持 SQL 级 `LISTEN`/`NOTIFY` 的开源数据库；其余 40+ 引擎全部缺失。
 3. **载荷大小普遍受限**：PostgreSQL 8000 字节、Oracle DBMS_ALERT 1800 字节、Firebird 仅事件名（无载荷）。"大消息走表，通道传引用"是普遍模式。
 4. **MySQL / MariaDB 完全缺失**：这是最大的开源 RDBMS 阵营的盲区，催生了 Canal / Maxwell / Debezium 等"伪推送"基于 binlog 的工具链。
