@@ -426,7 +426,7 @@ INSERT FIRST
 SELECT * FROM source_orders;
 ```
 
-`INSERT ALL` 单语句最多 999 个 INTO 子句（10g 起放宽到 1000），适合中等规模批量插入。
+`INSERT ALL` 无硬性 INTO 子句数量上限，受单语句解析器列引用限制（通常可容纳数百个 INTO），适合中等规模批量插入。
 
 ```sql
 -- Direct-Path Insert (/*+ APPEND */)，自 Oracle 7.3 起
@@ -524,7 +524,7 @@ SET async_insert = 1;
 SET wait_for_async_insert = 1;  -- 0 表示 fire-and-forget
 
 -- 小批 INSERT 会被服务端 buffer，达到阈值后才落 part
-SET async_insert_max_data_size = 1000000;       -- 字节
+SET async_insert_max_data_size = 1000000;       -- 字节（注：默认值在较新版本已上调至 10MB）
 SET async_insert_busy_timeout_ms = 200;          -- 最长等待
 SET async_insert_max_query_number = 450;
 ```
@@ -711,7 +711,7 @@ Appender 直接写入向量化 column chunk，跳过 SQL parser、binder、optim
 
 ### 1. 多行 VALUES 是几乎所有引擎都支持的最低公分母
 
-45+ 引擎中，仅 Oracle 与 Firebird 不支持 SQL:1999 的多行 VALUES 语法。Oracle 用 `INSERT ALL`（语义更强但 ~1000 行/语句限制），Firebird 用 PSQL 的 `EXECUTE BLOCK`。这意味着跨引擎数据访问层最容易实现的批处理优化就是"把 N 个单行 INSERT 重写为 1 个多行 INSERT"。
+45+ 引擎中，仅 Oracle 与 Firebird 不支持 SQL:1999 的多行 VALUES 语法。Oracle 用 `INSERT ALL`（语义更强，受解析器列引用限制），Firebird 用 PSQL 的 `EXECUTE BLOCK`。这意味着跨引擎数据访问层最容易实现的批处理优化就是"把 N 个单行 INSERT 重写为 1 个多行 INSERT"。
 
 ### 2. 客户端协议层的"假批处理"是常见陷阱
 
