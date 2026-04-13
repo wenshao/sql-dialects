@@ -22,7 +22,7 @@
 
 | 引擎 | 关键字 | 类型 | 稳定性 | 备注 |
 |------|--------|------|--------|------|
-| Oracle | `ROWID` | base64 编码 (file#, block#, row#) | 行不移动则稳定 | 最快的访问路径 |
+| Oracle | `ROWID` | base64 编码 (object#, file#, block#, row#) | 行不移动则稳定 | 最快的访问路径 |
 | PostgreSQL | `ctid` | `(block, offset)` 元组 | UPDATE/VACUUM FULL 后变化 | MVCC 物理位置 |
 | MySQL (InnoDB) | -- | 内部 6 字节 row_id | -- | 不暴露给 SQL |
 | MariaDB | -- | -- | -- | 同 MySQL |
@@ -116,7 +116,7 @@
 | BigQuery | 是 | GA | -- |
 | Redshift | 是 | GA | -- |
 | DuckDB | 是 | 早期 | -- |
-| ClickHouse | 是 | 21.3+ (实验), 21.10+ GA | 早期需 `arrayJoin` 模拟 |
+| ClickHouse | 是 | 21.4+ (实验), 21.10+ GA | 早期需 `arrayJoin` 模拟 |
 | Trino/Presto | 是 | GA | 支持 `WINDOW` 子句 |
 | Spark SQL | 是 | 1.4+ | -- |
 | Hive | 是 | 0.11+ | -- |
