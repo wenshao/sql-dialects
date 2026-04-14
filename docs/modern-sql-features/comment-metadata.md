@@ -17,7 +17,7 @@
 
 ## SQL 标准定义
 
-SQL:2003 标准（ISO/IEC 9075-11 Information Schema）正式收录了 `COMMENT ON` 语句，但它的历史远比 2003 久。事实上 IBM SQL/DS 在 1980 年代就引入了 `COMMENT ON`，Oracle 在 v7（1992）跟进，PostgreSQL 在 7.3（2002）实现，最终被 SQL:2003 追认为标准。
+`COMMENT ON` 是事实标准而非 ISO/IEC 9075 正式定义——SQL:2008 才在 Information Schema 部分间接提及对象描述字段，真正的 `COMMENT ON` 语句形态从未被 Foundation 正式收录。它的历史反而远比标准更久：IBM SQL/DS 在 1980 年代就引入了 `COMMENT ON`，Oracle 在 v7（1992）跟进，PostgreSQL 在 7.3（2002）实现，各家厂商用事实一致性沉淀出了今天的"准标准"。
 
 ```sql
 <comment_statement> ::=
