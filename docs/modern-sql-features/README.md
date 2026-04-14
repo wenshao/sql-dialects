@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 124 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 139 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -41,6 +41,12 @@
 ### 模式匹配
 - [MATCH_RECOGNIZE 行模式匹配](match-recognize.md)
 
+### 排序与 Top-K
+- [Top-K 查询优化](top-k-optimization.md)
+
+### SQL 解析器
+- [SQL 解析器差异（大小写/引用/保留字）](sql-parser-differences.md)
+
 ---
 
 ## 连接
@@ -67,6 +73,8 @@
 - [INSERT OVERWRITE](insert-overwrite.md)
 - [RETURNING / OUTPUT 子句](returning-output.md)
 - [DML RETURNING 与 MERGE 深度对比](dml-returning-merge.md)
+- [批处理 INSERT 优化](batch-insert-optimization.md)
+- [自增锁与序列并发](auto-increment-locking.md)
 
 ---
 
@@ -86,6 +94,7 @@
 - [可插拔存储引擎](pluggable-storage-engines.md)
 - [表空间与文件布局](tablespace-file-layout.md)
 - [表与列压缩](table-column-compression.md)
+- [分片键与分布键](shard-key-distribution.md)
 
 ### 索引
 - [索引类型与创建语法](index-types-creation.md)
@@ -123,6 +132,10 @@
 ### 字符集与排序
 - [字符集与排序规则](charset-collation.md)
 - [字符串比较与 COLLATE](string-comparison-collation.md)
+- [字符集转换函数](charset-conversion-functions.md)
+
+### 时区
+- [时区处理 (TIMESTAMPTZ / AT TIME ZONE)](timezone-handling.md)
 
 ---
 
@@ -153,6 +166,7 @@
 ## 搜索
 
 - [全文检索](full-text-search.md)
+- [分词器与文本分析器](tokenization-analyzers.md)
 - [地理空间函数](geospatial-functions.md)
 - [向量类型与相似性搜索](vector-similarity-search.md)
 
@@ -170,13 +184,18 @@
 - [MVCC 实现机制](mvcc-implementation.md)
 - [事务隔离级别对比](transaction-isolation-comparison.md)
 - [锁机制与死锁检测](locks-deadlocks.md)
+- [元数据锁 (MDL / Schema Lock)](metadata-locks.md)
 - [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
+- [崩溃恢复 (ARIES)](crash-recovery.md)
+- [VACUUM 与垃圾回收](vacuum-gc.md)
 
 ---
 
 ## 执行与优化
 
 - [EXPLAIN 执行计划](explain-execution-plan.md)
+- [EXPLAIN 输出格式 (TEXT/JSON/XML)](explain-output-formats.md)
+- [查询执行阶段 (Parser → Optimizer → Executor)](query-execution-phases.md)
 - [优化器演进](optimizer-evolution.md)
 - [预编译语句与计划缓存](prepared-statement-cache.md)
 - [资源管理与工作负载管理 (WLM)](resource-management-wlm.md)
@@ -186,6 +205,8 @@
 - [查询取消与超时控制](query-cancellation-timeouts.md)
 - [统计信息与直方图](statistics-histograms.md)
 - [慢查询日志与性能监控](slow-query-log.md)
+- [I/O 监控与读写统计](io-monitoring.md)
+- [内存使用监控](memory-usage-monitoring.md)
 
 ---
 
