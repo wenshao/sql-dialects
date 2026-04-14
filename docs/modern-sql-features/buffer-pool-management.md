@@ -31,7 +31,7 @@
 | BigQuery | 执行引擎内部 | 自动 | 托管 | 否 |
 | Redshift | 内部 block cache | 自动 | 托管 | 否 |
 | DuckDB | `memory_limit` | 80% RAM | 按会话 | 是 |
-| ClickHouse | `mark_cache_size` / `uncompressed_cache_size` | 5GB / 0 | 按负载 | 是 |
+| ClickHouse | `mark_cache_size` / `uncompressed_cache_size` | 5GB / 8GB (22.x+, 历史上为 0) | 按负载 | 是 |
 | Trino | `memory.heap-headroom-per-node` | 30% heap | 按负载 | 否 |
 | Presto | `query.max-memory-per-node` | 0.1 heap | 按负载 | 否 |
 | Spark SQL | `spark.memory.storageFraction` | 0.5 | 按工作集 | 否 |
@@ -482,7 +482,7 @@ SYSTEM DROP UNCOMPRESSED CACHE;
 SYSTEM DROP MMAP CACHE;
 ```
 
-为什么 `uncompressed_cache_size` 默认是 0？因为对于全表扫描型查询，缓存解压结果反而会污染其他查询的命中——列存的"每次解压都不贵"让 OS page cache 已经够用。只有在**点查 / 小范围查询 >50% 的负载**时才建议开启。
+为什么历史上 `uncompressed_cache_size` 默认是 0？因为对于全表扫描型查询，缓存解压结果反而会污染其他查询的命中——列存的"每次解压都不贵"让 OS page cache 已经够用。早期社区版 ClickHouse（18.x–21.x）因此将其关闭，只在**点查 / 小范围查询 >50% 的负载**下才建议开启。不过自 ClickHouse 22.x 起官方默认配置已经将其调整为约 8 GiB（上方 `config.xml` 示例即为现代默认），新部署无需手动打开。
 
 ### SQLite：page_cache_size 三种含义
 
