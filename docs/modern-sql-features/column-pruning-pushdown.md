@@ -81,7 +81,7 @@ SQL:2016 / SQL:2023 没有任何与投影下推相关的语法或语义规范。
 | Yellowbrick | 列 | 是 | 是 | 是 | 是 | 是 (Parquet) | 有限 | 是 |
 | Firebolt | 列 (F3) | 是 | 是 | 是 | 是 | 是 (Parquet) | -- | 是 |
 
-> 统计：约 48 个引擎中，**49 个都实现了逻辑层列裁剪**（通过 Join / 子查询 / UNION），但只有约 **30 个**具备真正的"物理存储层投影下推"——这基本上等于"是否是列存"的镜像。
+> 统计：48 个引擎中，**几乎全部都实现了逻辑层列裁剪**（通过 Join / 子查询 / UNION），但只有约 **30 个**具备真正的"物理存储层投影下推"——这基本上等于"是否是列存"的镜像。
 
 ### 嵌套列裁剪支持（Nested / STRUCT / JSON）
 
@@ -313,7 +313,7 @@ SELECT /*+ INMEMORY */ SUM(amount) FROM sales WHERE region='US';
 
 ### SQL Server Columnstore（batch mode）
 
-SQL Server 2012 引入 non-clustered columnstore 索引，2014 引入 clustered columnstore，后来 2016 之后推出 batch mode on rowstore。columnstore 以 row group（~1M 行）为单位列式存储，每 row group 每列一个 segment（压缩列块）。执行引擎 `ColumnStoreScan` 算子只读取投影列的 segment：
+SQL Server 2012 引入 non-clustered columnstore 索引，2014 引入 clustered columnstore，SQL Server 2019 引入 batch mode on rowstore (仍需 Enterprise 或 Standard 兼容级别 150+)。columnstore 以 row group（~1M 行）为单位列式存储，每 row group 每列一个 segment（压缩列块）。执行引擎 `ColumnStoreScan` 算子只读取投影列的 segment：
 
 ```sql
 SET STATISTICS IO ON;
