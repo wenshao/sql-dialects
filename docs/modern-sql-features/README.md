@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 139 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 154 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -43,6 +43,7 @@
 
 ### 排序与 Top-K
 - [Top-K 查询优化](top-k-optimization.md)
+- [NULLS FIRST/LAST 排序](null-ordering.md)
 
 ### SQL 解析器
 - [SQL 解析器差异（大小写/引用/保留字）](sql-parser-differences.md)
@@ -98,7 +99,12 @@
 
 ### 索引
 - [索引类型与创建语法](index-types-creation.md)
+- [覆盖索引 (INCLUDE / STORING)](covering-indexes.md)
+- [表达式索引 (函数索引)](expression-indexes.md)
+- [部分索引 (WHERE 条件过滤)](partial-indexes.md)
+- [布隆过滤器索引](bloom-filter-indexes.md)
 - [分区策略对比](partition-strategy-comparison.md)
+- [分区裁剪](partition-pruning.md)
 
 ### DDL 事务性 / 在线 DDL
 - [DDL 事务性与在线 DDL](ddl-transactionality-online.md)
@@ -106,7 +112,11 @@
 
 ### 时态表
 - [时态表 / 系统版本控制](temporal-tables.md)
+- [系统版本查询 (FOR SYSTEM_TIME AS OF / Time Travel)](system-versioned-queries.md)
 - [PERIOD / 范围类型](range-period-types.md)
+
+### 元数据
+- [COMMENT 与描述元数据](comment-metadata.md)
 
 ---
 
@@ -176,6 +186,7 @@
 
 - [物化视图](materialized-views.md)
 - [物化视图模式](materialized-view-patterns.md)
+- [物化视图刷新策略](materialized-view-refresh.md)
 
 ---
 
@@ -198,11 +209,15 @@
 - [查询执行阶段 (Parser → Optimizer → Executor)](query-execution-phases.md)
 - [优化器演进](optimizer-evolution.md)
 - [预编译语句与计划缓存](prepared-statement-cache.md)
+- [查询结果缓存](query-result-caching.md)
+- [缓冲池管理](buffer-pool-management.md)
 - [资源管理与工作负载管理 (WLM)](resource-management-wlm.md)
 - [并行查询执行](parallel-query-execution.md)
 - [查询提示 (Query Hints)](query-hints.md)
 - [查询重写规则](query-rewrite-rules.md)
 - [查询取消与超时控制](query-cancellation-timeouts.md)
+- [Hash Join 算法变体](hash-join-algorithms.md)
+- [列裁剪与投影下推](column-pruning-pushdown.md)
 - [统计信息与直方图](statistics-histograms.md)
 - [慢查询日志与性能监控](slow-query-log.md)
 - [I/O 监控与读写统计](io-monitoring.md)
@@ -243,12 +258,19 @@
 - [行级安全 (RLS)](row-level-security.md)
 - [审计日志](audit-logging.md)
 - [数据血缘与查询溯源](data-lineage.md)
+- [透明数据加密 (TDE)](transparent-data-encryption.md)
 
 ---
 
 ## 元数据与系统目录
 
 - [系统目录与信息模式 (INFORMATION_SCHEMA / pg_catalog / sys.*)](information-schema-catalogs.md)
+
+---
+
+## 存储引擎基础
+
+- [B+Tree vs LSM-Tree 存储引擎对比](btree-vs-lsm.md)
 
 ---
 
