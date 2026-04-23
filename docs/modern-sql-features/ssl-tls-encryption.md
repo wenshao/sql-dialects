@@ -21,7 +21,7 @@
 
 | 引擎 | TLS 支持 | 默认最低版本 | TLS 1.3 | 版本 |
 |------|---------|-------------|---------|------|
-| PostgreSQL | 是 | TLS 1.2 (可配) | 是 (13+, OpenSSL 1.1.1) | 8.0+ |
+| PostgreSQL | 是 | TLS 1.2 (可配) | 是 (12+, OpenSSL 1.1.1) | 8.0+ |
 | MySQL | 是 | TLS 1.2 | 是 (8.0.16+) | 5.5+ |
 | MariaDB | 是 | TLS 1.2 | 是 (10.5+) | 5.5+ |
 | SQLite | 否（嵌入式） | -- | -- | -- |
@@ -165,8 +165,7 @@ hostnossl   all       all   0.0.0.0/0         reject
 
 关键演进：
 - PG 10 (2017) 引入 SCRAM-SHA-256，替代容易被离线破解的 MD5
-- PG 12 (2019) 加入 `ssl_min_protocol_version`/`ssl_max_protocol_version`
-- PG 13 (2020) 支持 TLS 1.3（依赖 OpenSSL 1.1.1）
+- PostgreSQL 12+ 起通过 OpenSSL 1.1.1 支持 TLS 1.3，并加入 `ssl_min_protocol_version`/`ssl_max_protocol_version`
 - PG 16 (2023) 默认不再协商 TLS < 1.2
 
 ## MySQL：从 --ssl 到 ssl-mode
@@ -235,7 +234,7 @@ HKLM\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL<ver>.<instance>\MSSQLServer\S
 
 关键版本信息：
 - SQL Server 2016+ 支持 TLS 1.2
-- Azure SQL Database 自 2020 年起**强制** TLS 1.2，2024 年 Azure SQL 开始默认要求 TLS 1.3
+- Azure SQL Database 自 2020 年起**强制** TLS 1.2；Azure SQL 2024 年起支持 TLS 1.3（但 1.2 仍为默认最低）
 - SQL Server 2022 首次支持 TLS 1.3（需 Windows Server 2022+）
 - `Encrypt=Strict`（2022+ MSOLEDBSQL 19、microsoft.data.sqlclient 5.0+）强制使用 TDS 8.0，禁止明文 prelogin
 
@@ -576,7 +575,7 @@ Snowflake、BigQuery、Athena、Synapse、Databricks、Firebolt、Google Spanner
 7. **FIPS 140-2/3 模式覆盖不均**：Oracle、Teradata、Vertica、SAP HANA、SQL Server 原生支持；开源引擎通常依赖发行版（RHEL FIPS、OpenJDK FIPS）。
 8. **`require`/`PREFERRED` 是伪安全**：它们只挡被动窃听，不防主动中间人攻击。生产必须 `verify-full` 或 `VERIFY_IDENTITY`。
 9. **SCRAM-SHA-256 + TLS 是 PG 的现代默认**（PG 10, 2017）。仍然使用 `md5` 认证的 PG 应视为 Legacy。
-10. **MySQL 8.0.16 起默认开启 TLS**：即便客户端未请求，握手失败也不会回退明文；这是从 5.7 到 8.0 的一项隐式安全升级。
+10. **MySQL 自 8.0 GA 起 `--ssl-mode=PREFERRED` 为默认**；自 5.7.6 起 `mysqld --initialize` 自动生成证书，握手失败不会回退明文——这是从 5.7 到 8.0 的一项隐式安全升级。
 11. **SQL Server 2022 的 `Encrypt=Strict`** 在 pre-login 阶段就要求 TDS 8.0，消除了 TLS 降级攻击面。
 12. **可重复审计**：`pg_stat_ssl`（PG 9.5+）、`performance_schema.session_ssl_status`（MySQL 8.0.21+）、`sys.dm_exec_connections.encrypt_option`（SQL Server）让 DBA 能实时验证连接是否加密。
 
