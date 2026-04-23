@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 154 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 169 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -76,6 +76,7 @@
 - [DML RETURNING 与 MERGE 深度对比](dml-returning-merge.md)
 - [批处理 INSERT 优化](batch-insert-optimization.md)
 - [自增锁与序列并发](auto-increment-locking.md)
+- [TRUNCATE vs DELETE 深度对比](truncate-vs-delete.md)
 
 ---
 
@@ -96,6 +97,10 @@
 - [表空间与文件布局](tablespace-file-layout.md)
 - [表与列压缩](table-column-compression.md)
 - [分片键与分布键](shard-key-distribution.md)
+- [分层存储 (热/温/冷)](tiered-storage.md)
+- [复合主键设计](composite-primary-keys.md)
+- [Schema 演进模式](schema-evolution.md)
+- [热点写入缓解 (AUTO_RANDOM / UUID v7)](hotspot-write-mitigation.md)
 
 ### 索引
 - [索引类型与创建语法](index-types-creation.md)
@@ -124,6 +129,8 @@
 
 - [数据类型映射](data-type-mapping.md)
 - [类型系统设计](type-system-design.md)
+- [域类型与用户定义类型 (CREATE DOMAIN / UDT)](domain-types.md)
+- [BLOB/CLOB 大对象处理](blob-clob-handling.md)
 - [数组 / 集合类型 (ARRAY/MAP/STRUCT)](array-collection-types.md)
 - [行类型与复合类型 (ROW / STRUCT)](row-composite-types.md)
 - [JSON 在 SQL 中的演进](json-in-sql-evolution.md)
@@ -197,8 +204,11 @@
 - [锁机制与死锁检测](locks-deadlocks.md)
 - [元数据锁 (MDL / Schema Lock)](metadata-locks.md)
 - [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
+- [WAL 归档与 PITR](wal-archiving.md)
 - [崩溃恢复 (ARIES)](crash-recovery.md)
 - [VACUUM 与垃圾回收](vacuum-gc.md)
+- [SAVEPOINT 保存点](savepoints.md)
+- [分布式事务 XA / 2PC](distributed-transactions-xa.md)
 
 ---
 
@@ -222,6 +232,8 @@
 - [慢查询日志与性能监控](slow-query-log.md)
 - [I/O 监控与读写统计](io-monitoring.md)
 - [内存使用监控](memory-usage-monitoring.md)
+- [查询计划稳定性 (SPM / Query Store)](query-plan-stability.md)
+- [临时空间管理 (spill to disk)](temp-space-management.md)
 
 ---
 
@@ -236,6 +248,7 @@
 - [安全错误处理](error-handling-safe.md)
 - [变量与会话管理](variables-sessions.md)
 - [连接池与会话管理](connection-pooling.md)
+- [数据库 Wire 协议](wire-protocols.md)
 
 ---
 
@@ -259,6 +272,8 @@
 - [审计日志](audit-logging.md)
 - [数据血缘与查询溯源](data-lineage.md)
 - [透明数据加密 (TDE)](transparent-data-encryption.md)
+- [数据遮罩与脱敏](data-masking.md)
+- [SSL/TLS 连接加密](ssl-tls-encryption.md)
 
 ---
 
