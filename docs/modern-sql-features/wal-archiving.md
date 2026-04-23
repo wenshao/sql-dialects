@@ -890,9 +890,9 @@ repo1-cipher-type=aes-256-cbc
 repo1-cipher-pass=my-very-long-passphrase
 ```
 
-### wal-g（Wild Apricot/Citus, 2017）
+### wal-g（Yandex, 2017）
 
-wal-g 由 Citus 团队（现已并入 Microsoft/Azure）开发，以极简和云原生著称：
+wal-g 由 Yandex 开发和维护（github.com/wal-g/wal-g），2017 年开源，以极简和云原生著称：
 
 ```bash
 export WALG_S3_PREFIX="s3://my-pg-backup/cluster1"
