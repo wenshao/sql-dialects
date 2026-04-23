@@ -663,7 +663,7 @@ try (InputStream in = new FileInputStream("/tmp/big.bin")) {
 | 驱动 | 读流式方法 | 写流式方法 | 分块大小 |
 |------|-----------|-----------|---------|
 | PostgreSQL JDBC | `getBinaryStream` (Large Object) / `getBytes` (BYTEA) | `setBinaryStream` | 驱动配置 |
-| MySQL Connector/J | `getBinaryStream` | `setBinaryStream` | 默认 64KB chunk |
+| MySQL Connector/J | `getBinaryStream` | `setBinaryStream` | `blobSendChunkSize` 默认 1 MiB (1048576 字节) |
 | Oracle JDBC | `getBinaryStream` / LOB API | `setBinaryStream` / `DBMS_LOB` | 32KB |
 | Microsoft JDBC | `getBinaryStream` | `setBinaryStream` | 可配置 |
 | psycopg2 (Python) | `lobject()` API | `lobject().write()` | 内存全载 (BYTEA) |
