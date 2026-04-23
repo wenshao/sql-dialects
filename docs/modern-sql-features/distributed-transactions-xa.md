@@ -4,7 +4,7 @@
 
 ## X/Open XA 规范 (1991)
 
-X/Open (现 The Open Group) 在 1991 年发布 **XA 规范** (Distributed Transaction Processing: The XA Specification, 1991 年 10 月)，后来被 **ISO/IEC 19076:2016** 正式采纳为国际标准。XA 定义了 **事务管理器 (Transaction Manager, TM)** 与 **资源管理器 (Resource Manager, RM)** 之间的接口。
+X/Open (现 The Open Group) 在 1991 年发布 **XA 规范** (Distributed Transaction Processing: The XA Specification, 1991 年 10 月)，后来被 **ISO/IEC 14834:1996**（Information technology — Distributed Transaction Processing — The XA Specification）正式采纳为国际标准。XA 定义了 **事务管理器 (Transaction Manager, TM)** 与 **资源管理器 (Resource Manager, RM)** 之间的接口。
 
 ```
  ┌──────────────┐    xa_start / xa_end      ┌────────────────┐
@@ -249,7 +249,7 @@ using (var scope = new TransactionScope())
 
 ### MySQL InnoDB — 迟来的 XA 支持
 
-MySQL 5.0 (2005 年) 引入 XA 支持，但有一个**严重的历史 bug** (MDEV-742 / Bug#12161): XA PREPARE 后，若主库崩溃，binlog 与 InnoDB redo log 会不一致，导致从库复制出错。
+MySQL 5.0 (2005 年) 引入 XA 支持，但有一个**严重的历史 bug** (MySQL Bug#12161): XA PREPARE 后，若主库崩溃，binlog 与 InnoDB redo log 会不一致，导致从库复制出错。
 
 ```sql
 -- MySQL XA 语法
@@ -909,7 +909,7 @@ WHERE transaction_type = 2;  -- 分布式事务
 
 2. **PostgreSQL 选了不同的路线**：`PREPARE TRANSACTION` (8.1, 2005) 语法不叫 XA，但语义等价，且集成更干净。Greenplum / Citus 等基于 PG 的 MPP 系统都依赖它做分布式提交。
 
-3. **MySQL XA 的历史 bug (MDEV-742) 直到 5.7.7 (2015) 才修复。** 这是 MySQL 在分布式事务领域落后的主要原因之一。MariaDB Galera Cluster 完全放弃 XA，走认证复制路线。
+3. **MySQL XA 的历史 bug (Bug#12161) 直到 5.7.7 (2015) 才修复。** 这是 MySQL 在分布式事务领域落后的主要原因之一。MariaDB Galera Cluster 完全放弃 XA，走认证复制路线。
 
 4. **Google 在 Percolator (2010) 和 Spanner (2012) 中重新定义了 2PC。** Percolator 的去中心化 2PC 被 TiDB 采用；Spanner 的 TrueTime 2PC 至今仍是跨地域强一致的金标准。
 
@@ -1057,12 +1057,12 @@ Commit:
 ## 参考资料
 
 - X/Open XA 规范 (1991): [Distributed Transaction Processing: The XA Specification](https://pubs.opengroup.org/onlinepubs/009680699/toc.pdf)
-- ISO/IEC 19076:2016 — XA 国际标准化版本
+- ISO/IEC 14834:1996 — XA 国际标准化版本（Information technology — Distributed Transaction Processing — The XA Specification）
 - Java JTA: [JSR 907 - Java Transaction API](https://www.oracle.com/java/technologies/jta.html)
 - Oracle: [DBMS_XA Package](https://docs.oracle.com/en/database/oracle/oracle-database/19/arpls/DBMS_XA.html)
 - SQL Server: [Distributed Transactions](https://learn.microsoft.com/en-us/sql/relational-databases/native-client-ole-db-transactions/)
 - MySQL: [XA Transactions](https://dev.mysql.com/doc/refman/8.0/en/xa.html)
-- MySQL Bug 12161 / MDEV-742: XA recovery binlog inconsistency
+- MySQL Bug#12161: XA recovery binlog inconsistency (MySQL bug tracker)
 - PostgreSQL: [PREPARE TRANSACTION](https://www.postgresql.org/docs/current/sql-prepare-transaction.html)
 - DB2: [XA transaction support](https://www.ibm.com/docs/en/db2/11.5?topic=managers-xa-transactions)
 - Peng, Dabek, "Large-scale Incremental Processing Using Distributed Transactions and Notifications" (Percolator), OSDI 2010
