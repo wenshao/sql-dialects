@@ -738,7 +738,7 @@ CREATE TABLE order_items (
 -- JOIN 在同一 split 内完成，消除分布式 JOIN 成本
 
 -- CockroachDB（已弃用）
--- CRDB 20.1 引入 INTERLEAVE IN PARENT，23.1 正式移除
+-- CRDB 2.0 (2018) 引入 INTERLEAVE IN PARENT，22.1 废弃，23.1 正式移除
 -- 移除原因：
 --   1. 降低了 split 自动负载均衡能力
 --   2. ALTER PRIMARY KEY 无法在交错表上使用
