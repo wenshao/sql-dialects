@@ -56,7 +56,7 @@
 | PostgreSQL | 是 | `TRUNCATE [TABLE] t [, ...]` | 支持多表 |
 | MySQL | 是 | `TRUNCATE [TABLE] t` | 5.5+ 实为隐式 DDL |
 | MariaDB | 是 | `TRUNCATE [TABLE] t` | 与 MySQL 相同 |
-| SQLite | 是* | `DELETE FROM t`（TRUNCATE 优化） | 没有 TRUNCATE 关键字 |
+| SQLite | 否（DELETE 优化） | `DELETE FROM t`（无 WHERE 时触发内部 TRUNCATE 优化） | 没有 TRUNCATE 关键字 |
 | Oracle | 是 | `TRUNCATE TABLE t` | DDL，auto-commit |
 | SQL Server | 是 | `TRUNCATE TABLE t` | 最小日志 |
 | DB2 | 是 | `TRUNCATE TABLE t IMMEDIATE` | IMMEDIATE 必需 |
@@ -70,7 +70,7 @@
 | Spark SQL | 是 | `TRUNCATE TABLE t [PARTITION (...)]` | 支持分区截断 |
 | Hive | 是 | `TRUNCATE TABLE t [PARTITION (...)]` | 仅 managed 表 |
 | Flink SQL | 是 | `TRUNCATE TABLE t` | 1.18+ |
-| Databricks | 是 | `TRUNCATE TABLE t` | Delta 不支持*见下 |
+| Databricks | 是 | `TRUNCATE TABLE t` | Delta Lake 原生支持 |
 | Teradata | 是 | `DELETE FROM t ALL`（等价） | 无 TRUNCATE 关键字 |
 | Greenplum | 是 | `TRUNCATE [TABLE] t` | 继承 PG |
 | CockroachDB | 是 | `TRUNCATE [TABLE] t [, ...]` | 实为 DROP+RECREATE |
