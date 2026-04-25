@@ -274,12 +274,12 @@ SET effective_io_concurrency = 200;-- SSD 支持高并发 I/O (HDD 用 2)
   方向: 调高 parallel_setup_cost 阻止小查询并行化
 ```
 
-## MySQL: 从硬编码到可配置（8.0+）
+## MySQL: 从硬编码到可配置（5.7.5+）
 
 ### 8.0 之前的硬编码代价
 
 ```
-MySQL 5.7 及之前, 代价常量在源码中硬编码:
+MySQL 5.7.4 及之前, 代价常量在源码中硬编码 (5.7.5+ 引入 mysql.server_cost/engine_cost 表):
   - ROW_EVALUATE_COST = 0.2 (处理一行的 CPU 代价)
   - DISK_TEMPTABLE_READ_COST = 20.0
   - DISK_TEMPTABLE_CREATE_COST = 20.0
