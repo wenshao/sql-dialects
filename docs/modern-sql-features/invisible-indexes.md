@@ -179,7 +179,7 @@ WHERE salary > 5000;
 -- 或使用特殊 Hint USE_INVISIBLE_INDEXES
 ```
 
-### UNUSABLE（更早就存在，8i 起）
+### UNUSABLE（Oracle 7.x+，更早就存在；INVISIBLE 自 11g 起）
 
 ```sql
 -- 将索引设为不可用
