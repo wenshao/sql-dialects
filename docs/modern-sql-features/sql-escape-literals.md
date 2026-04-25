@@ -77,7 +77,7 @@ SQL 标准明确**未定义**以下常见"特性"：
 
 | 引擎 | `''` 双写 | `\'` 反斜杠 | 可配置反斜杠 | `E'...'` | `N'...'` | `U&'...'` | `$$...$$` | 引擎版本来源 |
 |------|---------|-----------|------------|---------|---------|-----------|-----------|-------------|
-| PostgreSQL | 标准 | 仅 E'..' | `standard_conforming_strings` | 是 | 标准行为 | 是 | 是 | 8.3+ 标准化 |
+| PostgreSQL | 标准 | 仅 E'..' | `standard_conforming_strings` | 是 | 标准行为 | 是 | 是 | 8.1+ E'...' / 9.1+ 默认标准 |
 | MySQL | 标准 | 默认启用 | `NO_BACKSLASH_ESCAPES` | -- | 是（仅前缀） | -- | -- | 5.0+ |
 | MariaDB | 标准 | 默认启用 | `NO_BACKSLASH_ESCAPES` | -- | 是（仅前缀） | -- | -- | 继承 MySQL |
 | Oracle | 标准 | 禁用 | 无（非字符串转义） | -- | 是（nchar） | 扩展 | -- | Q'{..}' 10g+ |
@@ -215,7 +215,7 @@ SELECT '\n' AS s;                   -- 就是两个字符：反斜杠 + n
 SELECT E'\n' AS s;                  -- 换行符
 SELECT E'\t\r\n\b\f\v\\\'\"' AS s;  -- C 风格全套
 SELECT E'\x1b[31mRed\x1b[0m' AS s;  -- 十六进制字节（每 \xHH 为一字节）
-SELECT E'é' AS s;              -- Unicode BMP 代码点（4 位十六进制）
+SELECT E'\u00E9' AS s;              -- Unicode BMP 代码点（4 位十六进制）
 SELECT E'\U0001F600' AS s;          -- Unicode 非 BMP 代码点（8 位十六进制）
 SELECT E'\101' AS s;                -- 八进制（3 位），等于 'A'
 
