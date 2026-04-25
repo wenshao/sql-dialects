@@ -38,7 +38,7 @@ ANSI/ISO SQL 标准定义了 ACID 的语义、隔离级别（READ UNCOMMITTED、
 | PostgreSQL | XID / FullTransactionId | 32 / 64 | epoch + xid | `txid_current()`、`xid8` | 13+ 才有 64 位 xid8 |
 | MySQL InnoDB | trx_id | 48 | 平坦计数器 | `INFORMATION_SCHEMA.INNODB_TRX` | 6 字节，存储在行隐藏列 |
 | MariaDB | trx_id | 48 | 同 InnoDB | 同 InnoDB | 继承自 InnoDB |
-| Oracle | SCN | 48 | base(48) [+ wrap(16)] | `CURRENT_SCN`、`SCN_TO_TIMESTAMP` | 6 字节核心 + 16 位 wrap |
+| Oracle | SCN | 48 | base(32) + wrap(16) | `CURRENT_SCN`、`SCN_TO_TIMESTAMP` | 6 字节 (48 位)，base(32) + wrap(16) |
 | SQL Server | LSN | 96 | VLF#(32) + offset(32) + slot(16) | `sys.fn_dblog`、`%%LOCKRES%%` | 实际 10 字节，常见 "10:00000045:0001" |
 | DB2 | LSN | 64 | offset in log stream | `db2pd -logs` | LSO (Log Sequence Offset) |
 | SQLite | rowid + change counter | 64 | 平坦 | -- | 没有真正的 txid，rollback journal 跟踪页 |
@@ -48,7 +48,7 @@ ANSI/ISO SQL 标准定义了 ACID 的语义、隔离级别（READ UNCOMMITTED、
 | H2 | tx id | 64 | 平坦 | `INFORMATION_SCHEMA.SESSIONS` | 内存数据库 |
 | HSQLDB | tx id | 64 | 平坦 | -- | 内存优先 |
 | Derby | tx id | 64 | 平坦 | -- | -- |
-| CockroachDB | HLC timestamp | 128 (96 物理 + 32 逻辑) | physical(64ns) + logical(32) | `cluster_logical_timestamp()` | HLC 论文 2014 |
+| CockroachDB | HLC timestamp | 96 (64 物理 + 32 逻辑) | physical(64ns) + logical(32) | `cluster_logical_timestamp()` | HLC 论文 2014 |
 | Spanner | commit timestamp | 64 + uncertainty | 物理时间 + ε（TrueTime） | `READ_TIMESTAMP` | TrueTime SOSP 2012 |
 | TiDB | TSO | 64 | physical(46ms) + logical(18) | `tidb_current_ts` | PD 集中分配 |
 | YugabyteDB | HLC | 64 | physical(52μs) + logical(12) | -- | 借鉴 Spanner + HLC |
@@ -88,7 +88,7 @@ ANSI/ISO SQL 标准定义了 ACID 的语义、隔离级别（READ UNCOMMITTED、
 | Doris | transaction id | 64 | 平坦 | `SHOW TRANSACTION` | FE 集中分配 |
 | Tarantool | LSN | 64 | per-instance | box.info.lsn | 主从复制基础 |
 
-> 统计（位宽）：32 位 XID 5 个（PG 经典、Redshift、Greenplum 经典、Firebird、Synapse），48 位 3 个（InnoDB/MariaDB/Oracle SCN），64 位 25+ 个，96+ 位 2 个（SQL Server LSN、CockroachDB HLC 128 位）。
+> 统计（位宽）：32 位 XID 5 个（PG 经典、Redshift、Greenplum 经典、Firebird、Synapse），48 位 3 个（InnoDB/MariaDB/Oracle SCN），64 位 25+ 个，96 位 2 个（SQL Server LSN、CockroachDB HLC）。
 >
 > 统计（结构）：平坦计数器 25+ 个；epoch + counter 模式 PG 后期、Oracle、ClickHouse；HLC 模式 CockroachDB、YugabyteDB；TrueTime 模式 Spanner；TSO 模式 TiDB、OceanBase（GTS）。
 
@@ -504,7 +504,7 @@ SHOW TRANSACTION TIMESTAMP;
 
 ### Google Spanner: TrueTime 与外部一致性
 
-Spanner（论文 OSDI 2012、SOSP 2012）通过 GPS + 原子钟提供 TrueTime API，每次调用 `TT.now()` 返回的不是单一时间戳，而是 `[earliest, latest]` 区间——保证真实物理时间一定落在这个区间内。
+Spanner（论文 OSDI 2012）通过 GPS + 原子钟提供 TrueTime API，每次调用 `TT.now()` 返回的不是单一时间戳，而是 `[earliest, latest]` 区间——保证真实物理时间一定落在这个区间内。
 
 #### TrueTime API
 
