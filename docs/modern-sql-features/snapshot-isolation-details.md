@@ -172,7 +172,7 @@ First-Committer-Wins (FCW):
   优点: 乐观, 读阶段无锁
   缺点: 事务可能跑了很久才在提交点被中止, 浪费资源
 
-  采用: Snowflake, MonetDB, BigQuery, CockroachDB (时间戳推进), PostgreSQL SI
+  采用: Snowflake, MonetDB, BigQuery, CockroachDB (时间戳推进)
 
 First-Updater-Wins (FUW):
   谁先对冲突行执行写操作谁赢
@@ -182,10 +182,10 @@ First-Updater-Wins (FUW):
   优点: 冲突早发现, 不浪费计算资源
   缺点: 需要写锁或版本锁
 
-  采用: Oracle, SQL Server SNAPSHOT, SAP HANA, MySQL InnoDB
+  采用: Oracle, SQL Server SNAPSHOT, SAP HANA, MySQL InnoDB, PostgreSQL (REPEATABLE READ)
 ```
 
-PostgreSQL 的 SI 历史上采用 FCW：提交时扫描写集合，若任何行的 xmin 大于自己的 snapshot，中止。FUW 更容易让并发写冲突尽早显现，FCW 则让只读工作负载完全不受影响。
+PostgreSQL REPEATABLE READ 实际采用 FUW 语义：UPDATE/DELETE 时若发现行版本已被并发事务修改且已提交，当前事务以 `could not serialize access` 报错中止；若并发事务未提交则等待。SSI (SERIALIZABLE) 在此基础上叠加 SIREAD 谓词锁与读写依赖图检测。FUW 让并发写冲突尽早显现，FCW 则让只读工作负载完全不受影响。
 
 ### Predicate Lock / 谓词锁
 
@@ -793,7 +793,7 @@ Cahill/PostgreSQL 的 SSI 只增加两个 bit per transaction + SIREAD 锁追踪
 
 ### 发现 4：RC-SI 是现实最好的默认
 
-Oracle RC (自 1990 年代就是 RC-SI)、SQL Server RCSI (2005+)、PostgreSQL 的 RC (2004+ 行版本)、许多 NewSQL 引擎的默认——这一级别是现实中平衡正确性与性能的最佳点。每条语句一次快照，避免长事务的版本链问题，又保证了"不见脏数据 + 不阻塞写"。MySQL RR 的"一致读 + 当前读 + Gap Lock"虽然语义复杂但也源于类似考量。
+Oracle RC (自 1990 年代就是 RC-SI)、SQL Server RCSI (2005+)、PostgreSQL 的 RC (自 PG 早期版本即基于 MVCC 行版本)、许多 NewSQL 引擎的默认——这一级别是现实中平衡正确性与性能的最佳点。每条语句一次快照，避免长事务的版本链问题，又保证了"不见脏数据 + 不阻塞写"。MySQL RR 的"一致读 + 当前读 + Gap Lock"虽然语义复杂但也源于类似考量。
 
 ### 发现 5：谓词锁的代价促生多种创新
 
