@@ -113,7 +113,7 @@ HLL++ 对此进一步改进：使用经验测得的 "偏差校正表" (bias corr
 | Presto | `approx_distinct` | HLL | 0.x | e=0.023 |
 | Hive | -- (UDF) | -- | 需 UDF | -- |
 | Hive + Brickhouse UDF | `approx_distinct` | HLL | 第三方 | -- |
-| Impala | `NDV` | HLL | 1.2 (2014) | p=10 |
+| Impala | `NDV` | HLL | 1.2 (2013) | p=10 |
 | Drill | `hll` (函数) | HLL | 1.16+ (2019) | log2m=10 |
 | ClickHouse | `uniq` (默认) | 自适应 (HLL+稀疏) | 早期 | 自适应 |
 | ClickHouse | `uniqHLL12` | 标准 HLL | 早期 | p=12 |
@@ -125,7 +125,7 @@ HLL++ 对此进一步改进：使用经验测得的 "偏差校正表" (bias corr
 | Apache Pinot | `DISTINCTCOUNTHLL` / `DistinctCountHLLPlus` | HLL/HLL+ | GA | log2m=8 |
 | Apache Pinot | `DistinctCountThetaSketch` | DataSketches Theta | GA | -- |
 | DuckDB | `approx_count_distinct` | HLL | 0.8+ (2023) | p=11 |
-| Vertica | `APPROXIMATE_COUNT_DISTINCT` | HLL | 7.2 (2016) | 1.25% 误差 |
+| Vertica | `APPROXIMATE_COUNT_DISTINCT` | HLL | 7.2 (2015) | 1.25% 误差 |
 | Greenplum | `hll_add_agg` (扩展) | postgresql-hll | 6+ | log2m=11 |
 | Teradata | -- | -- | 不支持 | -- |
 | Teradata Vantage | `approx_distinct` | HLL | NewSQL+ | -- |
@@ -751,7 +751,7 @@ Druid 还支持 Theta sketch (集合运算) 和 Quantiles sketch，整套使用 
 
 ### Apache Impala：NDV 函数
 
-Impala 较早 (1.2, 2014) 就引入了 NDV (Number of Distinct Values)：
+Impala 较早 (1.2, 2013) 就引入了 NDV (Number of Distinct Values)：
 
 ```sql
 -- 基础用法
