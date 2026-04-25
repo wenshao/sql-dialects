@@ -434,7 +434,7 @@ END;
 ### optimizer_index_cost_adj
 
 ```sql
--- optimizer_index_cost_adj (10..10000, 默认 100)
+-- optimizer_index_cost_adj (1..10000, 默认 100)
 -- 含义: 索引扫描代价乘以此百分比
 -- 100 = 不调整 (默认), 50 = 索引代价减半 (更倾向索引), 200 = 索引代价翻倍
 
