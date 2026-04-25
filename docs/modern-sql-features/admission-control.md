@@ -63,13 +63,13 @@ ISO SQL 标准从未涉及准入控制语法，原因与资源管理相同：这
 | MariaDB | `max_connections` (默认 151) | `max_statement_time` | -- (拒绝) | 全部 |
 | SQLite | 无 (嵌入式) | 无 | -- | -- |
 | Oracle | `processes` / `sessions` | Resource Manager `ACTIVE_SESS_POOL_P1` | 是 | 8i+ |
-| SQL Server | `max server connections` | Resource Governor `MAX_CONCURRENT_REQUEST_COUNT` | 是 | 2008 Ent+ |
+| SQL Server | `max server connections` | Resource Governor `GROUP_MAX_REQUESTS` | 是 | 2008 Ent+ |
 | DB2 | `MAX_CONNECTIONS` / `MAX_COORDAGENTS` | WLM `CONCURRENTDBCOORDACTIVITIES` | 是 | 9.5+ |
 | Snowflake | 按 Warehouse 配额 | `MAX_CONCURRENCY_LEVEL` (默认 8) | 是 | GA |
 | BigQuery | slots 池 | slot 调度 (无显式查询数上限) | 是 | GA |
 | Redshift | `max_connections` (默认 500) | WLM 队列 `query_concurrency` | 是 | GA |
 | DuckDB | 嵌入式 | 多线程内部 | -- | -- |
-| ClickHouse | `max_connections` (默认 1024) | `max_concurrent_queries` (默认 100) | 是 (0.23+) | 全部 |
+| ClickHouse | `max_connections` (默认 1024) | `max_concurrent_queries` (默认 100) | 是 (23.x+) | 全部 |
 | Trino | 协调器 HTTP 连接 | Resource Group `maxRunning` | 是 | 早期 |
 | Presto | 同 Trino | 同 Trino | 是 | 早期 |
 | Spark SQL | 无显式连接概念 | FAIR Scheduler 池 | 是 | 1.0+ |
@@ -296,7 +296,7 @@ Oracle 的关键准入参数：
 
 这是**内存感知 + 优化器估算感知**的准入控制典型案例：Oracle 会在执行前用 CBO 估算查询成本，如果明显超标就**提前拒绝**。
 
-### SQL Server：Resource Governor 与 MAX_CONCURRENT_REQUEST_COUNT
+### SQL Server：Resource Governor 与 GROUP_MAX_REQUESTS
 
 SQL Server 从 2008 Enterprise 开始支持 Resource Governor：
 
@@ -310,7 +310,7 @@ WITH (
     MAX_MEMORY_PERCENT = 60
 );
 
--- 2. 创建工作负载组 (关键：MAX_CONCURRENT_REQUEST_COUNT 即并发请求上限)
+-- 2. 创建工作负载组 (关键：GROUP_MAX_REQUESTS 即并发请求上限)
 CREATE WORKLOAD GROUP wgAnalytics
 WITH (
     IMPORTANCE = LOW,                       -- 优先级：LOW/MEDIUM/HIGH
@@ -339,8 +339,6 @@ ALTER RESOURCE GOVERNOR RECONFIGURE;
 ```
 
 `GROUP_MAX_REQUESTS` 就是 SQL Server 的并发准入上限。超过后新查询会在内部队列等待，如果 `REQUEST_MEMORY_GRANT_TIMEOUT_SEC` 超时则取消。
-
-> 注：早期文档中提到的 `MAX_CONCURRENT_REQUEST_COUNT` 在 SQL Server 2016+ 已更名为 `GROUP_MAX_REQUESTS`，二者含义相同。
 
 ### Snowflake：Warehouse 级别的查询排队
 
