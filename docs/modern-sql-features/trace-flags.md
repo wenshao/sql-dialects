@@ -32,7 +32,7 @@ ISO/IEC 9075 系列标准 (SQL:1992 至 SQL:2023) 从未定义任何"跟踪"、"
 | 引擎 | 主要机制 | 关键字 / 命令 | 引入版本 |
 |------|---------|---------------|----------|
 | SQL Server | DBCC TRACEON/TRACEOFF + 启动参数 -T | `DBCC TRACEON (1117, -1)` | 早期 (6.x+) |
-| Oracle | EVENTS + oradebug + tkprof | `ALTER SESSION SET EVENTS '10046 trace name context forever, level 12'` | v6 / v7 (1989) |
+| Oracle | EVENTS + oradebug + tkprof | `ALTER SESSION SET EVENTS '10046 trace name context forever, level 12'` | v7 (1992) |
 | PostgreSQL | log_min_messages + debug_print_* GUC | `SET log_min_messages = 'debug5'` | 早期 |
 | MySQL | --debug 选项 + optimizer_trace | `SET SESSION optimizer_trace='enabled=on'` | 5.6 (2013) |
 | MariaDB | 继承 MySQL + slow_query_log_filter | `SET optimizer_trace='enabled=on'` | 10.0+ |
