@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 185 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 184 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -214,7 +214,6 @@
 - [崩溃恢复 (ARIES)](crash-recovery.md)
 - [VACUUM 与垃圾回收](vacuum-gc.md)
 - [SAVEPOINT 保存点](savepoints.md)
-- [自治事务 (Autonomous Transactions)](autonomous-transactions.md)
 - [分布式事务 XA / 2PC](distributed-transactions-xa.md)
 - [副本读路由 (Read Routing / Follower Reads)](replica-read-routing.md)
 
