@@ -200,9 +200,9 @@ FOREIGN KEY (a, b) REFERENCES parent(a, b)
 | PostgreSQL | 是（6.1+） | 是 | 是 | 是 | 是 |
 | Oracle | 是（8.0+） | 是 | 是 | 是 | 是 |
 | SQL Server | **否**（仅支持禁用/启用约束） | -- | -- | -- | -- |
-| MySQL (InnoDB) | 8.0 之前**否**（仅 SESSION 级 `FOREIGN_KEY_CHECKS` 开关） | -- | -- | -- | -- |
-| MariaDB | 否（同 MySQL） | -- | -- | -- | -- |
-| SQLite | 是（3.0+） | 是 | 是 | -- | 是 |
+| MySQL (InnoDB) | **不支持（任何版本）**（仅 SESSION 级 `FOREIGN_KEY_CHECKS` 开关） | -- | -- | -- | -- |
+| MariaDB | **不支持（任何版本）**（同 MySQL） | -- | -- | -- | -- |
+| SQLite | 是（3.6.19+，需 `PRAGMA foreign_keys=ON`） | 是 | 是 | -- | 是 |
 | DB2 | 否（用 NOT ENFORCED 替代） | -- | -- | -- | -- |
 | Firebird | 否 | -- | -- | -- | -- |
 | CockroachDB | 有限支持 | 有限 | 有限 | 是 | 是 |
