@@ -60,7 +60,7 @@
 | Databricks | -- | -- | -- | -- | -- | 是 | OAuth, PAT, SCIM | GA |
 | Teradata | -- (TD2 + SHA-256) | -- | 是 (TD2) | 是 | 是 (LDAP) | 是 | OIDC (17.20+) | 16.20+ |
 | Greenplum | 继承 PG | 继承 PG | 继承 PG | 是 | 是 | 是 | -- | 6.x+ |
-| CockroachDB | 是 (v20.2+) | -- | 是 | 是 (v23.1+) | 是 | 是 (默认推荐) | OIDC (v22.1+) | v1.0+ |
+| CockroachDB | 是 (v22.2+, 2022; experimental from v22.1) | -- | 是 | 是 (v23.1+) | 是 | 是 (默认推荐) | OIDC (v22.1+) | v1.0+ |
 | TiDB | -- | -- | caching_sha2 | -- | 是 (5.2+) | 是 | tidb_auth_token (6.5+) | 4.0+ |
 | OceanBase | -- | -- | 是 | 是 (4.0+) | 是 | 是 | -- | 3.x+ |
 | YugabyteDB | 继承 PG | 继承 PG | 继承 PG | 是 | 是 | 是 | OIDC (2.18+) | 2.0+ |
@@ -416,11 +416,11 @@ cockroach sql --certs-dir=./certs --user=alice \
 CREATE USER alice WITH PASSWORD 'strong_password';
 -- cluster setting
 SET CLUSTER SETTING server.user_login.password_hashes.default_cost = 10;
--- 选择哈希算法：bcrypt / scram-sha-256 (v22.1+)
+-- 选择哈希算法：bcrypt / scram-sha-256 (v22.2+ GA, experimental from v22.1)
 SET CLUSTER SETTING server.user_login.password_encryption = 'scram-sha-256';
 ```
 
-CockroachDB v22.1 引入 SCRAM-SHA-256 以替代 bcrypt；v22.1 引入 OIDC (通过 HTTP 控制台) 用于运维登录；v23.1 引入 GSSAPI。企业版还支持 JWT-based 登录 (v23.2+)。
+CockroachDB v22.2（2022 年 12 月）GA SCRAM-SHA-256 以替代 bcrypt（v22.1 实验性）；v22.1 引入 OIDC (通过 HTTP 控制台) 用于运维登录；v23.1 引入 GSSAPI。企业版还支持 JWT-based 登录 (v23.2+)。
 
 ### TiDB：tidb_auth_token 与云原生
 
