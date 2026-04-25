@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 169 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 184 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -23,6 +23,7 @@
 ### 递归与层次
 - [CTE 与递归查询](cte-recursive-query.md)
 - [递归 CTE 增强特性（SEARCH/CYCLE）](recursive-cte-enhancements.md)
+- [CTE 物化提示 (MATERIALIZED / NOT MATERIALIZED)](cte-materialization-hints.md)
 - [子查询与半连接优化](subquery-optimization.md)
 
 ### 行列变换
@@ -87,6 +88,7 @@
 - [CREATE OR REPLACE 语法](create-or-replace.md)
 - [临时表](temporary-tables.md)
 - [约束语法](constraint-syntax.md)
+- [外键级联语义 (ON DELETE/UPDATE)](foreign-key-cascade-semantics.md)
 - [生成列与计算列](generated-computed-columns.md) · [旧版](generated-columns.md)
 - [AUTO_INCREMENT / SEQUENCE / IDENTITY](auto-increment-sequence-identity.md)
 - [外部表](external-tables.md)
@@ -94,6 +96,7 @@
 
 ### 存储架构
 - [可插拔存储引擎](pluggable-storage-engines.md)
+- [聚簇表 vs 堆表](clustered-heap-storage.md)
 - [表空间与文件布局](tablespace-file-layout.md)
 - [表与列压缩](table-column-compression.md)
 - [分片键与分布键](shard-key-distribution.md)
@@ -108,6 +111,7 @@
 - [表达式索引 (函数索引)](expression-indexes.md)
 - [部分索引 (WHERE 条件过滤)](partial-indexes.md)
 - [布隆过滤器索引](bloom-filter-indexes.md)
+- [不可见索引 (INVISIBLE / UNUSABLE)](invisible-indexes.md)
 - [分区策略对比](partition-strategy-comparison.md)
 - [分区裁剪](partition-pruning.md)
 
@@ -150,6 +154,7 @@
 - [字符集与排序规则](charset-collation.md)
 - [字符串比较与 COLLATE](string-comparison-collation.md)
 - [字符集转换函数](charset-conversion-functions.md)
+- [SQL 字符串字面量转义 (E'' / N'' / U&'' / $$)](sql-escape-literals.md)
 
 ### 时区
 - [时区处理 (TIMESTAMPTZ / AT TIME ZONE)](timezone-handling.md)
@@ -201,6 +206,7 @@
 
 - [MVCC 实现机制](mvcc-implementation.md)
 - [事务隔离级别对比](transaction-isolation-comparison.md)
+- [快照隔离实现细节 (SI / RC-SI / SSI)](snapshot-isolation-details.md)
 - [锁机制与死锁检测](locks-deadlocks.md)
 - [元数据锁 (MDL / Schema Lock)](metadata-locks.md)
 - [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
@@ -209,6 +215,7 @@
 - [VACUUM 与垃圾回收](vacuum-gc.md)
 - [SAVEPOINT 保存点](savepoints.md)
 - [分布式事务 XA / 2PC](distributed-transactions-xa.md)
+- [副本读路由 (Read Routing / Follower Reads)](replica-read-routing.md)
 
 ---
 
@@ -229,11 +236,17 @@
 - [Hash Join 算法变体](hash-join-algorithms.md)
 - [列裁剪与投影下推](column-pruning-pushdown.md)
 - [统计信息与直方图](statistics-histograms.md)
+- [扩展统计信息 (多列/相关性/函数依赖)](extended-statistics.md)
+- [选择性估计 (Selectivity Estimation)](selectivity-estimation.md)
+- [优化器代价模型与代价单位](cost-model-units.md)
+- [自适应查询优化 (Adaptive Plans / AQE / Adaptive Joins)](adaptive-query-plans.md)
+- [并行 DML (Parallel INSERT/UPDATE/DELETE)](parallel-dml.md)
 - [慢查询日志与性能监控](slow-query-log.md)
 - [I/O 监控与读写统计](io-monitoring.md)
 - [内存使用监控](memory-usage-monitoring.md)
 - [查询计划稳定性 (SPM / Query Store)](query-plan-stability.md)
 - [临时空间管理 (spill to disk)](temp-space-management.md)
+- [准入控制与查询排队](admission-control.md)
 
 ---
 
@@ -241,6 +254,7 @@
 
 - [存储过程与 UDF](stored-procedures-udf.md)
 - [外部 UDF 与原生扩展 (C/Java/Python/JS/Rust/WASM)](udf-external-functions.md)
+- [函数波动性 (IMMUTABLE / STABLE / VOLATILE)](function-volatility.md)
 - [触发器](triggers.md)
 - [游标](cursors.md)
 - [动态 SQL](dynamic-sql.md)
@@ -249,6 +263,7 @@
 - [变量与会话管理](variables-sessions.md)
 - [连接池与会话管理](connection-pooling.md)
 - [数据库 Wire 协议](wire-protocols.md)
+- [数据库认证方式 (SCRAM/GSSAPI/Kerberos/Cert)](auth-methods.md)
 
 ---
 
