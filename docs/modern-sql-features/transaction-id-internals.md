@@ -49,7 +49,7 @@ ANSI/ISO SQL 标准定义了 ACID 的语义、隔离级别（READ UNCOMMITTED、
 | HSQLDB | tx id | 64 | 平坦 | -- | 内存优先 |
 | Derby | tx id | 64 | 平坦 | -- | -- |
 | CockroachDB | HLC timestamp | 96 (64 物理 + 32 逻辑) | physical(64ns) + logical(32) | `cluster_logical_timestamp()` | HLC 论文 2014 |
-| Spanner | commit timestamp | 64 + uncertainty | 物理时间 + ε（TrueTime） | `READ_TIMESTAMP` | TrueTime SOSP 2012 |
+| Spanner | commit timestamp | 64 + uncertainty | 物理时间 + ε（TrueTime） | `READ_TIMESTAMP` | TrueTime OSDI 2012 |
 | TiDB | TSO | 64 | physical(46ms) + logical(18) | `tidb_current_ts` | PD 集中分配 |
 | YugabyteDB | HLC | 64 | physical(52μs) + logical(12) | -- | 借鉴 Spanner + HLC |
 | OceanBase | GTS | 64 | physical(μs) + logical | -- | 类 TSO，租户级 GTS |
@@ -1071,7 +1071,7 @@ Flink、Materialize、RisingWave 没有传统的事务 ID，用 timestamp / epoc
 
 ### 9. wraparound 不是"不可能"，而是"未发生过"
 
-48 位、64 位看起来巨大无比，但摩尔定律和云规模化让"不可能"变成"未发生过"。AWS RDS 已记录到一些 PG 数据库 5 年内推进了 1000 亿 XID（频繁批处理 + 大量 OLTP 事务），按这个速度 64 位也会在 30 年后耗尽。设计 100 年期数据库时仍需考虑 128 位（如 CockroachDB 的 HLC）。
+48 位、64 位看起来巨大无比，但摩尔定律和云规模化让"不可能"变成"未发生过"。AWS RDS 已记录到一些 PG 数据库 5 年内推进了 1000 亿 XID（频繁批处理 + 大量 OLTP 事务），按这个速度 64 位也会在 30 年后耗尽。设计 100 年期数据库时仍需考虑更宽时钟（如 CockroachDB HLC 96 位、Spanner TrueTime 128 位 wall+uncertainty）。
 
 ### 10. 用户友好性的两极分化
 
