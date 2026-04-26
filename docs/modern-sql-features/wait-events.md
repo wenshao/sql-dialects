@@ -1276,7 +1276,7 @@ Log Rate Governor        : POOL_LOG_RATE_GOVERNOR (Azure SQL)
 ### 3. wait class 概念的普及度
 
 ```text
-Oracle: 12 大类 (1992 引入), 是行业标准
+Oracle: 12 大类 (10g 2004 引入 wait_class), 是行业标准
 PostgreSQL: 8 大类 (2016 引入), 借鉴 Oracle 概念
 SQL Server: 平铺 ~1000 个 wait_type, 无内置分类 (Query Store 2017 才有 wait_category)
 MySQL: 4 大类前缀分类 (wait/io/, wait/lock/, wait/synch/, wait/idle)
