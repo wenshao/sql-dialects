@@ -155,7 +155,7 @@ ISO SQL 标准从未涉及内存授予的概念，原因与资源管理类似：
 | Databricks | 是 | Photon AQE | 单次 query | stage | GA |
 | 其他引擎 | -- | 多数无反馈 | -- | -- | -- |
 
-> SQL Server 的 Memory Grant Feedback 是业界**最完整、最透明**的实现：从 2017 行模式 (in-batch) → 2019 持久化到计划缓存 → 2022 持久化到 Query Store。Oracle 通过 PGA 自动管理实现"半反馈"——不是针对单个查询，而是针对整个工作负载的全局优化。
+> SQL Server 的 Memory Grant Feedback 是业界**最完整、最透明**的实现：从 2017 批模式 (in-batch MGF) → 2019 增加行模式 MGF → 2022 持久化到 Query Store。Oracle 通过 PGA 自动管理实现"半反馈"——不是针对单个查询，而是针对整个工作负载的全局优化。
 
 ### 4. 每查询内存上限 (Per-Query Memory Cap)
 
