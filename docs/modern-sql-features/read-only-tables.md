@@ -102,8 +102,8 @@ ISO/IEC 9075（SQL:1999 ~ SQL:2023）中关于只读的内容：
 |------|---------------------------|------------------------------|-------------|---------|
 | Oracle | 是 | 是 | 是 | 6.x（早期） |
 | SQL Server | -- (用 SET 隔离级别 SNAPSHOT) | -- | -- | 不支持标准语法 |
-| PostgreSQL | 是 | 是 | `default_transaction_read_only` | 6.5（1999） |
-| MySQL | 是 | 是 | `transaction_read_only` 变量 | 5.6（2013） |
+| PostgreSQL | 是 | 是 | `default_transaction_read_only` | 7.0（2000） |
+| MySQL | 是 | 是 | `transaction_read_only` 变量 | 5.6.5（2012-04） |
 | MariaDB | 是 | 是 | `transaction_read_only` 变量 | 10.0+ |
 | SQLite | -- | -- | `PRAGMA query_only` | 不支持事务级 |
 | DB2 | 是 | -- | -- | 早期 |
@@ -374,10 +374,10 @@ PG 不实现 ALTER TABLE READ ONLY 的设计理由（社区讨论摘要）：
 - 表级只读涉及多个组件（HOT updates、autovacuum、重写规则）的复杂耦合
 - 历史邮件列表多次提议都未通过
 
-#### SET TRANSACTION READ ONLY（6.5+，1999）
+#### SET TRANSACTION READ ONLY（7.0+，2000）
 
 ```sql
--- 标准 SQL 语法（PG 6.5 引入，1999 年）
+-- 标准 SQL 语法（PG 7.0 引入，2000 年）
 BEGIN;
 SET TRANSACTION READ ONLY;
 SELECT * FROM orders;
