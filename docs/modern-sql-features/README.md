@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 214 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 229 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -126,6 +126,7 @@
 ### DDL 事务性 / 在线 DDL
 - [DDL 事务性与在线 DDL](ddl-transactionality-online.md)
 - [在线 DDL 实现机制](online-ddl-implementation.md)
+- [在线表重组 (Online Table Reorganization)](reorg-online.md)
 
 ### 时态表
 - [时态表 / 系统版本控制](temporal-tables.md)
@@ -136,6 +137,8 @@
 ### 元数据
 - [COMMENT 与描述元数据](comment-metadata.md)
 - [ON COMMIT 动作 (DELETE/PRESERVE/DROP)](on-commit-actions.md)
+- [服务端配置文件](server-config-files.md)
+- [动态配置重载](dynamic-config-reload.md)
 
 ---
 
@@ -227,14 +230,22 @@
 - [元数据锁 (MDL / Schema Lock)](metadata-locks.md)
 - [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
 - [WAL 归档与 PITR](wal-archiving.md)
+- [日志传送 (Log Shipping)](log-shipping.md)
 - [崩溃恢复 (ARIES)](crash-recovery.md)
 - [VACUUM 与垃圾回收](vacuum-gc.md)
+- [快照保留期与 Undo 配置](snapshot-age-config.md)
 - [SAVEPOINT 保存点](savepoints.md)
 - [自治事务 (PRAGMA AUTONOMOUS_TRANSACTION)](autonomous-transactions.md)
 - [分布式事务 XA / 2PC](distributed-transactions-xa.md)
+- [组提交 (Group Commit)](group-commit.md)
+- [同步复制 (Synchronous Replication)](synchronous-replication.md)
+- [数据库高可用与故障切换 (HA & Failover)](database-failover-ha.md)
+- [滚动升级 (Rolling Upgrade)](rolling-upgrade.md)
 - [副本读路由 (Read Routing / Follower Reads)](replica-read-routing.md)
+- [读后写一致性 (Read-After-Write Consistency)](read-after-write-consistency.md)
 - [快照导出 (pg_export_snapshot / mydumper)](snapshot-export.md)
 - [逻辑解码 (Logical Decoding / Binlog)](logical-decoding.md)
+- [写入停顿与限速 (Write Stalls and Rate Limiting)](write-stalls-rate-limiting.md)
 
 ---
 
@@ -253,6 +264,8 @@
 - [查询重写规则](query-rewrite-rules.md)
 - [查询取消与超时控制](query-cancellation-timeouts.md)
 - [Hash Join 算法变体](hash-join-algorithms.md)
+- [嵌套循环连接与跳跃扫描](nested-loop-skip-scan.md)
+- [半连接与反连接重写 (Semi/Anti-Join Rewriting)](semi-anti-join-rewrite.md)
 - [列裁剪与投影下推](column-pruning-pushdown.md)
 - [统计信息与直方图](statistics-histograms.md)
 - [扩展统计信息 (多列/相关性/函数依赖)](extended-statistics.md)
@@ -290,6 +303,8 @@
 - [变量与会话管理](variables-sessions.md)
 - [连接池与会话管理](connection-pooling.md)
 - [数据库 Wire 协议](wire-protocols.md)
+- [服务端预编译语句 (Server-Side Prepared)](server-side-prepared-statements.md)
+- [事务流水线 (Transaction Pipelining)](transaction-pipelining.md)
 - [数据库认证方式 (SCRAM/GSSAPI/Kerberos/Cert)](auth-methods.md)
 
 ---
