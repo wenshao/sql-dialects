@@ -6,7 +6,7 @@ LSM 的本质矛盾不在于"是否合并"，而在于"如何合并"——合并
 
 LSM 通过把所有写入转化为顺序写赢得了惊人的写吞吐量，但 MemTable 转储下来的 SSTable 数量会无限增长——如果不合并，一次点查可能要遍历数百个 SSTable，范围扫描更是灾难。合并不是可选项，而是 LSM 的生存必需。问题在于：合并本身要写、要读、要占用 IO 带宽，合并策略的选择直接决定了三类放大的曲线形状。
 
-### Lemire RUM 三角与 LSM 合并
+### Athanassoulis RUM 三角与 LSM 合并
 
 2016 年 Boston University 的 Manos Athanassoulis 等人在论文 *"Designing Access Methods: The RUM Conjecture"*（EDBT 2016）中正式提出了 RUM 三角猜想。LSM 合并策略的选择本质上就是在这个三角形上选择具体的位置：
 
