@@ -197,7 +197,7 @@ NL 内侧查找时大批量异步发出 I/O，隐藏磁盘延迟。
 | 引擎 | BKA / 等价能力 | 引入版本 | 备注 |
 |------|----------------|---------|------|
 | MySQL | 是（BKA） | 5.6 (2013) | `optimizer_switch` 控制 |
-| MariaDB | 是（BKA + BKAH） | 5.3 (2011) | **比 MySQL 早 2 年** |
+| MariaDB | 是（BKA + BKAH） | 5.3 (2012) | **比 MySQL 早 1 年** |
 | Oracle | 是（Vector Index Access） | 11g+ | -- |
 | SQL Server | 是（List Prefetch） | 2005+ | NL 内侧 |
 | DB2 | 是（List Prefetch） | LUW 早期 | -- |
@@ -384,7 +384,7 @@ SET optimizer_switch = 'mrr=on,mrr_cost_based=on,batched_key_access=on';
 - 内存紧张（hash 要建表，BKA 流式）
 - 外侧已排序（不需 buffer 排序的额外开销）
 
-MariaDB 的同名特性 **早于 MySQL 2 年**（5.3, 2011），且增强为 **BKAH**（BKA Hash），把 join_buffer 内的 key 用哈希索引而非排序。
+MariaDB 的同名特性 **早于 MySQL 1 年**（5.3, 2012），且增强为 **BKAH**（BKA Hash），把 join_buffer 内的 key 用哈希索引而非排序。
 
 ### PostgreSQL：17 不支持，18 提案中（Peter Geoghegan）
 
