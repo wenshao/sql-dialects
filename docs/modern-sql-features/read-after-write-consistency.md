@@ -198,7 +198,6 @@ PACELC: 即使没有分区时 (Else), 选 Latency 还是 Consistency?
 | SingleStore | 强一致 | 分布式 | 同步复制 | PC/EC | GA |
 | Vertica | 强一致 | MPP | k-safe 副本 | PC/EC | GA |
 | TimescaleDB | 继承 PG | 单机/副本 | 继承 PG | 继承 PG | 继承 PG |
-| Greenplum | 强一致 | MPP | 同步镜像 | PC/EC | GA |
 | Materialize | 强一致 | 流式视图 | 单 leader | PC/EC | GA |
 | RisingWave | 强一致 | 流式视图 | 内部复制 | PC/EC | GA |
 | ClickHouse Cloud | 强一致 | 云分离存储 | 单一对象存储 | PC/EC | GA |
