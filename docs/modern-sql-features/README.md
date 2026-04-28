@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 199 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 214 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -93,17 +93,23 @@
 - [AUTO_INCREMENT / SEQUENCE / IDENTITY](auto-increment-sequence-identity.md)
 - [外部表](external-tables.md)
 - [可更新视图规则](updatable-views.md)
+- [不可见列 (INVISIBLE Columns)](invisible-columns.md)
+- [只读表 (READ ONLY)](read-only-tables.md)
 
 ### 存储架构
 - [可插拔存储引擎](pluggable-storage-engines.md)
 - [聚簇表 vs 堆表](clustered-heap-storage.md)
 - [表空间与文件布局](tablespace-file-layout.md)
 - [表与列压缩](table-column-compression.md)
+- [字典编码 (Dictionary Encoding)](dictionary-encoding.md)
+- [InnoDB 行格式 (COMPACT/DYNAMIC/COMPRESSED)](row-format-storage.md)
+- [LSM 合并策略 (Leveled/Tiered/Universal/FIFO)](lsm-compaction-strategies.md)
 - [分片键与分布键](shard-key-distribution.md)
 - [分层存储 (热/温/冷)](tiered-storage.md)
 - [复合主键设计](composite-primary-keys.md)
 - [Schema 演进模式](schema-evolution.md)
 - [热点写入缓解 (AUTO_RANDOM / UUID v7)](hotspot-write-mitigation.md)
+- [DDL 复制 (跨副本)](ddl-replication.md)
 
 ### 索引
 - [索引类型与创建语法](index-types-creation.md)
@@ -159,9 +165,11 @@
 - [字符串比较与 COLLATE](string-comparison-collation.md)
 - [字符集转换函数](charset-conversion-functions.md)
 - [SQL 字符串字面量转义 (E'' / N'' / U&'' / $$)](sql-escape-literals.md)
+- [CHAR vs VARCHAR vs TEXT 语义对比](char-vs-varchar.md)
 
 ### 时区
 - [时区处理 (TIMESTAMPTZ / AT TIME ZONE)](timezone-handling.md)
+- [时间戳精度规则 (TIMESTAMP(p) / 亚秒/纳秒)](timestamp-precision-rules.md)
 
 ---
 
@@ -248,10 +256,13 @@
 - [列裁剪与投影下推](column-pruning-pushdown.md)
 - [统计信息与直方图](statistics-histograms.md)
 - [扩展统计信息 (多列/相关性/函数依赖)](extended-statistics.md)
+- [统计采集策略 (sampling / auto-collect)](statistics-collection-strategies.md)
+- [统计信息导出导入](statistics-export-import.md)
 - [选择性估计 (Selectivity Estimation)](selectivity-estimation.md)
 - [优化器代价模型与代价单位](cost-model-units.md)
 - [自适应查询优化 (Adaptive Plans / AQE / Adaptive Joins)](adaptive-query-plans.md)
 - [并行 DML (Parallel INSERT/UPDATE/DELETE)](parallel-dml.md)
+- [哈希聚合外存溢出 (Hash Aggregate Spill)](hash-aggregate-spill.md)
 - [慢查询日志与性能监控](slow-query-log.md)
 - [I/O 监控与读写统计](io-monitoring.md)
 - [内存使用监控](memory-usage-monitoring.md)
@@ -259,6 +270,7 @@
 - [等待事件监控 (V$/sys.dm_os_wait_stats/PS waits)](wait-events.md)
 - [查询计划稳定性 (SPM / Query Store)](query-plan-stability.md)
 - [查询指纹与摘要 (queryid / DIGEST / query_hash)](query-fingerprinting.md)
+- [计划缓存淘汰 (Plan Cache Eviction)](plan-cache-eviction.md)
 - [跟踪标志与调试开关 (DBCC TRACEON / EVENTS)](trace-flags.md)
 - [临时空间管理 (spill to disk)](temp-space-management.md)
 - [准入控制与查询排队](admission-control.md)
@@ -290,6 +302,8 @@
 - [跨区域地理复制](geo-replication.md)
 - [外部数据源与数据库链接 (FDW / dblink)](foreign-data-wrappers.md)
 - [备份与恢复语法](backup-restore-syntax.md)
+- [并行恢复 (pg_restore --jobs / XtraBackup)](parallel-restore.md)
+- [数据库克隆 (zero-copy / Snowflake CLONE)](database-cloning.md)
 - [数据库事件通知 (LISTEN/NOTIFY / Service Broker)](database-events-notify.md)
 
 ---
@@ -304,6 +318,7 @@
 - [透明数据加密 (TDE)](transparent-data-encryption.md)
 - [数据遮罩与脱敏](data-masking.md)
 - [SSL/TLS 连接加密](ssl-tls-encryption.md)
+- [密码策略 (Password Policy)](password-policy.md)
 
 ---
 
