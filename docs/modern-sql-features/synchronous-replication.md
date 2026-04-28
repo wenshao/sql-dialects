@@ -188,7 +188,7 @@ MySQL 在 5.5（2010）首次引入半同步复制插件 `rpl_semi_sync_master` 
 
 - 主库提交事务后，等待至少一个副本回 ACK 表示"我已经收到 binlog 并写入 relay log"
 - 超时（默认 10s）后自动降级为异步复制，使得单副本故障不会导致主库阻塞
-- 5.7.3（2014）引入 `AFTER_SYNC` 模式（lossless replication），把 ACK 时机从"COMMIT 之后"改到"COMMIT 之前"，确保即使主库在 ACK 后立即崩溃也不会丢数据
+- 5.7.3（2013）引入 `AFTER_SYNC` 模式（lossless replication），把 ACK 时机从"COMMIT 之后"改到"COMMIT 之前"，确保即使主库在 ACK 后立即崩溃也不会丢数据
 
 ```sql
 -- 1. 安装半同步插件（5.5+）
@@ -992,7 +992,7 @@ ACK 设计:
 
 ## 关键发现
 
-1. **MySQL 半同步是工业界第一个广泛部署的同步复制方案**：5.5（2010）首次引入，5.7.3（2014）通过 AFTER_SYNC 实现真正"无损"语义。但它本质是 flush 模式，不保证副本回放。
+1. **MySQL 半同步是工业界第一个广泛部署的同步复制方案**：5.5（2010）首次引入，5.7.3（2013）通过 AFTER_SYNC 实现真正"无损"语义。但它本质是 flush 模式，不保证副本回放。
 
 2. **PostgreSQL 是同步语义最细致的引擎**：从 9.1（2011）的同步流复制到 9.6（2016）的 5 档 `synchronous_commit`（off/local/remote_write/on/remote_apply）+ Quorum FIRST/ANY，提供了从最弱到最强、写/flush/apply 三档完整覆盖。
 
