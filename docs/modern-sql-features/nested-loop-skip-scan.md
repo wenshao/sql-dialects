@@ -1108,7 +1108,7 @@ PostgreSQL 社区的反对方观点：
 
 4. **MySQL Loose Index Scan 与 Skip Scan 是两个不同特性**：5.0 (2005) 的 Loose Index Scan 仅限 GROUP BY MIN/MAX；8.0 的 Skip Scan Range Access 才是类 Oracle 跳跃，但受限于"必须仅访问索引列"。两者命名混乱，文档查阅时需特别注意。
 
-5. **MySQL BKA (5.6, 2013) 是 NL with Index 的关键里程碑**：把外侧 key 缓存→排序→批量探测，让随机 I/O 变顺序 I/O。在 SSD 时代收益略减但 OLTP 仍重要。MariaDB 的 BKAH（5.3, 2011）早于 MySQL 2 年且更优。
+5. **MySQL BKA (5.6, 2013) 是 NL with Index 的关键里程碑**：把外侧 key 缓存→排序→批量探测，让随机 I/O 变顺序 I/O。在 SSD 时代收益略减但 OLTP 仍重要。MariaDB 的 BKAH（5.3, 2012）早于 MySQL 1 年且更优。
 
 6. **PostgreSQL 18 Skip Scan 提案是 2024-2025 PG 社区最受关注的优化器特性之一**。Peter Geoghegan 作为 B-Tree 主要维护者，patch 经过多轮 review。如成功合入将填补 PG 与 Oracle 在 OLTP 索引访问路径上的 24 年差距。
 
