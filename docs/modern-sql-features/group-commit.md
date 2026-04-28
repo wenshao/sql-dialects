@@ -52,7 +52,7 @@ SQL 标准只定义了 ACID 的语义（COMMIT 后修改必须持久），完全
 | PostgreSQL | 是 | WAL writer 隐式批 + `commit_delay` 显式 sleep | 7.0 隐式 / 8.3 commit_delay 重写 |
 | MySQL InnoDB | 是 | redo group commit + binlog 三阶段 group commit | 5.6 (2013) |
 | MariaDB | 是 | binlog group commit + Mariabackup 协调 | 5.5 (2012) |
-| Oracle | 是 | LGWR fast commit + adaptive batching | 6+ (1990s) |
+| Oracle | 是 | LGWR fast commit + adaptive batching | v6+ (1988) |
 | SQL Server | 部分 | 内部 log block flush；显式按事务用 delayed durability | 2014 (delayed durability) |
 | DB2 | 是 | 隐式 + `MINCOMMIT` 旧机制 | V8 (旧机制) / 9.5+ 隐式 |
 | Sybase ASE | 是 | private log cache + group commit | 12.5+ |
@@ -249,7 +249,7 @@ ALTER SYSTEM SET commit_siblings = 5;      -- 至少 5 个并发
 SELECT pg_reload_conf();
 ```
 
-`commit_delay` 是 PostgreSQL 6.x 时代就有的参数，但早期实现有 bug（`pg_usleep` 精度不足）。8.3 重写后真正可用，但因为现代 SSD 的 fsync 已经很快（< 100 微秒），多数情况下 `commit_delay = 0` 加 WAL writer 隐式批就够了。
+`commit_delay` 是 PostgreSQL 7.0 (2000) 引入的参数，但早期实现有 bug（`pg_usleep` 精度不足）。8.3 重写后真正可用，但因为现代 SSD 的 fsync 已经很快（< 100 微秒），多数情况下 `commit_delay = 0` 加 WAL writer 隐式批就够了。
 
 ### Oracle：LGWR fast commit
 
