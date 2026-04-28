@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 184 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 199 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -111,7 +111,9 @@
 - [表达式索引 (函数索引)](expression-indexes.md)
 - [部分索引 (WHERE 条件过滤)](partial-indexes.md)
 - [布隆过滤器索引](bloom-filter-indexes.md)
+- [位图索引 (Bitmap Indexes)](bitmap-indexes.md)
 - [不可见索引 (INVISIBLE / UNUSABLE)](invisible-indexes.md)
+- [索引维护 (REBUILD / REORGANIZE)](index-maintenance.md)
 - [分区策略对比](partition-strategy-comparison.md)
 - [分区裁剪](partition-pruning.md)
 
@@ -123,9 +125,11 @@
 - [时态表 / 系统版本控制](temporal-tables.md)
 - [系统版本查询 (FOR SYSTEM_TIME AS OF / Time Travel)](system-versioned-queries.md)
 - [PERIOD / 范围类型](range-period-types.md)
+- [Range / Multirange 操作](multirange-operations.md)
 
 ### 元数据
 - [COMMENT 与描述元数据](comment-metadata.md)
+- [ON COMMIT 动作 (DELETE/PRESERVE/DROP)](on-commit-actions.md)
 
 ---
 
@@ -171,6 +175,7 @@
 
 ### 专用聚合
 - [近似聚合函数（APPROX_*）](approx-functions.md)
+- [HyperLogLog 实现对比](hyperloglog-implementations.md)
 - [ARG_MIN / ARG_MAX](argmin-argmax.md)
 - [ANY_VALUE / 非分组列](any-value-grouping.md)
 - [STRING_AGG 演进](string-agg-evolution.md)
@@ -205,17 +210,23 @@
 ## 事务与并发
 
 - [MVCC 实现机制](mvcc-implementation.md)
+- [事务 ID 内部结构 (XID/SCN/LSN/HLC/TSO)](transaction-id-internals.md)
 - [事务隔离级别对比](transaction-isolation-comparison.md)
 - [快照隔离实现细节 (SI / RC-SI / SSI)](snapshot-isolation-details.md)
 - [锁机制与死锁检测](locks-deadlocks.md)
+- [锁模式与兼容性矩阵 (S/X/U/IS/IX/SIX)](lock-modes.md)
+- [锁升级 (Lock Escalation)](lock-escalation.md)
 - [元数据锁 (MDL / Schema Lock)](metadata-locks.md)
 - [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
 - [WAL 归档与 PITR](wal-archiving.md)
 - [崩溃恢复 (ARIES)](crash-recovery.md)
 - [VACUUM 与垃圾回收](vacuum-gc.md)
 - [SAVEPOINT 保存点](savepoints.md)
+- [自治事务 (PRAGMA AUTONOMOUS_TRANSACTION)](autonomous-transactions.md)
 - [分布式事务 XA / 2PC](distributed-transactions-xa.md)
 - [副本读路由 (Read Routing / Follower Reads)](replica-read-routing.md)
+- [快照导出 (pg_export_snapshot / mydumper)](snapshot-export.md)
+- [逻辑解码 (Logical Decoding / Binlog)](logical-decoding.md)
 
 ---
 
@@ -244,7 +255,11 @@
 - [慢查询日志与性能监控](slow-query-log.md)
 - [I/O 监控与读写统计](io-monitoring.md)
 - [内存使用监控](memory-usage-monitoring.md)
+- [内存授予反馈 (Memory Grant Feedback)](memory-grant-feedback.md)
+- [等待事件监控 (V$/sys.dm_os_wait_stats/PS waits)](wait-events.md)
 - [查询计划稳定性 (SPM / Query Store)](query-plan-stability.md)
+- [查询指纹与摘要 (queryid / DIGEST / query_hash)](query-fingerprinting.md)
+- [跟踪标志与调试开关 (DBCC TRACEON / EVENTS)](trace-flags.md)
 - [临时空间管理 (spill to disk)](temp-space-management.md)
 - [准入控制与查询排队](admission-control.md)
 
