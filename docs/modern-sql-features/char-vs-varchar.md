@@ -783,9 +783,9 @@ SELECT length(c_char), length(c_varchar) FROM spark_chartypes;
 
 ```sql
 -- ANSI_PADDING 历史与默认值：
--- - SQL Server 2000 及之前：默认 OFF
--- - SQL Server 2005-2008：默认 OFF（但创建表时使用当前会话值）
--- - SQL Server 2008+：默认 ON
+-- - SQL Server 7.0+：连接级默认 ON
+-- - SQL Server 2000+：数据库级默认 ON
+-- - 长期建议：始终保持 ON（旧 SQL Server 6.5 及更早默认 OFF，已废弃）
 -- - 强制推荐：始终使用 ON，未来版本可能强制启用
 
 -- 验证当前设置：
@@ -814,7 +814,7 @@ SELECT LEN(c), DATALENGTH(c) FROM pad_off;
 ```
 
 ANSI_PADDING 关键事实：
-- **ON 是默认且推荐**：自 2008 起
+- **ON 是默认且推荐**：自 SQL Server 2000 起（连接级自 7.0）
 - **OFF 是历史选项**：将在未来版本移除
 - **影响 CHAR / NCHAR / BINARY**：但 VARCHAR / NVARCHAR / VARBINARY 不受影响（始终不填充）
 - **创建时绑定**：列的填充行为由 CREATE TABLE 时的会话设置决定
