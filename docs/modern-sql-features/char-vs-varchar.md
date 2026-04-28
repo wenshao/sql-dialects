@@ -430,7 +430,7 @@ Oracle 关键事实：
 
 ### SQL Server：CHAR 补空格 (依赖 ANSI_PADDING)，TEXT/NTEXT 已废弃
 
-SQL Server 的字符类型行为受 `SET ANSI_PADDING` 历史选项影响，但自 2008 起默认行为已固化。
+SQL Server 的字符类型行为受 `SET ANSI_PADDING` 历史选项影响，SQL Server 2000 起默认 ON (连接默认自 7.0)。
 
 ```sql
 -- SQL Server 字符类型：
@@ -446,7 +446,7 @@ CREATE TABLE sqlserver_chartypes (
 );
 
 -- ANSI_PADDING 历史：
--- ANSI_PADDING ON  (推荐，2008 起默认 ON)：CHAR 右补空格
+-- ANSI_PADDING ON  (推荐，SQL Server 2000 起默认 ON，连接默认自 7.0)：CHAR 右补空格
 -- ANSI_PADDING OFF (历史遗留)：CHAR 行为退化为 VARCHAR
 SET ANSI_PADDING ON;
 
@@ -477,7 +477,7 @@ SELECT 'abc' = 'abc   ' COLLATE Latin1_General_BIN;   -- 0 (BIN 是 NO PAD)
 ```
 
 SQL Server 关键事实：
-- **ANSI_PADDING ON 自 2008 默认**：之前需要显式设置才符合标准
+- **ANSI_PADDING ON 自 SQL Server 2000 起默认 (连接默认自 7.0)**：之前需要显式设置才符合标准
 - **TEXT/NTEXT 自 2005 废弃**：未来版本会移除，必须迁移到 `VARCHAR(MAX)` / `NVARCHAR(MAX)`
 - **VARCHAR(MAX) 自 2005 引入**：行内 8000 字节 + 溢出 LOB
 - **VARCHAR 是单字节字符集**：基于排序规则的代码页，不能存非该代码页的字符
