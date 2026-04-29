@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 244 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 259 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -25,6 +25,8 @@
 - [递归 CTE 增强特性（SEARCH/CYCLE）](recursive-cte-enhancements.md)
 - [CTE 物化提示 (MATERIALIZED / NOT MATERIALIZED)](cte-materialization-hints.md)
 - [子查询与半连接优化](subquery-optimization.md)
+- [相关子查询执行 (Apply / Magic Decorrelation)](correlated-subquery-execution.md)
+- [递归复合类型](recursive-types.md)
 
 ### 行列变换
 - [PIVOT / UNPIVOT 行列转换](pivot-unpivot.md)
@@ -48,6 +50,7 @@
 
 ### SQL 解析器
 - [SQL 解析器差异（大小写/引用/保留字）](sql-parser-differences.md)
+- [SELECT 子句逻辑执行顺序](clauses-execution-order.md)
 
 ---
 
@@ -170,6 +173,12 @@
 - [NULL 处理行为](null-handling-behavior.md)
 - [NULL 安全比较](null-safe-comparison.md)
 - [算术溢出与除零](arithmetic-overflow-division.md)
+- [整数溢出检测](integer-overflow-detection.md)
+
+### 数值类型
+- [整数类型 (TINYINT/INT/BIGINT/INT128)](integer-types.md)
+- [浮点类型 (REAL/DOUBLE/BFLOAT16/DECFLOAT)](floating-point-types.md)
+- [BOOLEAN 类型与三值逻辑](boolean-type-semantics.md)
 
 ### 字符集与排序
 - [字符集与排序规则](charset-collation.md)
@@ -177,6 +186,7 @@
 - [字符集转换函数](charset-conversion-functions.md)
 - [SQL 字符串字面量转义 (E'' / N'' / U&'' / $$)](sql-escape-literals.md)
 - [CHAR vs VARCHAR vs TEXT 语义对比](char-vs-varchar.md)
+- [字符串填充行为 (PAD SPACE / NO PAD)](string-padding-behavior.md)
 
 ### 时区
 - [时区处理 (TIMESTAMPTZ / AT TIME ZONE)](timezone-handling.md)
@@ -198,6 +208,9 @@
 - [ARG_MIN / ARG_MAX](argmin-argmax.md)
 - [ANY_VALUE / 非分组列](any-value-grouping.md)
 - [STRING_AGG 演进](string-agg-evolution.md)
+- [数组聚合 (ARRAY_AGG / GROUP_CONCAT / collect_list)](array-aggregate.md)
+- [JSON 聚合 (JSON_OBJECTAGG / JSON_ARRAYAGG)](json-aggregate.md)
+- [分析函数 vs 聚合函数](analytic-vs-aggregate.md)
 
 ### 生成与展开
 - [集合返回函数](set-returning-functions.md)
@@ -206,6 +219,9 @@
 - [正则表达式语法](regex-syntax.md)
 - [Lambda 表达式](lambda-expressions.md)
 - [函数与操作符重载](function-operator-overloading.md)
+- [表值函数 (TVF / PTF)](table-valued-functions.md)
+- [内置哈希函数 (MD5/SHA/CRC/xxHash/CityHash)](hash-functions-builtin.md)
+- [UUID 生成函数 (v1/v4/v7)](uuid-generation.md)
 
 ---
 
@@ -239,6 +255,7 @@
 - [WAL / Redo 日志与持久化配置](wal-checkpoint-durability.md)
 - [WAL 归档与 PITR](wal-archiving.md)
 - [日志传送 (Log Shipping)](log-shipping.md)
+- [复制槽生命周期管理](logical-replication-slot.md)
 - [崩溃恢复 (ARIES)](crash-recovery.md)
 - [VACUUM 与垃圾回收](vacuum-gc.md)
 - [快照保留期与 Undo 配置](snapshot-age-config.md)
