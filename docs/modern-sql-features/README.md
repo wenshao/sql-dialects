@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 259 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 274 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -92,6 +92,7 @@
 - [临时表](temporary-tables.md)
 - [约束语法](constraint-syntax.md)
 - [外键级联语义 (ON DELETE/UPDATE)](foreign-key-cascade-semantics.md)
+- [约束验证状态 (NOVALIDATE/NOCHECK/NOT VALID)](constraint-validation-states.md)
 - [生成列与计算列](generated-computed-columns.md) · [旧版](generated-columns.md)
 - [AUTO_INCREMENT / SEQUENCE / IDENTITY](auto-increment-sequence-identity.md)
 - [默认值求值时机 (DEFAULT)](default-value-evaluation.md)
@@ -103,6 +104,7 @@
 ### 存储架构
 - [可插拔存储引擎](pluggable-storage-engines.md)
 - [聚簇表 vs 堆表](clustered-heap-storage.md)
+- [聚簇键与排序键](cluster-keys.md)
 - [表空间与文件布局](tablespace-file-layout.md)
 - [表与列压缩](table-column-compression.md)
 - [字典编码 (Dictionary Encoding)](dictionary-encoding.md)
@@ -122,17 +124,20 @@
 - [部分索引 (WHERE 条件过滤)](partial-indexes.md)
 - [布隆过滤器索引](bloom-filter-indexes.md)
 - [位图索引 (Bitmap Indexes)](bitmap-indexes.md)
+- [空间索引类型 (R-Tree/GiST/SP-GiST/QuadTree/H3)](spatial-index-types.md)
 - [不可见索引 (INVISIBLE / UNUSABLE)](invisible-indexes.md)
 - [仅索引扫描 (Index-Only Scan)](index-only-scan.md)
 - [外键自动建索引](fk-auto-index.md)
 - [索引维护 (REBUILD / REORGANIZE)](index-maintenance.md)
 - [分区策略对比](partition-strategy-comparison.md)
 - [分区裁剪](partition-pruning.md)
+- [分区智能连接 (Partition-Wise Join)](partition-wise-join.md)
 
 ### DDL 事务性 / 在线 DDL
 - [DDL 事务性与在线 DDL](ddl-transactionality-online.md)
 - [在线 DDL 实现机制](online-ddl-implementation.md)
 - [在线表重组 (Online Table Reorganization)](reorg-online.md)
+- [数据库迁移工具 (Liquibase/Flyway/sqitch/Atlas)](database-migration-tools.md)
 
 ### 时态表
 - [时态表 / 系统版本控制](temporal-tables.md)
@@ -229,6 +234,7 @@
 
 - [全文检索](full-text-search.md)
 - [分词器与文本分析器](tokenization-analyzers.md)
+- [全文搜索排名算法 (BM25/TF-IDF)](text-search-ranking.md)
 - [地理空间函数](geospatial-functions.md)
 - [向量类型与相似性搜索](vector-similarity-search.md)
 
@@ -245,9 +251,12 @@
 ## 事务与并发
 
 - [MVCC 实现机制](mvcc-implementation.md)
+- [行版本存储格式 (Row Version Storage)](row-version-storage-format.md)
 - [事务 ID 内部结构 (XID/SCN/LSN/HLC/TSO)](transaction-id-internals.md)
 - [事务隔离级别对比](transaction-isolation-comparison.md)
 - [快照隔离实现细节 (SI / RC-SI / SSI)](snapshot-isolation-details.md)
+- [事务异常 (Write Skew / Lost Update / Phantom)](transaction-anomalies.md)
+- [嵌套事务 (Nested Transactions)](nested-transactions.md)
 - [锁机制与死锁检测](locks-deadlocks.md)
 - [锁模式与兼容性矩阵 (S/X/U/IS/IX/SIX)](lock-modes.md)
 - [锁升级 (Lock Escalation)](lock-escalation.md)
@@ -288,9 +297,11 @@
 - [查询提示 (Query Hints)](query-hints.md)
 - [查询重写规则](query-rewrite-rules.md)
 - [查询取消与超时控制](query-cancellation-timeouts.md)
+- [SARGable 谓词与下推](sargable-predicates.md)
 - [Hash Join 算法变体](hash-join-algorithms.md)
 - [嵌套循环连接与跳跃扫描](nested-loop-skip-scan.md)
 - [半连接与反连接重写 (Semi/Anti-Join Rewriting)](semi-anti-join-rewrite.md)
+- [星型/雪花模型优化](star-schema-optimization.md)
 - [列裁剪与投影下推](column-pruning-pushdown.md)
 - [统计信息与直方图](statistics-histograms.md)
 - [扩展统计信息 (多列/相关性/函数依赖)](extended-statistics.md)
@@ -313,6 +324,7 @@
 - [计划缓存淘汰 (Plan Cache Eviction)](plan-cache-eviction.md)
 - [跟踪标志与调试开关 (DBCC TRACEON / EVENTS)](trace-flags.md)
 - [扩展事件与 SQL 跟踪](extended-events-vs-traces.md)
+- [工作负载模式检测 (Workload Pattern Detection)](workload-pattern-detection.md)
 - [临时空间管理 (spill to disk)](temp-space-management.md)
 - [准入控制与查询排队](admission-control.md)
 - [资源隔离 (Resource Isolation)](resource-isolation-cgroups.md)
@@ -329,12 +341,14 @@
 - [动态 SQL](dynamic-sql.md)
 - [错误处理](error-handling.md)
 - [安全错误处理](error-handling-safe.md)
+- [异常传播](exception-propagation.md)
 - [变量与会话管理](variables-sessions.md)
 - [自动提交模式 (Autocommit Modes)](autocommit-modes.md)
 - [连接池与会话管理](connection-pooling.md)
 - [数据库 Wire 协议](wire-protocols.md)
 - [服务端预编译语句 (Server-Side Prepared)](server-side-prepared-statements.md)
 - [事务流水线 (Transaction Pipelining)](transaction-pipelining.md)
+- [结果集流式传输](result-set-streaming.md)
 - [数据库认证方式 (SCRAM/GSSAPI/Kerberos/Cert)](auth-methods.md)
 
 ---
@@ -361,6 +375,7 @@
 - [审计日志](audit-logging.md)
 - [数据血缘与查询溯源](data-lineage.md)
 - [透明数据加密 (TDE)](transparent-data-encryption.md)
+- [加密密钥管理 (KEK/DEK/HSM/KMS)](encryption-key-management.md)
 - [数据遮罩与脱敏](data-masking.md)
 - [SSL/TLS 连接加密](ssl-tls-encryption.md)
 - [密码策略 (Password Policy)](password-policy.md)
