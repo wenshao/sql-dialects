@@ -34,12 +34,12 @@ VARCHAR(5) 存 'abc' -> 物理存储 'abc' (实际 3 字符 + 长度元数据)
   结果: TRUE
 ```
 
-### SQL:2003 引入的 NO PAD 选项
+### SQL:1992 已有的 NO PAD 选项
 
-SQL:2003 (ISO/IEC 9075-2 §10.3) 引入了排序规则 (collation) 的 `PAD SPACE` / `NO PAD` 属性，允许引擎覆盖默认的 PAD SPACE 比较语义：
+SQL:1992 在 §4.2.4 与 §11.32 的 `<collation definition>` 中已经定义了排序规则 (collation) 的 `PAD SPACE` / `NO PAD` 属性，允许引擎覆盖默认的 PAD SPACE 比较语义；后续版本仅在细节上做了微调：
 
 ```sql
--- SQL:2003 引入的属性:
+-- SQL:1992 已定义的属性:
 CREATE COLLATION my_no_pad_collation
     FROM "ucs_basic"
     NO PAD;     -- 比较时不再填充, 'abc' != 'abc   '
@@ -49,7 +49,7 @@ CREATE COLLATION my_pad_collation
     PAD SPACE;  -- 比较时填充, 'abc' = 'abc   '
 ```
 
-`PAD SPACE` 是 SQL:1992 默认；`NO PAD` 是 SQL:2003 新增可选项，让 VARCHAR 比较"所见即所得"。这一属性解决了一个长期争议：标准默认让 `'abc' = 'abc   '` 在所有字符串比较中为 TRUE，许多用户认为反直觉。NO PAD 让 VARCHAR 的语义更接近大多数程序员的心理模型。
+`PAD SPACE` 是 SQL:1992 字符比较的默认；`NO PAD` 同样在 SQL:1992 中作为 collation 可选属性已被定义，让 VARCHAR 比较"所见即所得"。这一属性解决了一个长期争议：标准默认让 `'abc' = 'abc   '` 在所有字符串比较中为 TRUE，许多用户认为反直觉。NO PAD 让 VARCHAR 的语义更接近大多数程序员的心理模型。
 
 ### 三个独立维度
 
@@ -227,10 +227,10 @@ LIKE 不受 PAD SPACE 影响 (SQL:1992 §8.5):
   'abc   ' LIKE 'abc%'  -> TRUE   (% 匹配空格)
 ```
 
-### SQL:2003 引入的 NO PAD 属性
+### SQL:1992 已定义的 NO PAD 属性
 
 ```sql
--- SQL:2003 §10.3 排序规则定义:
+-- SQL:1992 §4.2.4 / §11.32 排序规则定义即包含:
 CREATE COLLATION my_no_pad
     FROM "ucs_basic"
     NO PAD;     -- 比较时不填充
@@ -241,13 +241,13 @@ CREATE COLLATION my_no_pad
 
 NO PAD 让 VARCHAR 比较"所见即所得"，更符合现代程序员的心理预期。一些数据库（如 MySQL 8.0 的 `utf8mb4_0900` 系列）将 NO PAD 设为新默认。
 
-### SQL:1992 与 SQL:2003 的渐进迁移
+### 标准时间线与各版本调整
 
 ```
 时间线:
-  SQL:1992  -> 所有字符串比较默认 PAD SPACE
+  SQL:1992  -> 字符比较默认 PAD SPACE; collation 定义已包含 PAD SPACE / NO PAD 属性
   SQL:1999  -> 引入 CLOB, 不在 PAD SPACE 范围
-  SQL:2003  -> 引入 NO PAD 排序规则属性 (可选)
+  SQL:2003  -> 排序规则与 Unicode 进一步整合
   SQL:2008  -> Unicode 排序规则进一步规范
   SQL:2016  -> 多字节字符的 NO PAD 行为细化
 ```
@@ -894,23 +894,23 @@ SQL:1992 决定将 TRIM 设计为函数（带语法关键字 LEADING/TRAILING/BO
 
 但实际工程中 LTRIM / RTRIM 短小好记，几乎所有引擎都同时支持。SQL Server 在 2017 才补全 SQL 标准 TRIM 函数（之前只有 LTRIM / RTRIM）。
 
-## PAD SPACE / NO PAD 排序规则属性 (SQL:2003)
+## PAD SPACE / NO PAD 排序规则属性 (SQL:1992)
 
 ### 标准定义
 
 ```sql
--- SQL:2003 §10.3 排序规则定义:
+-- SQL:1992 §4.2.4 / §11.32 排序规则定义即包含:
 CREATE COLLATION my_collation
     FROM "ucs_basic"
     [ PAD SPACE | NO PAD ]
     [ NO CASE_SENSITIVITY | CASE_SENSITIVITY ]
     [ NO ACCENT_SENSITIVITY | ACCENT_SENSITIVITY ];
 
--- 默认: PAD SPACE (与 SQL:1992 兼容)
--- NO PAD: 比较时不填充
+-- 默认: PAD SPACE (SQL:1992 字符比较默认)
+-- NO PAD: 比较时不填充 (SQL:1992 起即可在 collation 中显式声明)
 ```
 
-### 主要引擎对 SQL:2003 排序规则属性的支持
+### 主要引擎对 SQL:1992 排序规则属性的支持
 
 | 引擎 | 排序规则系统 | NO PAD 支持 | 默认 PAD 行为 | 设置方式 |
 |------|------------|------------|--------------|---------|
@@ -1302,7 +1302,7 @@ SELECT * FROM t WHERE TRIM(c) = '';
 
 6. **LIKE 不 PAD 是所有引擎的共识**：但 CHAR 列上 LIKE 的"幽灵空格"陷阱会让等号查询命中而 LIKE 失败。CHAR 列上做 LIKE 必须先 RTRIM。
 
-7. **SQL:2003 NO PAD 选项仍是少数引擎实现**：仅 PG 16+、MySQL 8.0+、MariaDB 10.10+ (uca1400)、Spark 3.4+ 等少数主流引擎完整实现。SQL Server 至今未提供原生 NO PAD VARCHAR。
+7. **SQL:1992 NO PAD 选项仍是少数引擎实现**：尽管 SQL:1992 即已定义此 collation 属性，仅 PG 16+、MySQL 8.0+、MariaDB 10.10+ (uca1400)、Spark 3.4+ 等少数主流引擎完整实现。SQL Server 至今未提供原生 NO PAD VARCHAR。
 
 8. **TRIM 标准 vs LTRIM/RTRIM 简写**：SQL 标准只定义 TRIM；LTRIM/RTRIM 是事实标准但语义在跨引擎间不完全一致 (单字符 vs 字符集)。Firebird/Flink SQL 不提供 LTRIM/RTRIM 简写。
 
@@ -1322,8 +1322,8 @@ SELECT * FROM t WHERE TRIM(c) = '';
 
 ## 参考资料
 
-- SQL:1992 标准: ISO/IEC 9075:1992, §4.2 (character string types), §6.7 (TRIM function), §8.2 (comparison predicate)
-- SQL:2003 标准: ISO/IEC 9075-2:2003, §10.3 (collation definition with PAD SPACE / NO PAD attribute)
+- SQL:1992 标准: ISO/IEC 9075:1992, §4.2 (character string types, including §4.2.4 collation pad attribute), §6.7 (TRIM function), §8.2 (comparison predicate), §11.32 (collation definition with PAD SPACE / NO PAD attribute)
+- SQL:2003 标准: ISO/IEC 9075-2:2003 (refinements to collation/Unicode handling)
 - PostgreSQL: [Character Types (CHARACTER, CHARACTER VARYING)](https://www.postgresql.org/docs/current/datatype-character.html)
 - MySQL: [Char and Varchar Types](https://dev.mysql.com/doc/refman/8.0/en/char.html) and [Trailing Spaces in CHAR/VARCHAR](https://dev.mysql.com/doc/refman/8.0/en/charset-collation-pad-attribute.html)
 - MySQL Release Notes 5.0.3: [Changes in MySQL 5.0.3](https://dev.mysql.com/doc/refman/5.0/en/news-5-0-3.html)
