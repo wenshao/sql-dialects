@@ -52,7 +52,7 @@ SELECT dept_id, ARRAY_AGG(name) AS names FROM employees GROUP BY dept_id;
 2009  PostgreSQL 8.4 实现 ARRAY_AGG (业界第一个完整实现)
 2013  Hive 0.13 引入 collect_list / collect_set
 2014  Trino (Presto) 引入 array_agg
-2015  MySQL 5.7 引入 JSON_ARRAYAGG (JSON 数组,非原生 ARRAY)
+2018  MySQL 5.7.22 引入 JSON_ARRAYAGG (JSON 数组,非原生 ARRAY)
 2016  SQL:2016 标准化 LISTAGG (字符串聚合)
 2017  SQL Server 2017 引入 STRING_AGG (仍无 ARRAY_AGG)
 2018  ClickHouse groupArray 系列稳定
