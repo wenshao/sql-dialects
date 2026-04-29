@@ -334,7 +334,7 @@ SELECT level1();
 
 ### Oracle PL/SQL（业界最早的 EXCEPTION 块）
 
-Oracle 在 PL/SQL 7.0 (1992) 引入完整的 `EXCEPTION` 块和命名异常机制，是后续所有"BEGIN..EXCEPTION..END"模型的鼻祖：
+Oracle PL/SQL 自 v6 (1988) 即支持 `EXCEPTION` 块；7.0 (1992) PL/SQL 2.0 增强了命名异常和 `PRAGMA EXCEPTION_INIT`，是后续所有"BEGIN..EXCEPTION..END"模型的鼻祖：
 
 ```sql
 DECLARE
