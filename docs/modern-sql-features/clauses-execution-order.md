@@ -168,7 +168,7 @@ SELECT salary * 12 AS annual_salary FROM employees WHERE annual_salary > 100000;
 | Firebolt | 否 | 是 | 是 | 是 | -- |
 | DatabendDB | 是 | 是 | 是 | 是 | -- |
 
-> 统计：47 个引擎中，全部支持 ORDER BY 引用列别名；约 35 个支持 GROUP BY 引用别名；约 31 个支持 HAVING 引用别名；仅 7 个支持 WHERE 引用别名 (Snowflake、BigQuery、Redshift、ClickHouse、DuckDB、Spark 3.4+、Databricks DBR 13+、DatabendDB)。
+> 统计：47 个引擎中，全部支持 ORDER BY 引用列别名；约 35 个支持 GROUP BY 引用别名；约 31 个支持 HAVING 引用别名；仅 8 个支持 WHERE 引用别名 (Snowflake、BigQuery、Redshift、ClickHouse、DuckDB、Spark 3.4+、Databricks DBR 13+、DatabendDB)。
 
 ### WINDOW 命名子句执行时机
 
