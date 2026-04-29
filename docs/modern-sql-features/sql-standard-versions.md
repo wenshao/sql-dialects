@@ -1,4 +1,4 @@
-# SQL 标准版本与方言采用 (SQL Standards Versions and Dialect Adoption)
+# SQL 标准版本与方言采用 (SQL Standard Versions and Dialect Adoption)
 
 SQL 标准从 1986 年首次发布到 2023 年最新版，已经经历了近 40 年的演进，但没有任何一个数据库引擎完全实现过任意一版的 Full 级别——这就是 SQL 世界最大的悖论：标准存在，但人人都讲方言。
 
