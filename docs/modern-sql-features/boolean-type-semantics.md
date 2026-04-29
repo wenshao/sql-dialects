@@ -14,7 +14,7 @@
 - **1999**: SQL:1999 标准（ISO/IEC 9075-2:1999）正式引入 `BOOLEAN` 类型，但作为可选特征 T031
 - **2004**: MySQL 4.1 引入 `BOOLEAN` 关键字，但实际只是 `TINYINT(1)` 的别名
 - **2016**: DB2 11.1 引入原生 `BOOLEAN`（IBM 长期使用 SMALLINT 代替）
-- **2022**: ClickHouse 22.3 引入 `Bool` 类型（之前用 `UInt8`）
+- **2022-03**: ClickHouse 22.3 引入 `Bool` 类型（之前用 `UInt8`）
 - **2024**: Oracle 23ai (Database 23c) 终于在 SQL 层引入 `BOOLEAN`（PL/SQL 自 v7 即支持）
 
 这条时间线揭示了一个深刻的现实：**BOOLEAN 是 SQL 标准中采用最慢、最不一致的基础类型之一**。其根本原因在于：
@@ -88,7 +88,7 @@ SQL:2003 进一步细化：
 | BigQuery | 是 (`BOOL`) | -- | 是 (`TRUE`/`FALSE`) | 标准 3VL | 否（需 CAST） | 全版本 |
 | Redshift | 是 | -- | 是 (含 `'t'`/`'f'`/`'yes'`/`'no'`) | 标准 3VL | 否 | 全版本 |
 | DuckDB | 是 | -- | 是 | 标准 3VL | 否（需 CAST） | 早期 |
-| ClickHouse | 是 (`Bool`) | 之前用 `UInt8` | 是 | 类似 3VL | 是（Bool ↔ UInt8） | **22.3 (2022-01)** |
+| ClickHouse | 是 (`Bool`) | 之前用 `UInt8` | 是 | 类似 3VL | 是（Bool ↔ UInt8） | **22.3 (2022-03)** |
 | Trino | 是 | -- | 是 | 标准 3VL | 否 | 全版本 |
 | Presto | 是 | -- | 是 | 标准 3VL | 否 | 全版本 |
 | Spark SQL | 是 | -- | 是 | 标准 3VL | 否 | 全版本 |
@@ -548,7 +548,7 @@ CREATE TABLE accounts_old (
 
 DB2 z/OS 和 IBM i 直到更晚的版本才有 BOOLEAN，这两个平台的 SQL 兼容性常常滞后于 LUW。
 
-### ClickHouse：从 UInt8 到 Bool（22.3, 2022 年 1 月）
+### ClickHouse：从 UInt8 到 Bool（22.3, 2022 年 3 月）
 
 ClickHouse 早期没有 BOOLEAN，约定俗成使用 `UInt8`：
 
