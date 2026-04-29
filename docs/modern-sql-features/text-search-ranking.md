@@ -33,7 +33,7 @@
 2009  Lucene 默认 TF-IDF
         Practical Scoring Function 变体
 2013  MySQL 5.6 InnoDB FULLTEXT (BM25 调优变体)
-2015  Lucene 6.0 切换默认评分到 BM25 (Robertson 经典版)
+2016  Lucene 6.0 切换默认评分到 BM25 (Robertson 经典版)
 2016  Elasticsearch 5.0 默认使用 BM25
 2019  ColBERT (Stanford, 后期交互检索)
 2020  SPLADE (sparse learned retrieval)
@@ -1531,7 +1531,7 @@ FROM dcg JOIN idcg USING (search_id);
 
 ```
 切换时间表:
-  2015 Lucene 6.0: 默认从 TF-IDF 切到 BM25
+  2016 Lucene 6.0: 默认从 TF-IDF 切到 BM25
   2016 Elasticsearch 5.0: 同步切换
   2017 Solr 7.0: 同步切换
   2017 SQLite FTS5: 默认 BM25
