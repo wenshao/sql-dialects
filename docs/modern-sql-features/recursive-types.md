@@ -81,9 +81,9 @@ SQL:1999 第二部分（Foundation, ISO/IEC 9075-2）在 Section 4.8 "User-defin
 1. **存储模型**：行存数据库无法预知一个递归值的最终大小，必须引入间接性（指针）才能存储。
 2. **类型系统终止性**：递归类型的相等比较、序列化、深拷贝等操作必须显式定义终止条件；标准为了避免引入这些复杂性，干脆禁止。
 
-### SQL:2003 引入 REF 类型解禁部分场景
+### SQL:1999 引入 REF 类型解禁部分场景
 
-SQL:2003（基于 SQL:1999 之上的修订）引入了 `REF(structured-type)` 这一引用类型：
+SQL:1999（Part 2 Foundation，与结构化 UDT 同期）引入了 `REF(structured-type)` 这一引用类型：
 
 ```sql
 CREATE TYPE node_t AS (
@@ -102,9 +102,9 @@ CREATE TABLE next_table OF node_t (REF IS oid SYSTEM GENERATED);
 
 这是 Oracle 早在 8i（1999）就实现的模型，也成为 IBM DB2、Informix 等少数走 OO 路线引擎的基础。
 
-### SQL:2003 ARRAY OF self 仍然禁止
+### SQL:1999 ARRAY OF self 仍然禁止
 
-SQL:2003 引入了 `ARRAY` 作为集合类型，但标准对结构化类型的递归限制依然适用：
+SQL:1999 引入了 `ARRAY` 作为集合类型（SQL:2003 后续补充了 MULTISET 与 ROW），但标准对结构化类型的递归限制依然适用：
 
 ```sql
 CREATE TYPE tree_t AS (
