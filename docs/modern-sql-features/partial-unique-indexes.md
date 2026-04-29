@@ -113,7 +113,7 @@ SQL:2008（ISO/IEC 9075-2:2008，Clause 11.7 `<unique constraint definition>`）
 
 | 引擎 | 关键字 | 部分 UNIQUE | 表达式部分 UNIQUE | 版本 |
 |------|--------|-------------|-------------------|------|
-| PostgreSQL | `WHERE` | 是 | 是 | 7.2+ (2002) |
+| PostgreSQL | `WHERE` | 是 | 是 | 7.0+ (2000，7.2 完善) |
 | MySQL | -- | 否 | 否 | 不支持 |
 | MariaDB | -- | 否 | 否 | 不支持 |
 | SQLite | `WHERE` | 是 | 是 | 3.8.0+ (2013) |
@@ -238,7 +238,7 @@ CREATE UNIQUE INDEX i ON t (a, b) NULLS NOT DISTINCT;
 
 ### PostgreSQL（部分 UNIQUE 索引的发明者）
 
-PostgreSQL 7.2（2002 年 2 月）首次引入 `CREATE UNIQUE INDEX ... WHERE` 语法，是所有主流引擎里最早的实现，也是功能最完整的：
+PostgreSQL 7.0（2000 年 5 月）首次引入 `CREATE UNIQUE INDEX ... WHERE` 语法（7.2 完善），是所有主流引擎里最早的实现，也是功能最完整的：
 
 ```sql
 -- 最经典：每个用户最多一个未删除的主邮箱
@@ -1439,7 +1439,7 @@ SQL Server 的 filtered unique index 与 MERGE 兼容性较好，但仍需注意
 
 1. **部分 UNIQUE 索引解锁了"条件唯一"业务规则**：软删除、状态机、多版本、单一主项、分布式锁——这些场景没有部分 UNIQUE 只能靠触发器或编码技巧。
 
-2. **PostgreSQL 7.x（2002）是先驱**：最早实现 `CREATE UNIQUE INDEX ... WHERE`，至今仍是功能最完整的引擎，谓词最灵活、匹配最智能、与表达式索引/INCLUDE 自由组合。
+2. **PostgreSQL 7.0（2000）是先驱**：最早实现 `CREATE UNIQUE INDEX ... WHERE`（7.2 完善），至今仍是功能最完整的引擎，谓词最灵活、匹配最智能、与表达式索引/INCLUDE 自由组合。
 
 3. **SQL Server 2008 跟进 filtered unique index**：语法相近但限制更多——参数化查询匹配陷阱、谓词不能用计算列/UDF/`BETWEEN` 等是常见痛点。
 
