@@ -1,6 +1,6 @@
 # 现代 SQL 特性对比目录
 
-本目录收录 229 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
+本目录收录 244 篇 SQL 方言对比文章，每篇横向对比 40+ 数据库在某一特性上的语法设计与实现差异，面向 SQL 引擎开发者。
 
 ---
 
@@ -91,6 +91,7 @@
 - [外键级联语义 (ON DELETE/UPDATE)](foreign-key-cascade-semantics.md)
 - [生成列与计算列](generated-computed-columns.md) · [旧版](generated-columns.md)
 - [AUTO_INCREMENT / SEQUENCE / IDENTITY](auto-increment-sequence-identity.md)
+- [默认值求值时机 (DEFAULT)](default-value-evaluation.md)
 - [外部表](external-tables.md)
 - [可更新视图规则](updatable-views.md)
 - [不可见列 (INVISIBLE Columns)](invisible-columns.md)
@@ -119,6 +120,8 @@
 - [布隆过滤器索引](bloom-filter-indexes.md)
 - [位图索引 (Bitmap Indexes)](bitmap-indexes.md)
 - [不可见索引 (INVISIBLE / UNUSABLE)](invisible-indexes.md)
+- [仅索引扫描 (Index-Only Scan)](index-only-scan.md)
+- [外键自动建索引](fk-auto-index.md)
 - [索引维护 (REBUILD / REORGANIZE)](index-maintenance.md)
 - [分区策略对比](partition-strategy-comparison.md)
 - [分区裁剪](partition-pruning.md)
@@ -148,6 +151,11 @@
 - [类型系统设计](type-system-design.md)
 - [域类型与用户定义类型 (CREATE DOMAIN / UDT)](domain-types.md)
 - [BLOB/CLOB 大对象处理](blob-clob-handling.md)
+- [INET 与 CIDR 网络地址类型](inet-cidr-types.md)
+- [MONEY 与货币类型](money-currency-types.md)
+- [ENUM 与 SET 类型](enum-set-types.md)
+- [层次数据类型 (hierarchyid / ltree)](hierarchyid-ltree-types.md)
+- [INTERVAL 类型与算术](interval-types-arithmetic.md)
 - [数组 / 集合类型 (ARRAY/MAP/STRUCT)](array-collection-types.md)
 - [行类型与复合类型 (ROW / STRUCT)](row-composite-types.md)
 - [JSON 在 SQL 中的演进](json-in-sql-evolution.md)
@@ -282,11 +290,15 @@
 - [内存授予反馈 (Memory Grant Feedback)](memory-grant-feedback.md)
 - [等待事件监控 (V$/sys.dm_os_wait_stats/PS waits)](wait-events.md)
 - [查询计划稳定性 (SPM / Query Store)](query-plan-stability.md)
+- [计划参数化 (Plan Parameterization)](plan-parameterization.md)
+- [SQL 调优顾问与索引建议](plan-advisor-tuning.md)
 - [查询指纹与摘要 (queryid / DIGEST / query_hash)](query-fingerprinting.md)
 - [计划缓存淘汰 (Plan Cache Eviction)](plan-cache-eviction.md)
 - [跟踪标志与调试开关 (DBCC TRACEON / EVENTS)](trace-flags.md)
+- [扩展事件与 SQL 跟踪](extended-events-vs-traces.md)
 - [临时空间管理 (spill to disk)](temp-space-management.md)
 - [准入控制与查询排队](admission-control.md)
+- [资源隔离 (Resource Isolation)](resource-isolation-cgroups.md)
 
 ---
 
@@ -301,6 +313,7 @@
 - [错误处理](error-handling.md)
 - [安全错误处理](error-handling-safe.md)
 - [变量与会话管理](variables-sessions.md)
+- [自动提交模式 (Autocommit Modes)](autocommit-modes.md)
 - [连接池与会话管理](connection-pooling.md)
 - [数据库 Wire 协议](wire-protocols.md)
 - [服务端预编译语句 (Server-Side Prepared)](server-side-prepared-statements.md)
@@ -340,6 +353,8 @@
 ## 元数据与系统目录
 
 - [系统目录与信息模式 (INFORMATION_SCHEMA / pg_catalog / sys.*)](information-schema-catalogs.md)
+- [SQL 标准版本与方言采用](sql-standard-versions.md)
+- [多租户数据库模式](multi-tenant-database.md)
 
 ---
 
