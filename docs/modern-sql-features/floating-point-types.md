@@ -1,6 +1,6 @@
 # 浮点类型 (Floating-Point Types)
 
-`SELECT 0.1 + 0.2` 在 PostgreSQL、MySQL、Oracle 中都返回 `0.3`——但当你比较 `(0.1 + 0.2) = 0.3` 时，它返回 `false`。这不是 bug，而是 IEEE 754 二进制浮点数对十进制小数的有限精度表示。浮点类型是 SQL 引擎中最容易被忽视、却又最容易踩坑的数值类型——从精度选择、存储成本，到 ML 工作负载的 BFLOAT16/FP16，再到金融场景的 DECFLOAT，每一个决策都会显著影响系统行为。本文系统梳理 45+ SQL 方言对浮点类型的支持，覆盖 IEEE 754 二进制浮点、SQL:2003 DECFLOAT 十进制浮点，以及 ML 时代新兴的 16 位浮点格式。
+`SELECT 0.1 + 0.2` 在 PostgreSQL、MySQL、Oracle 中都返回 `0.3`——但当你比较 `(0.1 + 0.2) = 0.3` 时，它返回 `false`。这不是 bug，而是 IEEE 754 二进制浮点数对十进制小数的有限精度表示。浮点类型是 SQL 引擎中最容易被忽视、却又最容易踩坑的数值类型——从精度选择、存储成本，到 ML 工作负载的 BFLOAT16/FP16，再到金融场景的 DECFLOAT，每一个决策都会显著影响系统行为。本文系统梳理 45+ SQL 方言对浮点类型的支持，覆盖 IEEE 754 二进制浮点、SQL:2008 DECFLOAT 十进制浮点，以及 ML 时代新兴的 16 位浮点格式。
 
 ## IEEE 754 二进制浮点 vs DECFLOAT 十进制浮点
 
@@ -24,7 +24,7 @@
 
 ### 十进制浮点 (Decimal Float / DECFLOAT)
 
-为解决二进制浮点的十进制精度问题，IEEE 754-2008 引入了十进制浮点格式 (基数 10)，SQL:2016 标准化为 `DECFLOAT(p)`：
+为解决二进制浮点的十进制精度问题，IEEE 754-2008 引入了十进制浮点格式 (基数 10)，SQL:2008 标准化为 `DECFLOAT(p)`：
 
 ```
 DECFLOAT(16): 1 + 5 + 50 = 64 位 (decimal64), 16 位十进制有效数字
@@ -83,9 +83,9 @@ ISO/IEC 9075:1992 在 Section 4.4 (Numbers) 定义了三个近似数值类型：
 
 注意：SQL:1992 的 `FLOAT(p)` 中的 `p` 是**二进制位**，不是十进制位。这一点与 `DECIMAL(p,s)` 的 `p` 是**十进制位**形成鲜明对比。Oracle 是少数严格遵守"FLOAT(p) 中 p 是二进制位"语义的引擎之一。
 
-### SQL:2003 / SQL:2016 — DECFLOAT
+### SQL:2008 — DECFLOAT
 
-ISO/IEC 9075:2003 在 Section 4.5 引入了 `DECFLOAT(p)` 类型 (实际广泛实施在 SQL:2016)：
+ISO/IEC 9075:2008 引入了 `DECFLOAT(p)` 类型（与 IEEE 754-2008 十进制浮点对齐）：
 
 ```sql
 <decimal floating-point type> ::=
@@ -581,7 +581,7 @@ FROM UNNEST([1.0, 2.0, CAST('NaN' AS FLOAT64), 3.0]) AS x;
 
 ### DB2 — DECFLOAT(16/34) 旗舰实现
 
-DB2 是首个全面支持 SQL:2003 DECFLOAT 的主流引擎 (DB2 9.5, 2007)：
+DB2 是首个全面支持 SQL:2008 DECFLOAT 的主流引擎 (DB2 9.5, 2007)：
 
 ```sql
 -- IEEE 754 二进制浮点 (DB2 全版本支持)
@@ -1147,7 +1147,7 @@ WHERE ABS(value_8b - 0.3) < 1e-9;   -- 而不是 value_8b = 0.3
 - IEEE Std 754-2008: IEEE Standard for Floating-Point Arithmetic (2008) — 加入 binary16, decimal floating-point
 - IEEE Std 754-2019: IEEE Standard for Floating-Point Arithmetic (2019) — 微调
 - ISO/IEC 9075:1992 (SQL:1992): REAL / DOUBLE PRECISION / FLOAT(p) 定义
-- ISO/IEC 9075:2003 (SQL:2003): DECFLOAT 类型引入
+- ISO/IEC 9075:2008 (SQL:2008): DECFLOAT 类型引入（IEEE 754-2008 十进制浮点对齐）
 - David Goldberg, "What Every Computer Scientist Should Know About Floating-Point Arithmetic" (1991), ACM Computing Surveys
 - Google Brain, "Mixed Precision Training" (2017): BFLOAT16 设计动机
 - NVIDIA, "TensorFloat-32" Whitepaper (2020): TF32 与 A100 架构
