@@ -307,7 +307,7 @@ rs.close();  // 必须显式关闭！否则连接占用直到超时
 
 ### 第三种：MySQL X DevAPI（异步流）
 
-MySQL 8.0 引入 X Protocol（端口 33060），原生支持异步迭代器：
+MySQL 5.7.12 (2016) 引入 X Protocol（端口 33060），MySQL 8.0 进一步扩展，原生支持异步迭代器：
 
 ```java
 // X DevAPI Java 8+
